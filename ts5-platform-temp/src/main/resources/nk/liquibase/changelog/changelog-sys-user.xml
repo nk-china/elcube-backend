@@ -1,0 +1,60 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <!--
+    -->
+
+    <changeSet id="SYS_ACCOUNT-01" author="bean">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="SYS_ACCOUNT" />
+            </not>
+        </preConditions>
+        <comment />
+        <createTable tableName="SYS_ACCOUNT" remarks="">
+            <column name="ID"             		type="${type.uuid}"     remarks=""><constraints primaryKey="true" /></column>
+            <column name="USERNAME"             type="${type.uuid}"     remarks="" />
+            <column name="PASSWORD"             type="${type.uuid}"     remarks="" />
+            <column name="LOCKED"             	type="${type.int6}"     remarks="" />
+            <column name="VALID_FROM"           type="${type.desc}"     remarks="" />
+            <column name="VALID_TO"             type="${type.desc}"     remarks="" />
+            <column name="REALNAME"             type="${type.uuid}"     remarks="" />
+            <column name="CREATED_TIME"         type="${type.date}"     remarks="" />
+            <column name="UPDATED_TIME"         type="${type.date}"     remarks="" />
+            <column name="LAST_ACTIVED"         type="${type.date}"     remarks="" />
+            <column name="OBJECT_ID"            type="${type.uuid}"     remarks="" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="SYS_ACCOUNT_DATA_INIT-01" author="bean" runAlways="true">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(1) FROM SYS_ACCOUNT WHERE ID = 'nk-default-admin';
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            INSERT INTO SYS_ACCOUNT( ID , USERNAME , PASSWORD , LOCKED , VALID_FROM , VALID_TO , REALNAME , CREATED_TIME , UPDATED_TIME , LAST_ACTIVED , OBJECT_ID)
+            VALUES( 'nk-default-admin' , 'admin' , '7b2e9f54cdff413fcde01f330af6896c3cd7e6cd' , '0' , '00000000' , '20991231' , '系统管理员' , NULL , '0' , NULL , NULL);
+        </sql>
+    </changeSet>
+
+    <changeSet id="SYS_USER_SAVED_QUERY-01" author="bean">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="SYS_USER_SAVED_QUERY" />
+            </not>
+        </preConditions>
+        <comment />
+        <createTable tableName="SYS_USER_SAVED_QUERY" remarks="">
+            <column name="ID"             		type="${type.uuid}"     remarks=""><constraints primaryKey="true" /></column>
+            <column name="NAME"             	type="${type.desc}"     remarks="" />
+            <column name="JSON"             	type="${type.clob}"     remarks="" />
+            <column name="USER_ID"             	type="${type.uuid}"     remarks="" />
+            <column name="SOURCE"             	type="${type.uuid}"     remarks="" />
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

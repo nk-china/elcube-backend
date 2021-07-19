@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE generatorConfiguration PUBLIC
+		"-//mybatis.org//DTD MyBatis Generator Configuration 1.0//EN"
+		"http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
+<generatorConfiguration>
+
+	<context id="context1">
+		
+		<property name="javaFileEncoding" value="UTF-8"/>
+		
+		<plugin type="org.beanopen.tools.mybatis.generator.MySQLPaginationPlugin2" />
+		<plugin type="org.beanopen.tools.mybatis.generator.WsDocPlugin">
+			<property name="annotationType" value="cn.nkpro.ts5.basic.wsdoc.annotation.CodeFieldNotes" />
+		</plugin>
+		<plugin type="org.beanopen.tools.mybatis.generator.ZJsonIgnorePropertiesPlugin" />
+		<plugin type="org.mybatis.generator.plugins.SerializablePlugin" />
+		
+		<commentGenerator type="org.beanopen.tools.mybatis.generator.WsDocCommentGenerator">
+			<property name="suppressDate" value="true"/>
+		</commentGenerator>
+
+		<jdbcConnection driverClass="com.mysql.jdbc.Driver" connectionURL="jdbc:mysql://121.36.76.251:3306/tfms" userId="root" password="VTOZ8clUpSerX6hI" />
+        <javaTypeResolver type="org.beanopen.tools.mybatis.generator.ZJavaTypeResolverDefaultImpl">
+            <property name="forceBigDecimals" value="false" />
+        </javaTypeResolver>
+
+		<javaModelGenerator targetPackage="cn.nkpro.tfms.platform.model.po" targetProject="src/main/java" />
+		<sqlMapGenerator targetPackage="cn.nkpro.tfms.platform.mappers.gen" targetProject="src/main/resources" />
+		<javaClientGenerator targetPackage="cn.nkpro.tfms.platform.mappers.gen" targetProject="src/main/java" type="XMLMAPPER" />
+
+
+		<!-- 基础组件 -->
+
+		<table tableName="sys_account"		 			 	enableDeleteByExample="false"/>
+		<table tableName="sys_auth_group"			 	 	enableDeleteByExample="false"/>
+		<table tableName="sys_auth_group_ref"			 	enableDeleteByExample="true"/>
+		<table tableName="sys_auth_permission"			 	enableDeleteByExample="false"/>
+		<table tableName="sys_auth_limit"			 	 	enableDeleteByExample="false"/>
+
+		<table tableName="sys_webapp_menu"				 	enableDeleteByExample="true"/>
+		<table tableName="sys_user_saved_query"			 	enableDeleteByExample="false"/>
+		<table tableName="sys_user_dashboard"			 	enableDeleteByExample="false"/>
+		<table tableName="sys_user_dashboard_ref"			enableDeleteByExample="true"/>
+
+		<table tableName="sys_log_doc_record"			 	enableDeleteByExample="false"/>
+
+		<table tableName="def_constant"					 	enableDeleteByExample="true"/>
+		<table tableName="def_script"					 	enableDeleteByExample="false"/>
+
+		<table tableName="def_project_type"				 	enableDeleteByExample="false"/>
+		<table tableName="def_project_doc"				 	enableDeleteByExample="true"/>
+		<table tableName="def_project_status"			 	enableDeleteByExample="true"/>
+
+		<table tableName="def_partner_role"				 	enableDeleteByExample="false"/>
+		<table tableName="def_partner_role_doc"			 	enableDeleteByExample="true"/>
+
+		<table tableName="def_workflow"					 	enableDeleteByExample="false"/>
+
+		<table tableName="def_doc_type"					 	enableDeleteByExample="false"/>
+		<table tableName="def_doc_component"			 	enableDeleteByExample="true"/>
+		<table tableName="def_doc_status"				 	enableDeleteByExample="true"/>
+		<table tableName="def_doc_index_rule"			 	enableDeleteByExample="true"/>
+		<table tableName="def_doc_bpm"					 	enableDeleteByExample="true"/>
+		<table tableName="def_doc_props"				 	enableDeleteByExample="true"/>
+
+		<table tableName="def_doc_partner_role"			 	enableDeleteByExample="true"/>
+		<table tableName="biz_doc_partner" 				 	enableDeleteByExample="true"/>
+
+
+		<table tableName="biz_partner" 					 	enableDeleteByExample="false"/>
+		<table tableName="biz_project" 					 	enableDeleteByExample="false"/>
+		<table tableName="biz_doc" 						 	enableDeleteByExample="false"/>
+		<table tableName="biz_doc_sys_status" 			 	enableDeleteByExample="true"/>
+		<table tableName="biz_doc_props"				 	enableDeleteByExample="true"/>
+
+
+		<table tableName="biz_org"						 	enableDeleteByExample="true"/>
+		<table tableName="biz_org_position_area"		 	enableDeleteByExample="true"/>
+		<table tableName="biz_org_position_bpm_prop"	 	enableDeleteByExample="true"/>
+		<table tableName="biz_org_area"					 	enableDeleteByExample="true"/>
+		<table tableName="biz_org_area_region"			 	enableDeleteByExample="true"/>
+
+
+		<table tableName="biz_doc_subject"				 	enableDeleteByExample="true"/>
+
+
+		<table tableName="def_service_status_manager" 	 	enableDeleteByExample="true"/>
+
+		<table tableName="def_modal_selector"			 	enableDeleteByExample="false"/>
+		<table tableName="def_doc_simple"			 	 	enableDeleteByExample="false"/>
+
+
+
+		<!--<table tableName="def_decision_cond"	enableDeleteByExample="false"/>-->
+		<!--<table tableName="def_decision_date"	enableDeleteByExample="false"/>-->
+		<!--<table tableName="def_decision_partner"	enableDeleteByExample="false"/>-->
+		<!--<table tableName="def_doc_oper" 		enableDeleteByExample="false"/>-->
+		<!--<table tableName="def_doc_workflow"		enableDeleteByExample="false"/>-->
+		<!--<table tableName="def_project_doc"		enableDeleteByExample="false"/>-->
+
+		<!--<table tableName="nk_fund" 				enableDeleteByExample="false"/>-->
+		<!--<table tableName="nk_project_commodity" enableDeleteByExample="false"/>-->
+		<!--<table tableName="nk_project_payment" 	enableDeleteByExample="false"/>-->
+		<!--<table tableName="nk_project_product" 	enableDeleteByExample="false"/>-->
+		<!--<table tableName="nk_project_state" 	enableDeleteByExample="false"/>-->
+	</context>
+
+</generatorConfiguration>

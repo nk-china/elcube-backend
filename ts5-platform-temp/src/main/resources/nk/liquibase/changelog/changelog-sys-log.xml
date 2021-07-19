@@ -1,0 +1,35 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <!--
+    -->
+
+    <changeSet id="SYS_LOG_DOC_RECORD-01" author="bean">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="SYS_LOG_DOC_RECORD" />
+            </not>
+        </preConditions>
+        <comment />
+        <createTable tableName="SYS_LOG_DOC_RECORD" remarks="">
+            <column name="ID"             		type="${type.uuid}"     remarks=""><constraints primaryKey="true" /></column>
+            <column name="DOC_ID"             	type="${type.uuid}"     remarks="" />
+            <column name="VERSION"             	type="${type.int6}"     remarks="" />
+            <column name="STATE_ORIGINAL"       type="${type.uuid}"     remarks="" />
+            <column name="STATE_ORIGINAL_DESC"  type="${type.uuid}"     remarks="" />
+            <column name="STATE"             	type="${type.uuid}"     remarks="" />
+            <column name="STATE_DESC"           type="${type.uuid}"     remarks="" />
+            <column name="CARD_NAMES"           type="${type.var2}"     remarks="" />
+            <column name="DATA"             	type="${type.clob}"     remarks="" />
+            <column name="USER_ID"             	type="${type.uuid}"     remarks="" />
+            <column name="USER_REALNAME"        type="${type.uuid}"     remarks="" />
+            <column name="SOURCE"             	type="${type.desc}"     remarks="" />
+            <column name="LOG_GROUP_ID"         type="${type.uuid}"     remarks="" />
+            <column name="UPDATED_TIME"         type="${type.date}"     remarks="" />
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

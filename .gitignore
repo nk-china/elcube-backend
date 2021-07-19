@@ -1,0 +1,8 @@
+/*/target/
+.idea
+**/*.iml
+*.iml
+/logs/
+/nk-tfms-platform-lcv/logs/
+**/application-local-*.yml
+
