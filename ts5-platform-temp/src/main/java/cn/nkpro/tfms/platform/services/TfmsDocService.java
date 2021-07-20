@@ -1,12 +1,12 @@
 package cn.nkpro.tfms.platform.services;
 
 import cn.nkpro.tfms.platform.custom.EnumDocClassify;
+import cn.nkpro.tfms.platform.elasticearch.ESPageList;
 import cn.nkpro.tfms.platform.elasticearch.ESRoot;
-import cn.nkpro.tfms.platform.exception.TfmsSearchException;
 import cn.nkpro.tfms.platform.model.BizDocBase;
 import cn.nkpro.tfms.platform.model.index.IndexDoc;
 import cn.nkpro.tfms.platform.model.po.DefDocType;
-import cn.nkpro.tfms.platform.elasticearch.ESPageList;
+import cn.nkpro.ts5.exception.TfmsException;
 import com.alibaba.fastjson.JSONObject;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +19,7 @@ import java.util.List;
  */
 public interface TfmsDocService {
 
-    <T extends ESRoot> ESPageList<T> query(Class<T> docType, JSONObject params, QueryBuilder queryBuilder) throws TfmsSearchException;
+    <T extends ESRoot> ESPageList<T> query(Class<T> docType, JSONObject params, QueryBuilder queryBuilder) throws TfmsException;
 
     List<DefDocType> getDocTypes(String classify);
 

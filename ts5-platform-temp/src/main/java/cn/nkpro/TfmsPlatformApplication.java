@@ -18,5 +18,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class TfmsPlatformApplication {
     public static void main(String[] args) {
         SpringApplication.run(TfmsPlatformApplication.class, args);
+        System.out.println(cn.nkpro.ts5.cards.NkCardDate.class);
     }
 }

@@ -4,7 +4,6 @@ import cn.nkpro.tfms.platform.elasticearch.ESPageList;
 import cn.nkpro.tfms.platform.elasticearch.ESRoot;
 import cn.nkpro.tfms.platform.elasticearch.SearchEngine;
 import cn.nkpro.ts5.exception.TfmsException;
-import cn.nkpro.tfms.platform.exception.TfmsSearchException;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;

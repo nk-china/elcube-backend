@@ -9,8 +9,6 @@ import cn.nkpro.tfms.platform.custom.doc.TfmsDocProcessor;
 import cn.nkpro.tfms.platform.elasticearch.ESPageList;
 import cn.nkpro.tfms.platform.elasticearch.ESRoot;
 import cn.nkpro.tfms.platform.elasticearch.SearchEngine;
-import cn.nkpro.ts5.exception.TfmsIllegalContentException;
-import cn.nkpro.tfms.platform.exception.TfmsSearchException;
 import cn.nkpro.tfms.platform.mappers.gen.BizDocMapper;
 import cn.nkpro.tfms.platform.model.BizDocBase;
 import cn.nkpro.tfms.platform.model.DefDocTypeBO;
@@ -20,6 +18,8 @@ import cn.nkpro.tfms.platform.model.po.BizDoc;
 import cn.nkpro.tfms.platform.model.po.BizDocExample;
 import cn.nkpro.tfms.platform.model.po.DefDocType;
 import cn.nkpro.tfms.platform.services.*;
+import cn.nkpro.ts5.exception.TfmsException;
+import cn.nkpro.ts5.exception.TfmsIllegalContentException;
 import cn.nkpro.ts5.supports.RedisSupport;
 import cn.nkpro.ts5.supports.SequenceSupport;
 import cn.nkpro.ts5.utils.BeanUtilz;
@@ -78,10 +78,10 @@ public class TfmsDocEngineServiceImpl extends TfmsDocEngineBaseImpl implements T
      * @param queryBuilder  预编译的前置查询条件
      * @param <T>           索引类型
      * @return  返回索引列表
-     * @throws TfmsSearchException 搜索引擎错误
+     * @throws TfmsException 搜索引擎错误
      */
     @Override
-    public <T extends ESRoot> ESPageList<T> query(Class<T> docType, JSONObject params, QueryBuilder queryBuilder) throws TfmsSearchException {
+    public <T extends ESRoot> ESPageList<T> query(Class<T> docType, JSONObject params, QueryBuilder queryBuilder) throws TfmsException {
         return indexService.queryList(docType, queryBuilder,params);
     }
 

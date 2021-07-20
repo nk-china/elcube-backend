@@ -69,10 +69,15 @@ spring:
       connection-timeout: 1s
       read-timeout: 30s
   liquibase:
+    enabled: false
     change-log: classpath:nk/liquibase/master.xml
     database-change-log-table: SYS_DATABASECHANGEDLOG
     database-change-log-lock-table: SYS_DATABASECHANGEDLOG_LOK
     drop-first: true
+  devtools:
+    restart:
+      enabled: true
+
 
 logging:
   config: classpath:logging-config.xml
@@ -81,3 +86,6 @@ logging:
 mybatis:
   config-location: classpath:/mybatis-configuration.xml
   dialect: cn.nkpro.ts5.config.mybatis.pagination.dialect.MySQLDialect
+
+flowable:
+  database-schema-update: false
