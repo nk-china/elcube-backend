@@ -1,9 +1,9 @@
 package cn.nkpro.ts5.supports.defaults.file;
 
-import cn.nkpro.tfms.platform.model.NkFileUploadStatus;
-import cn.nkpro.tfms.platform.services.TfmsSysAccountService;
-import cn.nkpro.ts5.supports.FileSupport;
 import cn.nkpro.ts5.config.nk.NKProperties;
+import cn.nkpro.ts5.services.TfmsSysAccountService;
+import cn.nkpro.ts5.supports.FileSupport;
+import cn.nkpro.ts5.supports.NkFileUploadStatus;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;

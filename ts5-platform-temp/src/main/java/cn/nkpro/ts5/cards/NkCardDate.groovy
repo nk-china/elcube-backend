@@ -1,14 +1,15 @@
 package cn.nkpro.ts5.cards
 
-import cn.nkpro.tfms.platform.custom.TfmsAbstractCard
-import cn.nkpro.tfms.platform.model.BizDocBase
-import cn.nkpro.tfms.platform.model.DefDocTypeBO
+
+import cn.nkpro.ts5.engine.doc.NKAbstractCard
+import cn.nkpro.ts5.engine.doc.model.DocDefHV
+import cn.nkpro.ts5.engine.doc.model.DocHV
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 
 @Component
-class NkCardDate extends TfmsAbstractCard<Map,Map>{
+class NkCardDate extends NKAbstractCard<Map,Map> {
 
     Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -27,23 +28,23 @@ class NkCardDate extends TfmsAbstractCard<Map,Map>{
 
     }
 
-    @Override
+    //@Override
     String getComponentDesc() {
         return null
     }
 
-    @Override
-    protected Map doGetData(BizDocBase doc, Map o) throws Exception {
+    //@Override
+    protected Map doGetData(DocHV doc, Map o) throws Exception {
         return null
     }
 
-    @Override
-    protected Map toCreate(BizDocBase doc, BizDocBase preDoc, DefDocTypeBO docDef, Map o) throws Exception {
+    //@Override
+    protected Map toCreate(DocHV doc, DocHV preDoc, DocDefHV docDef, Map o) throws Exception {
         return null
     }
 
-    @Override
-    protected void doUpdate(BizDocBase doc, DefDocTypeBO docDef, Map data, Map o) throws Exception {
+    //@Override
+    protected void doUpdate(DocHV doc, DocDefHV docDef, Map data, Map o) throws Exception {
 
     }
 }

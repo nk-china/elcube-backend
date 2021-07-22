@@ -1,6 +1,5 @@
 package cn.nkpro.ts5.config;
 
-import cn.nkpro.tfms.platform.controllers.ThreadLocalClearInterceptor;
 import cn.nkpro.ts5.config.mvc.CompressReturnHandler;
 import cn.nkpro.ts5.config.nk.NKProperties;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -16,6 +16,7 @@ public interface RedisSupport<T> {
 
     T getIfAbsent(String hash,String hashKey,Function<T> mapper) throws TfmsException;
     T getIfAbsent(String hash,String hashKey,boolean cacheNullValue,Function<T> mapper) throws TfmsException;
+    Map<String, T> getHashIfAbsent(String hash, Function<Map<String,T>> mapper);
     Map<String, T> getHash(String hash, Collection<String> keys);
     void putHash(String hash, String key, T value);
 

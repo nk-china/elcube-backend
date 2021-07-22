@@ -1,5 +1,8 @@
 package cn.nkpro.ts5.config;
 
+import cn.nkpro.ts5.config.nk.AliyunProperties;
+import cn.nkpro.ts5.config.nk.HuaweiProperties;
+import cn.nkpro.ts5.config.nk.NKProperties;
 import cn.nkpro.ts5.supports.FileSupport;
 import cn.nkpro.ts5.supports.GUID;
 import cn.nkpro.ts5.supports.RedisSupport;
@@ -9,9 +12,6 @@ import cn.nkpro.ts5.supports.defaults.DefaultSequenceSupportImpl;
 import cn.nkpro.ts5.supports.defaults.file.DefaultFileSupportAliyunOSS;
 import cn.nkpro.ts5.supports.defaults.file.DefaultFileSupportHuaweiOBS;
 import cn.nkpro.ts5.supports.defaults.file.DefaultFileSupportImpl;
-import cn.nkpro.ts5.config.nk.AliyunProperties;
-import cn.nkpro.ts5.config.nk.HuaweiProperties;
-import cn.nkpro.ts5.config.nk.NKProperties;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;

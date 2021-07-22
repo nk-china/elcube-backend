@@ -1,10 +1,10 @@
 package cn.nkpro.ts5.supports.defaults.file;
 
-import cn.nkpro.ts5.exception.TfmsIllegalContentException;
-import cn.nkpro.tfms.platform.model.NkFileUploadStatus;
-import cn.nkpro.ts5.supports.FileSupport;
 import cn.nkpro.ts5.config.nk.AliyunProperties;
 import cn.nkpro.ts5.config.nk.NKProperties;
+import cn.nkpro.ts5.exception.TfmsIllegalContentException;
+import cn.nkpro.ts5.supports.FileSupport;
+import cn.nkpro.ts5.supports.NkFileUploadStatus;
 import com.aliyun.oss.HttpMethod;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;

@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.config.security;
 
-import cn.nkpro.tfms.platform.model.SystemAccountBO;
+import cn.nkpro.ts5.model.SystemAccountBO;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
 import org.springframework.security.core.userdetails.UserDetails;
 

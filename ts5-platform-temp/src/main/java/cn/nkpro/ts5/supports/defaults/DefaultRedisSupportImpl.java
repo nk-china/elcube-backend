@@ -51,6 +51,21 @@ public class DefaultRedisSupportImpl<T> implements RedisSupport<T>,ApplicationCo
     }
 
     @Override
+    public Map<String,T> getHashIfAbsent(String hash, Function<Map<String,T>> mapper){
+        Assert.notNull(hash,"hash不能为空");
+
+        HashOperations<String,String,T> hashOperations = redisTemplate.opsForHash();
+        Map<String,T> value =  hashOperations.entries(hash);
+        if(value==null){
+            value = mapper.apply();
+            if(value != null){
+                hashOperations.putAll(hash,value);
+            }
+        }
+        return value;
+    }
+
+    @Override
     public Map<String,T> getHash(String hash, Collection<String> keys){
         Assert.notNull(hash,"hash不能为空");
 

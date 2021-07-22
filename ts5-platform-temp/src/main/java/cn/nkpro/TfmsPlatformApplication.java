@@ -11,7 +11,10 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 @EnableScheduling
 @EnableTransactionManagement
-@MapperScan(basePackages = {"cn.nkpro.tfms.platform.mappers",})
+@MapperScan(basePackages = {
+        "cn.nkpro.tfms.platform.mappers",
+        "cn.nkpro.ts5.model.mb",
+})
 @SpringBootApplication(scanBasePackages = {
         "cn.nkpro"
 })
