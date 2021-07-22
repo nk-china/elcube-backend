@@ -1,26 +1,44 @@
 package cn.nkpro.ts5.engine.doc;
 
+import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.model.mb.gen.DocDefI;
+import cn.nkpro.ts5.utils.SpringEmulated;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class NKAbstractCard<DT,DDT> implements NKCard<DT,DDT> {
+public abstract class NKAbstractCard<DT,DDT> implements NKCard<DT,DDT> {
 
     @Getter
     protected String cardHandler;
+
+    @Getter
+    protected String cardName;
+
+    public NKAbstractCard(){
+
+        this.cardHandler = parseComponentName();
+        this.cardName = Optional.ofNullable(getClass().getAnnotation(WsDocNote.class))
+                .map(WsDocNote::value)
+                .orElse(cardHandler);
+    }
+
+    @Override
+    public String desc() {
+        return cardHandler + " | " + cardName;
+    }
 
     public String getDataComponentName() {
         return cardHandler;
@@ -67,7 +85,7 @@ public class NKAbstractCard<DT,DDT> implements NKCard<DT,DDT> {
     @SuppressWarnings("all")
     public final DT getData(DocHV doc, DocDefI defI) throws Exception {
         // todo 从数据库中加载原始JSON数据
-        return (DT) doc.getData().get(defI.getItemKey());
+        return (DT) doc.getData().get(defI.getCardKey());
     }
 
     @Override
@@ -85,7 +103,7 @@ public class NKAbstractCard<DT,DDT> implements NKCard<DT,DDT> {
      */
     @SuppressWarnings("all")
     public final DT calculate(DocHV doc, DocDefHV docDef, DocDefI defI) throws Exception{
-        return (DT) doc.getData().get(defI.getItemKey());
+        return (DT) doc.getData().get(defI.getCardKey());
     }
 
     /**
@@ -143,5 +161,22 @@ public class NKAbstractCard<DT,DDT> implements NKCard<DT,DDT> {
             }
             return null;
         });
+    }
+
+
+
+    private String parseComponentName(){
+
+        Class<? extends NKAbstractCard> clazz = getClass();
+
+        Component component = clazz.getDeclaredAnnotation(Component.class);
+        if(component!=null && StringUtils.isNotBlank(component.value()))
+            return component.value();
+
+        Service service = clazz.getDeclaredAnnotation(Service.class);
+        if(service!=null && StringUtils.isNotBlank(service.value()))
+            return service.value();
+
+        return SpringEmulated.decapitalize(clazz.getSimpleName());
     }
 }

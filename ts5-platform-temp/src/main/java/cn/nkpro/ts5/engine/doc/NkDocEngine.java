@@ -47,23 +47,23 @@ public class NkDocEngine {
         // 获取单据行项目
         doInComponents(docId,def,false,(nkCard,docDefI)->{
 
-            Object itemData = redisSupportItem.getIfAbsent(docId, docDefI.getItemKey(), () -> {
+            Object itemData = redisSupportItem.getIfAbsent(docId, docDefI.getCardKey(), () -> {
 
                 // 从DB获取卡片数据
                 DocIKey docIKey = new DocIKey();
                 docIKey.setDocId(docId);
-                docIKey.setItemKey(docDefI.getItemKey());
+                docIKey.setItemKey(docDefI.getCardKey());
                 DocI docI = docIMapper.selectByPrimaryKey(docIKey);
 
                 // 调用卡片程序解析数据
                 try{
-                    return nkCard.afterGetData(docHV, docI.getItemContent(), docDefI.getItemContent());
+                    return nkCard.afterGetData(docHV, docI.getItemContent(), docDefI.getCardContent());
                 }finally {
                     docI.setItemContent(null);
                 }
             });
 
-            docHV.getData().put(docDefI.getItemKey(),itemData);
+            docHV.getData().put(docDefI.getCardKey(),itemData);
         });
 
         // 触发单据数据加载完成事件
@@ -89,7 +89,7 @@ public class NkDocEngine {
          */
         ThreadLocalContextHolder.lockBizDoc(docId);
         try{
-            List<DocDefIWithBLOBs> collect = defDocTypeBO.getItems()
+            List<DocDefIWithBLOBs> collect = defDocTypeBO.getCards()
                     .stream()
                     .sorted(Comparator.comparingInt(c -> (c.getCalcOrder() == null ? -1 : c.getCalcOrder())))
                     .collect(Collectors.toList());
@@ -105,7 +105,7 @@ public class NkDocEngine {
                     if(timesCalc>=times){
                         // 找到对应的组件实现类
                         runInComponents.run(
-                                customObjectManager.getCustomObject(defDocComponent.getItemHandler(), NKCard.class),
+                                customObjectManager.getCustomObject(defDocComponent.getCardHandler(), NKCard.class),
                                 defDocComponent);
                     }
 

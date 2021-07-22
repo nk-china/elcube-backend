@@ -3,7 +3,7 @@ package cn.nkpro.ts5.model.mb.gen;
 import java.io.Serializable;
 
 public class DocDefIWithBLOBs extends DocDefI implements Serializable {
-    private String itemContent;
+    private String cardContent;
 
     private String markdown;
 
@@ -16,12 +16,12 @@ public class DocDefIWithBLOBs extends DocDefI implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @cn.nkpro.ts5.basic.wsdoc.annotation.CodeFieldNotes("")
-    public String getItemContent() {
-        return itemContent;
+    public String getCardContent() {
+        return cardContent;
     }
 
-    public void setItemContent(String itemContent) {
-        this.itemContent = itemContent;
+    public void setCardContent(String cardContent) {
+        this.cardContent = cardContent;
     }
 
     @cn.nkpro.ts5.basic.wsdoc.annotation.CodeFieldNotes("")

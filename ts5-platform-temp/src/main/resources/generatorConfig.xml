@@ -34,6 +34,7 @@
 		<table tableName="nk_doc_i"		 					enableDeleteByExample="false" domainObjectName="DocI"/>
 		<table tableName="nk_doc_def_h"		 				enableDeleteByExample="false" domainObjectName="DocDefH"/>
 		<table tableName="nk_doc_def_i"		 				enableDeleteByExample="true"  domainObjectName="DocDefI"/>
+		<table tableName="nk_doc_def_state"				 	enableDeleteByExample="true"  domainObjectName="DocDefState"/>
 
 		<!-- 基础组件 -->
 
@@ -64,7 +65,6 @@
 
 		<table tableName="def_doc_type"					 	enableDeleteByExample="false"/>
 		<table tableName="def_doc_component"			 	enableDeleteByExample="true"/>
-		<table tableName="def_doc_status"				 	enableDeleteByExample="true"/>
 		<table tableName="def_doc_index_rule"			 	enableDeleteByExample="true"/>
 		<table tableName="def_doc_bpm"					 	enableDeleteByExample="true"/>
 		<table tableName="def_doc_props"				 	enableDeleteByExample="true"/>

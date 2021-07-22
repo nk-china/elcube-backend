@@ -194,6 +194,76 @@ public class DocDefIExample {
             criteria.add(new Criterion(condition, value1, value2));
         }
 
+        public Criteria andCardKeyIsNull() {
+            addCriterion("CARD_KEY is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyIsNotNull() {
+            addCriterion("CARD_KEY is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyEqualTo(String value) {
+            addCriterion("CARD_KEY =", value, "cardKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyNotEqualTo(String value) {
+            addCriterion("CARD_KEY <>", value, "cardKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyGreaterThan(String value) {
+            addCriterion("CARD_KEY >", value, "cardKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyGreaterThanOrEqualTo(String value) {
+            addCriterion("CARD_KEY >=", value, "cardKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyLessThan(String value) {
+            addCriterion("CARD_KEY <", value, "cardKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyLessThanOrEqualTo(String value) {
+            addCriterion("CARD_KEY <=", value, "cardKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyLike(String value) {
+            addCriterion("CARD_KEY like", value, "cardKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyNotLike(String value) {
+            addCriterion("CARD_KEY not like", value, "cardKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyIn(List<String> values) {
+            addCriterion("CARD_KEY in", values, "cardKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyNotIn(List<String> values) {
+            addCriterion("CARD_KEY not in", values, "cardKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyBetween(String value1, String value2) {
+            addCriterion("CARD_KEY between", value1, value2, "cardKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyNotBetween(String value1, String value2) {
+            addCriterion("CARD_KEY not between", value1, value2, "cardKey");
+            return (Criteria) this;
+        }
+
         public Criteria andDocTypeIsNull() {
             addCriterion("DOC_TYPE is null");
             return (Criteria) this;
@@ -264,76 +334,6 @@ public class DocDefIExample {
             return (Criteria) this;
         }
 
-        public Criteria andItemKeyIsNull() {
-            addCriterion("ITEM_KEY is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andItemKeyIsNotNull() {
-            addCriterion("ITEM_KEY is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andItemKeyEqualTo(String value) {
-            addCriterion("ITEM_KEY =", value, "itemKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andItemKeyNotEqualTo(String value) {
-            addCriterion("ITEM_KEY <>", value, "itemKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andItemKeyGreaterThan(String value) {
-            addCriterion("ITEM_KEY >", value, "itemKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andItemKeyGreaterThanOrEqualTo(String value) {
-            addCriterion("ITEM_KEY >=", value, "itemKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andItemKeyLessThan(String value) {
-            addCriterion("ITEM_KEY <", value, "itemKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andItemKeyLessThanOrEqualTo(String value) {
-            addCriterion("ITEM_KEY <=", value, "itemKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andItemKeyLike(String value) {
-            addCriterion("ITEM_KEY like", value, "itemKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andItemKeyNotLike(String value) {
-            addCriterion("ITEM_KEY not like", value, "itemKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andItemKeyIn(List<String> values) {
-            addCriterion("ITEM_KEY in", values, "itemKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andItemKeyNotIn(List<String> values) {
-            addCriterion("ITEM_KEY not in", values, "itemKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andItemKeyBetween(String value1, String value2) {
-            addCriterion("ITEM_KEY between", value1, value2, "itemKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andItemKeyNotBetween(String value1, String value2) {
-            addCriterion("ITEM_KEY not between", value1, value2, "itemKey");
-            return (Criteria) this;
-        }
-
         public Criteria andVersionIsNull() {
             addCriterion("VERSION is null");
             return (Criteria) this;
@@ -394,143 +394,143 @@ public class DocDefIExample {
             return (Criteria) this;
         }
 
-        public Criteria andItemHandlerIsNull() {
-            addCriterion("ITEM_HANDLER is null");
+        public Criteria andCardHandlerIsNull() {
+            addCriterion("CARD_HANDLER is null");
             return (Criteria) this;
         }
 
-        public Criteria andItemHandlerIsNotNull() {
-            addCriterion("ITEM_HANDLER is not null");
+        public Criteria andCardHandlerIsNotNull() {
+            addCriterion("CARD_HANDLER is not null");
             return (Criteria) this;
         }
 
-        public Criteria andItemHandlerEqualTo(String value) {
-            addCriterion("ITEM_HANDLER =", value, "itemHandler");
+        public Criteria andCardHandlerEqualTo(String value) {
+            addCriterion("CARD_HANDLER =", value, "cardHandler");
             return (Criteria) this;
         }
 
-        public Criteria andItemHandlerNotEqualTo(String value) {
-            addCriterion("ITEM_HANDLER <>", value, "itemHandler");
+        public Criteria andCardHandlerNotEqualTo(String value) {
+            addCriterion("CARD_HANDLER <>", value, "cardHandler");
             return (Criteria) this;
         }
 
-        public Criteria andItemHandlerGreaterThan(String value) {
-            addCriterion("ITEM_HANDLER >", value, "itemHandler");
+        public Criteria andCardHandlerGreaterThan(String value) {
+            addCriterion("CARD_HANDLER >", value, "cardHandler");
             return (Criteria) this;
         }
 
-        public Criteria andItemHandlerGreaterThanOrEqualTo(String value) {
-            addCriterion("ITEM_HANDLER >=", value, "itemHandler");
+        public Criteria andCardHandlerGreaterThanOrEqualTo(String value) {
+            addCriterion("CARD_HANDLER >=", value, "cardHandler");
             return (Criteria) this;
         }
 
-        public Criteria andItemHandlerLessThan(String value) {
-            addCriterion("ITEM_HANDLER <", value, "itemHandler");
+        public Criteria andCardHandlerLessThan(String value) {
+            addCriterion("CARD_HANDLER <", value, "cardHandler");
             return (Criteria) this;
         }
 
-        public Criteria andItemHandlerLessThanOrEqualTo(String value) {
-            addCriterion("ITEM_HANDLER <=", value, "itemHandler");
+        public Criteria andCardHandlerLessThanOrEqualTo(String value) {
+            addCriterion("CARD_HANDLER <=", value, "cardHandler");
             return (Criteria) this;
         }
 
-        public Criteria andItemHandlerLike(String value) {
-            addCriterion("ITEM_HANDLER like", value, "itemHandler");
+        public Criteria andCardHandlerLike(String value) {
+            addCriterion("CARD_HANDLER like", value, "cardHandler");
             return (Criteria) this;
         }
 
-        public Criteria andItemHandlerNotLike(String value) {
-            addCriterion("ITEM_HANDLER not like", value, "itemHandler");
+        public Criteria andCardHandlerNotLike(String value) {
+            addCriterion("CARD_HANDLER not like", value, "cardHandler");
             return (Criteria) this;
         }
 
-        public Criteria andItemHandlerIn(List<String> values) {
-            addCriterion("ITEM_HANDLER in", values, "itemHandler");
+        public Criteria andCardHandlerIn(List<String> values) {
+            addCriterion("CARD_HANDLER in", values, "cardHandler");
             return (Criteria) this;
         }
 
-        public Criteria andItemHandlerNotIn(List<String> values) {
-            addCriterion("ITEM_HANDLER not in", values, "itemHandler");
+        public Criteria andCardHandlerNotIn(List<String> values) {
+            addCriterion("CARD_HANDLER not in", values, "cardHandler");
             return (Criteria) this;
         }
 
-        public Criteria andItemHandlerBetween(String value1, String value2) {
-            addCriterion("ITEM_HANDLER between", value1, value2, "itemHandler");
+        public Criteria andCardHandlerBetween(String value1, String value2) {
+            addCriterion("CARD_HANDLER between", value1, value2, "cardHandler");
             return (Criteria) this;
         }
 
-        public Criteria andItemHandlerNotBetween(String value1, String value2) {
-            addCriterion("ITEM_HANDLER not between", value1, value2, "itemHandler");
+        public Criteria andCardHandlerNotBetween(String value1, String value2) {
+            addCriterion("CARD_HANDLER not between", value1, value2, "cardHandler");
             return (Criteria) this;
         }
 
-        public Criteria andItemNameIsNull() {
-            addCriterion("ITEM_NAME is null");
+        public Criteria andCardNameIsNull() {
+            addCriterion("CARD_NAME is null");
             return (Criteria) this;
         }
 
-        public Criteria andItemNameIsNotNull() {
-            addCriterion("ITEM_NAME is not null");
+        public Criteria andCardNameIsNotNull() {
+            addCriterion("CARD_NAME is not null");
             return (Criteria) this;
         }
 
-        public Criteria andItemNameEqualTo(String value) {
-            addCriterion("ITEM_NAME =", value, "itemName");
+        public Criteria andCardNameEqualTo(String value) {
+            addCriterion("CARD_NAME =", value, "cardName");
             return (Criteria) this;
         }
 
-        public Criteria andItemNameNotEqualTo(String value) {
-            addCriterion("ITEM_NAME <>", value, "itemName");
+        public Criteria andCardNameNotEqualTo(String value) {
+            addCriterion("CARD_NAME <>", value, "cardName");
             return (Criteria) this;
         }
 
-        public Criteria andItemNameGreaterThan(String value) {
-            addCriterion("ITEM_NAME >", value, "itemName");
+        public Criteria andCardNameGreaterThan(String value) {
+            addCriterion("CARD_NAME >", value, "cardName");
             return (Criteria) this;
         }
 
-        public Criteria andItemNameGreaterThanOrEqualTo(String value) {
-            addCriterion("ITEM_NAME >=", value, "itemName");
+        public Criteria andCardNameGreaterThanOrEqualTo(String value) {
+            addCriterion("CARD_NAME >=", value, "cardName");
             return (Criteria) this;
         }
 
-        public Criteria andItemNameLessThan(String value) {
-            addCriterion("ITEM_NAME <", value, "itemName");
+        public Criteria andCardNameLessThan(String value) {
+            addCriterion("CARD_NAME <", value, "cardName");
             return (Criteria) this;
         }
 
-        public Criteria andItemNameLessThanOrEqualTo(String value) {
-            addCriterion("ITEM_NAME <=", value, "itemName");
+        public Criteria andCardNameLessThanOrEqualTo(String value) {
+            addCriterion("CARD_NAME <=", value, "cardName");
             return (Criteria) this;
         }
 
-        public Criteria andItemNameLike(String value) {
-            addCriterion("ITEM_NAME like", value, "itemName");
+        public Criteria andCardNameLike(String value) {
+            addCriterion("CARD_NAME like", value, "cardName");
             return (Criteria) this;
         }
 
-        public Criteria andItemNameNotLike(String value) {
-            addCriterion("ITEM_NAME not like", value, "itemName");
+        public Criteria andCardNameNotLike(String value) {
+            addCriterion("CARD_NAME not like", value, "cardName");
             return (Criteria) this;
         }
 
-        public Criteria andItemNameIn(List<String> values) {
-            addCriterion("ITEM_NAME in", values, "itemName");
+        public Criteria andCardNameIn(List<String> values) {
+            addCriterion("CARD_NAME in", values, "cardName");
             return (Criteria) this;
         }
 
-        public Criteria andItemNameNotIn(List<String> values) {
-            addCriterion("ITEM_NAME not in", values, "itemName");
+        public Criteria andCardNameNotIn(List<String> values) {
+            addCriterion("CARD_NAME not in", values, "cardName");
             return (Criteria) this;
         }
 
-        public Criteria andItemNameBetween(String value1, String value2) {
-            addCriterion("ITEM_NAME between", value1, value2, "itemName");
+        public Criteria andCardNameBetween(String value1, String value2) {
+            addCriterion("CARD_NAME between", value1, value2, "cardName");
             return (Criteria) this;
         }
 
-        public Criteria andItemNameNotBetween(String value1, String value2) {
-            addCriterion("ITEM_NAME not between", value1, value2, "itemName");
+        public Criteria andCardNameNotBetween(String value1, String value2) {
+            addCriterion("CARD_NAME not between", value1, value2, "cardName");
             return (Criteria) this;
         }
 

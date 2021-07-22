@@ -3,16 +3,14 @@ package cn.nkpro.ts5.controller.def;
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
 import cn.nkpro.ts5.config.mvc.CompressResponse;
+import cn.nkpro.ts5.engine.doc.model.CardDescribe;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.service.NKDocDefService;
 import cn.nkpro.ts5.model.mb.gen.DocDefH;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
@@ -47,7 +45,7 @@ public class SysDocDefController {
             @WsDocNote("排序方式")
             @RequestParam(value = "order",      defaultValue = "")          String order
     ){
-        return defDocTypeService.getPage(docType,keyword,from,rows,orderField,order);
+        return defDocTypeService.getPage(docClassify,docType,keyword,from,rows,orderField,order);
     }
 
     @WsDocNote("2、获取单据配置详情")
@@ -58,19 +56,26 @@ public class SysDocDefController {
         return defDocTypeService.getDocDefined(docType, 1, true, true, true);
     }
 
-    @WsDocNote("4、获取选项")
+    @WsDocNote("3、更新单据配置")
     @ResponseBody
-    @RequestMapping("/type/options")
-    public Map<String, Object> options(){
-        return defDocTypeService.options();
-    }
-
-    @WsDocNote("5、更新单据配置")
-    @CompressResponse
     @RequestMapping("/type/update")
     public void update(
             @WsDocNote("更新模式")@RequestParam("create") Boolean create,
             @WsDocNote("单据配置对象")@RequestBody DocDefHV defDocTypeBO){
         defDocTypeService.doUpdate(defDocTypeBO, create, false);
+    }
+
+    @WsDocNote("4、获取选项")
+    @ResponseBody
+    @RequestMapping("/type/options")
+    public Map<String, Object> options(@WsDocNote("分类")@RequestParam(value="classify",required = false) String classify){
+        return defDocTypeService.options(classify);
+    }
+
+    @WsDocNote("5、获取卡片信息")
+    @ResponseBody
+    @RequestMapping("/card/{cardHandlerName}")
+    public CardDescribe cardDescribe(@WsDocNote("分类")@PathVariable String cardHandlerName){
+        return defDocTypeService.getCardDescribe(cardHandlerName);
     }
 }

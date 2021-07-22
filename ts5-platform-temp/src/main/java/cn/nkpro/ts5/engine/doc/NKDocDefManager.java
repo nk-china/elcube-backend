@@ -27,11 +27,11 @@ public class NKDocDefManager {
                 .andDocTypeEqualTo(docType)
                 .andVersionEqualTo(version);
 
-        def.setItems(
-                docDefIMapper.selectByExampleWithBLOBs(example)
-                        .stream()
-                        .collect(Collectors.toList())
-        );
+//        def.setItems(
+//                docDefIMapper.selectByExampleWithBLOBs(example)
+//                        .stream()
+//                        .collect(Collectors.toList())
+//        );
 
         return def;
     }

@@ -7,9 +7,9 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DocDefI extends DocDefIKey implements Serializable {
-    private String itemHandler;
+    private String cardHandler;
 
-    private String itemName;
+    private String cardName;
 
     private Integer orderBy;
 
@@ -32,21 +32,21 @@ public class DocDefI extends DocDefIKey implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @cn.nkpro.ts5.basic.wsdoc.annotation.CodeFieldNotes("")
-    public String getItemHandler() {
-        return itemHandler;
+    public String getCardHandler() {
+        return cardHandler;
     }
 
-    public void setItemHandler(String itemHandler) {
-        this.itemHandler = itemHandler;
+    public void setCardHandler(String cardHandler) {
+        this.cardHandler = cardHandler;
     }
 
     @cn.nkpro.ts5.basic.wsdoc.annotation.CodeFieldNotes("")
-    public String getItemName() {
-        return itemName;
+    public String getCardName() {
+        return cardName;
     }
 
-    public void setItemName(String itemName) {
-        this.itemName = itemName;
+    public void setCardName(String cardName) {
+        this.cardName = cardName;
     }
 
     @cn.nkpro.ts5.basic.wsdoc.annotation.CodeFieldNotes("")

@@ -3,9 +3,9 @@ package cn.nkpro.ts5.model.mb.gen;
 import java.io.Serializable;
 
 public class DocDefIKey implements Serializable {
-    private String docType;
+    private String cardKey;
 
-    private String itemKey;
+    private String docType;
 
     private Integer version;
 
@@ -18,21 +18,21 @@ public class DocDefIKey implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @cn.nkpro.ts5.basic.wsdoc.annotation.CodeFieldNotes("")
+    public String getCardKey() {
+        return cardKey;
+    }
+
+    public void setCardKey(String cardKey) {
+        this.cardKey = cardKey;
+    }
+
+    @cn.nkpro.ts5.basic.wsdoc.annotation.CodeFieldNotes("")
     public String getDocType() {
         return docType;
     }
 
     public void setDocType(String docType) {
         this.docType = docType;
-    }
-
-    @cn.nkpro.ts5.basic.wsdoc.annotation.CodeFieldNotes("")
-    public String getItemKey() {
-        return itemKey;
-    }
-
-    public void setItemKey(String itemKey) {
-        this.itemKey = itemKey;
     }
 
     @cn.nkpro.ts5.basic.wsdoc.annotation.CodeFieldNotes("")

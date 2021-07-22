@@ -2,12 +2,14 @@ package cn.nkpro.ts5.basic;
 
 import io.jsonwebtoken.lang.Assert;
 import org.apache.commons.lang3.StringUtils;
+import org.mvel2.util.Make;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -47,12 +49,16 @@ public class NKCustomObjectManager implements ApplicationContextAware {
         return list;
     }
 
-    public List<NKCustomObjectDesc> getCustomObjectDescriptionList(Class<? extends NKCustomObject> clazz, boolean emptyValue){
+    public List<NKCustomObjectDesc> getCustomObjectDescriptionList(Class<? extends NKCustomObject> clazz, boolean emptyValue, Predicate<Map.Entry<String,? extends NKCustomObject>> predicate){
+        if(predicate==null){
+            predicate = (e)-> true;
+        }
         List<NKCustomObjectDesc> list = applicationContext.getBeansOfType(clazz)
                 .entrySet()
                 .stream()
+                .filter(predicate)
                 .map((e)->new NKCustomObjectDesc(e.getKey(),e.getValue().desc()))
-                .sorted(Comparator.comparing(NKCustomObjectDesc::getKey))
+                .sorted(Comparator.comparing(NKCustomObjectDesc::getName))
                 .collect(Collectors.toList());
         if(emptyValue)
             list.add(0,new NKCustomObjectDesc(StringUtils.EMPTY,"空配置"));

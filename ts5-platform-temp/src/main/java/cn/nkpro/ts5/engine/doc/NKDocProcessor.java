@@ -5,22 +5,8 @@ import lombok.Getter;
 
 public interface NKDocProcessor extends NKCustomObject {
     enum EnumDocClassify {
-
-        PARTNER     ("伙伴"),
-        TRANSACTION ("交易")
-        ;
-
-        @Getter
-        private String desc;
-
-        EnumDocClassify(String desc){
-            this.desc = desc;
-        }
-
-        public boolean is(String classify) {
-            return this.name().equals(classify);
-        }
+        PARTNER,
+        TRANSACTION
     }
-
     EnumDocClassify classify();
 }

@@ -3,7 +3,7 @@
 nk:
   env-key: ts5-platform-beebattle-dev
   env-name: 研发环境 in BeeBattle
-  response-compress: true
+  response-compress: false
   file-root-path: /Users/ybo/Downloads/tfms
   #长度介于6-16位，且必须包含1个大写字母，1个小写字母，及1个特殊符号
   password-strategy: ^.*(?=.{6,16})(?=.*\d)(?=.*[A-Z]{1,})(?=.*[a-z]{1,})(?=.*[.!@#$%^&*?\(\)]).*$

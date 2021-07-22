@@ -8,6 +8,6 @@ public interface NKCustomObject {
         return false;
     }
     default String desc() {
-        return getClass().getName();
+        return getClass().getSimpleName();
     }
 }

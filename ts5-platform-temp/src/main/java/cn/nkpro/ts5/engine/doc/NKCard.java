@@ -3,6 +3,7 @@ package cn.nkpro.ts5.engine.doc;
 import cn.nkpro.ts5.basic.NKCustomObject;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.model.mb.gen.DocDefI;
+import org.apache.commons.lang3.ArrayUtils;
 
 public interface NKCard<DT,DDT> extends NKCustomObject {
 
@@ -12,7 +13,11 @@ public interface NKCard<DT,DDT> extends NKCustomObject {
      */
     String getCardHandler();
 
+    String getDataComponentName();
 
+    String[] getDefComponentNames();
+
+    String getCardName();
 
     Object afterCreate(DocHV doc, DocHV preDoc, DT data, DDT def);
 
