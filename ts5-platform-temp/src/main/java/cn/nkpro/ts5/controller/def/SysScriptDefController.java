@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 /**
  * Created by bean on 2020/7/17.
  */
-@WsDocNote("D4.脚本配置")
+@WsDocNote("D3.脚本配置")
 @Controller
 @RequestMapping("/def/script")
 @PreAuthorize("hasAnyAuthority('*:*','DEF:*','DEF:SCRIPT')")
@@ -53,7 +53,7 @@ public class SysScriptDefController {
 //        return scriptService.update(script);
 //    }
 
-    @WsDocNote("5、获取脚本的Groovy类名")
+    @WsDocNote("5.获取脚本的Groovy类名")
     @ResponseBody
     @RequestMapping("/class/{beanName}")
     public String className(@PathVariable("beanName") String beanName){

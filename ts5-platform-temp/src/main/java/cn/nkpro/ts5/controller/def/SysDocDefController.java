@@ -27,7 +27,7 @@ public class SysDocDefController {
     @Autowired
     private NKDocDefService defDocTypeService;
 
-    @WsDocNote("1、获取单据配置列表")
+    @WsDocNote("1.获取单据配置列表")
     @CompressResponse
     @RequestMapping("/type/page")
     public PageList<DocDefH> getPage(
@@ -51,14 +51,14 @@ public class SysDocDefController {
         return defDocTypeService.getPage(docClassify,docType,state, keyword,from,rows,orderField,order);
     }
 
-    @WsDocNote("3、更新单据配置")
+    @WsDocNote("2.获取所有单据类型")
     @ResponseBody
     @RequestMapping("/type/types")
     public List<DocDefH> types(){
         return defDocTypeService.getAllDocTypes();
     }
 
-    @WsDocNote("2、获取单据配置详情")
+    @WsDocNote("3.获取单据配置详情")
     @CompressResponse
     @RequestMapping(value = "/type/detail/{docType}/{version}")
     public DocDefHV detail(
@@ -66,7 +66,7 @@ public class SysDocDefController {
         return defDocTypeService.getDocDefined(docType, version, true, true);
     }
 
-    @WsDocNote("3、更新单据配置")
+    @WsDocNote("4.预处理编辑单据配置")
     @ResponseBody
     @RequestMapping("/type/edit")
     public DocDefHV edit(
@@ -74,7 +74,7 @@ public class SysDocDefController {
         return defDocTypeService.doEdit(def);
     }
 
-    @WsDocNote("3、更新单据配置")
+    @WsDocNote("5.更新单据配置")
     @ResponseBody
     @RequestMapping("/type/update")
     public DocDefHV update(
@@ -82,7 +82,7 @@ public class SysDocDefController {
         return defDocTypeService.doUpdate(def, false);
     }
 
-    @WsDocNote("3、创建一个新分支")
+    @WsDocNote("6.创建一个新分支")
     @ResponseBody
     @RequestMapping("/type/breach")
     public DocDefHV breach(
@@ -90,7 +90,7 @@ public class SysDocDefController {
         return defDocTypeService.doBreach(def);
     }
 
-    @WsDocNote("3、创建一个新分支")
+    @WsDocNote("7.激活配置")
     @ResponseBody
     @RequestMapping("/type/active")
     public DocDefHV active(
@@ -98,7 +98,7 @@ public class SysDocDefController {
         return defDocTypeService.doActive(def);
     }
 
-    @WsDocNote("3、创建一个新分支")
+    @WsDocNote("8.删除配置")
     @ResponseBody
     @RequestMapping("/type/delete")
     public void delete(
@@ -106,14 +106,14 @@ public class SysDocDefController {
         defDocTypeService.doDelete(def,false);
     }
 
-    @WsDocNote("4、获取选项")
+    @WsDocNote("9.获取单据配置的Options")
     @ResponseBody
     @RequestMapping("/type/options")
     public Map<String, Object> options(@WsDocNote("分类")@RequestParam(value="classify",required = false) String classify){
         return defDocTypeService.options(classify);
     }
 
-    @WsDocNote("5、获取卡片信息")
+    @WsDocNote("10.获取卡片信息")
     @ResponseBody
     @RequestMapping("/card/{cardHandlerName}")
     public DocDefIV cardDescribe(@WsDocNote("分类")@PathVariable String cardHandlerName){

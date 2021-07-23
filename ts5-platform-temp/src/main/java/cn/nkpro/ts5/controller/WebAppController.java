@@ -23,7 +23,7 @@ import java.util.List;
 public class WebAppController {
 
     @Autowired
-    private NKProperties toolkitProperties;
+    private NKProperties properties;
 
     @Autowired
     private TfmsSysWebappMenuService tfmsSysWebappMenuService;
@@ -33,21 +33,21 @@ public class WebAppController {
 //    private TfmsDefDocTypeService defDocTypeService;
 
 
-    @WsDocNote("11、加载Web主菜单")
+    @WsDocNote("1.获取环境名称")
     @ResponseBody
     @RequestMapping("/env")
     public String env(){
-        return toolkitProperties.getEnvName();
+        return properties.getEnvName();
     }
 
-    @WsDocNote("11、加载Web主菜单")
+    @WsDocNote("2.加载Web主菜单")
     @CompressResponse
     @RequestMapping("/menus")
     public List<SysWebappMenuBO> menus(){
         return tfmsSysWebappMenuService.getMenus(true);
     }
 
-    @WsDocNote("12、加载菜单详情")
+    @WsDocNote("3.加载菜单详情")
     @CompressResponse
     @RequestMapping("/menu/{id}")
     public SysWebappMenu menus(@PathVariable("id") String id){

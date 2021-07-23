@@ -8,9 +8,8 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.ClassUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.lang.annotation.Annotation;
@@ -24,7 +23,6 @@ public class WsDocAngularController implements ApplicationContextAware {
 
 	private ApplicationContext applicationContext;
 	private Class<Object> ctrlType = Object.class;
-	private ResourcePatternResolver resolver = new PathMatchingResourcePatternResolver();
 
 
 	@Value("${spring.application.name}")
@@ -38,7 +36,7 @@ public class WsDocAngularController implements ApplicationContextAware {
 
 	/**
 	 * 获取所有接口类
-	 * @return
+	 * @return 接口类
 	 */
 	@ResponseBody
 	@RequestMapping(value = "/controllers")
@@ -48,13 +46,13 @@ public class WsDocAngularController implements ApplicationContextAware {
 		beans.putAll(applicationContext.getBeansWithAnnotation(Controller.class));
 		beans.putAll(applicationContext.getBeansWithAnnotation(RestController.class));
 
-		List<Ctrl> ctrls = beans
+		return beans
 				.entrySet()
 				.stream()
-				.filter(entry -> entry.getValue().getClass().isAnnotationPresent(WsDocNote.class))
+				.filter(entry -> ClassUtils.getUserClass(entry.getValue()).isAnnotationPresent(WsDocNote.class))
 				.map(entry -> {
 
-					Class<?> controllerType = entry.getValue().getClass();
+					Class<?> controllerType = ClassUtils.getUserClass(entry.getValue());
 					WsDocNote nkController = controllerType.getAnnotation(WsDocNote.class);
 
 					Ctrl ctrlConfig = new Ctrl();
@@ -68,14 +66,12 @@ public class WsDocAngularController implements ApplicationContextAware {
 				})
 				.sorted()
 				.collect(Collectors.toList());
-
-		return ctrls;
 	}
 
 	/**
 	 * 获取接口类详情
-	 * @param beanName
-	 * @return
+	 * @param beanName beanName
+	 * @return 详情
 	 */
 	@ResponseBody
 	@RequestMapping("/controller/{beanName}")
@@ -83,7 +79,7 @@ public class WsDocAngularController implements ApplicationContextAware {
 
 		Object ctrl = applicationContext.getBean(beanName, ctrlType);
 
-		Class<? extends Object> controllerType = ctrl.getClass();
+		Class<?> controllerType = ClassUtils.getUserClass(ctrl);
 		WsDocNote ctrlNote = controllerType.getAnnotation(WsDocNote.class);
 
 		Ctrl ctrlConfig = new Ctrl();
@@ -97,8 +93,8 @@ public class WsDocAngularController implements ApplicationContextAware {
 
 	/**
 	 * 获取指定类的接口列表
-	 * @param controllerType
-	 * @return
+	 * @param controllerType controllerType
+	 * @return 获取指定类的接口列表
 	 */
 	private List<Fun> methods(Class<?> controllerType){
 
@@ -166,7 +162,7 @@ public class WsDocAngularController implements ApplicationContextAware {
 	 * 获取接口详情
 	 * @param beanName beanName
 	 * @param funcMapping funcMapping
-	 * @return
+	 * @return 获取接口详情
 	 */
 	@ResponseBody
 	@RequestMapping("/controller/{beanName}/{funcMapping}")
@@ -179,7 +175,7 @@ public class WsDocAngularController implements ApplicationContextAware {
 		String funcMappings1 = funcMappings.length>1?funcMappings[1]: StringUtils.EMPTY;
 
 		Object ctrl = applicationContext.getBean(beanName, ctrlType);
-		Method method = Arrays.stream(ctrl.getClass().getMethods())
+		Method method = Arrays.stream(ClassUtils.getUserClass(ctrl).getMethods())
 			.filter(item->{
 
 				if(!item.getName().equals(funcMappings0)){
@@ -196,14 +192,14 @@ public class WsDocAngularController implements ApplicationContextAware {
 		if(method==null)return null;
 
 		// crtl...
-		Class<? extends Object> controllerType = ctrl.getClass();
+		Class<?> controllerType = ClassUtils.getUserClass(ctrl);
 		RequestMapping ctrlRequestMapping = controllerType.getAnnotation(RequestMapping.class);
 		String ctrlMappingURL = ctrlRequestMapping != null ? ctrlRequestMapping.value()[0] : "";
 
 		// method...
-		Map<String, Object> methodConfig = new HashMap<String, Object>();
+		Map<String, Object> methodConfig = new HashMap<>();
 
-		String methodUrl = "";
+		String methodUrl;
 		RequestMapping methodRequestMapping = method.getAnnotation(RequestMapping.class);
 		if(methodRequestMapping!= null){
 			methodUrl = methodRequestMapping.value()[0];
