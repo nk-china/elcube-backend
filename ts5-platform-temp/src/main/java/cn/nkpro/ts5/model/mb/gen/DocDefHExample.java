@@ -274,52 +274,62 @@ public class DocDefHExample {
             return (Criteria) this;
         }
 
-        public Criteria andVersionEqualTo(Integer value) {
+        public Criteria andVersionEqualTo(String value) {
             addCriterion("VERSION =", value, "version");
             return (Criteria) this;
         }
 
-        public Criteria andVersionNotEqualTo(Integer value) {
+        public Criteria andVersionNotEqualTo(String value) {
             addCriterion("VERSION <>", value, "version");
             return (Criteria) this;
         }
 
-        public Criteria andVersionGreaterThan(Integer value) {
+        public Criteria andVersionGreaterThan(String value) {
             addCriterion("VERSION >", value, "version");
             return (Criteria) this;
         }
 
-        public Criteria andVersionGreaterThanOrEqualTo(Integer value) {
+        public Criteria andVersionGreaterThanOrEqualTo(String value) {
             addCriterion("VERSION >=", value, "version");
             return (Criteria) this;
         }
 
-        public Criteria andVersionLessThan(Integer value) {
+        public Criteria andVersionLessThan(String value) {
             addCriterion("VERSION <", value, "version");
             return (Criteria) this;
         }
 
-        public Criteria andVersionLessThanOrEqualTo(Integer value) {
+        public Criteria andVersionLessThanOrEqualTo(String value) {
             addCriterion("VERSION <=", value, "version");
             return (Criteria) this;
         }
 
-        public Criteria andVersionIn(List<Integer> values) {
+        public Criteria andVersionLike(String value) {
+            addCriterion("VERSION like", value, "version");
+            return (Criteria) this;
+        }
+
+        public Criteria andVersionNotLike(String value) {
+            addCriterion("VERSION not like", value, "version");
+            return (Criteria) this;
+        }
+
+        public Criteria andVersionIn(List<String> values) {
             addCriterion("VERSION in", values, "version");
             return (Criteria) this;
         }
 
-        public Criteria andVersionNotIn(List<Integer> values) {
+        public Criteria andVersionNotIn(List<String> values) {
             addCriterion("VERSION not in", values, "version");
             return (Criteria) this;
         }
 
-        public Criteria andVersionBetween(Integer value1, Integer value2) {
+        public Criteria andVersionBetween(String value1, String value2) {
             addCriterion("VERSION between", value1, value2, "version");
             return (Criteria) this;
         }
 
-        public Criteria andVersionNotBetween(Integer value1, Integer value2) {
+        public Criteria andVersionNotBetween(String value1, String value2) {
             addCriterion("VERSION not between", value1, value2, "version");
             return (Criteria) this;
         }
@@ -591,6 +601,66 @@ public class DocDefHExample {
 
         public Criteria andRefObjectTypeNotBetween(String value1, String value2) {
             addCriterion("REF_OBJECT_TYPE not between", value1, value2, "refObjectType");
+            return (Criteria) this;
+        }
+
+        public Criteria andDocEntranceIsNull() {
+            addCriterion("DOC_ENTRANCE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDocEntranceIsNotNull() {
+            addCriterion("DOC_ENTRANCE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDocEntranceEqualTo(Integer value) {
+            addCriterion("DOC_ENTRANCE =", value, "docEntrance");
+            return (Criteria) this;
+        }
+
+        public Criteria andDocEntranceNotEqualTo(Integer value) {
+            addCriterion("DOC_ENTRANCE <>", value, "docEntrance");
+            return (Criteria) this;
+        }
+
+        public Criteria andDocEntranceGreaterThan(Integer value) {
+            addCriterion("DOC_ENTRANCE >", value, "docEntrance");
+            return (Criteria) this;
+        }
+
+        public Criteria andDocEntranceGreaterThanOrEqualTo(Integer value) {
+            addCriterion("DOC_ENTRANCE >=", value, "docEntrance");
+            return (Criteria) this;
+        }
+
+        public Criteria andDocEntranceLessThan(Integer value) {
+            addCriterion("DOC_ENTRANCE <", value, "docEntrance");
+            return (Criteria) this;
+        }
+
+        public Criteria andDocEntranceLessThanOrEqualTo(Integer value) {
+            addCriterion("DOC_ENTRANCE <=", value, "docEntrance");
+            return (Criteria) this;
+        }
+
+        public Criteria andDocEntranceIn(List<Integer> values) {
+            addCriterion("DOC_ENTRANCE in", values, "docEntrance");
+            return (Criteria) this;
+        }
+
+        public Criteria andDocEntranceNotIn(List<Integer> values) {
+            addCriterion("DOC_ENTRANCE not in", values, "docEntrance");
+            return (Criteria) this;
+        }
+
+        public Criteria andDocEntranceBetween(Integer value1, Integer value2) {
+            addCriterion("DOC_ENTRANCE between", value1, value2, "docEntrance");
+            return (Criteria) this;
+        }
+
+        public Criteria andDocEntranceNotBetween(Integer value1, Integer value2) {
+            addCriterion("DOC_ENTRANCE not between", value1, value2, "docEntrance");
             return (Criteria) this;
         }
 

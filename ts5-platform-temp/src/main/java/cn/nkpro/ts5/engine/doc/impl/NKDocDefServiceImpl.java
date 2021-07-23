@@ -16,6 +16,7 @@ import cn.nkpro.ts5.model.mb.gen.*;
 import cn.nkpro.ts5.supports.RedisSupport;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
+import cn.nkpro.ts5.utils.VersioningUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
@@ -28,6 +29,7 @@ import org.springframework.util.Assert;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Created by bean on 2020/6/10.
@@ -51,15 +53,24 @@ public class NKDocDefServiceImpl implements NKDocDefService {
     private DocDefFlowMapper docDefFlowMapper;
 
     @Override
-    public PageList<DocDefH> getPage(String docClassify, String docType, String keyword, int from, int rows, String orderField, String order){
+    public PageList<DocDefH> getPage(String docClassify,
+                                     String docType,
+                                     String state,
+                                     String keyword,
+                                     int from,
+                                     int rows,
+                                     String orderField,
+                                     String order){
 
         DocDefHExample example = new DocDefHExample();
 
         DocDefHExample.Criteria criteria = example.createCriteria();
-        if(StringUtils.isNotBlank(docType))
+        if(StringUtils.isNotBlank(docClassify))
             criteria.andDocClassifyEqualTo(docClassify);
         if(StringUtils.isNotBlank(docType))
             criteria.andDocTypeEqualTo(docType);
+        if(StringUtils.isNotBlank(state))
+            criteria.andStateEqualTo(state);
         if(StringUtils.isNotBlank(keyword))
             criteria.andDocNameLike(String.format("%%%s%%",keyword));
         if(StringUtils.isNotBlank(orderField)){
@@ -69,15 +80,6 @@ public class NKDocDefServiceImpl implements NKDocDefService {
         PaginationContext context = PaginationContext.init();
         List<DocDefH> list = docDefHMapper.selectByExample(example, new RowBounds(from, rows));
         return new PageList<>(list,from, rows, context.getTotal());
-    }
-
-    @Override
-    public List<DocDefH> getDocTypes(){
-        DocDefHExample example = new DocDefHExample();
-        example.createCriteria().andVersionHeadEqualTo(1);
-        example.setOrderByClause("DOC_TYPE");
-
-        return docDefHMapper.selectByExample(example);
     }
 
 
@@ -97,48 +99,119 @@ public class NKDocDefServiceImpl implements NKDocDefService {
         return BeanUtilz.copyFromObject(customObjectManager.getCustomObject(cardHandlerName,NKCard.class), DocDefIV.class);
     }
 
+    /**
+     * 编辑前操作，如果当前版本已激活，那么增加Patch
+     * @param docDefHV
+     * @return
+     */
+    @Override
+    public DocDefHV doEdit(DocDefHV docDefHV){
+        if(StringUtils.equals(docDefHV.getState(),"Active")){
+            DocDefH lastUpdatedVersion = getLastUpdatedVersion(docDefHV.getDocType(), VersioningUtils.parseMinor(docDefHV.getVersion()));
+            // 增加Patch
+            docDefHV.setVersion(VersioningUtils.nextPatch(lastUpdatedVersion.getVersion()));
+            docDefHV.setValidFrom(null);
+            docDefHV.setValidTo(null);
+            docDefHV.setState("InActive");
+            return doUpdate(docDefHV,false);
+        }
+        return docDefHV;
+    }
+
+    /**
+     * 创建配置分支，增加Major
+     * @param docDefHV
+     * @return
+     */
     @Override
     public DocDefHV doBreach(DocDefHV docDefHV){
 
-        DocDefHExample example = new DocDefHExample();
-        example.createCriteria()
-                .andDocTypeEqualTo(docDefHV.getDocType());
-        example.setOrderByClause("VERSION desc");
+        if(docDefHV.getState().equals("Active")){
+            // 从已激活的版本创建分支，从当前最大版本 增加Major
+            DocDefH lastVersionDef = getLastUpdatedVersion(docDefHV.getDocType(),null);
+            docDefHV.setVersion(VersioningUtils.nextMajor(lastVersionDef.getVersion()));
+        }else{
+            // 从未激活的版本创建分支，从当前版本 增加Minor
+            DocDefH lastVersionDef = getLastUpdatedVersion(docDefHV.getDocType(),VersioningUtils.parseMajor(docDefHV.getVersion()));
+            docDefHV.setVersion(VersioningUtils.nextMinor(lastVersionDef.getVersion()));
+        }
+        docDefHV.setValidFrom(null);
+        docDefHV.setValidTo(null);
+        docDefHV.setState("InActive");
 
-        docDefHV.setVersion(
-            docDefHMapper.selectByExample(example, new RowBounds(0, 1))
-                .stream()
-                .findFirst()
-                .map(DocDefHKey::getVersion)
-                .orElse(0)
-            + 1
-        );
-        return doUpdate(docDefHV,true,false);
+        return doUpdate(docDefHV,false);
     }
 
+    /**
+     * 激活配置，增加Minor
+     * @param docDefHV
+     * @return
+     */
     @Override
-    public DocDefH doActive(DocDefHV docDefHV){
+    public DocDefHV doActive(DocDefHV docDefHV){
+
+        Assert.hasText(docDefHV.getValidFrom(),"请设定有效起始日期");
+        Assert.hasText(docDefHV.getValidTo(),  "请设定有效起始日期");
+
+        DocDefH activeVersion = getActiveVersion(docDefHV.getDocType(), VersioningUtils.parseMajor(docDefHV.getVersion()));
+        if(activeVersion!=null) {
+            //Assert.isTrue(activeVersion.getVersion().compareTo(docDefHV.getVersion())<0,
+            //        String.format("当前版本比激活版本[%s]低，不允许激活",activeVersion.getVersion()));
+            doDelete(activeVersion,true);
+        }
+
         docDefHV.setState("Active");
-        return doUpdate(docDefHV,false,false);
+        return doUpdate(docDefHV,false);
     }
 
     @Override
-    public DocDefHV doUpdate(DocDefHV docDefHV, boolean create, boolean force){
+    public void doDelete(DocDefH docDefHV, boolean force){
+        if(!force){
+            Assert.isTrue(!docDefHV.getState().equals("Active"),"已激活版本不能删除");
+        }
+        DocDefStateExample stateExample = new DocDefStateExample();
+        stateExample.createCriteria()
+                .andDocTypeEqualTo(docDefHV.getDocType())
+                .andVersionEqualTo(docDefHV.getVersion());
+        docDefStateMapper.deleteByExample(stateExample);
 
-        /*
-         * 获取修改前的详情
-         */
-        DocDefH exists = docDefHMapper.selectByPrimaryKey(docDefHV);
-        Assert.isTrue(force || !create || exists==null,
-                String.format("单据类型%s已存在",docDefHV.getDocType()));
+        DocDefFlowExample flowExample = new DocDefFlowExample();
+        flowExample.createCriteria()
+                .andDocTypeEqualTo(docDefHV.getDocType())
+                .andVersionEqualTo(docDefHV.getVersion());
+        docDefFlowMapper.deleteByExample(flowExample);
 
-        Assert.isTrue(Pattern.matches("^[A-Z0-9]{4}$",docDefHV.getDocType()),
-                "单据类型必须为A-Z以及0-9组成的4位字符串");
+        DocDefIExample defIExample = new DocDefIExample();
+        defIExample.createCriteria()
+                .andDocTypeEqualTo(docDefHV.getDocType())
+                .andVersionEqualTo(docDefHV.getVersion());
+        docDefIMapper.deleteByExample(defIExample);
 
-        NKDocProcessor docProcessor = customObjectManager.getCustomObject(docDefHV.getRefObjectType(), NKDocProcessor.class);
+        docDefHMapper.deleteByPrimaryKey(docDefHV);
+        redisSupport.delete(String.format(Constants.CACHE_DEF_DOC,docDefHV.getDocType(),docDefHV.getVersion()));
+    }
 
-        if(!create){
-            Assert.isTrue(StringUtils.equals(exists.getDocClassify(),docProcessor.classify().name()),"对象扩展分类不一致");
+    /**
+     * 保存配置
+     * @param docDefHV
+     * @param force
+     * @return
+     */
+    @Override
+    public DocDefHV doUpdate(DocDefHV docDefHV, boolean force){
+
+        Assert.isTrue(Pattern.matches("^[A-Z0-9]{4}$",docDefHV.getDocType()),"单据类型必须为A-Z以及0-9组成的4位字符串");
+
+        NKDocProcessor  docProcessor        = customObjectManager.getCustomObject(docDefHV.getRefObjectType(), NKDocProcessor.class);
+        DocDefH         lastUpdatedVersion  = getLastUpdatedVersion(docDefHV.getDocType(),docDefHV.getVersion());
+
+        // 数据有效性检查
+        if(StringUtils.isBlank(docDefHV.getVersion())){
+            // 如果版本号为空，表示新创建的一个单据类型，需要检查是否已存在
+            Assert.isTrue(force  || lastUpdatedVersion==null, String.format("单据类型%s已存在",docDefHV.getDocType()));
+            docDefHV.setVersion("1.0.0");
+        }else if(lastUpdatedVersion!=null){
+            Assert.isTrue(StringUtils.equals(lastUpdatedVersion.getDocClassify(),docProcessor.classify().name()),"对象扩展分类不一致");
         }
 
         // status
@@ -162,6 +235,8 @@ public class NKDocDefServiceImpl implements NKDocDefService {
                 });
 
         // flow
+        docDefHV.setDocEntrance(0);
+
         Assert.notEmpty(docDefHV.getFlows(),"业务流不能为空");
         DocDefFlowExample flowExample = new DocDefFlowExample();
         flowExample.createCriteria()
@@ -178,6 +253,11 @@ public class NKDocDefServiceImpl implements NKDocDefService {
                     flow.setUpdatedTime(DateTimeUtilz.nowSeconds());
 
                     docDefFlowMapper.insert(flow);
+
+                    // 设置入口单据标识
+                    if(StringUtils.equals(flow.getPreDocType(),"@")){
+                        docDefHV.setDocEntrance(1);
+                    }
                 });
 
 
@@ -205,7 +285,7 @@ public class NKDocDefServiceImpl implements NKDocDefService {
         docDefHV.setDocClassify(docProcessor.classify().name());
         docDefHV.setMarkdownFlag(StringUtils.isBlank(docDefHV.getMarkdown())?0:1);
         docDefHV.setUpdatedTime(DateTimeUtilz.nowSeconds());
-        if(exists==null){
+        if(docDefHMapper.selectByPrimaryKey(docDefHV)==null){
             docDefHMapper.insertSelective(docDefHV);
         }else{
             docDefHMapper.updateByPrimaryKeySelective(docDefHV);
@@ -214,6 +294,50 @@ public class NKDocDefServiceImpl implements NKDocDefService {
         redisSupport.delete(String.format(Constants.CACHE_DEF_DOC,docDefHV.getDocType(),docDefHV.getVersion()));
 
         return docDefHV;
+    }
+
+    @Override
+    public List<DocDefH> getAllDocTypes(){
+
+        Map<String,DocDefH> cache = new HashMap<>();
+
+        DocDefHExample example = new DocDefHExample();
+        example.setOrderByClause("DOC_TYPE");
+
+        docDefHMapper.selectByExample(example)
+                .forEach(docDefH -> cache.computeIfAbsent(docDefH.getDocType(),(e)-> docDefH));
+
+        return cache.values().stream()
+                .sorted(Comparator.comparing(DocDefH::getDocType))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<DocDefH> getEntrance(String classify){
+
+        String today = DateTimeUtilz.todayShortString();
+
+        DocDefHExample example = new DocDefHExample();
+        DocDefHExample.Criteria criteria = example.createCriteria()
+                .andValidFromLessThanOrEqualTo(today)
+                .andValidToGreaterThanOrEqualTo(today)
+                .andDocEntranceEqualTo(1)
+                .andStateEqualTo("Active");
+
+        if(StringUtils.isNotBlank(classify)){
+            criteria.andDocClassifyEqualTo(classify);
+        }
+
+        example.setOrderByClause("DOC_TYPE, VERSION DESC");
+
+        Map<String,DocDefH> cache = new HashMap<>();
+        docDefHMapper
+                .selectByExample(example)
+                .forEach(docDefH -> cache.computeIfAbsent(docDefH.getDocType(),(e)-> docDefH));
+
+        return cache.values().stream()
+                .sorted(Comparator.comparing(DocDefH::getDocName))
+                .collect(Collectors.toList());
     }
 
     /**
@@ -251,7 +375,7 @@ public class NKDocDefServiceImpl implements NKDocDefService {
      * @return DocDefHV
      */
     @Override
-    public DocDefHV getDocDefined(String docType,Integer version, boolean includeComponentMarkdown, boolean ignoreError){
+    public DocDefHV getDocDefined(String docType,String version, boolean includeComponentMarkdown, boolean ignoreError){
         String cacheKey = String.format(Constants.CACHE_DEF_DOC,docType,version);
 
         DocDefHV docDefHV = redisSupport.getIfAbsent(cacheKey,StringUtils.EMPTY,()->{
@@ -385,6 +509,42 @@ public class NKDocDefServiceImpl implements NKDocDefService {
 //            ((JSONArray)data).toJavaList(DocDefHV.class)
 //                .forEach(DocDefHV -> doUpdate(DocDefHV,true,true));
 //    }
+
+
+    private DocDefH getActiveVersion(String docType,String major){
+        DocDefHExample example = new DocDefHExample();
+        example.createCriteria()
+                .andDocTypeEqualTo(docType)
+                .andStateEqualTo("Active")
+                .andVersionLike(major+".%");
+        example.setOrderByClause("VERSION desc");
+
+        return docDefHMapper.selectByExample(example, new RowBounds(0, 1))
+                .stream()
+                .findFirst()
+                .orElse(null);
+    }
+    /**
+     * 获取同一个Major版本的最后一次更新
+     * @param docType
+     * @param versionPrefix
+     * @return
+     */
+    private DocDefH getLastUpdatedVersion(String docType,String versionPrefix){
+
+        String major = StringUtils.isBlank(versionPrefix)?"%":(versionPrefix + ".%");
+
+        DocDefHExample example = new DocDefHExample();
+        example.createCriteria()
+                .andDocTypeEqualTo(docType)
+                .andVersionLike(major);
+        example.setOrderByClause("VERSION desc");
+
+        return docDefHMapper.selectByExample(example, new RowBounds(0, 1))
+                .stream()
+                .findFirst()
+                .orElse(null);
+    }
 
     @FunctionalInterface
     private interface RunInComponents{

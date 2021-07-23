@@ -1,5 +1,6 @@
 package cn.nkpro.ts5.engine.doc;
 
+import cn.nkpro.ts5.engine.doc.impl.NkDocEngineImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -7,8 +8,8 @@ import org.springframework.context.annotation.Configuration;
 public class NKDocEngineAutoConfiguration {
 
     @Bean
-    public NkDocEngine nkDocEngine(){
-        return new NkDocEngine();
+    public NkDocEngineImpl nkDocEngine(){
+        return new NkDocEngineImpl();
     }
     @Bean
     public NKDocDefManager nkDocDefManager(){

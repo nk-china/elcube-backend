@@ -8,7 +8,7 @@
     -->
     <id column="CARD_KEY" jdbcType="VARCHAR" property="cardKey" />
     <id column="DOC_TYPE" jdbcType="VARCHAR" property="docType" />
-    <id column="VERSION" jdbcType="INTEGER" property="version" />
+    <id column="VERSION" jdbcType="VARCHAR" property="version" />
     <result column="CARD_HANDLER" jdbcType="VARCHAR" property="cardHandler" />
     <result column="CARD_NAME" jdbcType="VARCHAR" property="cardName" />
     <result column="ORDER_BY" jdbcType="INTEGER" property="orderBy" />
@@ -157,7 +157,7 @@
     from nk_doc_def_i
     where CARD_KEY = #{cardKey,jdbcType=VARCHAR}
       and DOC_TYPE = #{docType,jdbcType=VARCHAR}
-      and VERSION = #{version,jdbcType=INTEGER}
+      and VERSION = #{version,jdbcType=VARCHAR}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="cn.nkpro.ts5.model.mb.gen.DocDefIKey">
     <!--
@@ -167,7 +167,7 @@
     delete from nk_doc_def_i
     where CARD_KEY = #{cardKey,jdbcType=VARCHAR}
       and DOC_TYPE = #{docType,jdbcType=VARCHAR}
-      and VERSION = #{version,jdbcType=INTEGER}
+      and VERSION = #{version,jdbcType=VARCHAR}
   </delete>
   <delete id="deleteByExample" parameterType="cn.nkpro.ts5.model.mb.gen.DocDefIExample">
     <!--
@@ -189,7 +189,7 @@
       CALC_ORDER, CALC_TIMES, EDITABLE_SP_E_L, 
       MARKDOWN_FLAG, UPDATED_TIME, CARD_CONTENT, 
       MARKDOWN)
-    values (#{cardKey,jdbcType=VARCHAR}, #{docType,jdbcType=VARCHAR}, #{version,jdbcType=INTEGER}, 
+    values (#{cardKey,jdbcType=VARCHAR}, #{docType,jdbcType=VARCHAR}, #{version,jdbcType=VARCHAR}, 
       #{cardHandler,jdbcType=VARCHAR}, #{cardName,jdbcType=VARCHAR}, #{orderBy,jdbcType=INTEGER}, 
       #{calcOrder,jdbcType=INTEGER}, #{calcTimes,jdbcType=INTEGER}, #{editableSpEL,jdbcType=VARCHAR}, 
       #{markdownFlag,jdbcType=INTEGER}, #{updatedTime,jdbcType=BIGINT}, #{cardContent,jdbcType=LONGVARCHAR}, 
@@ -250,7 +250,7 @@
         #{docType,jdbcType=VARCHAR},
       </if>
       <if test="version != null">
-        #{version,jdbcType=INTEGER},
+        #{version,jdbcType=VARCHAR},
       </if>
       <if test="cardHandler != null">
         #{cardHandler,jdbcType=VARCHAR},
@@ -308,7 +308,7 @@
         DOC_TYPE = #{record.docType,jdbcType=VARCHAR},
       </if>
       <if test="record.version != null">
-        VERSION = #{record.version,jdbcType=INTEGER},
+        VERSION = #{record.version,jdbcType=VARCHAR},
       </if>
       <if test="record.cardHandler != null">
         CARD_HANDLER = #{record.cardHandler,jdbcType=VARCHAR},
@@ -353,7 +353,7 @@
     update nk_doc_def_i
     set CARD_KEY = #{record.cardKey,jdbcType=VARCHAR},
       DOC_TYPE = #{record.docType,jdbcType=VARCHAR},
-      VERSION = #{record.version,jdbcType=INTEGER},
+      VERSION = #{record.version,jdbcType=VARCHAR},
       CARD_HANDLER = #{record.cardHandler,jdbcType=VARCHAR},
       CARD_NAME = #{record.cardName,jdbcType=VARCHAR},
       ORDER_BY = #{record.orderBy,jdbcType=INTEGER},
@@ -376,7 +376,7 @@
     update nk_doc_def_i
     set CARD_KEY = #{record.cardKey,jdbcType=VARCHAR},
       DOC_TYPE = #{record.docType,jdbcType=VARCHAR},
-      VERSION = #{record.version,jdbcType=INTEGER},
+      VERSION = #{record.version,jdbcType=VARCHAR},
       CARD_HANDLER = #{record.cardHandler,jdbcType=VARCHAR},
       CARD_NAME = #{record.cardName,jdbcType=VARCHAR},
       ORDER_BY = #{record.orderBy,jdbcType=INTEGER},
@@ -429,7 +429,7 @@
     </set>
     where CARD_KEY = #{cardKey,jdbcType=VARCHAR}
       and DOC_TYPE = #{docType,jdbcType=VARCHAR}
-      and VERSION = #{version,jdbcType=INTEGER}
+      and VERSION = #{version,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKeyWithBLOBs" parameterType="cn.nkpro.ts5.model.mb.gen.DocDefIWithBLOBs">
     <!--
@@ -449,7 +449,7 @@
       MARKDOWN = #{markdown,jdbcType=LONGVARCHAR}
     where CARD_KEY = #{cardKey,jdbcType=VARCHAR}
       and DOC_TYPE = #{docType,jdbcType=VARCHAR}
-      and VERSION = #{version,jdbcType=INTEGER}
+      and VERSION = #{version,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="cn.nkpro.ts5.model.mb.gen.DocDefI">
     <!--
@@ -467,6 +467,6 @@
       UPDATED_TIME = #{updatedTime,jdbcType=BIGINT}
     where CARD_KEY = #{cardKey,jdbcType=VARCHAR}
       and DOC_TYPE = #{docType,jdbcType=VARCHAR}
-      and VERSION = #{version,jdbcType=INTEGER}
+      and VERSION = #{version,jdbcType=VARCHAR}
   </update>
 </mapper>

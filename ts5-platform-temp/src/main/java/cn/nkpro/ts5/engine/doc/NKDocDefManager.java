@@ -14,7 +14,7 @@ public class NKDocDefManager {
     @Autowired
     private DocDefIMapper docDefIMapper;
 
-    public DocDefHV getDef(String docType, Integer version){
+    public DocDefHV getDef(String docType, String version){
 
         DocDefHKey key = new DocDefHKey();
         key.setDocType(docType);

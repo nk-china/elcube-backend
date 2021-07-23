@@ -1,7 +1,7 @@
 package nk.docengine;
 
 import cn.nkpro.TfmsPlatformApplication;
-import cn.nkpro.ts5.engine.doc.NkDocEngine;
+import cn.nkpro.ts5.engine.doc.impl.NkDocEngineImpl;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +15,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(classes={TfmsPlatformApplication.class})
 public class DocEngineTest {
     @Autowired
-    private NkDocEngine docEngine;
+    private NkDocEngineImpl docEngine;
 
     @Test
     public void test1(){

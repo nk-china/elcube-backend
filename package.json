@@ -1,0 +1,15 @@
+{
+  "name": "nk-ts5-beebattle-vue2",
+  "version": "0.0.1",
+  "private": false,
+  "author": "Bean <mailxbs@126.com>",
+  "main": "dist/index.umd.js",
+  "scripts": {
+  },
+  "dependencies": {
+    "ant-design-vue": "^1.5.6"
+  },
+  "devDependencies": {
+    "yarn": "^1.22.10"
+  }
+}

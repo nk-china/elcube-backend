@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -34,6 +35,8 @@ public class SysDocDefController {
             @RequestParam(value = "docClassify",required = false)           String docClassify,
             @WsDocNote("单据类型")
             @RequestParam(value = "docType",    required = false)           String docType,
+            @WsDocNote("状态")
+            @RequestParam(value = "state",      required = false)           String state,
             @WsDocNote("查询关键字")
             @RequestParam(value = "keyword",    required = false)           String keyword,
             @WsDocNote("起始条目")
@@ -45,32 +48,62 @@ public class SysDocDefController {
             @WsDocNote("排序方式")
             @RequestParam(value = "order",      defaultValue = "")          String order
     ){
-        return defDocTypeService.getPage(docClassify,docType,keyword,from,rows,orderField,order);
+        return defDocTypeService.getPage(docClassify,docType,state, keyword,from,rows,orderField,order);
+    }
+
+    @WsDocNote("3、更新单据配置")
+    @ResponseBody
+    @RequestMapping("/type/types")
+    public List<DocDefH> types(){
+        return defDocTypeService.getAllDocTypes();
     }
 
     @WsDocNote("2、获取单据配置详情")
     @CompressResponse
     @RequestMapping(value = "/type/detail/{docType}/{version}")
     public DocDefHV detail(
-            @WsDocNote(value = "单据类型") @PathVariable("docType") String docType, @PathVariable Integer version){
+            @WsDocNote(value = "单据类型") @PathVariable("docType") String docType, @PathVariable String version){
         return defDocTypeService.getDocDefined(docType, version, true, true);
+    }
+
+    @WsDocNote("3、更新单据配置")
+    @ResponseBody
+    @RequestMapping("/type/edit")
+    public DocDefHV edit(
+            @WsDocNote("单据配置对象")@RequestBody DocDefHV def){
+        return defDocTypeService.doEdit(def);
     }
 
     @WsDocNote("3、更新单据配置")
     @ResponseBody
     @RequestMapping("/type/update")
     public DocDefHV update(
-            @WsDocNote("更新模式")@RequestParam("create") Boolean create,
-            @WsDocNote("单据配置对象")@RequestBody DocDefHV defDocTypeBO){
-        return defDocTypeService.doUpdate(defDocTypeBO, create, false);
+            @WsDocNote("单据配置对象")@RequestBody DocDefHV def){
+        return defDocTypeService.doUpdate(def, false);
     }
 
     @WsDocNote("3、创建一个新分支")
     @ResponseBody
     @RequestMapping("/type/breach")
     public DocDefHV breach(
-            @WsDocNote("单据配置对象")@RequestBody DocDefHV defDocTypeBO){
-        return defDocTypeService.doBreach(defDocTypeBO);
+            @WsDocNote("单据配置对象")@RequestBody DocDefHV def){
+        return defDocTypeService.doBreach(def);
+    }
+
+    @WsDocNote("3、创建一个新分支")
+    @ResponseBody
+    @RequestMapping("/type/active")
+    public DocDefHV active(
+            @WsDocNote("单据配置对象")@RequestBody DocDefHV def){
+        return defDocTypeService.doActive(def);
+    }
+
+    @WsDocNote("3、创建一个新分支")
+    @ResponseBody
+    @RequestMapping("/type/delete")
+    public void delete(
+            @WsDocNote("单据配置对象")@RequestBody DocDefHV def){
+        defDocTypeService.doDelete(def,false);
     }
 
     @WsDocNote("4、获取选项")

@@ -43,17 +43,25 @@ public class CompressReturnHandler implements HandlerMethodReturnValueHandler {
         PropertyPreFilters filter = new PropertyPreFilters();
 
         HttpServletResponse response = nativeWebRequest.getNativeResponse(HttpServletResponse.class);
-        Annotation[] annos = methodParameter.getMethodAnnotations();
-        Arrays.asList(annos).forEach(anno -> {
-            if (anno instanceof JsonConfig) {
-                JsonConfig config = (JsonConfig) anno;
+        Annotation[] annotations = methodParameter.getMethodAnnotations();
+        Arrays.asList(annotations).forEach(annotation -> {
+            if (annotation instanceof JsonConfig) {
+                JsonConfig config = (JsonConfig) annotation;
                 filter.addFilter(config.type())
                         .addIncludes(config.includes())
                         .addExcludes(config.excludes());
             }
         });
 
-        String output = o==null? StringUtils.EMPTY:JSONObject.toJSONString(o,filter.toFilters(), SerializerFeature.DisableCircularReferenceDetect);
+        String output;
+        if(o==null){
+            output = StringUtils.EMPTY;
+        }else if(o instanceof CompressObject){
+            output = o.toString();
+        }else{
+            output = JSONObject.toJSONString(o,filter.toFilters(), SerializerFeature.DisableCircularReferenceDetect);
+        }
+
         if(responseCompress && methodParameter.hasMethodAnnotation(CompressResponse.class)){
             output = TextUtils.compress(output);
         }

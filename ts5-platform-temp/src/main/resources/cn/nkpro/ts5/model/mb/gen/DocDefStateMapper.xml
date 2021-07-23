@@ -9,7 +9,7 @@
     <id column="DOC_STATE" jdbcType="VARCHAR" property="docState" />
     <id column="DOC_TYPE" jdbcType="VARCHAR" property="docType" />
     <id column="PRE_DOC_STATE" jdbcType="VARCHAR" property="preDocState" />
-    <id column="VERSION" jdbcType="INTEGER" property="version" />
+    <id column="VERSION" jdbcType="VARCHAR" property="version" />
     <result column="DOC_STATE_DESC" jdbcType="VARCHAR" property="docStateDesc" />
     <result column="SYS_STATE" jdbcType="VARCHAR" property="sysState" />
     <result column="REF_OBJECT_TYPE" jdbcType="VARCHAR" property="refObjectType" />
@@ -121,7 +121,7 @@
     where DOC_STATE = #{docState,jdbcType=VARCHAR}
       and DOC_TYPE = #{docType,jdbcType=VARCHAR}
       and PRE_DOC_STATE = #{preDocState,jdbcType=VARCHAR}
-      and VERSION = #{version,jdbcType=INTEGER}
+      and VERSION = #{version,jdbcType=VARCHAR}
   </select>
   <delete id="deleteByPrimaryKey" parameterType="cn.nkpro.ts5.model.mb.gen.DocDefStateKey">
     <!--
@@ -132,7 +132,7 @@
     where DOC_STATE = #{docState,jdbcType=VARCHAR}
       and DOC_TYPE = #{docType,jdbcType=VARCHAR}
       and PRE_DOC_STATE = #{preDocState,jdbcType=VARCHAR}
-      and VERSION = #{version,jdbcType=INTEGER}
+      and VERSION = #{version,jdbcType=VARCHAR}
   </delete>
   <delete id="deleteByExample" parameterType="cn.nkpro.ts5.model.mb.gen.DocDefStateExample">
     <!--
@@ -154,7 +154,7 @@
       REF_OBJECT_TYPE, EDIT_PERM, UPDATED_TIME, 
       ACTION, ORDER_BY)
     values (#{docState,jdbcType=VARCHAR}, #{docType,jdbcType=VARCHAR}, #{preDocState,jdbcType=VARCHAR}, 
-      #{version,jdbcType=INTEGER}, #{docStateDesc,jdbcType=VARCHAR}, #{sysState,jdbcType=VARCHAR}, 
+      #{version,jdbcType=VARCHAR}, #{docStateDesc,jdbcType=VARCHAR}, #{sysState,jdbcType=VARCHAR}, 
       #{refObjectType,jdbcType=VARCHAR}, #{editPerm,jdbcType=INTEGER}, #{updatedTime,jdbcType=BIGINT}, 
       #{action,jdbcType=VARCHAR}, #{orderBy,jdbcType=INTEGER})
   </insert>
@@ -210,7 +210,7 @@
         #{preDocState,jdbcType=VARCHAR},
       </if>
       <if test="version != null">
-        #{version,jdbcType=INTEGER},
+        #{version,jdbcType=VARCHAR},
       </if>
       <if test="docStateDesc != null">
         #{docStateDesc,jdbcType=VARCHAR},
@@ -262,7 +262,7 @@
         PRE_DOC_STATE = #{record.preDocState,jdbcType=VARCHAR},
       </if>
       <if test="record.version != null">
-        VERSION = #{record.version,jdbcType=INTEGER},
+        VERSION = #{record.version,jdbcType=VARCHAR},
       </if>
       <if test="record.docStateDesc != null">
         DOC_STATE_DESC = #{record.docStateDesc,jdbcType=VARCHAR},
@@ -299,7 +299,7 @@
     set DOC_STATE = #{record.docState,jdbcType=VARCHAR},
       DOC_TYPE = #{record.docType,jdbcType=VARCHAR},
       PRE_DOC_STATE = #{record.preDocState,jdbcType=VARCHAR},
-      VERSION = #{record.version,jdbcType=INTEGER},
+      VERSION = #{record.version,jdbcType=VARCHAR},
       DOC_STATE_DESC = #{record.docStateDesc,jdbcType=VARCHAR},
       SYS_STATE = #{record.sysState,jdbcType=VARCHAR},
       REF_OBJECT_TYPE = #{record.refObjectType,jdbcType=VARCHAR},
@@ -343,7 +343,7 @@
     where DOC_STATE = #{docState,jdbcType=VARCHAR}
       and DOC_TYPE = #{docType,jdbcType=VARCHAR}
       and PRE_DOC_STATE = #{preDocState,jdbcType=VARCHAR}
-      and VERSION = #{version,jdbcType=INTEGER}
+      and VERSION = #{version,jdbcType=VARCHAR}
   </update>
   <update id="updateByPrimaryKey" parameterType="cn.nkpro.ts5.model.mb.gen.DocDefState">
     <!--
@@ -361,6 +361,6 @@
     where DOC_STATE = #{docState,jdbcType=VARCHAR}
       and DOC_TYPE = #{docType,jdbcType=VARCHAR}
       and PRE_DOC_STATE = #{preDocState,jdbcType=VARCHAR}
-      and VERSION = #{version,jdbcType=INTEGER}
+      and VERSION = #{version,jdbcType=VARCHAR}
   </update>
 </mapper>

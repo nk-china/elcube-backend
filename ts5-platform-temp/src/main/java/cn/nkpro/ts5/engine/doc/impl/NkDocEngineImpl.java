@@ -1,6 +1,9 @@
-package cn.nkpro.ts5.engine.doc;
+package cn.nkpro.ts5.engine.doc.impl;
 
 import cn.nkpro.ts5.basic.NKCustomObjectManager;
+import cn.nkpro.ts5.engine.doc.NKCard;
+import cn.nkpro.ts5.engine.doc.NKDocDefManager;
+import cn.nkpro.ts5.engine.doc.ThreadLocalContextHolder;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.model.mb.gen.*;
@@ -15,7 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class NkDocEngine {
+public class NkDocEngineImpl {
 
     @Autowired
     private DocHMapper docHMapper;
@@ -42,7 +45,7 @@ public class NkDocEngine {
         });
 
         // 获取单据DEF
-        DocDefHV def = docDefManager.getDef(docHV.getDocType(), docHV.getDefVersion());
+        DocDefHV def = docDefManager.getDef(docHV.getDocType(), docHV.getDefVersion()+"");
 
         // 获取单据行项目
         doInComponents(docId,def,false,(nkCard,docDefI)->{
