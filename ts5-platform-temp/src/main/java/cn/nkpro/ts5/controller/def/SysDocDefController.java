@@ -24,7 +24,7 @@ import java.util.Map;
 @PreAuthorize("hasAnyAuthority('*:*','DEF:*','DEF:DOCTYPE')")
 public class SysDocDefController {
 
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private NKDocDefService defDocTypeService;
 
     @WsDocNote("1.获取单据配置列表")

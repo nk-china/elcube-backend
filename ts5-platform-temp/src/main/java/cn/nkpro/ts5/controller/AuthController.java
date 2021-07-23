@@ -30,12 +30,13 @@ import java.util.Map;
 public class AuthController {
 
     @Qualifier("NkSysAccountService")
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private TfmsSysAccountService tfmsSysAccountService;
 
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private TfmsPermService permService;
 
+    @WsDocNote("1.获取token登陆")
     @ResponseBody
     @CompressResponse
     @RequestMapping("/token")
@@ -43,6 +44,21 @@ public class AuthController {
         return tfmsSysAccountService.createToken();
     }
 
+    @WsDocNote("2.刷新token")
+    @CompressResponse
+    @RequestMapping("/refresh_token")
+    public CompressObject refreshToken(){
+        return CompressObject.valueOf(tfmsSysAccountService.refreshToken());
+    }
+
+    @WsDocNote("3.清除token并退出")
+    @ResponseBody
+    @RequestMapping("/clear")
+    public void clear(){
+        tfmsSysAccountService.clear();
+    }
+
+    @WsDocNote("4.获取用户信息")
     @CompressResponse
     @RequestMapping("/info")
     public TfmsUserDetails info(){
@@ -51,6 +67,7 @@ public class AuthController {
         return user;
     }
 
+    @WsDocNote("5.获取用户授权限制")
     @CompressResponse
     @RequestMapping("/info/limits")
     public List<SysAuthLimit> limits(@RequestBody String[] limitIds){
@@ -60,18 +77,7 @@ public class AuthController {
         return permService.getLimits(limitIds);
     }
 
-    @ResponseBody
-    @RequestMapping("/clear")
-    public void clear(){
-        tfmsSysAccountService.clear();
-    }
-
-    @CompressResponse
-    @RequestMapping("/refresh_token")
-    public CompressObject refreshToken(){
-        return CompressObject.valueOf(tfmsSysAccountService.refreshToken());
-    }
-
+    @WsDocNote("6.修改密码")
     @ResponseBody
     @RequestMapping("/change_password")
     public void changePassword(@RequestParam("oldPassword") String oldPassword, @RequestParam("newPassword")String newPassword){

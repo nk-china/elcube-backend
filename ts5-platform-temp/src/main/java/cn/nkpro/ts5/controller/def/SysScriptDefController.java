@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @PreAuthorize("hasAnyAuthority('*:*','DEF:*','DEF:SCRIPT')")
 public class SysScriptDefController {
 
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private NKScriptEngine scriptEngine;
 
 //    @Autowired

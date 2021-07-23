@@ -19,7 +19,8 @@ import java.util.List;
 @Controller
 @RequestMapping("/doc")
 public class DocController {
-    @Autowired
+
+    @Autowired@SuppressWarnings("all")
     private NKDocDefService docDefService;
 //    @Autowired
 //    private TfmsDocService docService;

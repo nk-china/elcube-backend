@@ -22,10 +22,10 @@ import java.util.List;
 @Controller
 public class WebAppController {
 
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private NKProperties properties;
 
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private TfmsSysWebappMenuService tfmsSysWebappMenuService;
 
 //    private TfmsUserQueryService userQueryService;
