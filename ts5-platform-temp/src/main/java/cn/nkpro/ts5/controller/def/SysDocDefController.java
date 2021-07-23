@@ -3,8 +3,8 @@ package cn.nkpro.ts5.controller.def;
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
 import cn.nkpro.ts5.config.mvc.CompressResponse;
-import cn.nkpro.ts5.engine.doc.model.CardDescribe;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
+import cn.nkpro.ts5.engine.doc.model.DocDefIV;
 import cn.nkpro.ts5.engine.doc.service.NKDocDefService;
 import cn.nkpro.ts5.model.mb.gen.DocDefH;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,19 +50,27 @@ public class SysDocDefController {
 
     @WsDocNote("2、获取单据配置详情")
     @CompressResponse
-    @RequestMapping(value = "/type/detail")
+    @RequestMapping(value = "/type/detail/{docType}/{version}")
     public DocDefHV detail(
-            @WsDocNote(value="单据类型") @RequestParam("docType") String docType){
-        return defDocTypeService.getDocDefined(docType, 1, true, true, true);
+            @WsDocNote(value = "单据类型") @PathVariable("docType") String docType, @PathVariable Integer version){
+        return defDocTypeService.getDocDefined(docType, version, true, true);
     }
 
     @WsDocNote("3、更新单据配置")
     @ResponseBody
     @RequestMapping("/type/update")
-    public void update(
+    public DocDefHV update(
             @WsDocNote("更新模式")@RequestParam("create") Boolean create,
             @WsDocNote("单据配置对象")@RequestBody DocDefHV defDocTypeBO){
-        defDocTypeService.doUpdate(defDocTypeBO, create, false);
+        return defDocTypeService.doUpdate(defDocTypeBO, create, false);
+    }
+
+    @WsDocNote("3、创建一个新分支")
+    @ResponseBody
+    @RequestMapping("/type/breach")
+    public DocDefHV breach(
+            @WsDocNote("单据配置对象")@RequestBody DocDefHV defDocTypeBO){
+        return defDocTypeService.doBreach(defDocTypeBO);
     }
 
     @WsDocNote("4、获取选项")
@@ -75,7 +83,7 @@ public class SysDocDefController {
     @WsDocNote("5、获取卡片信息")
     @ResponseBody
     @RequestMapping("/card/{cardHandlerName}")
-    public CardDescribe cardDescribe(@WsDocNote("分类")@PathVariable String cardHandlerName){
+    public DocDefIV cardDescribe(@WsDocNote("分类")@PathVariable String cardHandlerName){
         return defDocTypeService.getCardDescribe(cardHandlerName);
     }
 }

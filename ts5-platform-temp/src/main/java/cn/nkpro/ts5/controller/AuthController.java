@@ -1,6 +1,7 @@
 package cn.nkpro.ts5.controller;
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
+import cn.nkpro.ts5.config.mvc.CompressObject;
 import cn.nkpro.ts5.config.mvc.CompressResponse;
 import cn.nkpro.ts5.config.security.TfmsUserDetails;
 import cn.nkpro.ts5.model.mb.gen.SysAuthLimit;
@@ -67,8 +68,8 @@ public class AuthController {
 
     @CompressResponse
     @RequestMapping("/refresh_token")
-    public Map<String, Object> refreshToken(){
-        return tfmsSysAccountService.refreshToken();
+    public CompressObject refreshToken(){
+        return CompressObject.valueOf(tfmsSysAccountService.refreshToken());
     }
 
     @ResponseBody

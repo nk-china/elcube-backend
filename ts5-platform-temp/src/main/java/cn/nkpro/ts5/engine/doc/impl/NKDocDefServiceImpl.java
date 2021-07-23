@@ -8,7 +8,6 @@ import cn.nkpro.ts5.config.mybatis.pagination.PaginationContext;
 import cn.nkpro.ts5.engine.doc.NKCard;
 import cn.nkpro.ts5.engine.doc.NKDocProcessor;
 import cn.nkpro.ts5.engine.doc.NKDocStateInterceptor;
-import cn.nkpro.ts5.engine.doc.model.CardDescribe;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocDefIV;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
@@ -38,17 +37,18 @@ import java.util.regex.Pattern;
 public class NKDocDefServiceImpl implements NKDocDefService {
 
     @Autowired
+    private RedisSupport<DocDefHV> redisSupport;
+    @Autowired
+    private NKCustomObjectManager customObjectManager;
+
+    @Autowired
     private DocDefHMapper docDefHMapper;
     @Autowired
     private DocDefIMapper docDefIMapper;
     @Autowired
     private DocDefStateMapper docDefStateMapper;
     @Autowired
-    private RedisSupport<DocDefHV> redisSupport;
-    @Autowired
-    private RedisSupport<Object> redisSupportObject;
-    @Autowired
-    private NKCustomObjectManager customObjectManager;
+    private DocDefFlowMapper docDefFlowMapper;
 
     @Override
     public PageList<DocDefH> getPage(String docClassify, String docType, String keyword, int from, int rows, String orderField, String order){
@@ -93,12 +93,37 @@ public class NKDocDefServiceImpl implements NKDocDefService {
     }
 
     @Override
-    public CardDescribe getCardDescribe(String cardHandlerName){
-        return BeanUtilz.copyFromObject(customObjectManager.getCustomObject(cardHandlerName,NKCard.class), CardDescribe.class);
+    public DocDefIV getCardDescribe(String cardHandlerName){
+        return BeanUtilz.copyFromObject(customObjectManager.getCustomObject(cardHandlerName,NKCard.class), DocDefIV.class);
     }
 
     @Override
-    public void doUpdate(DocDefHV docDefHV, boolean create,boolean force){
+    public DocDefHV doBreach(DocDefHV docDefHV){
+
+        DocDefHExample example = new DocDefHExample();
+        example.createCriteria()
+                .andDocTypeEqualTo(docDefHV.getDocType());
+        example.setOrderByClause("VERSION desc");
+
+        docDefHV.setVersion(
+            docDefHMapper.selectByExample(example, new RowBounds(0, 1))
+                .stream()
+                .findFirst()
+                .map(DocDefHKey::getVersion)
+                .orElse(0)
+            + 1
+        );
+        return doUpdate(docDefHV,true,false);
+    }
+
+    @Override
+    public DocDefH doActive(DocDefHV docDefHV){
+        docDefHV.setState("Active");
+        return doUpdate(docDefHV,false,false);
+    }
+
+    @Override
+    public DocDefHV doUpdate(DocDefHV docDefHV, boolean create, boolean force){
 
         /*
          * 获取修改前的详情
@@ -117,6 +142,7 @@ public class NKDocDefServiceImpl implements NKDocDefService {
         }
 
         // status
+        Assert.notEmpty(docDefHV.getStatus(),"状态不能为空");
         DocDefStateExample stateExample = new DocDefStateExample();
         stateExample.createCriteria()
                 .andDocTypeEqualTo(docDefHV.getDocType())
@@ -124,6 +150,8 @@ public class NKDocDefServiceImpl implements NKDocDefService {
         docDefStateMapper.deleteByExample(stateExample);
         docDefHV.getStatus()
                 .forEach(state->{
+                    Assert.hasLength(state.getDocState(),"状态 不能为空");
+                    Assert.hasLength(state.getDocStateDesc(),"状态描述 不能为空");
 
                     state.setDocType(docDefHV.getDocType());
                     state.setVersion(docDefHV.getVersion());
@@ -133,24 +161,47 @@ public class NKDocDefServiceImpl implements NKDocDefService {
                     docDefStateMapper.insertSelective(state);
                 });
 
+        // flow
+        Assert.notEmpty(docDefHV.getFlows(),"业务流不能为空");
+        DocDefFlowExample flowExample = new DocDefFlowExample();
+        flowExample.createCriteria()
+                .andDocTypeEqualTo(docDefHV.getDocType())
+                .andVersionEqualTo(docDefHV.getVersion());
+        docDefFlowMapper.deleteByExample(flowExample);
+        docDefHV.getFlows()
+                .forEach(flow->{
+                    Assert.hasLength(flow.getPreDocType(),"业务流 前置交易 不能为空");
+                    flow.setPreDocState(StringUtils.defaultIfBlank(flow.getPreDocState(),"@"));
+                    flow.setDocType(docDefHV.getDocType());
+                    flow.setVersion(docDefHV.getVersion());
+                    flow.setOrderBy(docDefHV.getFlows().indexOf(flow));
+                    flow.setUpdatedTime(DateTimeUtilz.nowSeconds());
+
+                    docDefFlowMapper.insert(flow);
+                });
+
+
         // components
         DocDefIExample defIExample = new DocDefIExample();
         defIExample.createCriteria()
                 .andDocTypeEqualTo(docDefHV.getDocType())
                 .andVersionEqualTo(docDefHV.getVersion());
         docDefIMapper.deleteByExample(defIExample);
-        docDefHV.getCards()
-                .forEach(item -> {
-                    item.setDocType(docDefHV.getDocType());
-                    item.setVersion(docDefHV.getVersion());
-                    item.setUpdatedTime(DateTimeUtilz.nowSeconds());
-                    item.setOrderBy(docDefHV.getCards().indexOf(item));
-                    item.setMarkdownFlag(StringUtils.isNotBlank(item.getMarkdown())?1:0);
-                    item.setCardContent(JSONObject.toJSONString(item.getConfig()));
-                    docDefIMapper.insertSelective(item);
-                });
+        if(docDefHV.getCards()!=null){
+            docDefHV.getCards()
+                    .forEach(item -> {
+                        item.setDocType(docDefHV.getDocType());
+                        item.setVersion(docDefHV.getVersion());
+                        item.setUpdatedTime(DateTimeUtilz.nowSeconds());
+                        item.setOrderBy(docDefHV.getCards().indexOf(item));
+                        item.setMarkdownFlag(StringUtils.isNotBlank(item.getMarkdown())?1:0);
+                        item.setCardContent(JSONObject.toJSONString(item.getConfig()));
+                        docDefIMapper.insertSelective(item);
+                    });
+        }
 
-        // 单据
+        // h
+        docDefHV.setState(StringUtils.defaultIfBlank(docDefHV.getState(),"InActive"));
         docDefHV.setDocClassify(docProcessor.classify().name());
         docDefHV.setMarkdownFlag(StringUtils.isBlank(docDefHV.getMarkdown())?0:1);
         docDefHV.setUpdatedTime(DateTimeUtilz.nowSeconds());
@@ -161,6 +212,8 @@ public class NKDocDefServiceImpl implements NKDocDefService {
         }
 
         redisSupport.delete(String.format(Constants.CACHE_DEF_DOC,docDefHV.getDocType(),docDefHV.getVersion()));
+
+        return docDefHV;
     }
 
     /**
@@ -177,7 +230,8 @@ public class NKDocDefServiceImpl implements NKDocDefService {
         example.createCriteria()
                 .andDocTypeEqualTo(docType)
                 .andValidFromLessThanOrEqualTo(today)
-                .andValidToGreaterThanOrEqualTo(today);
+                .andValidToGreaterThanOrEqualTo(today)
+                .andStateEqualTo("Active");
         example.setOrderByClause("VERSION DESC");
 
         Optional<DocDefH> first = docDefHMapper
@@ -187,7 +241,7 @@ public class NKDocDefServiceImpl implements NKDocDefService {
 
         Assert.isTrue(first.isPresent(),String.format("单据类型[%s]的配置没有找到",docType));
 
-        return getDocDefined(docType,first.get().getVersion(),true, false,false);
+        return getDocDefined(docType,first.get().getVersion(), false,false);
     }
 
     /**
@@ -197,7 +251,7 @@ public class NKDocDefServiceImpl implements NKDocDefService {
      * @return DocDefHV
      */
     @Override
-    public DocDefHV getDocDefined(String docType,Integer version, boolean includeComponentDef, boolean includeComponentMarkdown, boolean ignoreError){
+    public DocDefHV getDocDefined(String docType,Integer version, boolean includeComponentMarkdown, boolean ignoreError){
         String cacheKey = String.format(Constants.CACHE_DEF_DOC,docType,version);
 
         DocDefHV docDefHV = redisSupport.getIfAbsent(cacheKey,StringUtils.EMPTY,()->{
@@ -219,6 +273,14 @@ public class NKDocDefServiceImpl implements NKDocDefService {
                     .andVersionEqualTo(version);
             stateExample.setOrderByClause("ORDER_BY");
             def.setStatus(docDefStateMapper.selectByExample(stateExample));
+
+            // flows
+            DocDefFlowExample flowExample = new DocDefFlowExample();
+            flowExample.createCriteria()
+                    .andDocTypeEqualTo(docType)
+                    .andVersionEqualTo(version);
+            flowExample.setOrderByClause("ORDER_BY");
+            def.setFlows(docDefFlowMapper.selectByExample(flowExample));
 
             // cards
             DocDefIExample docDefIExample = new DocDefIExample();

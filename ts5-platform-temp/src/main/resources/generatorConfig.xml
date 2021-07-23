@@ -35,6 +35,7 @@
 		<table tableName="nk_doc_def_h"		 				enableDeleteByExample="false" domainObjectName="DocDefH"/>
 		<table tableName="nk_doc_def_i"		 				enableDeleteByExample="true"  domainObjectName="DocDefI"/>
 		<table tableName="nk_doc_def_state"				 	enableDeleteByExample="true"  domainObjectName="DocDefState"/>
+		<table tableName="nk_doc_def_flow"				 	enableDeleteByExample="true"  domainObjectName="DocDefFlow"/>
 
 		<!-- 基础组件 -->
 
