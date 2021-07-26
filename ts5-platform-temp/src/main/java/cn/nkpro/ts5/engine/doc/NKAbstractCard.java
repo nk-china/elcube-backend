@@ -103,8 +103,9 @@ public abstract class NKAbstractCard<DT,DDT> implements NKCard<DT,DDT> {
      * @return
      * @throws Exception
      */
+    @Override
     @SuppressWarnings("all")
-    public final DT calculate(DocHV doc, DocDefHV docDef, DocDefI defI) throws Exception{
+    public final DT calculate(DocHV doc, DocDefI defI,String options) throws Exception{
         return (DT) doc.getData().get(defI.getCardKey());
     }
 
@@ -133,7 +134,9 @@ public abstract class NKAbstractCard<DT,DDT> implements NKCard<DT,DDT> {
     protected final Object parse(Object obj, Type targetType){
         if(targetType!=null && obj!=null){
             // 简单判断一下，因为先转成string再parse效率会比较低
-            if(obj instanceof List){
+            if(obj instanceof String){
+                return JSON.parseObject((String)obj,targetType);
+            }else if(obj instanceof List){
                 return new JSONArray((List) obj).toJavaObject(targetType);
             }else if(obj instanceof Map){
                 return new JSONObject((Map) obj).toJavaObject(targetType);

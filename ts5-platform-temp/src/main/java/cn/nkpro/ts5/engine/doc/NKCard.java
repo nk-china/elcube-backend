@@ -1,6 +1,7 @@
 package cn.nkpro.ts5.engine.doc;
 
 import cn.nkpro.ts5.basic.NKCustomObject;
+import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.model.mb.gen.DocDefI;
 import org.apache.commons.lang3.ArrayUtils;
@@ -22,6 +23,8 @@ public interface NKCard<DT,DDT> extends NKCustomObject {
     DT create(DocHV doc, DocHV preDoc, DocDefI defI) throws Exception;
 
     Object afterCreate(DocHV doc, DocHV preDoc, DT data, DDT def);
+
+    DT calculate(DocHV doc, DocDefI defI,String options) throws Exception;
 
     @SuppressWarnings("all")
     DT getData(DocHV doc, DocDefI defI) throws Exception;

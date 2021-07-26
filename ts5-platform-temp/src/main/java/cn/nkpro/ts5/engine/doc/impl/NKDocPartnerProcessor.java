@@ -20,9 +20,4 @@ public class NKDocPartnerProcessor extends NKDocTransactionProcessor {
     public DocHV toCreate(DocDefHV def, DocHV preDoc) {
         return new DocHV();
     }
-
-    @Override
-    public DocHV detail(DocDefHV def, String docId) {
-        return new DocHV();
-    }
 }

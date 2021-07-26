@@ -1,19 +1,20 @@
 package cn.nkpro.ts5.engine.doc.impl;
 
-import cn.nkpro.ts5.basic.NKCustomObjectManager;
-import cn.nkpro.ts5.engine.doc.NKCard;
 import cn.nkpro.ts5.engine.doc.NKDocProcessor;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
-import cn.nkpro.ts5.engine.doc.model.DocDefIV;
+import cn.nkpro.ts5.engine.doc.model.DocHD;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
-import cn.nkpro.ts5.engine.doc.model.DocIV;
 import cn.nkpro.ts5.engine.doc.service.NKDocDefService;
 import cn.nkpro.ts5.model.mb.gen.DocH;
+import cn.nkpro.ts5.model.mb.gen.DocHMapper;
 import cn.nkpro.ts5.model.mb.gen.DocI;
+import cn.nkpro.ts5.model.mb.gen.DocIMapper;
 import cn.nkpro.ts5.supports.GUID;
 import cn.nkpro.ts5.supports.SequenceSupport;
+import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
 import cn.nkpro.ts5.utils.VersioningUtils;
+import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,14 +24,16 @@ import java.util.Optional;
 @Component("NKDocTransactionProcessor")
 public class NKDocTransactionProcessor implements NKDocProcessor {
 
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     protected GUID guid;
-    @Autowired
-    private NKCustomObjectManager customObjectManager;
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private NKDocDefService docDefService;
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private SequenceSupport sequenceUtils;
+    @Autowired@SuppressWarnings("all")
+    private DocHMapper docHMapper;
+    @Autowired@SuppressWarnings("all")
+    private DocIMapper docIMapper;
 
     @Override
     public EnumDocClassify classify() {
@@ -39,10 +42,6 @@ public class NKDocTransactionProcessor implements NKDocProcessor {
     @Override
     public String desc() {
         return "交易";
-    }
-
-    public DocHV detail(String docId){
-        return null;
     }
 
     @Override
@@ -71,43 +70,93 @@ public class NKDocTransactionProcessor implements NKDocProcessor {
         //doc.setPreDoc(preDoc);
         doc.setDef(def);
 
-        docDefService.doInCards(def,(card,defIV)->{
+        docDefService.runLoopCards(def,(card, defIV)->
+                doc.getData().put(defIV.getCardKey(),card.create(doc,preDoc,defIV))
+        );
 
-            DocIV docI = new DocIV();
-            docI.setDocId(doc.getDocId());
-            docI.setCardKey(defIV.getCardKey());
-            docI.setCreatedTime(doc.getCreatedTime());
-            docI.setData(card.create(doc,preDoc,defIV));
+        return doc;
+    }
 
-            doc.getData().put(defIV.getCardKey(),docI);
+    @Override
+    public DocHV calculate(DocHV doc, String fromCard, String options) throws Exception {
+        docDefService.runLoopCards(doc.getDef(),(card, defIV)->{
+            String _options = StringUtils.equals(fromCard,defIV.getCardKey())?options:null;
+            doc.getData().put(defIV.getCardKey(),card.calculate(doc,defIV,_options));
+        });
+        return doc;
+    }
 
+    @Override
+    public DocHV detail(DocDefHV def, DocHD docHD) throws Exception {
+
+        DocHV doc = BeanUtilz.copyFromObject(docHD, DocHV.class);
+        doc.setDef(def);
+
+        // 解析单据行项目数据
+        docDefService.runLoopCards(def,(nkCard, docDefI)->{
+
+            // 获取行项目数据
+            Optional.ofNullable(doc.getItems().get(docDefI.getCardKey()))
+                .ifPresent((docI -> {
+                    // 调用卡片程序解析数据
+                    Object dataI = nkCard.afterGetData(doc, docI.getCardContent(), docDefI.getCardContent());
+                    doc.getData().put(docDefI.getCardKey(),dataI);
+                    // 清除JSON，避免无效数据网络传输
+                    docI.setCardContent(null);
+                }));
         });
 
         return doc;
     }
 
     @Override
-    public DocHV detail(DocDefHV def, String docId) {
-        return new DocHV();
-    }
+    public DocHV doUpdate(DocDefHV def, DocHV doc, DocHV original, String optSource) throws Exception {
+        Optional<DocHV> optional = Optional.ofNullable(original);
 
-//    public DocHV doUpdate(DocHV doc, DocHV original){
-//        if(original==null){
-//            doc.setUpdatedTime(DateTimeUtilz.nowSeconds());
-//            // 如果原始单据信息为空，那么表示单据为新建
-//            if(StringUtils.isBlank(doc.getDocNumber()))
-//                doc.setDocNumber(sequenceUtils.next(EnumDocClassify.valueOf(doc.getClassify()), doc.getDocType()));
-//            bizDocMapper.insert(doc);
-//        }
-//
-//        return doc;
-//    }
+        doc.setUpdatedTime(DateTimeUtilz.nowSeconds());
 
-    public DocHV calculate(DocHV doc, String fromCard, String options){
-        return null;
-    }
+        if(!optional.isPresent()){
+            if(StringUtils.isBlank(doc.getDocNumber()))
+                doc.setDocNumber(sequenceUtils.next(EnumDocClassify.valueOf(doc.getClassify()), doc.getDocType()));
 
-    public DocHV doUpdate(DocHV doc, String optSource){
-        return null;
+            doc.setCreatedTime(doc.getUpdatedTime());
+            docHMapper.insert(doc);
+        }
+
+        // todo 检查单据状态是否合法，即符合单据配置中的 状态流
+
+        docDefService.runLoopCards(def,(card, defIV)->{
+
+            // 如果原始单据数据存在则更新，否则插入数据
+            if(original !=null && original.getItems().containsKey(defIV.getCardKey())){
+
+                DocI docI = BeanUtilz.copyFromObject(original.getItems().get(defIV.getCardKey()),DocI.class);
+                docI.setCardContent(JSON.toJSONString(doc.getData().get(defIV.getCardKey())));
+
+                docIMapper.updateByPrimaryKeyWithBLOBs(docI);
+
+                // 将更新后的数据放回到doc
+                doc.getItems().put(defIV.getCardKey(),docI);
+                docI.setCardContent(null);
+            }else{
+
+                DocI docI = new DocI();
+                docI.setDocId(doc.getDocId());
+                docI.setCardKey(defIV.getCardKey());
+                docI.setCreatedTime(doc.getUpdatedTime());
+                docI.setUpdatedTime(doc.getUpdatedTime());
+                docI.setCardContent(JSON.toJSONString(doc.getData().get(defIV.getCardKey())));
+
+                docIMapper.insert(docI);
+
+                // 将更新后的数据放回到doc
+                doc.getItems().put(defIV.getCardKey(),docI);
+                docI.setCardContent(null);
+            }
+        });
+
+        docHMapper.updateByPrimaryKeySelective(doc);
+
+        return doc;
     }
 }

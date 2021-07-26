@@ -18,7 +18,7 @@ public class DocEngineTest {
     private NkDocEngineServiceImpl docEngine;
 
     @Test
-    public void test1(){
+    public void test1() throws Exception {
         docEngine.detail("1");
     }
 }

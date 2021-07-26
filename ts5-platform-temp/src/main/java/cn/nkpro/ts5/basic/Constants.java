@@ -7,6 +7,7 @@ public interface Constants {
 
     String BIZ_DEFAULT_EMPTY = "@";
 
+
     String CACHE_DEF_CONSTANT       = "CACHE_DEF_CONSTANT";
 
     String CACHE_DEF_PARTNERROLES   = "CACHE_DEF_PARTNERROLES";
@@ -15,7 +16,7 @@ public interface Constants {
     String CACHE_DEF_DOC            = "CACHE_DEF_DOC:%s-%s";
 
 
-    String CACHE_DOC                = "CACHE_DOC:";
+    String CACHE_DOC                = "CACHE_DOC";
     String CACHE_PROJECT            = "CACHE_PROJECT:";
     String CACHE_PARTNER            = "CACHE_PARTNER:%s";
     String CACHE_DOC_HISTORY        = "CACHE_DOC_HISTORY";

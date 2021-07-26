@@ -10,7 +10,6 @@ import cn.nkpro.ts5.engine.doc.NKDocProcessor;
 import cn.nkpro.ts5.engine.doc.NKDocStateInterceptor;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocDefIV;
-import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.engine.doc.service.NKDocDefService;
 import cn.nkpro.ts5.model.mb.gen.*;
 import cn.nkpro.ts5.supports.RedisSupport;
@@ -24,6 +23,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import java.util.*;
@@ -38,18 +38,18 @@ import java.util.stream.Collectors;
 @Service
 public class NKDocDefServiceImpl implements NKDocDefService {
 
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private RedisSupport<DocDefHV> redisSupport;
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private NKCustomObjectManager customObjectManager;
 
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private DocDefHMapper docDefHMapper;
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private DocDefIMapper docDefIMapper;
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private DocDefStateMapper docDefStateMapper;
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private DocDefFlowMapper docDefFlowMapper;
 
     @Override
@@ -101,10 +101,11 @@ public class NKDocDefServiceImpl implements NKDocDefService {
 
     /**
      * 编辑前操作，如果当前版本已激活，那么增加Patch
-     * @param docDefHV
-     * @return
+     * @param docDefHV DocDefHV
+     * @return DocDefHV
      */
     @Override
+    @Transactional
     public DocDefHV doEdit(DocDefHV docDefHV){
         if(StringUtils.equals(docDefHV.getState(),"Active")){
             DocDefH lastUpdatedVersion = getLastUpdatedVersion(docDefHV.getDocType(), VersioningUtils.parseMinor(docDefHV.getVersion()));
@@ -120,10 +121,11 @@ public class NKDocDefServiceImpl implements NKDocDefService {
 
     /**
      * 创建配置分支，增加Major
-     * @param docDefHV
-     * @return
+     * @param docDefHV DocDefHV
+     * @return DocDefHV
      */
     @Override
+    @Transactional
     public DocDefHV doBreach(DocDefHV docDefHV){
 
         if(docDefHV.getState().equals("Active")){
@@ -144,10 +146,11 @@ public class NKDocDefServiceImpl implements NKDocDefService {
 
     /**
      * 激活配置，增加Minor
-     * @param docDefHV
-     * @return
+     * @param docDefHV DocDefHV
+     * @return DocDefHV
      */
     @Override
+    @Transactional
     public DocDefHV doActive(DocDefHV docDefHV){
 
         Assert.hasText(docDefHV.getValidFrom(),"请设定有效起始日期");
@@ -165,6 +168,7 @@ public class NKDocDefServiceImpl implements NKDocDefService {
     }
 
     @Override
+    @Transactional
     public void doDelete(DocDefH docDefHV, boolean force){
         if(!force){
             Assert.isTrue(!docDefHV.getState().equals("Active"),"已激活版本不能删除");
@@ -193,11 +197,12 @@ public class NKDocDefServiceImpl implements NKDocDefService {
 
     /**
      * 保存配置
-     * @param docDefHV
-     * @param force
-     * @return
+     * @param docDefHV DocDefHV
+     * @param force force
+     * @return DocDefHV
      */
     @Override
+    @Transactional
     public DocDefHV doUpdate(DocDefHV docDefHV, boolean force){
 
         Assert.isTrue(Pattern.matches("^[A-Z0-9]{4}$",docDefHV.getDocType()),"单据类型必须为A-Z以及0-9组成的4位字符串");
@@ -348,7 +353,7 @@ public class NKDocDefServiceImpl implements NKDocDefService {
     @Override
     public DocDefHV getDocDef(String docType, Integer major){
 
-        String version = null;
+        String version;
 
         String today = DateTimeUtilz.todayShortString();
         if(major == null){
@@ -385,6 +390,8 @@ public class NKDocDefServiceImpl implements NKDocDefService {
                     .findFirst();
 
             Assert.isTrue(first.isPresent(),String.format("单据类型[%s]版本[%s]的配置没有找到",docType,major));
+
+            version = first.get().getVersion();
         }
 
         return getDocDef(docType,version, false,false);
@@ -455,55 +462,11 @@ public class NKDocDefServiceImpl implements NKDocDefService {
     }
 
     @Override
-    public DocDefHV getDocDefinedRuntime(String docType, DocHV doc) {
-        return null;
-    }
-
-//    @Override
-//    public DocDefHV getDocDefinedRuntime(String docType, BizDoc doc){
-
-//        DocDefHV defined = doc!=null?getDocDefined(doc.getDocType(), doc.getDefVersion(), true, false,false)
-//                                        :getDocDefined(docType);
-//        String runtimeState =  doc!=null?doc.getDocState()
-//                                        :defined.getStatus()
-//                                            .stream()
-//                                            .filter(state->StringUtils.equals(state.getPreDocState(),Constants.BIZ_DEFAULT_EMPTY))
-//                                            .findAny()
-//                                            .orElseThrow(IllegalArgumentException::new)
-//                                            .getDocState();
-//
-//        defined.setStatus(
-//                defined.getStatus().stream()
-//                        .map(state->BeanUtilz.copyFromObject(state, DefDocStatusExt.class))
-//                        .peek(state->state.setAvailable(StringUtils.equalsAny(
-//                                runtimeState,
-//                                state.getPreDocState(),
-//                                state.getDocState())))
-//                        //.distinct()
-//                        .collect(Collectors.toList())
-//        );
-//
-//        BizDoc cxt = doc!=null?doc:new BizDoc();
-//        defined.getCustomComponents()
-//                .forEach(defDocComponentBO -> {
-//                    defDocComponentBO.setWriteable(true);
-//                    if(StringUtils.isNotBlank(defDocComponentBO.getEditableSpEL())){
-//                        try {
-//                            defDocComponentBO.setWriteable((Boolean) parser.parseExpression(defDocComponentBO.getEditableSpEL()).getValue(cxt));
-//                        }catch (Exception e){
-//                            throw new TfmsIllegalContentException("SpEL表达式["+defDocComponentBO.getEditableSpEL()+"]错误:"+e.getMessage());
-//                        }
-//                    }
-//                });
-//        return defined;
-//    }
-
-    @Override
-    public void doInCards(DocDefHV docDefHV, RunInComponents runInComponents) throws Exception{
+    public void runLoopCards(DocDefHV docDefHV, Function function) throws Exception{
 
         for(DocDefIV docDefI : docDefHV.getCards()){
             // 找到对应的组件实现类
-            runInComponents.run(
+            function.run(
                     customObjectManager.getCustomObjectIfExists(docDefI.getCardKey(), NKCard.class),
                     docDefI);
         }
@@ -549,9 +512,9 @@ public class NKDocDefServiceImpl implements NKDocDefService {
     }
     /**
      * 获取同一个Major版本的最后一次更新
-     * @param docType
-     * @param versionPrefix
-     * @return
+     * @param docType docType
+     * @param versionPrefix versionPrefix
+     * @return DocDefH
      */
     private DocDefH getLastUpdatedVersion(String docType,String versionPrefix){
 

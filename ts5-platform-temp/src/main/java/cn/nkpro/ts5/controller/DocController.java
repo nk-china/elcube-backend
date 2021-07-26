@@ -6,12 +6,15 @@ import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.engine.doc.service.NKDocDefService;
 import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService;
 import cn.nkpro.ts5.model.mb.gen.DocDefH;
+import eu.bitwalker.useragentutils.Browser;
+import eu.bitwalker.useragentutils.UserAgent;
+import eu.bitwalker.useragentutils.Version;
+import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
@@ -55,12 +58,12 @@ public class DocController {
         return docDefService.getEntrance(classify);
     }
 
-//    @ResponseCompress
-//    @WsDocNote("3、拉取交易详情")
-//    @RequestMapping(value = "/detail/{docId}",method = RequestMethod.GET)
-//    public BizDoc get(@PathVariable("docId") String docId) {
-//        return docEngineWithPerm.getDetailHasDocPermForController(docId);
-//    }
+    @CompressResponse
+    @WsDocNote("3、拉取交易详情")
+    @RequestMapping(value = "/detail/{docId}",method = RequestMethod.GET)
+    public DocHV get(@PathVariable("docId") String docId) throws Exception {
+        return docEngine.detail(docId);
+    }
 //
 //    @ResponseCompress
 //    @WsDocNote("3、拉取交易历史版本")
@@ -82,19 +85,23 @@ public class DocController {
     public DocHV preCreate(
             @WsDocNote(value="前序ID") @RequestParam(value="preDocId",required = false) String preDocId,
             @WsDocNote(value="单据类型") @RequestParam(value="docType") String docType) throws Exception {
-        return docEngine.toCreate(docType,preDocId);
+        return docEngine.create(docType,preDocId);
     }
-//
-//    @ResponseCompress
-//    @WsDocNote("7、计算")
-//    @RequestMapping(value = "/calculate/{docType}",method = RequestMethod.POST)
-//    public BizDocBase calculate(
-//            @WsDocNote(value="单据类型") @PathVariable(value="docType") String docType,
-//            @WsDocNote(value="卡片名称") @RequestParam(value="component",required = false) String componentName,
-//            @WsDocNote(value="计算类型") @RequestParam(value="calculate",required = false) String calculate,
-//            @WsDocNote(value="单据JSON") @RequestBody String json) {
-//        return docEngineWithPerm.calculateForController(docType,componentName,calculate,json);
-//    }
+
+    @CompressResponse
+    @WsDocNote("7、计算")
+    @RequestMapping(value = "/calculate",method = RequestMethod.POST)
+    public DocHV calculate(
+            @WsDocNote(value="单据JSON") @RequestBody CalcModel calcModel) throws Exception {
+        return docEngine.calculate(calcModel.getDoc(),calcModel.getFromCard(),calcModel.getOptions());
+    }
+
+    @Data
+    static class CalcModel extends DocHV{
+        String fromCard;
+        String options;
+        DocHV doc;
+    }
 //
 //    @ResponseBody
 //    @ResponseCompress
@@ -117,35 +124,34 @@ public class DocController {
 //        return docEngineWithPerm.preUpdateForController(docType,docId);
 //    }
 //
-//    @ResponseCompress
-//    @WsDocNote("A、修改单据")
-//    @RequestMapping(value = "/update/{docType}",method = RequestMethod.POST)
-//    public BizDocBase update(
-//            HttpServletRequest request,
-//            @WsDocNote(value="单据类型") @PathVariable(value="docType") String docType,
-//            @WsDocNote(value="单据JSON") @RequestBody String json) {
-//
-//        Browser browser = UserAgent.parseUserAgentString(request.getHeader("User-Agent")).getBrowser();
-//        Version version = browser.getVersion(request.getHeader("User-Agent"));
-//        String info = null;//browser.getName() + "/" + version.getVersion();
-//        //微信小程序请求
-//        if(request.getHeader("User-Agent").contains("MicroMessenger"))
-//        {
-//            String str = request.getHeader("User-Agent");
-//            String cut = " ";
-//            String[] newStr = str.split(cut);
-//            for(String s:newStr){
-//                if(s.contains("MicroMessenger"))
-//                {
-//                    info= s;
-//                    break;
-//                }
-//            }
-//        }else {
-//            info = browser.getName() + "/" + version.getVersion();
-//        }
-//        return docEngineWithPerm.doUpdateForController(docType, json, info);
-//    }
+    @CompressResponse
+    @WsDocNote("A、修改单据")
+    @RequestMapping(value = "/update",method = RequestMethod.POST)
+    public DocHV update(
+            HttpServletRequest request,
+            @WsDocNote(value="单据JSON") @RequestBody DocHV doc) throws Exception {
+
+        Browser browser = UserAgent.parseUserAgentString(request.getHeader("User-Agent")).getBrowser();
+        Version version = browser.getVersion(request.getHeader("User-Agent"));
+        String info = null;//browser.getName() + "/" + version.getVersion();
+        //微信小程序请求
+        if(request.getHeader("User-Agent").contains("MicroMessenger"))
+        {
+            String str = request.getHeader("User-Agent");
+            String cut = " ";
+            String[] newStr = str.split(cut);
+            for(String s:newStr){
+                if(s.contains("MicroMessenger"))
+                {
+                    info= s;
+                    break;
+                }
+            }
+        }else {
+            info = browser.getName() + "/" + version.getVersion();
+        }
+        return docEngine.doUpdate(doc);
+    }
 //
 //    @ResponseBody
 //    @ResponseCompress
