@@ -18,7 +18,7 @@ import java.util.Map;
  * Created by bean on 2020/1/15.
  */
 @WsDocNote("D1.单据配置")
-@Controller
+@RestController
 @RequestMapping("/def/doc")
 @PreAuthorize("hasAnyAuthority('*:*','DEF:*','DEF:DOCTYPE')")
 public class SysDocDefController {
@@ -27,7 +27,6 @@ public class SysDocDefController {
     private NKDocDefService defDocTypeService;
 
     @WsDocNote("1.获取单据配置列表")
-    @ResponseBody
     @RequestMapping("/type/page")
     public PageList<DocDefH> getPage(
             @WsDocNote("单据分类")
@@ -51,14 +50,12 @@ public class SysDocDefController {
     }
 
     @WsDocNote("2.获取所有单据类型")
-    @ResponseBody
     @RequestMapping("/type/types")
     public List<DocDefH> types(){
         return defDocTypeService.getAllDocTypes();
     }
 
     @WsDocNote("3.获取单据配置详情")
-    @ResponseBody
     @RequestMapping(value = "/type/detail/{docType}/{version}")
     public DocDefHV detail(
             @WsDocNote(value = "单据类型") @PathVariable("docType") String docType, @PathVariable String version){
@@ -66,7 +63,6 @@ public class SysDocDefController {
     }
 
     @WsDocNote("4.预处理编辑单据配置")
-    @ResponseBody
     @RequestMapping("/type/edit")
     public DocDefHV edit(
             @WsDocNote("单据配置对象")@RequestBody DocDefHV def){
@@ -74,7 +70,6 @@ public class SysDocDefController {
     }
 
     @WsDocNote("5.更新单据配置")
-    @ResponseBody
     @RequestMapping("/type/update")
     public DocDefHV update(
             @WsDocNote("单据配置对象")@RequestBody DocDefHV def){
@@ -82,7 +77,6 @@ public class SysDocDefController {
     }
 
     @WsDocNote("6.创建一个新分支")
-    @ResponseBody
     @RequestMapping("/type/breach")
     public DocDefHV breach(
             @WsDocNote("单据配置对象")@RequestBody DocDefHV def){
@@ -90,7 +84,6 @@ public class SysDocDefController {
     }
 
     @WsDocNote("7.激活配置")
-    @ResponseBody
     @RequestMapping("/type/active")
     public DocDefHV active(
             @WsDocNote("单据配置对象")@RequestBody DocDefHV def){
@@ -98,7 +91,6 @@ public class SysDocDefController {
     }
 
     @WsDocNote("8.删除配置")
-    @ResponseBody
     @RequestMapping("/type/delete")
     public void delete(
             @WsDocNote("单据配置对象")@RequestBody DocDefHV def){
@@ -106,14 +98,12 @@ public class SysDocDefController {
     }
 
     @WsDocNote("9.获取单据配置的Options")
-    @ResponseBody
     @RequestMapping("/type/options")
     public Map<String, Object> options(@WsDocNote("分类")@RequestParam(value="classify",required = false) String classify){
         return defDocTypeService.options(classify);
     }
 
     @WsDocNote("10.获取卡片信息")
-    @ResponseBody
     @RequestMapping("/card/{cardHandlerName}")
     public DocDefIV cardDescribe(@WsDocNote("分类")@PathVariable String cardHandlerName){
         return defDocTypeService.getCardDescribe(cardHandlerName);

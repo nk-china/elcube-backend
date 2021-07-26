@@ -8,12 +8,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 /**
  * Created by bean on 2020/7/17.
  */
 @WsDocNote("D3.脚本配置")
-@Controller
+@RestController
 @RequestMapping("/def/script")
 @PreAuthorize("hasAnyAuthority('*:*','DEF:*','DEF:SCRIPT')")
 public class SysScriptDefController {
@@ -53,7 +54,6 @@ public class SysScriptDefController {
 //    }
 
     @WsDocNote("5.获取脚本的Groovy类名")
-    @ResponseBody
     @RequestMapping("/class/{beanName}")
     public String className(@PathVariable("beanName") String beanName){
         return scriptEngine.getClassName(beanName);

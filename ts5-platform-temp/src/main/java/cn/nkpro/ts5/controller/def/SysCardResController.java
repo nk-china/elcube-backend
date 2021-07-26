@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  * Created by bean on 2020/1/15.
  */
 @WsDocNote("D2.卡片配置")
-@Controller
+@RestController
 @RequestMapping("/public/def/card")
 public class SysCardResController {
 
@@ -27,7 +27,6 @@ public class SysCardResController {
 
     @PreAuthorize("permitAll")
     @WsDocNote("1.获取卡片信息")
-    @ResponseBody
     @RequestMapping("/vueTemplates")
     public Map<String, String> vueTemplates() throws IOException {
 

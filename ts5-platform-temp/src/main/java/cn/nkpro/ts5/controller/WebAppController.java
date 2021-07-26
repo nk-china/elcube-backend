@@ -9,10 +9,7 @@ import cn.nkpro.ts5.model.mb.gen.SysUserSavedQuery;
 import cn.nkpro.ts5.model.mb.gen.SysWebappMenu;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -21,7 +18,7 @@ import java.util.List;
  */
 @WsDocNote("2.UI控制器")
 @RequestMapping("/webapp")
-@Controller
+@RestController
 public class WebAppController {
 
     @Autowired@SuppressWarnings("all")
@@ -35,35 +32,30 @@ public class WebAppController {
 
 
     @WsDocNote("1.获取环境名称")
-    @ResponseBody
     @RequestMapping("/env")
     public String env(){
         return properties.getEnvName();
     }
 
     @WsDocNote("2.加载Web主菜单")
-    @ResponseBody
     @RequestMapping("/menus")
     public List<WebMenuBO> menus(){
         return tfmsSysWebappMenuService.getMenus(true);
     }
 
     @WsDocNote("3.加载菜单详情")
-    @ResponseBody
     @RequestMapping("/menu/{id}")
     public SysWebappMenu menus(@PathVariable("id") String id){
         return tfmsSysWebappMenuService.getDetail(id);
     }
 
     @WsDocNote("31、获取保存的搜索列表")
-    @ResponseBody
     @RequestMapping("/user/saved/query/list")
     public List<SysUserSavedQuery> getList(String source){
         return userQueryService.getList(source);
     }
 
     @WsDocNote("32、保存的搜索条件")
-    @ResponseBody
     @RequestMapping("/user/saved/query/create")
     public SysUserSavedQuery create(@RequestBody SysUserSavedQuery query){
         userQueryService.create(query);
@@ -71,7 +63,6 @@ public class WebAppController {
     }
 
     @WsDocNote("33、删除已保存的搜索条件")
-    @ResponseBody
     @RequestMapping("/user/saved/query/delete")
     public void delete(String queryId){
         userQueryService.delete(queryId);

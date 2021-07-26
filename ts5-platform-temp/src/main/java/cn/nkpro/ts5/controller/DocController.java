@@ -24,7 +24,7 @@ import java.util.List;
  * Created by bean on 2020/6/9.
  */
 @WsDocNote("13.单据")
-@Controller
+@RestController
 @RequestMapping("/doc")
 public class DocController {
 
@@ -40,21 +40,21 @@ public class DocController {
 //    @Autowired
 //    private TfmsDocHistoryService historyService;
 
-    @ResponseBody
+    
     @WsDocNote("1.拉取交易列表数据")
     @RequestMapping(value = "/list",method = RequestMethod.POST)
     public ESPageList<DocHES> list(@RequestBody JSONObject params) {
         return docService.queryList(DocHES.class, null, params);
     }
 
-    @ResponseBody
+    
     @WsDocNote("2.拉取入口单据列表")
     @RequestMapping(value = "/entrance",method = RequestMethod.GET)
     public List<DocDefH> getEntrance(@RequestParam("classify") String classify){
         return docDefService.getEntrance(classify);
     }
 
-    @ResponseBody
+    
     @WsDocNote("3.拉取交易详情")
     @RequestMapping(value = "/detail/{docId}",method = RequestMethod.GET)
     public DocHV get(@PathVariable("docId") String docId) throws Exception {
@@ -82,7 +82,7 @@ public class DocController {
 //        return historyService.getDetail(id);
 //    }
 //
-    @ResponseBody
+    
     @WsDocNote("4、创建新单据")
     @RequestMapping(value = "/pre/create",method = RequestMethod.POST)
     public DocHV preCreate(
@@ -91,7 +91,7 @@ public class DocController {
         return docEngine.create(docType,preDocId);
     }
 
-    @ResponseBody
+    
     @WsDocNote("7、计算")
     @RequestMapping(value = "/calculate",method = RequestMethod.POST)
     public DocHV calculate(
@@ -106,7 +106,7 @@ public class DocController {
         DocHV doc;
     }
 //
-//    @ResponseBody
+//    
 //    @ResponseCompress
 //    @WsDocNote("8、调用")
 //    @RequestMapping(value = "/call/{docType}",method = RequestMethod.POST)
@@ -127,7 +127,7 @@ public class DocController {
 //        return docEngineWithPerm.preUpdateForController(docType,docId);
 //    }
 //
-    @ResponseBody
+    
     @WsDocNote("A、修改单据")
     @RequestMapping(value = "/update",method = RequestMethod.POST)
     public DocHV update(
@@ -156,7 +156,7 @@ public class DocController {
         return docEngine.doUpdate(doc);
     }
 //
-//    @ResponseBody
+//    
 //    @ResponseCompress
 //    @WsDocNote("B、执行单据函数")
 //    @RequestMapping(value = "/exec/processor/{docType}",method = RequestMethod.POST)
@@ -166,7 +166,7 @@ public class DocController {
 //        return docService.execDocProcessorFunc(docType,json);
 //    }
 //
-//    @ResponseBody
+//    
 //    @ResponseCompress
 //    @WsDocNote("C、执行组件函数")
 //    @RequestMapping(value = {

@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ import java.util.List;
  */
 @WsDocNote("C1.菜单设置")
 @RequestMapping("/settings/menu")
-@Controller
+@RestController
 @PreAuthorize("hasAnyAuthority('*:*','SETTINGS:*','SETTINGS:MENU')")
 public class MenuSettingsController {
 
@@ -25,7 +26,6 @@ public class MenuSettingsController {
     private WebMenuService webappMenuService;
 
     @WsDocNote("1.加载Web主菜单")
-    @ResponseBody
     @RequestMapping("/menus")
     public List<WebMenuBO> menus(){
         return webappMenuService.getMenus(false);
@@ -33,7 +33,6 @@ public class MenuSettingsController {
 
 
     @WsDocNote("2.更新菜单")
-    @ResponseBody
     @RequestMapping("/save")
     public void save(@RequestBody List<WebMenuBO> menus){
         webappMenuService.doUpdate(menus);
