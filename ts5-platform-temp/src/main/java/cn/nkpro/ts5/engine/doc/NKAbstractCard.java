@@ -57,7 +57,9 @@ public abstract class NKAbstractCard<DT,DDT> implements NKCard<DT,DDT> {
      * @throws Exception
      */
     @SuppressWarnings("all")
-    public final DT create(DocHV doc, DocHV preDoc, DocDefHV docDef) throws Exception{
+
+    @Override
+    public final DT create(DocHV doc, DocHV preDoc, DocDefI docDef) throws Exception{
         Class<DT> typeDT = (Class<DT>) getType(0);
 
         if(typeDT == Map.class){

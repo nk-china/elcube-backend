@@ -4,6 +4,7 @@ import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote
 import cn.nkpro.ts5.engine.doc.NKAbstractCard
 import cn.nkpro.ts5.engine.doc.model.DocDefHV
 import cn.nkpro.ts5.engine.doc.model.DocHV
+import cn.nkpro.ts5.model.mb.gen.DocDefI
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
@@ -33,7 +34,7 @@ class NkCardDate extends NKAbstractCard<Map,Map> {
     String[] getDefComponentNames() {
         return ["NkCardDateDef"];
     }
-//@Override
+    //@Override
     String getComponentDesc() {
         return null
     }
@@ -52,4 +53,6 @@ class NkCardDate extends NKAbstractCard<Map,Map> {
     protected void doUpdate(DocHV doc, DocDefHV docDef, Map data, Map o) throws Exception {
 
     }
+
+
 }

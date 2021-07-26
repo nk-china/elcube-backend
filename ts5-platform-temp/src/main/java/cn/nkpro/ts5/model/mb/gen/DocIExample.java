@@ -194,6 +194,76 @@ public class DocIExample {
             criteria.add(new Criterion(condition, value1, value2));
         }
 
+        public Criteria andCardKeyIsNull() {
+            addCriterion("CARD_KEY is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyIsNotNull() {
+            addCriterion("CARD_KEY is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyEqualTo(String value) {
+            addCriterion("CARD_KEY =", value, "cardKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyNotEqualTo(String value) {
+            addCriterion("CARD_KEY <>", value, "cardKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyGreaterThan(String value) {
+            addCriterion("CARD_KEY >", value, "cardKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyGreaterThanOrEqualTo(String value) {
+            addCriterion("CARD_KEY >=", value, "cardKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyLessThan(String value) {
+            addCriterion("CARD_KEY <", value, "cardKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyLessThanOrEqualTo(String value) {
+            addCriterion("CARD_KEY <=", value, "cardKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyLike(String value) {
+            addCriterion("CARD_KEY like", value, "cardKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyNotLike(String value) {
+            addCriterion("CARD_KEY not like", value, "cardKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyIn(List<String> values) {
+            addCriterion("CARD_KEY in", values, "cardKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyNotIn(List<String> values) {
+            addCriterion("CARD_KEY not in", values, "cardKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyBetween(String value1, String value2) {
+            addCriterion("CARD_KEY between", value1, value2, "cardKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyNotBetween(String value1, String value2) {
+            addCriterion("CARD_KEY not between", value1, value2, "cardKey");
+            return (Criteria) this;
+        }
+
         public Criteria andDocIdIsNull() {
             addCriterion("DOC_ID is null");
             return (Criteria) this;
@@ -261,76 +331,6 @@ public class DocIExample {
 
         public Criteria andDocIdNotBetween(String value1, String value2) {
             addCriterion("DOC_ID not between", value1, value2, "docId");
-            return (Criteria) this;
-        }
-
-        public Criteria andItemKeyIsNull() {
-            addCriterion("ITEM_KEY is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andItemKeyIsNotNull() {
-            addCriterion("ITEM_KEY is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andItemKeyEqualTo(String value) {
-            addCriterion("ITEM_KEY =", value, "itemKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andItemKeyNotEqualTo(String value) {
-            addCriterion("ITEM_KEY <>", value, "itemKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andItemKeyGreaterThan(String value) {
-            addCriterion("ITEM_KEY >", value, "itemKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andItemKeyGreaterThanOrEqualTo(String value) {
-            addCriterion("ITEM_KEY >=", value, "itemKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andItemKeyLessThan(String value) {
-            addCriterion("ITEM_KEY <", value, "itemKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andItemKeyLessThanOrEqualTo(String value) {
-            addCriterion("ITEM_KEY <=", value, "itemKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andItemKeyLike(String value) {
-            addCriterion("ITEM_KEY like", value, "itemKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andItemKeyNotLike(String value) {
-            addCriterion("ITEM_KEY not like", value, "itemKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andItemKeyIn(List<String> values) {
-            addCriterion("ITEM_KEY in", values, "itemKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andItemKeyNotIn(List<String> values) {
-            addCriterion("ITEM_KEY not in", values, "itemKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andItemKeyBetween(String value1, String value2) {
-            addCriterion("ITEM_KEY between", value1, value2, "itemKey");
-            return (Criteria) this;
-        }
-
-        public Criteria andItemKeyNotBetween(String value1, String value2) {
-            addCriterion("ITEM_KEY not between", value1, value2, "itemKey");
             return (Criteria) this;
         }
 

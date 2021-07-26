@@ -19,6 +19,6 @@ public class DocEngineTest {
 
     @Test
     public void test1(){
-        docEngine.getDoc("1");
+        docEngine.detail("1");
     }
 }

@@ -346,26 +346,48 @@ public class NKDocDefServiceImpl implements NKDocDefService {
      * @return DocDefHV
      */
     @Override
-    public DocDefHV getDocDefined(String docType){
+    public DocDefHV getDocDef(String docType, Integer major){
+
+        String version = null;
 
         String today = DateTimeUtilz.todayShortString();
+        if(major == null){
+            // 查找最新版本
 
-        DocDefHExample example = new DocDefHExample();
-        example.createCriteria()
-                .andDocTypeEqualTo(docType)
-                .andValidFromLessThanOrEqualTo(today)
-                .andValidToGreaterThanOrEqualTo(today)
-                .andStateEqualTo("Active");
-        example.setOrderByClause("VERSION DESC");
+            DocDefHExample example = new DocDefHExample();
+            example.createCriteria()
+                    .andDocTypeEqualTo(docType)
+                    .andValidFromLessThanOrEqualTo(today)
+                    .andValidToGreaterThanOrEqualTo(today)
+                    .andStateEqualTo("Active");
+            example.setOrderByClause("VERSION DESC");
 
-        Optional<DocDefH> first = docDefHMapper
-                .selectByExample(example, new RowBounds(0, 1))
-                .stream()
-                .findFirst();
+            Optional<DocDefH> first = docDefHMapper
+                    .selectByExample(example, new RowBounds(0, 1))
+                    .stream()
+                    .findFirst();
 
-        Assert.isTrue(first.isPresent(),String.format("单据类型[%s]的配置没有找到",docType));
+            Assert.isTrue(first.isPresent(),String.format("单据类型[%s]的配置没有找到",docType));
 
-        return getDocDefined(docType,first.get().getVersion(), false,false);
+            version = first.get().getVersion();
+        }else{
+            DocDefHExample example = new DocDefHExample();
+            example.createCriteria()
+                    .andDocTypeEqualTo(docType)
+                    .andVersionLike(major+".%")
+                    .andValidFromLessThanOrEqualTo(today)
+                    .andValidToGreaterThanOrEqualTo(today)
+                    .andStateEqualTo("Active");
+
+            Optional<DocDefH> first = docDefHMapper
+                    .selectByExample(example, new RowBounds(0, 1))
+                    .stream()
+                    .findFirst();
+
+            Assert.isTrue(first.isPresent(),String.format("单据类型[%s]版本[%s]的配置没有找到",docType,major));
+        }
+
+        return getDocDef(docType,version, false,false);
     }
 
     /**
@@ -375,7 +397,7 @@ public class NKDocDefServiceImpl implements NKDocDefService {
      * @return DocDefHV
      */
     @Override
-    public DocDefHV getDocDefined(String docType,String version, boolean includeComponentMarkdown, boolean ignoreError){
+    public DocDefHV getDocDef(String docType, String version, boolean includeComponentMarkdown, boolean ignoreError){
         String cacheKey = String.format(Constants.CACHE_DEF_DOC,docType,version);
 
         DocDefHV docDefHV = redisSupport.getIfAbsent(cacheKey,StringUtils.EMPTY,()->{
@@ -476,14 +498,15 @@ public class NKDocDefServiceImpl implements NKDocDefService {
 //        return defined;
 //    }
 
-    private void doInCards(DocDefHV docDefHV, RunInComponents runInComponents){
+    @Override
+    public void doInCards(DocDefHV docDefHV, RunInComponents runInComponents) throws Exception{
 
-        docDefHV.getCards().forEach((docDefI) -> {
+        for(DocDefIV docDefI : docDefHV.getCards()){
             // 找到对应的组件实现类
             runInComponents.run(
                     customObjectManager.getCustomObjectIfExists(docDefI.getCardKey(), NKCard.class),
                     docDefI);
-        });
+        }
     }
 //
 //    @Override
@@ -544,10 +567,5 @@ public class NKDocDefServiceImpl implements NKDocDefService {
                 .stream()
                 .findFirst()
                 .orElse(null);
-    }
-
-    @FunctionalInterface
-    private interface RunInComponents{
-        void run(NKCard card, DocDefIV docDefIV);
     }
 }

@@ -9,6 +9,10 @@ public class VersioningUtils {
         return split[0];
     }
 
+    public static Integer parseMajorInteger(String version){
+        return Integer.parseInt(parseMajor(version));
+    }
+
     public static String parseMinor(String version){
         String[] split = defaultIfBlank(version).split("[.]");
         String major = split[0];

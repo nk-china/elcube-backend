@@ -2,7 +2,9 @@ package cn.nkpro.ts5.controller;
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
 import cn.nkpro.ts5.config.mvc.CompressResponse;
+import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.engine.doc.service.NKDocDefService;
+import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService;
 import cn.nkpro.ts5.model.mb.gen.DocDefH;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -22,6 +24,9 @@ public class DocController {
 
     @Autowired@SuppressWarnings("all")
     private NKDocDefService docDefService;
+
+    @Autowired@SuppressWarnings("all")
+    private NkDocEngineFrontService docEngine;
 //    @Autowired
 //    private TfmsDocService docService;
 //    @Autowired
@@ -71,15 +76,14 @@ public class DocController {
 //        return historyService.getDetail(id);
 //    }
 //
-//    @ResponseCompress
-//    @WsDocNote("4、创建新单据")
-//    @RequestMapping(value = "/pre/create",method = RequestMethod.POST)
-//    public BizDocBase preCreate(
-//            @WsDocNote(value="容器ID") @RequestParam(value="refObjectId",required = false) String refObjectId,
-//            @WsDocNote(value="前序ID") @RequestParam(value="preDocId",required = false) String preDocId,
-//            @WsDocNote(value="单据类型") @RequestParam(value="docType") String docType) {
-//        return docEngineWithPerm.toCreateForController(refObjectId,preDocId,docType);
-//    }
+    @CompressResponse
+    @WsDocNote("4、创建新单据")
+    @RequestMapping(value = "/pre/create",method = RequestMethod.POST)
+    public DocHV preCreate(
+            @WsDocNote(value="前序ID") @RequestParam(value="preDocId",required = false) String preDocId,
+            @WsDocNote(value="单据类型") @RequestParam(value="docType") String docType) throws Exception {
+        return docEngine.toCreate(docType,preDocId);
+    }
 //
 //    @ResponseCompress
 //    @WsDocNote("7、计算")

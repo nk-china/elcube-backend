@@ -1,6 +1,8 @@
 package cn.nkpro.ts5.engine.doc.service;
 
 import cn.nkpro.ts5.basic.PageList;
+import cn.nkpro.ts5.engine.doc.NKCard;
+import cn.nkpro.ts5.engine.doc.impl.NKDocDefServiceImpl;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocDefIV;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
@@ -40,9 +42,16 @@ public interface NKDocDefService {
 
     List<DocDefH> getEntrance(String classify);
 
-    DocDefHV getDocDefined(String docType);
+    DocDefHV getDocDef(String docType, Integer major);
 
-    DocDefHV getDocDefined(String docType,String version, boolean includeComponentMarkdown, boolean ignoreError);
+    DocDefHV getDocDef(String docType, String version, boolean includeComponentMarkdown, boolean ignoreError);
 
     DocDefHV getDocDefinedRuntime(String docType, DocHV doc);
+
+    void doInCards(DocDefHV docDefHV, RunInComponents runInComponents) throws Exception;
+
+    @FunctionalInterface
+    interface RunInComponents{
+        void run(NKCard card, DocDefIV docDefIV) throws Exception;
+    }
 }

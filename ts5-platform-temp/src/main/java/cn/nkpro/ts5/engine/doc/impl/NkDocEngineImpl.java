@@ -3,9 +3,12 @@ package cn.nkpro.ts5.engine.doc.impl;
 import cn.nkpro.ts5.basic.NKCustomObjectManager;
 import cn.nkpro.ts5.engine.doc.NKCard;
 import cn.nkpro.ts5.engine.doc.NKDocDefManager;
+import cn.nkpro.ts5.engine.doc.NKDocProcessor;
 import cn.nkpro.ts5.engine.doc.ThreadLocalContextHolder;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
+import cn.nkpro.ts5.engine.doc.service.NKDocDefService;
+import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService;
 import cn.nkpro.ts5.model.mb.gen.*;
 import cn.nkpro.ts5.supports.RedisSupport;
 import cn.nkpro.ts5.utils.BeanUtilz;
@@ -15,29 +18,39 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class NkDocEngineImpl {
+public class NkDocEngineImpl implements NkDocEngineFrontService {
 
     @Autowired
     private DocHMapper docHMapper;
     @Autowired
-    private DocIMapper docIMapper;
-    @Autowired
     private RedisSupport<DocHV> redisSupport;
-    @Autowired
-    private RedisSupport<Object> redisSupportItem;
     @Autowired
     private NKCustomObjectManager customObjectManager;
     @Autowired
-    private NKDocDefManager docDefManager;
+    private NKDocDefService docDefService;
 
-    public DocHV toCreate(String docType){
-        return null;
+    @Override
+    public DocHV toCreate(String docType, String preDocId) throws Exception {
+
+        // 获取前序单据
+        DocHV preDoc = StringUtils.isBlank(preDocId) || StringUtils.equalsIgnoreCase(preDocId,"@") ? null : detail(preDocId);
+        Optional<DocHV> optPreDoc = Optional.ofNullable(preDoc);
+
+        // 获取单据配置
+        DocDefHV def = docDefService.getDocDef(docType, optPreDoc.map(DocH::getDefVersion).orElse(null));
+
+        // 获取单据处理器
+        NKDocProcessor processor = customObjectManager.getCustomObject(def.getRefObjectType(), NKDocProcessor.class);
+
+        // 创建单据
+        return processor.toCreate(def, null);
     }
 
-    public DocHV getDoc(String docId){
+    public DocHV detail(String docId){
 
         // 获取单据抬头
         DocHV docHV = redisSupport.getIfAbsent(docId, StringUtils.EMPTY,()->{
@@ -45,37 +58,39 @@ public class NkDocEngineImpl {
         });
 
         // 获取单据DEF
-        DocDefHV def = docDefManager.getDef(docHV.getDocType(), docHV.getDefVersion()+"");
+        DocDefHV def = docDefService.getDocDef(docHV.getDocType(), docHV.getDefVersion());
 
-        // 获取单据行项目
-        doInComponents(docId,def,false,(nkCard,docDefI)->{
+        // 获取单据处理器
+        NKDocProcessor processor = customObjectManager.getCustomObject(def.getRefObjectType(), NKDocProcessor.class);
 
-            Object itemData = redisSupportItem.getIfAbsent(docId, docDefI.getCardKey(), () -> {
-
-                // 从DB获取卡片数据
-                DocIKey docIKey = new DocIKey();
-                docIKey.setDocId(docId);
-                docIKey.setItemKey(docDefI.getCardKey());
-                DocI docI = docIMapper.selectByPrimaryKey(docIKey);
-
-                // 调用卡片程序解析数据
-                try{
-                    return nkCard.afterGetData(docHV, docI.getItemContent(), docDefI.getCardContent());
-                }finally {
-                    docI.setItemContent(null);
-                }
-            });
-
-            docHV.getData().put(docDefI.getCardKey(),itemData);
-        });
+        return processor.detail(def, docId);
+//
+//        // 获取单据行项目
+//        doInComponents(docId,def,false,(nkCard,docDefI)->{
+//
+//            Object itemData = redisSupportItem.getIfAbsent(docId, docDefI.getCardKey(), () -> {
+//
+//                // 从DB获取卡片数据
+//                DocIKey docIKey = new DocIKey();
+//                docIKey.setDocId(docId);
+//                docIKey.setItemKey(docDefI.getCardKey());
+//                DocI docI = docIMapper.selectByPrimaryKey(docIKey);
+//
+//                // 调用卡片程序解析数据
+//                try{
+//                    return nkCard.afterGetData(docHV, docI.getItemContent(), docDefI.getCardContent());
+//                }finally {
+//                    docI.setItemContent(null);
+//                }
+//            });
+//
+//            docHV.getData().put(docDefI.getCardKey(),itemData);
+//        });
 
         // 触发单据数据加载完成事件
         //doInComponents(docId,def,false,(nkCard,docDefI)->{
         //    nkDoc.getData().put(docDefI.getItemKey(),nkDoc.getData().get(docDefI.getItemKey()));
         //});
-
-
-        return docHV;
     }
 
     public DocHV doCalc(DocHV doc){

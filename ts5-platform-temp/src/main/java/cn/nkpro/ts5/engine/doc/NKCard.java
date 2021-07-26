@@ -19,6 +19,8 @@ public interface NKCard<DT,DDT> extends NKCustomObject {
 
     String getCardName();
 
+    DT create(DocHV doc, DocHV preDoc, DocDefI defI) throws Exception;
+
     Object afterCreate(DocHV doc, DocHV preDoc, DT data, DDT def);
 
     @SuppressWarnings("all")

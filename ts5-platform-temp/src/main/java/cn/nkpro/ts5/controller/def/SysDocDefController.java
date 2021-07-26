@@ -63,7 +63,7 @@ public class SysDocDefController {
     @RequestMapping(value = "/type/detail/{docType}/{version}")
     public DocDefHV detail(
             @WsDocNote(value = "单据类型") @PathVariable("docType") String docType, @PathVariable String version){
-        return defDocTypeService.getDocDefined(docType, version, true, true);
+        return defDocTypeService.getDocDef(docType, version, true, true);
     }
 
     @WsDocNote("4.预处理编辑单据配置")
