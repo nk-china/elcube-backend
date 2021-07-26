@@ -544,6 +544,66 @@ public class DocDefFlowExample {
             return (Criteria) this;
         }
 
+        public Criteria andActiveIsNull() {
+            addCriterion("ACTIVE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andActiveIsNotNull() {
+            addCriterion("ACTIVE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andActiveEqualTo(Integer value) {
+            addCriterion("ACTIVE =", value, "active");
+            return (Criteria) this;
+        }
+
+        public Criteria andActiveNotEqualTo(Integer value) {
+            addCriterion("ACTIVE <>", value, "active");
+            return (Criteria) this;
+        }
+
+        public Criteria andActiveGreaterThan(Integer value) {
+            addCriterion("ACTIVE >", value, "active");
+            return (Criteria) this;
+        }
+
+        public Criteria andActiveGreaterThanOrEqualTo(Integer value) {
+            addCriterion("ACTIVE >=", value, "active");
+            return (Criteria) this;
+        }
+
+        public Criteria andActiveLessThan(Integer value) {
+            addCriterion("ACTIVE <", value, "active");
+            return (Criteria) this;
+        }
+
+        public Criteria andActiveLessThanOrEqualTo(Integer value) {
+            addCriterion("ACTIVE <=", value, "active");
+            return (Criteria) this;
+        }
+
+        public Criteria andActiveIn(List<Integer> values) {
+            addCriterion("ACTIVE in", values, "active");
+            return (Criteria) this;
+        }
+
+        public Criteria andActiveNotIn(List<Integer> values) {
+            addCriterion("ACTIVE not in", values, "active");
+            return (Criteria) this;
+        }
+
+        public Criteria andActiveBetween(Integer value1, Integer value2) {
+            addCriterion("ACTIVE between", value1, value2, "active");
+            return (Criteria) this;
+        }
+
+        public Criteria andActiveNotBetween(Integer value1, Integer value2) {
+            addCriterion("ACTIVE not between", value1, value2, "active");
+            return (Criteria) this;
+        }
+
         public Criteria andUpdatedTimeIsNull() {
             addCriterion("UPDATED_TIME is null");
             return (Criteria) this;

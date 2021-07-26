@@ -30,6 +30,8 @@
 		<javaClientGenerator 	targetPackage="cn.nkpro.ts5.model.mb.gen" 	targetProject="src/main/java" type="XMLMAPPER" />
 
 		<!-- 2.0 -->
+		<table tableName="nk_constant_def"					enableDeleteByExample="true" domainObjectName="ConstantDef"/>
+
 		<table tableName="nk_doc_h"		  					enableDeleteByExample="false" domainObjectName="DocH"/>
 		<table tableName="nk_doc_i"		 					enableDeleteByExample="false" domainObjectName="DocI"/>
 		<table tableName="nk_doc_def_h"		 				enableDeleteByExample="false" domainObjectName="DocDefH"/>
@@ -52,7 +54,6 @@
 
 		<table tableName="sys_log_doc_record"			 	enableDeleteByExample="false"/>
 
-		<table tableName="def_constant"					 	enableDeleteByExample="true"/>
 		<table tableName="def_script"					 	enableDeleteByExample="false"/>
 
 		<table tableName="def_project_type"				 	enableDeleteByExample="false"/>

@@ -9,6 +9,8 @@ import java.io.Serializable;
 public class DocDefFlow extends DocDefFlowKey implements Serializable {
     private String refObjectType;
 
+    private Integer active;
+
     private Long updatedTime;
 
     private Integer orderBy;
@@ -28,6 +30,15 @@ public class DocDefFlow extends DocDefFlowKey implements Serializable {
 
     public void setRefObjectType(String refObjectType) {
         this.refObjectType = refObjectType;
+    }
+
+    @cn.nkpro.ts5.basic.wsdoc.annotation.CodeFieldNotes("")
+    public Integer getActive() {
+        return active;
+    }
+
+    public void setActive(Integer active) {
+        this.active = active;
     }
 
     @cn.nkpro.ts5.basic.wsdoc.annotation.CodeFieldNotes("")

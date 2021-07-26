@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.controller.sys;
+package cn.nkpro.ts5.controller.settings;
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
 import cn.nkpro.ts5.config.mvc.CompressResponse;
@@ -16,17 +16,16 @@ import java.util.List;
 /**
  * Created by bean on 2019/12/18.
  */
-@WsDocNote("D5.菜单管理控制器")
-@RequestMapping("/sys/menu")
+@WsDocNote("C1.菜单设置")
+@RequestMapping("/settings/menu")
 @Controller
 @PreAuthorize("hasAnyAuthority('*:*','SETTINGS:*','SETTINGS:MENU')")
-public class SysMenuController {
+public class MenuSettingsController {
 
     @Autowired@SuppressWarnings("all")
     private TfmsSysWebappMenuService webappMenuService;
 
-
-    @WsDocNote("11、加载Web主菜单")
+    @WsDocNote("1.加载Web主菜单")
     @CompressResponse
     @RequestMapping("/menus")
     public List<SysWebappMenuBO> menus(){
@@ -34,7 +33,7 @@ public class SysMenuController {
     }
 
 
-    @WsDocNote("12、更新菜单")
+    @WsDocNote("2.更新菜单")
     @ResponseBody
     @RequestMapping("/save")
     public void save(@RequestBody List<SysWebappMenuBO> menus){

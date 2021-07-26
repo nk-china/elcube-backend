@@ -254,6 +254,7 @@ public class NKDocDefServiceImpl implements NKDocDefService {
                     flow.setPreDocState(StringUtils.defaultIfBlank(flow.getPreDocState(),"@"));
                     flow.setDocType(docDefHV.getDocType());
                     flow.setVersion(docDefHV.getVersion());
+                    flow.setActive(StringUtils.equals(docDefHV.getState(),"Active")?1:0);
                     flow.setOrderBy(docDefHV.getFlows().indexOf(flow));
                     flow.setUpdatedTime(DateTimeUtilz.nowSeconds());
 
@@ -394,7 +395,19 @@ public class NKDocDefServiceImpl implements NKDocDefService {
             version = first.get().getVersion();
         }
 
-        return getDocDef(docType,version, false,false);
+        return Optional.ofNullable(getDocDef(docType,version, false,false))
+                .stream()
+                .peek(def->{
+                    DocDefFlowExample flowExample = new DocDefFlowExample();
+                    flowExample.createCriteria()
+                            .andPreDocTypeEqualTo(docType)
+                            .andActiveEqualTo(1)
+                            .andVersionLike(VersioningUtils.parseMajor(version)+".%");
+                    flowExample.setOrderByClause("ORDER_BY");
+                    def.setFlows(docDefFlowMapper.selectByExample(flowExample));
+                })
+                .findFirst()
+                .orElse(null);
     }
 
     /**
