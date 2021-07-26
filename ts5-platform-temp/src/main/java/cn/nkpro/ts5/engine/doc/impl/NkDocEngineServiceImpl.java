@@ -2,19 +2,21 @@ package cn.nkpro.ts5.engine.doc.impl;
 
 import cn.nkpro.ts5.basic.NKCustomObjectManager;
 import cn.nkpro.ts5.engine.doc.NKCard;
-import cn.nkpro.ts5.engine.doc.NKDocDefManager;
 import cn.nkpro.ts5.engine.doc.NKDocProcessor;
 import cn.nkpro.ts5.engine.doc.ThreadLocalContextHolder;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.engine.doc.service.NKDocDefService;
 import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService;
-import cn.nkpro.ts5.model.mb.gen.*;
+import cn.nkpro.ts5.model.mb.gen.DocDefIWithBLOBs;
+import cn.nkpro.ts5.model.mb.gen.DocH;
+import cn.nkpro.ts5.model.mb.gen.DocHMapper;
 import cn.nkpro.ts5.supports.RedisSupport;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
 import java.util.List;
@@ -22,7 +24,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class NkDocEngineImpl implements NkDocEngineFrontService {
+@Service
+public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
 
     @Autowired
     private DocHMapper docHMapper;

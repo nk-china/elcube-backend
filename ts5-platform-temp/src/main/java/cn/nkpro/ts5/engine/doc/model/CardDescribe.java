@@ -4,8 +4,8 @@ import lombok.Data;
 
 @Data
 public class CardDescribe {
-    private String cardHandler;
-    private String cardName;
-    private String dataComponentName;
-    private String[] defComponentNames;
+    private String      cardHandler;
+    private String      cardName;
+    private String      dataComponentName;
+    private String[]    defComponentNames;
 }
