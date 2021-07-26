@@ -1,9 +1,8 @@
 package cn.nkpro.ts5.controller.settings;
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
-import cn.nkpro.ts5.config.mvc.CompressResponse;
-import cn.nkpro.ts5.engine.web.model.WebMenuBO;
 import cn.nkpro.ts5.engine.web.WebMenuService;
+import cn.nkpro.ts5.engine.web.model.WebMenuBO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -26,7 +25,7 @@ public class MenuSettingsController {
     private WebMenuService webappMenuService;
 
     @WsDocNote("1.加载Web主菜单")
-    @CompressResponse
+    @ResponseBody
     @RequestMapping("/menus")
     public List<WebMenuBO> menus(){
         return webappMenuService.getMenus(false);

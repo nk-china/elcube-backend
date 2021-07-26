@@ -3,10 +3,11 @@
 nk:
   env-key: ts5-platform-beebattle-dev
   env-name: 研发环境 in BeeBattle
-  response-compress: false
   file-root-path: /Users/ybo/Downloads/tfms
   #长度介于6-16位，且必须包含1个大写字母，1个小写字母，及1个特殊符号
   password-strategy: ^.*(?=.{6,16})(?=.*\d)(?=.*[A-Z]{1,})(?=.*[a-z]{1,})(?=.*[.!@#$%^&*?\(\)]).*$
+  compress:
+    enabled: false #开发环境不压缩
 #  aliyun:
 #    access-key-id: LTAI4G6YUdTBx8b9C8uR3gTU
 #    access-key-secret: zeqaRsOAOkwwTLK8E2QyR1aEcj6RAL
@@ -17,6 +18,7 @@ nk:
 #    access-key-secret: CdDHj5aM2w8kLT89NsLAjxGRzY9b7C0ZduzGvimf
 #    obs:
 #      bucket: tfms
+
 
 server:
   port: 9200

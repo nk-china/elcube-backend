@@ -5,7 +5,7 @@ import cn.nkpro.ts5.model.mb.gen.SysUserSavedQuery;
 import cn.nkpro.ts5.model.mb.gen.SysUserSavedQueryExample;
 import cn.nkpro.ts5.model.mb.gen.SysUserSavedQueryMapper;
 import cn.nkpro.ts5.engine.web.UserQueryService;
-import cn.nkpro.ts5.supports.GUID;
+import cn.nkpro.ts5.config.id.GUID;
 import cn.nkpro.ts5.utils.SecurityUtilz;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

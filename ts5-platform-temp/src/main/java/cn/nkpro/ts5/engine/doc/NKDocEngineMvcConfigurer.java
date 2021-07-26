@@ -29,6 +29,7 @@ public class NKDocEngineMvcConfigurer implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new DebugHandlerInterceptor());
+        registry.addInterceptor(new ThreadLocalClearInterceptor());
     }
 
     class DebugHandlerInterceptor implements HandlerInterceptor {

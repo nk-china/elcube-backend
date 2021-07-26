@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.config.security.validate;
 
 import cn.nkpro.ts5.config.security.TfmsUserDetails;
-import cn.nkpro.ts5.supports.defaults.DefaultRedisSupportImpl;
+import cn.nkpro.ts5.config.redis.defaults.DefaultRedisSupportImpl;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;

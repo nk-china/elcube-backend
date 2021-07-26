@@ -2,7 +2,6 @@ package cn.nkpro.ts5.controller.def;
 
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
-import cn.nkpro.ts5.config.mvc.CompressResponse;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocDefIV;
 import cn.nkpro.ts5.engine.doc.service.NKDocDefService;
@@ -28,7 +27,7 @@ public class SysDocDefController {
     private NKDocDefService defDocTypeService;
 
     @WsDocNote("1.获取单据配置列表")
-    @CompressResponse
+    @ResponseBody
     @RequestMapping("/type/page")
     public PageList<DocDefH> getPage(
             @WsDocNote("单据分类")
@@ -59,7 +58,7 @@ public class SysDocDefController {
     }
 
     @WsDocNote("3.获取单据配置详情")
-    @CompressResponse
+    @ResponseBody
     @RequestMapping(value = "/type/detail/{docType}/{version}")
     public DocDefHV detail(
             @WsDocNote(value = "单据类型") @PathVariable("docType") String docType, @PathVariable String version){

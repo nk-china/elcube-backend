@@ -1,13 +1,12 @@
 package cn.nkpro.ts5.controller.settings;
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
-import cn.nkpro.ts5.config.mvc.CompressResponse;
+import cn.nkpro.ts5.engine.web.UserAuthorizationService;
 import cn.nkpro.ts5.engine.web.model.UserGroupBO;
 import cn.nkpro.ts5.model.mb.gen.SysAccount;
 import cn.nkpro.ts5.model.mb.gen.SysAuthGroup;
 import cn.nkpro.ts5.model.mb.gen.SysAuthLimit;
 import cn.nkpro.ts5.model.mb.gen.SysAuthPermission;
-import cn.nkpro.ts5.engine.web.UserAuthorizationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -26,19 +25,19 @@ public class AuthSettingsController {
     @Autowired
     private UserAuthorizationService permService;
 
-    @CompressResponse
+    @ResponseBody
     @RequestMapping("/limit/list")
     public List<SysAuthLimit> limits(){
         return permService.getLimits(null);
     }
 
-    @CompressResponse
+    @ResponseBody
     @RequestMapping("/limit/detail")
     public SysAuthLimit limitDetail(String limitId){
         return permService.getLimitDetail(limitId);
     }
 
-    @CompressResponse
+    @ResponseBody
     @RequestMapping("/limit/update")
     public SysAuthLimit limitUpdate(@RequestBody SysAuthLimit limit){
         permService.updateLimit(limit);
@@ -50,19 +49,19 @@ public class AuthSettingsController {
         permService.removeLimit(limitId);
     }
 
-    @CompressResponse
+    @ResponseBody
     @RequestMapping("/perm/list")
     public List<SysAuthPermission> perms(){
         return permService.getPerms();
     }
 
-    @CompressResponse
+    @ResponseBody
     @RequestMapping("/perm/detail")
     public SysAuthPermission permDetail(String permId){
         return permService.getPermDetail(permId);
     }
 
-    @CompressResponse
+    @ResponseBody
     @RequestMapping("/perm/update")
     public SysAuthPermission permUpdate(@RequestBody SysAuthPermission perm){
         permService.updatePerm(perm);
@@ -74,19 +73,19 @@ public class AuthSettingsController {
         permService.removePerm(permId);
     }
 
-    @CompressResponse
+    @ResponseBody
     @RequestMapping("/group/list")
     public List<SysAuthGroup> groups(){
         return permService.getGroups();
     }
 
-    @CompressResponse
+    @ResponseBody
     @RequestMapping("/group/detail")
     public SysAuthGroup groupDetail(String groupId){
         return permService.getGroupDetail(groupId);
     }
 
-    @CompressResponse
+    @ResponseBody
     @RequestMapping("/group/update")
     public UserGroupBO groupUpdate(@RequestBody UserGroupBO group){
         permService.updateGroup(group);
@@ -98,20 +97,20 @@ public class AuthSettingsController {
         permService.removeGroup(groupId);
     }
 
-    @CompressResponse
+    @ResponseBody
     @RequestMapping("/group/remove/account")
     public SysAuthGroup groupRemoveAccount(String groupId,String accountId){
         permService.removeAccountFromGroup(groupId,accountId);
         return permService.getGroupDetail(groupId);
     }
 
-    @CompressResponse
+    @ResponseBody
     @RequestMapping("/group/add/account")
     public SysAuthGroup groupAddAccount(String groupId, String accountId){
         permService.addAccountFromGroup(groupId,accountId);
         return permService.getGroupDetail(groupId);
     }
-    @CompressResponse
+    @ResponseBody
     @RequestMapping("/accounts")
     public List<SysAccount> accounts(String keyword){
         return permService.accounts(keyword);

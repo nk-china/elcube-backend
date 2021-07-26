@@ -1,7 +1,6 @@
 package cn.nkpro.ts5.controller.def;
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
-import cn.nkpro.ts5.config.mvc.CompressResponse;
 import cn.nkpro.ts5.engine.script.NKScriptEngine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;

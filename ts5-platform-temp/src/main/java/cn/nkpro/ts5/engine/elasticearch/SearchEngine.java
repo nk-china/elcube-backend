@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.engine.elasticearch;
 
-import cn.nkpro.ts5.config.nk.NKProperties;
+import cn.nkpro.ts5.config.global.NKProperties;
 import cn.nkpro.ts5.engine.elasticearch.annotation.*;
 import cn.nkpro.ts5.engine.elasticearch.model.ESDoc;
 import cn.nkpro.ts5.utils.LocalSyncUtilz;
@@ -25,7 +25,6 @@ import org.elasticsearch.search.aggregations.Aggregation;
 import org.elasticsearch.search.aggregations.bucket.filter.ParsedFilter;
 import org.elasticsearch.search.aggregations.bucket.terms.ParsedStringTerms;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;

@@ -5,7 +5,7 @@ import cn.nkpro.ts5.engine.doc.service.NKConstantService;
 import cn.nkpro.ts5.model.mb.gen.ConstantDef;
 import cn.nkpro.ts5.model.mb.gen.ConstantDefExample;
 import cn.nkpro.ts5.model.mb.gen.ConstantDefMapper;
-import cn.nkpro.ts5.supports.RedisSupport;
+import cn.nkpro.ts5.config.redis.RedisSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

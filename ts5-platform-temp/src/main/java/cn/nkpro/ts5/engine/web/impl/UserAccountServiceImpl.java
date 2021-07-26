@@ -1,14 +1,14 @@
 package cn.nkpro.ts5.engine.web.impl;
 
 import cn.nkpro.ts5.basic.Constants;
-import cn.nkpro.ts5.config.nk.NKProperties;
+import cn.nkpro.ts5.config.global.NKProperties;
 import cn.nkpro.ts5.engine.web.model.UserAccountBO;
 import cn.nkpro.ts5.model.mb.gen.SysAccount;
 import cn.nkpro.ts5.model.mb.gen.SysAccountExample;
 import cn.nkpro.ts5.model.mb.gen.SysAccountMapper;
 import cn.nkpro.ts5.engine.web.UserAuthorizationService;
 import cn.nkpro.ts5.engine.web.UserAccountService;
-import cn.nkpro.ts5.supports.RedisSupport;
+import cn.nkpro.ts5.config.redis.RedisSupport;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
 import cn.nkpro.ts5.utils.HashUtil;

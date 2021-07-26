@@ -1,7 +1,6 @@
 package cn.nkpro.ts5.controller.def;
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
-import cn.nkpro.ts5.config.mvc.CompressResponse;
 import cn.nkpro.ts5.engine.doc.service.NKConstantService;
 import cn.nkpro.ts5.model.mb.gen.ConstantDef;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +23,7 @@ public class SysConstantController {
     @Autowired
     private NKConstantService constantService;
 
-    @CompressResponse
+    @ResponseBody
     @WsDocNote("11、加载常量列表")
     @RequestMapping("/list")
     public List<ConstantDef> list(){

@@ -1,12 +1,10 @@
 package cn.nkpro.ts5.controller;
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
-import cn.nkpro.ts5.config.mvc.CompressObject;
-import cn.nkpro.ts5.config.mvc.CompressResponse;
 import cn.nkpro.ts5.config.security.TfmsUserDetails;
-import cn.nkpro.ts5.model.mb.gen.SysAuthLimit;
-import cn.nkpro.ts5.engine.web.UserAuthorizationService;
 import cn.nkpro.ts5.engine.web.UserAccountService;
+import cn.nkpro.ts5.engine.web.UserAuthorizationService;
+import cn.nkpro.ts5.model.mb.gen.SysAuthLimit;
 import cn.nkpro.ts5.utils.SecurityUtilz;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,17 +36,16 @@ public class AuthController {
 
     @WsDocNote("1.获取token登陆")
     @ResponseBody
-    @CompressResponse
     @RequestMapping("/token")
     public Map<String,Object> token(){
         return tfmsSysAccountService.createToken();
     }
 
     @WsDocNote("2.刷新token")
-    @CompressResponse
+    @ResponseBody
     @RequestMapping("/refresh_token")
-    public CompressObject refreshToken(){
-        return CompressObject.valueOf(tfmsSysAccountService.refreshToken());
+    public Map<String, Object> refreshToken(){
+        return tfmsSysAccountService.refreshToken();
     }
 
     @WsDocNote("3.清除token并退出")
@@ -59,7 +56,7 @@ public class AuthController {
     }
 
     @WsDocNote("4.获取用户信息")
-    @CompressResponse
+    @ResponseBody
     @RequestMapping("/info")
     public TfmsUserDetails info(){
         TfmsUserDetails user = SecurityUtilz.getUser();
@@ -68,7 +65,7 @@ public class AuthController {
     }
 
     @WsDocNote("5.获取用户授权限制")
-    @CompressResponse
+    @ResponseBody
     @RequestMapping("/info/limits")
     public List<SysAuthLimit> limits(@RequestBody String[] limitIds){
         if(ArrayUtils.isEmpty(limitIds)){

@@ -9,7 +9,7 @@ import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.engine.doc.service.NKDocDefService;
 import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService;
 import cn.nkpro.ts5.model.mb.gen.*;
-import cn.nkpro.ts5.supports.RedisSupport;
+import cn.nkpro.ts5.config.redis.RedisSupport;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.LocalSyncUtilz;
 import lombok.extern.slf4j.Slf4j;
