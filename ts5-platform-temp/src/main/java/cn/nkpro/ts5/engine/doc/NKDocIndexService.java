@@ -4,7 +4,7 @@ import cn.nkpro.ts5.engine.elasticearch.ESPageList;
 import cn.nkpro.ts5.engine.elasticearch.SearchEngine;
 import cn.nkpro.ts5.engine.elasticearch.model.ESDoc;
 import cn.nkpro.ts5.exception.TfmsException;
-import cn.nkpro.ts5.engine.web.TfmsPermService;
+import cn.nkpro.ts5.engine.web.UserAuthorizationService;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -28,7 +28,7 @@ public class NKDocIndexService {
     @Autowired
     private SearchEngine searchEngine;
     @Autowired
-    protected TfmsPermService permService;
+    protected UserAuthorizationService permService;
 
     public <T extends ESDoc> ESPageList<T> queryList(
             Class<T> docType,
@@ -47,7 +47,7 @@ public class NKDocIndexService {
             );
         }
         postQueryBuilder.must(
-            permService.buildDocFilter(TfmsPermService.MODE_READ, null,null,false)
+            permService.buildDocFilter(UserAuthorizationService.MODE_READ, null,null,false)
         );
 
         // 处理查询条件

@@ -2,8 +2,8 @@ package cn.nkpro.ts5.controller.settings;
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
 import cn.nkpro.ts5.config.mvc.CompressResponse;
-import cn.nkpro.ts5.model.SysWebappMenuBO;
-import cn.nkpro.ts5.engine.web.TfmsSysWebappMenuService;
+import cn.nkpro.ts5.engine.web.model.WebMenuBO;
+import cn.nkpro.ts5.engine.web.WebMenuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -23,12 +23,12 @@ import java.util.List;
 public class MenuSettingsController {
 
     @Autowired@SuppressWarnings("all")
-    private TfmsSysWebappMenuService webappMenuService;
+    private WebMenuService webappMenuService;
 
     @WsDocNote("1.加载Web主菜单")
     @CompressResponse
     @RequestMapping("/menus")
-    public List<SysWebappMenuBO> menus(){
+    public List<WebMenuBO> menus(){
         return webappMenuService.getMenus(false);
     }
 
@@ -36,7 +36,7 @@ public class MenuSettingsController {
     @WsDocNote("2.更新菜单")
     @ResponseBody
     @RequestMapping("/save")
-    public void save(@RequestBody List<SysWebappMenuBO> menus){
+    public void save(@RequestBody List<WebMenuBO> menus){
         webappMenuService.doUpdate(menus);
     }
 }

@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.model;
+package cn.nkpro.ts5.engine.web.model;
 
 import cn.nkpro.ts5.config.security.TfmsGrantedAuthority;
 import cn.nkpro.ts5.model.mb.gen.SysAccount;
@@ -9,7 +9,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class SysAuthGroupBO extends SysAuthGroup {
+public class UserGroupBO extends SysAuthGroup {
 
     private List<TfmsGrantedAuthority> authorities;
 

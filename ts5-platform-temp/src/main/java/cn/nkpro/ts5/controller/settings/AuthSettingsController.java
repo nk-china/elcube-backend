@@ -2,12 +2,12 @@ package cn.nkpro.ts5.controller.settings;
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
 import cn.nkpro.ts5.config.mvc.CompressResponse;
-import cn.nkpro.ts5.model.SysAuthGroupBO;
+import cn.nkpro.ts5.engine.web.model.UserGroupBO;
 import cn.nkpro.ts5.model.mb.gen.SysAccount;
 import cn.nkpro.ts5.model.mb.gen.SysAuthGroup;
 import cn.nkpro.ts5.model.mb.gen.SysAuthLimit;
 import cn.nkpro.ts5.model.mb.gen.SysAuthPermission;
-import cn.nkpro.ts5.engine.web.TfmsPermService;
+import cn.nkpro.ts5.engine.web.UserAuthorizationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
@@ -24,7 +24,7 @@ import java.util.List;
 public class AuthSettingsController {
 
     @Autowired
-    private TfmsPermService permService;
+    private UserAuthorizationService permService;
 
     @CompressResponse
     @RequestMapping("/limit/list")
@@ -88,7 +88,7 @@ public class AuthSettingsController {
 
     @CompressResponse
     @RequestMapping("/group/update")
-    public SysAuthGroupBO groupUpdate(@RequestBody SysAuthGroupBO group){
+    public UserGroupBO groupUpdate(@RequestBody UserGroupBO group){
         permService.updateGroup(group);
         return permService.getGroupDetail(group.getGroupId());
     }

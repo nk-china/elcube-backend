@@ -5,9 +5,9 @@ import cn.nkpro.ts5.basic.TfmsSpELManager;
 import cn.nkpro.ts5.config.security.TfmsGrantedAuthority;
 import cn.nkpro.ts5.config.security.TfmsUserDetails;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
-import cn.nkpro.ts5.model.SysAuthGroupBO;
+import cn.nkpro.ts5.engine.web.model.UserGroupBO;
 import cn.nkpro.ts5.model.mb.gen.*;
-import cn.nkpro.ts5.engine.web.TfmsPermService;
+import cn.nkpro.ts5.engine.web.UserAuthorizationService;
 import cn.nkpro.ts5.supports.GUID;
 import cn.nkpro.ts5.supports.RedisSupport;
 import cn.nkpro.ts5.utils.BeanUtilz;
@@ -27,7 +27,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class TfmsPermServiceImpl implements TfmsPermService {
+public class UserAuthorizationServiceImpl implements UserAuthorizationService {
 
     @Autowired
     private GUID guid;
@@ -43,7 +43,7 @@ public class TfmsPermServiceImpl implements TfmsPermService {
     private SysAccountMapper accountMapper;
 
     @Autowired
-    private RedisSupport<SysAuthGroupBO> redisSupport;
+    private RedisSupport<UserGroupBO> redisSupport;
     @Autowired
     private RedisSupport<SysAuthLimit> redisSupportLimit;
     @Autowired
@@ -71,7 +71,7 @@ public class TfmsPermServiceImpl implements TfmsPermService {
 
         authGroupRefMapper.selectByExample(authGroupRefExample)
                 .forEach((ref->{
-                    SysAuthGroupBO group = buildUserGroup(ref.getGroupId());
+                    UserGroupBO group = buildUserGroup(ref.getGroupId());
                     if(group!=null&&group.getAuthorities()!=null){
                         permList.addAll(group.getAuthorities());
                     }
@@ -291,7 +291,7 @@ public class TfmsPermServiceImpl implements TfmsPermService {
      * @param groupId 用户组Id
      * @return 用户组
      */
-    private SysAuthGroupBO buildUserGroup(String groupId){
+    private UserGroupBO buildUserGroup(String groupId){
 
         return redisSupport.getIfAbsent(Constants.CACHE_AUTH_GROUP,groupId,()->{
 
@@ -299,7 +299,7 @@ public class TfmsPermServiceImpl implements TfmsPermService {
 
             if(sysAuthGroup!=null){
 
-                SysAuthGroupBO g = BeanUtilz.copyFromObject(sysAuthGroup,SysAuthGroupBO.class);
+                UserGroupBO g = BeanUtilz.copyFromObject(sysAuthGroup, UserGroupBO.class);
 
                 SysAuthGroupRefExample authGroupRefExample = new SysAuthGroupRefExample();
                 authGroupRefExample.createCriteria()
@@ -486,9 +486,9 @@ public class TfmsPermServiceImpl implements TfmsPermService {
     }
 
     @Override
-    public SysAuthGroupBO getGroupDetail(String groupId){
+    public UserGroupBO getGroupDetail(String groupId){
 
-        SysAuthGroupBO group = buildUserGroup(groupId);
+        UserGroupBO group = buildUserGroup(groupId);
 
         // 查询用户组下的账号
         SysAuthGroupRefExample authGroupRefExample = new SysAuthGroupRefExample();
@@ -518,7 +518,7 @@ public class TfmsPermServiceImpl implements TfmsPermService {
         return group;
     }
     @Override
-    public void updateGroup(SysAuthGroupBO group){
+    public void updateGroup(UserGroupBO group){
 
 
         Assert.isTrue(StringUtils.isBlank(group.getGroupId()) || !group.getGroupId().startsWith("nk-default-"),"系统用户组不可更新");

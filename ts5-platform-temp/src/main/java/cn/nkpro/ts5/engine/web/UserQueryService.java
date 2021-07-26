@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Created by bean on 2020/7/22.
  */
-public interface TfmsUserQueryService {
+public interface UserQueryService {
     List<SysUserSavedQuery> getList(String source);
 
     @Transactional

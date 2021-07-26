@@ -3,11 +3,11 @@ package cn.nkpro.ts5.controller;
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
 import cn.nkpro.ts5.config.mvc.CompressResponse;
 import cn.nkpro.ts5.config.nk.NKProperties;
-import cn.nkpro.ts5.model.SysWebappMenuBO;
+import cn.nkpro.ts5.engine.web.model.WebMenuBO;
 import cn.nkpro.ts5.model.mb.gen.SysUserSavedQuery;
 import cn.nkpro.ts5.model.mb.gen.SysWebappMenu;
-import cn.nkpro.ts5.engine.web.TfmsSysWebappMenuService;
-import cn.nkpro.ts5.engine.web.TfmsUserQueryService;
+import cn.nkpro.ts5.engine.web.WebMenuService;
+import cn.nkpro.ts5.engine.web.UserQueryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,10 +29,10 @@ public class WebAppController {
     private NKProperties properties;
 
     @Autowired@SuppressWarnings("all")
-    private TfmsSysWebappMenuService tfmsSysWebappMenuService;
+    private WebMenuService tfmsSysWebappMenuService;
 
     @Autowired@SuppressWarnings("all")
-    private TfmsUserQueryService userQueryService;
+    private UserQueryService userQueryService;
 
 
     @WsDocNote("1.获取环境名称")
@@ -45,7 +45,7 @@ public class WebAppController {
     @WsDocNote("2.加载Web主菜单")
     @CompressResponse
     @RequestMapping("/menus")
-    public List<SysWebappMenuBO> menus(){
+    public List<WebMenuBO> menus(){
         return tfmsSysWebappMenuService.getMenus(true);
     }
 

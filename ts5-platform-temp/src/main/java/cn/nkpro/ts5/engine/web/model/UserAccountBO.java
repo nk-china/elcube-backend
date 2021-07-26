@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.model;
+package cn.nkpro.ts5.engine.web.model;
 
 import cn.nkpro.ts5.config.security.TfmsGrantedAuthority;
 import cn.nkpro.ts5.model.mb.gen.SysAccount;
@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Created by bean on 2019/12/30.
  */
-public class SystemAccountBO extends SysAccount {
+public class UserAccountBO extends SysAccount {
 
     @Getter@Setter
     private List<TfmsGrantedAuthority> authorities;

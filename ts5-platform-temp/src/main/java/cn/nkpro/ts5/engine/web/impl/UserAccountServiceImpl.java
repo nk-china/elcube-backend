@@ -2,12 +2,12 @@ package cn.nkpro.ts5.engine.web.impl;
 
 import cn.nkpro.ts5.basic.Constants;
 import cn.nkpro.ts5.config.nk.NKProperties;
-import cn.nkpro.ts5.model.SystemAccountBO;
+import cn.nkpro.ts5.engine.web.model.UserAccountBO;
 import cn.nkpro.ts5.model.mb.gen.SysAccount;
 import cn.nkpro.ts5.model.mb.gen.SysAccountExample;
 import cn.nkpro.ts5.model.mb.gen.SysAccountMapper;
-import cn.nkpro.ts5.engine.web.TfmsPermService;
-import cn.nkpro.ts5.engine.web.TfmsSysAccountService;
+import cn.nkpro.ts5.engine.web.UserAuthorizationService;
+import cn.nkpro.ts5.engine.web.UserAccountService;
 import cn.nkpro.ts5.supports.RedisSupport;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
@@ -32,7 +32,7 @@ import java.util.regex.Pattern;
  */
 @Primary
 @Component("NkSysAccountService")
-public class TfmsSysAccountServiceImpl implements TfmsSysAccountService {
+public class UserAccountServiceImpl implements UserAccountService {
 
     @Autowired
     private JwtHelper jwt;
@@ -44,12 +44,12 @@ public class TfmsSysAccountServiceImpl implements TfmsSysAccountService {
     private RedisSupport<SysAccount> redisTemplateAccount;
 
     @Autowired
-    private RedisSupport<SystemAccountBO> redisTemplate;
+    private RedisSupport<UserAccountBO> redisTemplate;
     @Autowired
     private NKProperties tfmsPlatformProperties;
 
     @Autowired
-    private TfmsPermService permService;
+    private UserAuthorizationService permService;
 
     @Override
     public SysAccount getAccountById(String id){
@@ -69,14 +69,14 @@ public class TfmsSysAccountServiceImpl implements TfmsSysAccountService {
     }
 
     @Override
-    public SystemAccountBO getAccount(String username,boolean preClear) {
+    public UserAccountBO getAccount(String username, boolean preClear) {
         if(preClear){
             redisTemplate.delete(Constants.CACHE_USERS,username);
         }
         return redisTemplate.getIfAbsent(Constants.CACHE_USERS,username,()-> getAccount(username));
     }
 
-    private SystemAccountBO getAccount(String username){
+    private UserAccountBO getAccount(String username){
 
         SysAccountExample example = new SysAccountExample();
         example.createCriteria().andUsernameEqualTo(username);
@@ -85,7 +85,7 @@ public class TfmsSysAccountServiceImpl implements TfmsSysAccountService {
                 .stream()
                 .findAny()
                 .map(sysAccount -> {
-                    SystemAccountBO ud = BeanUtilz.copyFromObject(sysAccount,SystemAccountBO.class);
+                    UserAccountBO ud = BeanUtilz.copyFromObject(sysAccount, UserAccountBO.class);
 
 
                     ud.setAuthorities(permService.buildGrantedPerms(sysAccount.getId(),sysAccount.getObjectId()));

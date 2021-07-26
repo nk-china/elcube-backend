@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.config.security;
 
-import cn.nkpro.ts5.engine.web.impl.TfmsSysAccountServiceImpl;
+import cn.nkpro.ts5.engine.web.impl.UserAccountServiceImpl;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,7 +12,7 @@ import java.util.Optional;
  * Created by bean on 2019/12/30.
  */
 @Component
-public class TfmsUserDetailsService extends TfmsSysAccountServiceImpl implements UserDetailsService {
+public class TfmsUserDetailsService extends UserAccountServiceImpl implements UserDetailsService {
     @Override
     public TfmsUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return Optional.ofNullable(super.getAccount(username,true))

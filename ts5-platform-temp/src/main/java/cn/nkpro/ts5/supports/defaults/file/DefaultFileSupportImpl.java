@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.supports.defaults.file;
 
 import cn.nkpro.ts5.config.nk.NKProperties;
-import cn.nkpro.ts5.engine.web.TfmsSysAccountService;
+import cn.nkpro.ts5.engine.web.UserAccountService;
 import cn.nkpro.ts5.supports.FileSupport;
 import cn.nkpro.ts5.supports.NkFileUploadStatus;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ public class DefaultFileSupportImpl implements FileSupport<Map<String, Object>> 
     private NKProperties properties;
 
     @Autowired
-    private TfmsSysAccountService accountService;
+    private UserAccountService accountService;
 
     @Override
     public ResponseEntity<Map<String, Object>> init(FileInfo file) {

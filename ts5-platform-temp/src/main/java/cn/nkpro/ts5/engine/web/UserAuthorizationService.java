@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.engine.web;
 
 import cn.nkpro.ts5.config.security.TfmsGrantedAuthority;
-import cn.nkpro.ts5.model.SysAuthGroupBO;
+import cn.nkpro.ts5.engine.web.model.UserGroupBO;
 import cn.nkpro.ts5.model.mb.gen.SysAccount;
 import cn.nkpro.ts5.model.mb.gen.SysAuthGroup;
 import cn.nkpro.ts5.model.mb.gen.SysAuthLimit;
@@ -10,7 +10,7 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 
 import java.util.List;
 
-public interface TfmsPermService {
+public interface UserAuthorizationService {
 
 
 
@@ -55,9 +55,9 @@ public interface TfmsPermService {
 
     List<SysAuthGroup> getGroups();
 
-    SysAuthGroupBO getGroupDetail(String groupId);
+    UserGroupBO getGroupDetail(String groupId);
 
-    void updateGroup(SysAuthGroupBO group);
+    void updateGroup(UserGroupBO group);
 
     void removeGroup(String groupId);
 

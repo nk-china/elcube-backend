@@ -5,8 +5,8 @@ import cn.nkpro.ts5.config.mvc.CompressObject;
 import cn.nkpro.ts5.config.mvc.CompressResponse;
 import cn.nkpro.ts5.config.security.TfmsUserDetails;
 import cn.nkpro.ts5.model.mb.gen.SysAuthLimit;
-import cn.nkpro.ts5.engine.web.TfmsPermService;
-import cn.nkpro.ts5.engine.web.TfmsSysAccountService;
+import cn.nkpro.ts5.engine.web.UserAuthorizationService;
+import cn.nkpro.ts5.engine.web.UserAccountService;
 import cn.nkpro.ts5.utils.SecurityUtilz;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +31,10 @@ public class AuthController {
 
     @Qualifier("NkSysAccountService")
     @Autowired@SuppressWarnings("all")
-    private TfmsSysAccountService tfmsSysAccountService;
+    private UserAccountService tfmsSysAccountService;
 
     @Autowired@SuppressWarnings("all")
-    private TfmsPermService permService;
+    private UserAuthorizationService permService;
 
     @WsDocNote("1.获取token登陆")
     @ResponseBody
