@@ -4,11 +4,14 @@ import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
 import cn.nkpro.ts5.config.mvc.CompressResponse;
 import cn.nkpro.ts5.config.nk.NKProperties;
 import cn.nkpro.ts5.model.SysWebappMenuBO;
+import cn.nkpro.ts5.model.mb.gen.SysUserSavedQuery;
 import cn.nkpro.ts5.model.mb.gen.SysWebappMenu;
 import cn.nkpro.ts5.services.TfmsSysWebappMenuService;
+import cn.nkpro.ts5.services.TfmsUserQueryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -28,9 +31,8 @@ public class WebAppController {
     @Autowired@SuppressWarnings("all")
     private TfmsSysWebappMenuService tfmsSysWebappMenuService;
 
-//    private TfmsUserQueryService userQueryService;
-//
-//    private TfmsDefDocTypeService defDocTypeService;
+    @Autowired@SuppressWarnings("all")
+    private TfmsUserQueryService userQueryService;
 
 
     @WsDocNote("1.获取环境名称")
@@ -54,26 +56,26 @@ public class WebAppController {
         return tfmsSysWebappMenuService.getDetail(id);
     }
 
-//    @WsDocNote("31、获取保存的搜索列表")
-//    @CompressResponse
-//    @RequestMapping("/user/saved/query/list")
-//    public List<SysUserSavedQuery> getList(String source){
-//        return userQueryService.getList(source);
-//    }
-//
-//    @WsDocNote("32、保存的搜索条件")
-//    @CompressResponse
-//    @RequestMapping("/user/saved/query/create")
-//    public SysUserSavedQuery create(@RequestBody SysUserSavedQuery query){
-//        userQueryService.create(query);
-//        return query;
-//    }
-//
-//    @WsDocNote("33、删除已保存的搜索条件")
-//    @CompressResponse
-//    @RequestMapping("/user/saved/query/delete")
-//    public void delete(String queryId){
-//        userQueryService.delete(queryId);
-//    }
+    @WsDocNote("31、获取保存的搜索列表")
+    @CompressResponse
+    @RequestMapping("/user/saved/query/list")
+    public List<SysUserSavedQuery> getList(String source){
+        return userQueryService.getList(source);
+    }
+
+    @WsDocNote("32、保存的搜索条件")
+    @CompressResponse
+    @RequestMapping("/user/saved/query/create")
+    public SysUserSavedQuery create(@RequestBody SysUserSavedQuery query){
+        userQueryService.create(query);
+        return query;
+    }
+
+    @WsDocNote("33、删除已保存的搜索条件")
+    @CompressResponse
+    @RequestMapping("/user/saved/query/delete")
+    public void delete(String queryId){
+        userQueryService.delete(queryId);
+    }
 
 }

@@ -2,10 +2,14 @@ package cn.nkpro.ts5.controller;
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
 import cn.nkpro.ts5.config.mvc.CompressResponse;
+import cn.nkpro.ts5.engine.doc.NKDocIndexService;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.engine.doc.service.NKDocDefService;
 import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService;
+import cn.nkpro.ts5.engine.elasticearch.ESPageList;
+import cn.nkpro.ts5.engine.elasticearch.model.DocHES;
 import cn.nkpro.ts5.model.mb.gen.DocDefH;
+import com.alibaba.fastjson.JSONObject;
 import eu.bitwalker.useragentutils.Browser;
 import eu.bitwalker.useragentutils.UserAgent;
 import eu.bitwalker.useragentutils.Version;
@@ -30,19 +34,33 @@ public class DocController {
 
     @Autowired@SuppressWarnings("all")
     private NkDocEngineFrontService docEngine;
-//    @Autowired
-//    private TfmsDocService docService;
+    @Autowired@SuppressWarnings("all")
+    private NKDocIndexService docService;
 //    @Autowired
 //    private TfmsDocEngineWithPerm docEngineWithPerm;
 //    @Autowired
 //    private TfmsDocHistoryService historyService;
 
-//    @ResponseCompress
-//    @WsDocNote("1、拉取交易列表数据")
-//    @RequestMapping(value = "/list",method = RequestMethod.POST)
-//    public ESPageList<IndexDoc> list(@RequestBody JSONObject params) {
-//        return docService.query(IndexDoc.class, params,null);
-//    }
+    @CompressResponse
+    @WsDocNote("1.拉取交易列表数据")
+    @RequestMapping(value = "/list",method = RequestMethod.POST)
+    public ESPageList<DocHES> list(@RequestBody JSONObject params) {
+        return docService.queryList(DocHES.class, null, params);
+    }
+
+    @CompressResponse
+    @WsDocNote("2.拉取入口单据列表")
+    @RequestMapping(value = "/entrance",method = RequestMethod.GET)
+    public List<DocDefH> getEntrance(@RequestParam("classify") String classify){
+        return docDefService.getEntrance(classify);
+    }
+
+    @CompressResponse
+    @WsDocNote("3.拉取交易详情")
+    @RequestMapping(value = "/detail/{docId}",method = RequestMethod.GET)
+    public DocHV get(@PathVariable("docId") String docId) throws Exception {
+        return docEngine.detail(docId);
+    }
 //
 //    @ResponseCompress
 //    @WsDocNote("1、拉取交易列表数据")
@@ -50,20 +68,6 @@ public class DocController {
 //    public ESPageList<IndexDocItem> itemList(@RequestBody JSONObject params) {
 //        return docService.query(IndexDocItem.class, params,null);
 //    }
-
-    @CompressResponse
-    @WsDocNote("2、拉取入口单据列表")
-    @RequestMapping(value = "/entrance",method = RequestMethod.GET)
-    public List<DocDefH> getEntrance(@RequestParam("classify") String classify){
-        return docDefService.getEntrance(classify);
-    }
-
-    @CompressResponse
-    @WsDocNote("3、拉取交易详情")
-    @RequestMapping(value = "/detail/{docId}",method = RequestMethod.GET)
-    public DocHV get(@PathVariable("docId") String docId) throws Exception {
-        return docEngine.detail(docId);
-    }
 //
 //    @ResponseCompress
 //    @WsDocNote("3、拉取交易历史版本")
