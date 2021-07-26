@@ -1,10 +1,8 @@
 package cn.nkpro.ts5.engine.doc;
 
 import cn.nkpro.ts5.basic.NKCustomObject;
-import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
-import cn.nkpro.ts5.model.mb.gen.DocDefI;
-import org.apache.commons.lang3.ArrayUtils;
+import cn.nkpro.ts5.orm.mb.gen.DocDefI;
 
 public interface NKCard<DT,DDT> extends NKCustomObject {
 

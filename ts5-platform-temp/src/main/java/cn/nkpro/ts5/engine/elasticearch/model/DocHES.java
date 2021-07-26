@@ -6,12 +6,16 @@ import cn.nkpro.ts5.engine.elasticearch.annotation.ESDocument;
 import cn.nkpro.ts5.engine.elasticearch.annotation.ESDynamicTemplate;
 import cn.nkpro.ts5.engine.elasticearch.annotation.ESField;
 import cn.nkpro.ts5.engine.elasticearch.annotation.ESId;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
 /**
  * Created by bean on 2020/7/6.
  */
+@EqualsAndHashCode
+@Data
 @ESDocument("document")
 // 不需要分词的文本：状态、枚举、常量等，不能模糊查询，只能全文匹配
 @ESDynamicTemplate(value = "keyword",   match = "*_keyword",mappingType = ESFieldType.Keyword)
@@ -48,8 +52,6 @@ public class DocHES extends ESDoc {
 
     @ESId
     @ESField(type= ESFieldType.Keyword)
-    @Getter
-    @Setter
     private String docId;
 
     @ESField(type= ESFieldType.Keyword)

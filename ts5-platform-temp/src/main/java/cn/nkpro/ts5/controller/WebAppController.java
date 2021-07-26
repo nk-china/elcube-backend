@@ -5,10 +5,9 @@ import cn.nkpro.ts5.config.global.NKProperties;
 import cn.nkpro.ts5.engine.web.UserQueryService;
 import cn.nkpro.ts5.engine.web.WebMenuService;
 import cn.nkpro.ts5.engine.web.model.WebMenuBO;
-import cn.nkpro.ts5.model.mb.gen.SysUserSavedQuery;
-import cn.nkpro.ts5.model.mb.gen.SysWebappMenu;
+import cn.nkpro.ts5.orm.mb.gen.SysUserSavedQuery;
+import cn.nkpro.ts5.orm.mb.gen.SysWebappMenu;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

@@ -7,14 +7,13 @@ import cn.nkpro.ts5.engine.doc.service.NKDocDefService;
 import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService;
 import cn.nkpro.ts5.engine.elasticearch.ESPageList;
 import cn.nkpro.ts5.engine.elasticearch.model.DocHES;
-import cn.nkpro.ts5.model.mb.gen.DocDefH;
+import cn.nkpro.ts5.orm.mb.gen.DocDefH;
 import com.alibaba.fastjson.JSONObject;
 import eu.bitwalker.useragentutils.Browser;
 import eu.bitwalker.useragentutils.UserAgent;
 import eu.bitwalker.useragentutils.Version;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;

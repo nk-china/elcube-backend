@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.engine.web.model;
 
-import cn.nkpro.ts5.model.mb.gen.SysWebappMenu;
+import cn.nkpro.ts5.orm.mb.gen.SysWebappMenu;
 import lombok.Getter;
 import lombok.Setter;
 

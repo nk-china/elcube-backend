@@ -2,10 +2,10 @@ package cn.nkpro.ts5.engine.web;
 
 import cn.nkpro.ts5.config.security.TfmsGrantedAuthority;
 import cn.nkpro.ts5.engine.web.model.UserGroupBO;
-import cn.nkpro.ts5.model.mb.gen.SysAccount;
-import cn.nkpro.ts5.model.mb.gen.SysAuthGroup;
-import cn.nkpro.ts5.model.mb.gen.SysAuthLimit;
-import cn.nkpro.ts5.model.mb.gen.SysAuthPermission;
+import cn.nkpro.ts5.orm.mb.gen.SysAccount;
+import cn.nkpro.ts5.orm.mb.gen.SysAuthGroup;
+import cn.nkpro.ts5.orm.mb.gen.SysAuthLimit;
+import cn.nkpro.ts5.orm.mb.gen.SysAuthPermission;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 
 import java.util.List;

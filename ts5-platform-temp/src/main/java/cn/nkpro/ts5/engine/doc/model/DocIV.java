@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.engine.doc.model;
 
-import cn.nkpro.ts5.model.mb.gen.DocI;
+import cn.nkpro.ts5.orm.mb.gen.DocI;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.engine.web;
 
 import cn.nkpro.ts5.engine.web.model.UserAccountBO;
-import cn.nkpro.ts5.model.mb.gen.SysAccount;
+import cn.nkpro.ts5.orm.mb.gen.SysAccount;
 
 import java.util.List;
 import java.util.Map;

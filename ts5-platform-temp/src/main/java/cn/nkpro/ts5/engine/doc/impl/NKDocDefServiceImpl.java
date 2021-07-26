@@ -11,8 +11,8 @@ import cn.nkpro.ts5.engine.doc.NKDocStateInterceptor;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocDefIV;
 import cn.nkpro.ts5.engine.doc.service.NKDocDefService;
-import cn.nkpro.ts5.model.mb.gen.*;
 import cn.nkpro.ts5.config.redis.RedisSupport;
+import cn.nkpro.ts5.orm.mb.gen.*;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
 import cn.nkpro.ts5.utils.VersioningUtils;
@@ -192,7 +192,7 @@ public class NKDocDefServiceImpl implements NKDocDefService {
         docDefIMapper.deleteByExample(defIExample);
 
         docDefHMapper.deleteByPrimaryKey(docDefHV);
-        redisSupport.delete(String.format(Constants.CACHE_DEF_DOC,docDefHV.getDocType(),docDefHV.getVersion()));
+        redisSupport.delete(Constants.CACHE_DEF_DOC,String.format("%s-%s",docDefHV.getDocType(),docDefHV.getVersion()));
     }
 
     /**
@@ -297,7 +297,7 @@ public class NKDocDefServiceImpl implements NKDocDefService {
             docDefHMapper.updateByPrimaryKeySelective(docDefHV);
         }
 
-        redisSupport.delete(String.format(Constants.CACHE_DEF_DOC,docDefHV.getDocType(),docDefHV.getVersion()));
+        redisSupport.delete(Constants.CACHE_DEF_DOC,String.format("%s-%s",docDefHV.getDocType(),docDefHV.getVersion()));
 
         return docDefHV;
     }
@@ -418,9 +418,9 @@ public class NKDocDefServiceImpl implements NKDocDefService {
      */
     @Override
     public DocDefHV getDocDef(String docType, String version, boolean includeComponentMarkdown, boolean ignoreError){
-        String cacheKey = String.format(Constants.CACHE_DEF_DOC,docType,version);
+        String cacheKey = String.format("%s-%s",docType,version);
 
-        DocDefHV docDefHV = redisSupport.getIfAbsent(cacheKey,StringUtils.EMPTY,()->{
+        DocDefHV docDefHV = redisSupport.getIfAbsent(Constants.CACHE_DEF_DOC,cacheKey,()->{
 
             DocDefHKey key = new DocDefHKey();
             key.setDocType(docType);

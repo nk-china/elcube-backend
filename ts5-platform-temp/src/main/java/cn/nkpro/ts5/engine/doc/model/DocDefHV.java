@@ -1,8 +1,8 @@
 package cn.nkpro.ts5.engine.doc.model;
 
-import cn.nkpro.ts5.model.mb.gen.DocDefFlow;
-import cn.nkpro.ts5.model.mb.gen.DocDefH;
-import cn.nkpro.ts5.model.mb.gen.DocDefState;
+import cn.nkpro.ts5.orm.mb.gen.DocDefFlow;
+import cn.nkpro.ts5.orm.mb.gen.DocDefH;
+import cn.nkpro.ts5.orm.mb.gen.DocDefState;
 import lombok.Data;
 
 import java.util.List;

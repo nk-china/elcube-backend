@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.engine.web;
 
 import cn.nkpro.ts5.engine.web.model.WebMenuBO;
-import cn.nkpro.ts5.model.mb.gen.SysWebappMenu;
+import cn.nkpro.ts5.orm.mb.gen.SysWebappMenu;
 
 import java.util.List;
 

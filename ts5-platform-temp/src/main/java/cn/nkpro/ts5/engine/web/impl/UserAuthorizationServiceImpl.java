@@ -6,10 +6,10 @@ import cn.nkpro.ts5.config.security.TfmsGrantedAuthority;
 import cn.nkpro.ts5.config.security.TfmsUserDetails;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.engine.web.model.UserGroupBO;
-import cn.nkpro.ts5.model.mb.gen.*;
 import cn.nkpro.ts5.engine.web.UserAuthorizationService;
 import cn.nkpro.ts5.config.id.GUID;
 import cn.nkpro.ts5.config.redis.RedisSupport;
+import cn.nkpro.ts5.orm.mb.gen.*;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.SecurityUtilz;
 import lombok.extern.slf4j.Slf4j;
@@ -360,7 +360,7 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
      * @param group
      * @return
      */
-    private TfmsGrantedAuthority buildAuthority(String resource,SysAuthPermission perm,SysAuthGroup group){
+    private TfmsGrantedAuthority buildAuthority(String resource, SysAuthPermission perm, SysAuthGroup group){
         TfmsGrantedAuthority authority = new TfmsGrantedAuthority();
         authority.setPermResource(resource);
         authority.setPermOperate(perm.getPermOperate());

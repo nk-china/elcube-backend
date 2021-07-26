@@ -2,9 +2,9 @@ package cn.nkpro.ts5.engine.doc.impl;
 
 import cn.nkpro.ts5.basic.Constants;
 import cn.nkpro.ts5.engine.doc.service.NKConstantService;
-import cn.nkpro.ts5.model.mb.gen.ConstantDef;
-import cn.nkpro.ts5.model.mb.gen.ConstantDefExample;
-import cn.nkpro.ts5.model.mb.gen.ConstantDefMapper;
+import cn.nkpro.ts5.orm.mb.gen.ConstantDef;
+import cn.nkpro.ts5.orm.mb.gen.ConstantDefExample;
+import cn.nkpro.ts5.orm.mb.gen.ConstantDefMapper;
 import cn.nkpro.ts5.config.redis.RedisSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

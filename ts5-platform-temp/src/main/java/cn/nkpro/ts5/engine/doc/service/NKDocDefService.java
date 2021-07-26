@@ -4,7 +4,7 @@ import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.engine.doc.NKCard;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocDefIV;
-import cn.nkpro.ts5.model.mb.gen.DocDefH;
+import cn.nkpro.ts5.orm.mb.gen.DocDefH;
 
 import java.util.List;
 import java.util.Map;

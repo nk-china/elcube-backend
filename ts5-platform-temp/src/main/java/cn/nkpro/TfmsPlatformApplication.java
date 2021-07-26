@@ -11,16 +11,10 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
  */
 @EnableScheduling
 @EnableTransactionManagement
-@MapperScan(basePackages = {
-        "cn.nkpro.tfms.platform.mappers",
-        "cn.nkpro.ts5.model.mb",
-})
-@SpringBootApplication(scanBasePackages = {
-        "cn.nkpro"
-})
+@MapperScan(basePackages = {"cn.nkpro.ts5.orm.mb"})
+@SpringBootApplication(scanBasePackages = {"cn.nkpro"})
 public class TfmsPlatformApplication {
     public static void main(String[] args) {
         SpringApplication.run(TfmsPlatformApplication.class, args);
-        System.out.println(cn.nkpro.ts5.cards.NkCardDate.class);
     }
 }

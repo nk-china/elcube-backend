@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.engine.doc.service;
 
-import cn.nkpro.ts5.model.mb.gen.ConstantDef;
+import cn.nkpro.ts5.orm.mb.gen.ConstantDef;
 
 import java.util.List;
 

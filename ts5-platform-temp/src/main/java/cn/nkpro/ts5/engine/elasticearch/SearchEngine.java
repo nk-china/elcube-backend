@@ -66,13 +66,13 @@ public class SearchEngine {
         ));
     }
 
-    public void indexAfterCommit(ESDoc... docs){
-        indexAfterCommit(Arrays.asList(docs));
+    public void indexBeforeCommit(ESDoc... docs){
+        indexBeforeCommit(Arrays.asList(docs));
     }
 
-    public void indexAfterCommit(Collection<ESDoc> docs){
+    public void indexBeforeCommit(Collection<ESDoc> docs){
 
-        LocalSyncUtilz.runAfterCommit(()-> {
+        LocalSyncUtilz.runBeforeCommit(()-> {
 
             for(ESDoc doc : docs){
 

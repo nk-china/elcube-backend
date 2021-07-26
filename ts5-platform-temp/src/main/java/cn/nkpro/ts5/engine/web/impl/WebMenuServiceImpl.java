@@ -2,9 +2,9 @@ package cn.nkpro.ts5.engine.web.impl;
 
 import cn.nkpro.ts5.basic.Constants;
 import cn.nkpro.ts5.engine.web.model.WebMenuBO;
-import cn.nkpro.ts5.model.mb.gen.SysWebappMenu;
-import cn.nkpro.ts5.model.mb.gen.SysWebappMenuExample;
-import cn.nkpro.ts5.model.mb.gen.SysWebappMenuMapper;
+import cn.nkpro.ts5.orm.mb.gen.SysWebappMenu;
+import cn.nkpro.ts5.orm.mb.gen.SysWebappMenuExample;
+import cn.nkpro.ts5.orm.mb.gen.SysWebappMenuMapper;
 import cn.nkpro.ts5.engine.devops.TfmsDefDeployAble;
 import cn.nkpro.ts5.engine.web.WebMenuService;
 import cn.nkpro.ts5.config.redis.RedisSupport;

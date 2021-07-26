@@ -3,7 +3,7 @@ package cn.nkpro.ts5.engine.doc;
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
-import cn.nkpro.ts5.model.mb.gen.DocDefI;
+import cn.nkpro.ts5.orm.mb.gen.DocDefI;
 import cn.nkpro.ts5.utils.SpringEmulated;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;

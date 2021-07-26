@@ -4,12 +4,11 @@ import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
 import cn.nkpro.ts5.config.security.TfmsUserDetails;
 import cn.nkpro.ts5.engine.web.UserAccountService;
 import cn.nkpro.ts5.engine.web.UserAuthorizationService;
-import cn.nkpro.ts5.model.mb.gen.SysAuthLimit;
+import cn.nkpro.ts5.orm.mb.gen.SysAuthLimit;
 import cn.nkpro.ts5.utils.SecurityUtilz;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;

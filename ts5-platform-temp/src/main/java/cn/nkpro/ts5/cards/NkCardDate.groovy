@@ -4,7 +4,6 @@ import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote
 import cn.nkpro.ts5.engine.doc.NKAbstractCard
 import cn.nkpro.ts5.engine.doc.model.DocDefHV
 import cn.nkpro.ts5.engine.doc.model.DocHV
-import cn.nkpro.ts5.model.mb.gen.DocDefI
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component

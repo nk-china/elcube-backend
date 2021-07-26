@@ -5,10 +5,9 @@ import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocDefIV;
 import cn.nkpro.ts5.engine.doc.service.NKDocDefService;
-import cn.nkpro.ts5.model.mb.gen.DocDefH;
+import cn.nkpro.ts5.orm.mb.gen.DocDefH;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

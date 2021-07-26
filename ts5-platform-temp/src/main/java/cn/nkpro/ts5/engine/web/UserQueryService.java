@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.engine.web;
 
-import cn.nkpro.ts5.model.mb.gen.SysUserSavedQuery;
+import cn.nkpro.ts5.orm.mb.gen.SysUserSavedQuery;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
