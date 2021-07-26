@@ -1,13 +1,23 @@
 <template>
-    <div>
-
-    </div>
+    <a-card :title="`${card.cardName}卡片`">
+        <nk-form :col="1" :edit="editMode">
+            <nk-form-item title="字段">
+                {{data.field}}
+                <a-input v-model="data.field" slot="edit" />
+            </nk-form-item>
+        </nk-form>
+    </a-card>
 </template>
 
 <script>
-
+    import Mixin from "Mixin";
+    export default {
+        mixins:[new Mixin({field:"test"})],
+        created() {
+        }
+    }
 </script>
 
-<style>
+<style scoped>
 
 </style>

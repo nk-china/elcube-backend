@@ -12,11 +12,13 @@ import cn.nkpro.ts5.model.mb.gen.DocDefIWithBLOBs;
 import cn.nkpro.ts5.model.mb.gen.DocH;
 import cn.nkpro.ts5.model.mb.gen.DocHMapper;
 import cn.nkpro.ts5.supports.RedisSupport;
+import cn.nkpro.ts5.supports.SequenceSupport;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 
 import java.util.Comparator;
 import java.util.List;
@@ -101,6 +103,19 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
     }
 
     public void doUpdate(DocHV doc){
+        Assert.hasText(doc.getDocId(),"单据ID不能为空");
+        Assert.hasText(doc.getDocType(),"单据类型不能为空");
+
+        // 获取原始单据数据
+        DocHV original = detail(doc.getDocId());
+
+        // 获取单据配置
+        DocDefHV def = original.getDef();
+
+        // 获取单据处理器
+        NKDocProcessor processor = customObjectManager.getCustomObject(def.getRefObjectType(), NKDocProcessor.class);
+
+//        processor
     }
 
 

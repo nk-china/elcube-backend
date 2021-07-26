@@ -11,6 +11,7 @@ import cn.nkpro.ts5.engine.doc.service.NKDocDefService;
 import cn.nkpro.ts5.model.mb.gen.DocH;
 import cn.nkpro.ts5.model.mb.gen.DocI;
 import cn.nkpro.ts5.supports.GUID;
+import cn.nkpro.ts5.supports.SequenceSupport;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
 import cn.nkpro.ts5.utils.VersioningUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -28,6 +29,8 @@ public class NKDocTransactionProcessor implements NKDocProcessor {
     private NKCustomObjectManager customObjectManager;
     @Autowired
     private NKDocDefService docDefService;
+    @Autowired
+    private SequenceSupport sequenceUtils;
 
     @Override
     public EnumDocClassify classify() {
@@ -87,6 +90,18 @@ public class NKDocTransactionProcessor implements NKDocProcessor {
     public DocHV detail(DocDefHV def, String docId) {
         return new DocHV();
     }
+
+//    public DocHV doUpdate(DocHV doc, DocHV original){
+//        if(original==null){
+//            doc.setUpdatedTime(DateTimeUtilz.nowSeconds());
+//            // 如果原始单据信息为空，那么表示单据为新建
+//            if(StringUtils.isBlank(doc.getDocNumber()))
+//                doc.setDocNumber(sequenceUtils.next(EnumDocClassify.valueOf(doc.getClassify()), doc.getDocType()));
+//            bizDocMapper.insert(doc);
+//        }
+//
+//        return doc;
+//    }
 
     public DocHV calculate(DocHV doc, String fromCard, String options){
         return null;
