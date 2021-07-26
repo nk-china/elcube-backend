@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.services;
+package cn.nkpro.ts5.engine.web;
 
 import cn.nkpro.ts5.config.security.TfmsGrantedAuthority;
 import cn.nkpro.ts5.model.SysAuthGroupBO;

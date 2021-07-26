@@ -3,7 +3,7 @@ package cn.nkpro.ts5.controller.settings;
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
 import cn.nkpro.ts5.config.mvc.CompressResponse;
 import cn.nkpro.ts5.model.SysWebappMenuBO;
-import cn.nkpro.ts5.services.TfmsSysWebappMenuService;
+import cn.nkpro.ts5.engine.web.TfmsSysWebappMenuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;

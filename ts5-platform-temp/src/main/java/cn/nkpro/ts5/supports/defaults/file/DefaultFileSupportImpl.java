@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.supports.defaults.file;
 
 import cn.nkpro.ts5.config.nk.NKProperties;
-import cn.nkpro.ts5.services.TfmsSysAccountService;
+import cn.nkpro.ts5.engine.web.TfmsSysAccountService;
 import cn.nkpro.ts5.supports.FileSupport;
 import cn.nkpro.ts5.supports.NkFileUploadStatus;
 import org.springframework.beans.factory.annotation.Autowired;

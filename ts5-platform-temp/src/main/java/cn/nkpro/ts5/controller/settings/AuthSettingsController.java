@@ -7,7 +7,7 @@ import cn.nkpro.ts5.model.mb.gen.SysAccount;
 import cn.nkpro.ts5.model.mb.gen.SysAuthGroup;
 import cn.nkpro.ts5.model.mb.gen.SysAuthLimit;
 import cn.nkpro.ts5.model.mb.gen.SysAuthPermission;
-import cn.nkpro.ts5.services.TfmsPermService;
+import cn.nkpro.ts5.engine.web.TfmsPermService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;

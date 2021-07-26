@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.services.impl;
+package cn.nkpro.ts5.engine.web.impl;
 
 import cn.nkpro.ts5.basic.Constants;
 import cn.nkpro.ts5.config.nk.NKProperties;
@@ -6,8 +6,8 @@ import cn.nkpro.ts5.model.SystemAccountBO;
 import cn.nkpro.ts5.model.mb.gen.SysAccount;
 import cn.nkpro.ts5.model.mb.gen.SysAccountExample;
 import cn.nkpro.ts5.model.mb.gen.SysAccountMapper;
-import cn.nkpro.ts5.services.TfmsPermService;
-import cn.nkpro.ts5.services.TfmsSysAccountService;
+import cn.nkpro.ts5.engine.web.TfmsPermService;
+import cn.nkpro.ts5.engine.web.TfmsSysAccountService;
 import cn.nkpro.ts5.supports.RedisSupport;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;

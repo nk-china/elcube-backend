@@ -1,10 +1,10 @@
-package cn.nkpro.ts5.services.impl;
+package cn.nkpro.ts5.engine.web.impl;
 
 import cn.nkpro.ts5.config.security.TfmsUserDetails;
 import cn.nkpro.ts5.model.mb.gen.SysUserSavedQuery;
 import cn.nkpro.ts5.model.mb.gen.SysUserSavedQueryExample;
 import cn.nkpro.ts5.model.mb.gen.SysUserSavedQueryMapper;
-import cn.nkpro.ts5.services.TfmsUserQueryService;
+import cn.nkpro.ts5.engine.web.TfmsUserQueryService;
 import cn.nkpro.ts5.supports.GUID;
 import cn.nkpro.ts5.utils.SecurityUtilz;
 import org.springframework.beans.factory.annotation.Autowired;

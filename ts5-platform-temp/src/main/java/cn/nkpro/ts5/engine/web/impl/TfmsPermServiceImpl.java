@@ -1,14 +1,13 @@
-package cn.nkpro.ts5.services.impl;
+package cn.nkpro.ts5.engine.web.impl;
 
 import cn.nkpro.ts5.basic.Constants;
 import cn.nkpro.ts5.basic.TfmsSpELManager;
 import cn.nkpro.ts5.config.security.TfmsGrantedAuthority;
 import cn.nkpro.ts5.config.security.TfmsUserDetails;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
-import cn.nkpro.ts5.exception.TfmsAccessDeniedException;
 import cn.nkpro.ts5.model.SysAuthGroupBO;
 import cn.nkpro.ts5.model.mb.gen.*;
-import cn.nkpro.ts5.services.TfmsPermService;
+import cn.nkpro.ts5.engine.web.TfmsPermService;
 import cn.nkpro.ts5.supports.GUID;
 import cn.nkpro.ts5.supports.RedisSupport;
 import cn.nkpro.ts5.utils.BeanUtilz;
@@ -19,13 +18,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 

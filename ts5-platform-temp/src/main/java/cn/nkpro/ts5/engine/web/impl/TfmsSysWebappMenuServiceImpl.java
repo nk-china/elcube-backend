@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.services.impl;
+package cn.nkpro.ts5.engine.web.impl;
 
 import cn.nkpro.ts5.basic.Constants;
 import cn.nkpro.ts5.model.SysWebappMenuBO;
@@ -6,7 +6,7 @@ import cn.nkpro.ts5.model.mb.gen.SysWebappMenu;
 import cn.nkpro.ts5.model.mb.gen.SysWebappMenuExample;
 import cn.nkpro.ts5.model.mb.gen.SysWebappMenuMapper;
 import cn.nkpro.ts5.services.TfmsDefDeployAble;
-import cn.nkpro.ts5.services.TfmsSysWebappMenuService;
+import cn.nkpro.ts5.engine.web.TfmsSysWebappMenuService;
 import cn.nkpro.ts5.supports.RedisSupport;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;

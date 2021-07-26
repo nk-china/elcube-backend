@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.services;
+package cn.nkpro.ts5.engine.web;
 
 import cn.nkpro.ts5.model.SysWebappMenuBO;
 import cn.nkpro.ts5.model.mb.gen.SysWebappMenu;

@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.config.security;
 
-import cn.nkpro.ts5.services.impl.TfmsSysAccountServiceImpl;
+import cn.nkpro.ts5.engine.web.impl.TfmsSysAccountServiceImpl;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
