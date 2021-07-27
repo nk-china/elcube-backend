@@ -12,6 +12,8 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -21,6 +23,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class NKAbstractCard<DT,DDT> implements NKCard<DT,DDT> {
+
+    protected Logger log = LoggerFactory.getLogger(getClass());
 
     @Getter
     private String cardHandler;

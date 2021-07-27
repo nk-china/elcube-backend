@@ -1,7 +1,10 @@
 package cn.nkpro.ts5.engine.script;
 
+import cn.nkpro.ts5.exception.TfmsException;
 import groovy.lang.GroovyObject;
 import lombok.SneakyThrows;
+import org.springframework.aop.framework.Advised;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -104,6 +107,15 @@ public class NKScriptEngine implements ApplicationContextAware, ApplicationListe
     public String getClassName(String beanName) {
         if(applicationContext.containsBean(beanName)){
             Object bean = applicationContext.getBean(beanName);
+
+            if(AopUtils.isAopProxy(bean)){
+                try {
+                    bean = ((Advised)bean).getTargetSource().getTarget();
+                } catch (Exception e) {
+                    throw new TfmsException(e.getMessage(),e);
+                }
+            }
+
             if(bean instanceof GroovyObject) {
                 return bean.getClass().getName();
             }

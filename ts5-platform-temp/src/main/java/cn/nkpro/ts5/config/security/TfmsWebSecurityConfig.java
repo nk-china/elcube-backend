@@ -46,19 +46,19 @@ public class TfmsWebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .frameOptions()
                 .sameOrigin()
                 .and()
-            .authorizeRequests()
-                .antMatchers(
-                        "/wsdoc",
-                        "/wsdoc/**",
-                        "/public/**",
-                        "/file/d/**",
-                        "/def/deploy/d/**"
-                    ).permitAll()
-                .antMatchers("/authentication/token")
-                    .hasAnyAuthority("*:*","SYS:LOGIN")
-                .anyRequest()
-                    .authenticated()
-                .and()
+//            .authorizeRequests()
+//                .antMatchers(
+//                        "/wsdoc",
+//                        "/wsdoc/**",
+//                        "/public/**",
+//                        "/file/d/**",
+//                        "/def/deploy/d/**"
+//                    ).permitAll()
+//                .antMatchers("/authentication/token")
+//                    .hasAnyAuthority("*:*","SYS:LOGIN")
+//                .anyRequest()
+//                    .authenticated()
+//                .and()
             .exceptionHandling()
                 .accessDeniedHandler(new TfmsAccessDeniedHandler())
                 .authenticationEntryPoint(authenticationEntryPoint())

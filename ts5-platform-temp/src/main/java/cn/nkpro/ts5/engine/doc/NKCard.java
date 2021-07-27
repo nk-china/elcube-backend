@@ -53,6 +53,6 @@ public interface NKCard<DT,DDT> extends NKCustomObject {
     // 更新方法
     DT beforeUpdate(DocHV doc, DT data, DDT def, DT original);
 
-    @Transactional(propagation = Propagation.NEVER)
+    @Transactional(propagation = Propagation.NOT_SUPPORTED, readOnly = true)
     default void afterUpdated(DocHV doc, DT data, DDT def){};
 }

@@ -20,12 +20,11 @@ import java.util.stream.Collectors;
  */
 @WsDocNote("D2.卡片配置")
 @RestController
-@RequestMapping("/public/def/card")
+@RequestMapping("/def/resources")
 public class SysCardResController {
 
     private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 
-    @PreAuthorize("permitAll")
     @WsDocNote("1.获取卡片信息")
     @RequestMapping("/vueTemplates")
     public Map<String, String> vueTemplates() throws IOException {

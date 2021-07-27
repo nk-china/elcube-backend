@@ -8,6 +8,7 @@ import cn.nkpro.ts5.engine.web.model.WebMenuBO;
 import cn.nkpro.ts5.orm.mb.gen.SysUserSavedQuery;
 import cn.nkpro.ts5.orm.mb.gen.SysWebappMenu;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,6 +16,7 @@ import java.util.List;
 /**
  * Created by bean on 2019/12/18.
  */
+
 @WsDocNote("2.UI控制器")
 @RequestMapping("/webapp")
 @RestController
@@ -36,24 +38,28 @@ public class WebAppController {
         return properties.getEnvName();
     }
 
+    @PreAuthorize("authenticated")
     @WsDocNote("2.加载Web主菜单")
     @RequestMapping("/menus")
     public List<WebMenuBO> menus(){
         return tfmsSysWebappMenuService.getMenus(true);
     }
 
+    @PreAuthorize("authenticated")
     @WsDocNote("3.加载菜单详情")
     @RequestMapping("/menu/{id}")
     public SysWebappMenu menus(@PathVariable("id") String id){
         return tfmsSysWebappMenuService.getDetail(id);
     }
 
+    @PreAuthorize("authenticated")
     @WsDocNote("31、获取保存的搜索列表")
     @RequestMapping("/user/saved/query/list")
     public List<SysUserSavedQuery> getList(String source){
         return userQueryService.getList(source);
     }
 
+    @PreAuthorize("authenticated")
     @WsDocNote("32、保存的搜索条件")
     @RequestMapping("/user/saved/query/create")
     public SysUserSavedQuery create(@RequestBody SysUserSavedQuery query){
@@ -61,6 +67,7 @@ public class WebAppController {
         return query;
     }
 
+    @PreAuthorize("authenticated")
     @WsDocNote("33、删除已保存的搜索条件")
     @RequestMapping("/user/saved/query/delete")
     public void delete(String queryId){

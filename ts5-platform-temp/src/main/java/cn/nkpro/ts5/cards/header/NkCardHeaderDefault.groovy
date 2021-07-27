@@ -16,6 +16,6 @@ class NkCardHeaderDefault extends NKAbstractCard<Map,Map> {
 
     @Override
     String[] getDefComponentNames() {
-        return {"NkCardHeaderDefaultDef"}
+        return ["NkCardHeaderDefaultDef"]
     }
 }

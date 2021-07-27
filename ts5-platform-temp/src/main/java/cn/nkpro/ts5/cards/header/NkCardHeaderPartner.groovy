@@ -15,6 +15,6 @@ class NkCardHeaderPartner extends NKAbstractCard<Map,Map> {
 
     @Override
     String[] getDefComponentNames() {
-        return {"NkCardHeaderPartnerDef"}
+        return ["NkCardHeaderPartnerDef"]
     }
 }

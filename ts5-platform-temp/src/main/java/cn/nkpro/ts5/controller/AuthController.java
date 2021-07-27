@@ -9,6 +9,7 @@ import cn.nkpro.ts5.utils.SecurityUtilz;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
@@ -18,6 +19,8 @@ import java.util.Map;
 /**
  * Created by bean on 2019/12/30.
  */
+
+@PreAuthorize("authenticated")
 @WsDocNote("1.用户验证服务")
 @RestController
 @RequestMapping("/authentication")
@@ -30,6 +33,7 @@ public class AuthController {
     @Autowired@SuppressWarnings("all")
     private UserAuthorizationService permService;
 
+    @PreAuthorize("hasAnyAuthority('*:*','SYS:LOGIN')")
     @WsDocNote("1.获取token登陆")
     @RequestMapping("/token")
     public Map<String,Object> token(){

@@ -14,6 +14,7 @@ import eu.bitwalker.useragentutils.UserAgent;
 import eu.bitwalker.useragentutils.Version;
 import lombok.Data;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,6 +23,7 @@ import java.util.List;
 /**
  * Created by bean on 2020/6/9.
  */
+@PreAuthorize("authenticated")
 @WsDocNote("13.单据")
 @RestController
 @RequestMapping("/doc")
