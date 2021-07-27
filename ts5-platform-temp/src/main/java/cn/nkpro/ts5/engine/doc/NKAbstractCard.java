@@ -59,7 +59,7 @@ public abstract class NKAbstractCard<DT,DDT> implements NKCard<DT,DDT> {
     @Override
     @SuppressWarnings("unchecked")
     public final DDT deserializeDef(DocDefIV docDefI){
-        return (DDT) parse(docDefI.getCardContent(),getType(0));
+        return (DDT) parse(docDefI.getCardContent(),getType(1));
     }
 
     public DDT afterGetDef(DocDefHV defHV, DocDefIV defIV, DDT def){
@@ -72,7 +72,7 @@ public abstract class NKAbstractCard<DT,DDT> implements NKCard<DT,DDT> {
     @Override
     @SuppressWarnings("all")
     public final DT deserialize(Object data){
-        return (DT) parse(data,getType(1));
+        return (DT) parse(data,getType(0));
     }
 
     @Override

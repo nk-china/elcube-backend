@@ -1,5 +1,5 @@
 <template>
-    <a-card title="日期配置">
+    <a-card title="日期配置2">
         这是一个后端写的Vue文件
         <a-input v-model="def.field"></a-input>
     </a-card>

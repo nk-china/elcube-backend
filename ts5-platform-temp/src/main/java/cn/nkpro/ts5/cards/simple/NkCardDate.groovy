@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.cards
+package cn.nkpro.ts5.cards.simple
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote
 import cn.nkpro.ts5.engine.doc.NKAbstractCard
