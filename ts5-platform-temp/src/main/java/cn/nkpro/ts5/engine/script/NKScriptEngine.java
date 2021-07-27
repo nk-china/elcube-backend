@@ -15,6 +15,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import groovy.lang.GroovyObject;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
@@ -34,10 +35,12 @@ import org.springframework.stereotype.Service;
 
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 public class NKScriptEngine implements ApplicationContextAware, ApplicationListener<ContextRefreshedEvent> {
 
@@ -49,9 +52,9 @@ public class NKScriptEngine implements ApplicationContextAware, ApplicationListe
 
     @Autowired@SuppressWarnings("all")
     private NKProperties properties;
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private CardDefHMapper cardDefHMapper;
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private RedisSupport<CardDefHWithBLOBs> redisSupport;
 
 
@@ -100,18 +103,17 @@ public class NKScriptEngine implements ApplicationContextAware, ApplicationListe
                 ));
     }
 
-    public void autoRegisterGroovyObject(String groovyName, String groovyCode){
+    public void registerGroovyObject(String groovyName, String groovyCode){
 
         Class<?> clazz;
 
         try {
             clazz = (Class<?>) engine.eval(groovyCode);
-        } catch (javax.script.ScriptException e) {
+        } catch (ScriptException e) {
             throw new RuntimeException(
-                    String.format("编译Groovy对象 [%s] 发生错误%s\n%s",
+                    String.format("编译Groovy对象 [%s] 发生错误: %s",
                             groovyName,
-                            groovyCode,
-                            e.getMessage()));
+                            e.getMessage()),e);
         }
 
         String beanName = ClassUtils.decapitateClassName(clazz.getSimpleName());
@@ -147,7 +149,13 @@ public class NKScriptEngine implements ApplicationContextAware, ApplicationListe
     }
 
     private void autoRegisterGroovyObject(){
-        getResources().forEach((k,v)-> autoRegisterGroovyObject(k,v.getGroovyMain()));
+        getResources().forEach((k,v)-> {
+            try {
+                registerGroovyObject(k, v.getGroovyMain());
+            }catch (RuntimeException e){
+                log.error(e.getMessage(),e);
+            }
+        });
     }
 
     private Map<String, CardDefHWithBLOBs> getResources(){
@@ -180,8 +188,10 @@ public class NKScriptEngine implements ApplicationContextAware, ApplicationListe
 
     @SneakyThrows
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent contextStartedEvent) {
-        this.autoRegisterGroovyObject();
+    public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
+        if(contextRefreshedEvent.getApplicationContext()==applicationContext){
+            this.autoRegisterGroovyObject();
+        }
     }
 
     @Override
