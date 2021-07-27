@@ -1,5 +1,6 @@
-package cn.nkpro.ts5.engine.doc;
+package cn.nkpro.ts5.engine.devops;
 
+import cn.nkpro.ts5.engine.doc.ThreadLocalClearInterceptor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -11,25 +12,19 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Created by bean on 2019/12/30.
  */
 @Configuration
-public class NKDocEngineMvcConfigurer implements WebMvcConfigurer {
+public class DebugConfigurer implements WebMvcConfigurer {
 
-    private static Map<String, ApplicationContext> debugContext = new ConcurrentHashMap<>();
-    private final static ThreadLocal<String>       localDebugId      = new ThreadLocal<>();
-
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private ApplicationContext applicationContext;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(new DebugHandlerInterceptor());
-        registry.addInterceptor(new ThreadLocalClearInterceptor());
     }
 
     class DebugHandlerInterceptor implements HandlerInterceptor {
@@ -38,11 +33,11 @@ public class NKDocEngineMvcConfigurer implements WebMvcConfigurer {
         public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
             String debugId = request.getHeader("NK-Debug");
             if(StringUtils.isNotBlank(debugId)){
-                localDebugId.set(debugId);
-                if(debugContext.get(debugId)==null){
+                DebugHolder.debug(debugId);
+                if(DebugHolder.getDebugContext()==null){
                     GenericApplicationContext context = new GenericApplicationContext(applicationContext);
                     context.refresh();
-                    debugContext.put(debugId,context);
+                    DebugHolder.setDebugContext(context);
                 }
             }
             return true;
@@ -50,7 +45,7 @@ public class NKDocEngineMvcConfigurer implements WebMvcConfigurer {
 
         @Override
         public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-            localDebugId.remove();
+            DebugHolder.remove();
         }
     }
 }

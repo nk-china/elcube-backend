@@ -5,6 +5,7 @@ import cn.nkpro.ts5.basic.NKCustomObject;
 import cn.nkpro.ts5.basic.NKCustomObjectManager;
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.config.mybatis.pagination.PaginationContext;
+import cn.nkpro.ts5.engine.devops.DebugHolder;
 import cn.nkpro.ts5.engine.doc.NKCard;
 import cn.nkpro.ts5.engine.doc.NKDocProcessor;
 import cn.nkpro.ts5.engine.doc.NKDocStateInterceptor;
@@ -16,7 +17,6 @@ import cn.nkpro.ts5.orm.mb.gen.*;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
 import cn.nkpro.ts5.utils.VersioningUtils;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -346,13 +346,29 @@ public class NKDocDefServiceImpl implements NKDocDefService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public void doDebug(DocDefHV docDefHV){
+        redisSupport.putHash(
+                "DEBUG:"+DebugHolder.debug(),
+                String.format("%s-%s", docDefHV.getDocType(), VersioningUtils.parseMajor(docDefHV.getVersion())),
+                docDefHV);
+    }
+
     /**
+     * 获取运行时的单据配置
      * 根据单据类型 获取当前日期下 单据对应的配置信息
      * @param docType docType
      * @return DocDefHV
      */
     @Override
-    public DocDefHV getDocDef(String docType, Integer major){
+    public DocDefHV getRuntimeDocDef(String docType, Integer major){
+
+        // 判断当前请求是否debug，如果是，先尝试从debug环境中获取配置
+        Optional<DocDefHV> optionalDebug = Optional.ofNullable(DebugHolder.debug())
+                .map(debugId -> redisSupport.getIfAbsent("DEBUG:"+DebugHolder.debug(), String.format("%s-%s", docType, major), () -> null));
+        if(optionalDebug.isPresent()){
+            return optionalDebug.get();
+        }
 
         String version;
 
@@ -411,6 +427,7 @@ public class NKDocDefServiceImpl implements NKDocDefService {
     }
 
     /**
+     * 获取单据配置
      * 根据单据类型及版本号 获取单据对应的配置信息
      * @param docType docType
      * @param version version

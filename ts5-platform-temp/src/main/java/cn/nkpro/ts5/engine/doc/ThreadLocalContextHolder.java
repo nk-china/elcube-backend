@@ -22,7 +22,6 @@ public class ThreadLocalContextHolder {
     * 由于在读取或创建 doc 的过程中，会递归读取或创建其他 doc，
     * 因此使用 computeIfAbsent 方法会导致线程安全的ConcurrentHashMap的数据在内部被修改，
     * 而抛出new IllegalStateException("Recursive update")的问题
-
     public static synchronized BizDocBase computeBizDocIfAbsent(String docId, Function<String, BizDocBase> mappingFunction){
         Map<String, BizDocBase> docMap = threadLocalDocs.get();
         if(docMap==null){

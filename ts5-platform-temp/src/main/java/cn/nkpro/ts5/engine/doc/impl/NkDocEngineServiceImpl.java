@@ -47,7 +47,7 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
         Optional<DocHV> optPreDoc = Optional.ofNullable(preDoc);
 
         // 获取单据配置
-        DocDefHV def = docDefService.getDocDef(docType, optPreDoc.map(DocH::getDefVersion).orElse(null));
+        DocDefHV def = docDefService.getRuntimeDocDef(docType, optPreDoc.map(DocH::getDefVersion).orElse(null));
 
         // 获取单据处理器
         NKDocProcessor processor = customObjectManager.getCustomObject(def.getRefObjectType(), NKDocProcessor.class);
@@ -81,7 +81,7 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
         if(docHD != null){
 
             // 获取单据DEF
-            DocDefHV def = docDefService.getDocDef(docHD.getDocType(), docHD.getDefVersion());
+            DocDefHV def = docDefService.getRuntimeDocDef(docHD.getDocType(), docHD.getDefVersion());
 
             // 获取单据处理器 并执行
             return customObjectManager
@@ -107,7 +107,7 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
 
         // 获取单据配置
         DocDefHV def = Optional.ofNullable(original).map(DocHV::getDef).orElseGet(()->
-                docDefService.getDocDef(doc.getDocType(),doc.getDefVersion())
+                docDefService.getRuntimeDocDef(doc.getDocType(),doc.getDefVersion())
         );
 
         // 获取单据处理器 并执行
@@ -127,7 +127,7 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
 
         // 获取单据配置
         DocDefHV def = Optional.ofNullable(original).map(DocHV::getDef).orElseGet(()->
-                docDefService.getDocDef(doc.getDocType(),doc.getDefVersion())
+                docDefService.getRuntimeDocDef(doc.getDocType(),doc.getDefVersion())
         );
 
         // 事务提交后清空缓存

@@ -96,13 +96,20 @@ public class SysDocDefController {
         defDocTypeService.doDelete(def,false);
     }
 
-    @WsDocNote("9.获取单据配置的Options")
+    @WsDocNote("9.调试配置")
+    @RequestMapping("/type/debug")
+    public void debug(
+            @WsDocNote("单据配置对象")@RequestBody DocDefHV def){
+        defDocTypeService.doDebug(def);
+    }
+
+    @WsDocNote("10.获取单据配置的Options")
     @RequestMapping("/type/options")
     public Map<String, Object> options(@WsDocNote("分类")@RequestParam(value="classify",required = false) String classify){
         return defDocTypeService.options(classify);
     }
 
-    @WsDocNote("10.获取卡片信息")
+    @WsDocNote("11.获取卡片信息")
     @RequestMapping("/card/{cardHandlerName}")
     public DocDefIV cardDescribe(@WsDocNote("分类")@PathVariable String cardHandlerName){
         return defDocTypeService.getCardDescribe(cardHandlerName);

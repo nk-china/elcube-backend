@@ -28,7 +28,9 @@ public interface NKDocDefService {
 
     List<DocDefH> getEntrance(String classify);
 
-    DocDefHV getDocDef(String docType, Integer major);
+    void doDebug(DocDefHV docDefHV);
+
+    DocDefHV getRuntimeDocDef(String docType, Integer major);
 
     DocDefHV getDocDef(String docType, String version, boolean includeComponentMarkdown, boolean ignoreError);
 
