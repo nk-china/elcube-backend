@@ -1,6 +1,8 @@
 package cn.nkpro.ts5.engine.script;
 
+import cn.nkpro.ts5.config.global.NKProperties;
 import cn.nkpro.ts5.exception.TfmsException;
+import cn.nkpro.ts5.utils.ResourceUtils;
 import groovy.lang.GroovyObject;
 import lombok.SneakyThrows;
 import org.springframework.aop.framework.Advised;
@@ -17,13 +19,38 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class NKScriptEngine implements ApplicationContextAware, ApplicationListener<ContextRefreshedEvent> {
 
+    @Autowired@SuppressWarnings("all")
+    private NKProperties properties;
+
     private ApplicationContext applicationContext;
 
     private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
+
+    public Map<String, String> getVueFromClasspath() {
+
+        List<Resource> resources = new ArrayList<>();
+
+        Arrays.stream(properties.getVueBasePackages())
+            .forEach(path->{
+                try {
+                    path = path.replaceAll("[.]","/");
+                    resources.addAll(Arrays.asList(resourcePatternResolver.getResources("classpath*:/"+path+"/**/*.vue")));
+                } catch (IOException ignored) {
+                }
+            });
+
+        return resources.stream()
+                .collect(Collectors.toMap(
+                        resource -> Objects.requireNonNull(resource.getFilename()).substring(0,resource.getFilename().length()-4),
+                        ResourceUtils::readText
+                ));
+    }
 
 //    public void registerResourcesDefined() throws Exception {
 //
@@ -98,11 +125,6 @@ public class NKScriptEngine implements ApplicationContextAware, ApplicationListe
         String[] split = resource.getURL().toString().split("[/]");
         return split[split.length-2];
     }
-
-//    public static void main(String[] args) throws Exception {
-//        new NKScriptEngine().registerResourcesDefined();
-//    }
-//
 
     public String getClassName(String beanName) {
         if(applicationContext.containsBean(beanName)){

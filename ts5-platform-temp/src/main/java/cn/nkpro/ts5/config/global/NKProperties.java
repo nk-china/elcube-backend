@@ -15,5 +15,9 @@ public class NKProperties {
     private String fileRootPath;
     private String passwordStrategy;
     private Boolean enableBreachStream;
+
+    private String[] vueBasePackages = new String[]{
+            "cn.nkpro.ts5.cards"
+    };
 }
 
