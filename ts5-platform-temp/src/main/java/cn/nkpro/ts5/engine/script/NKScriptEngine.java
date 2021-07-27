@@ -60,8 +60,10 @@ public class NKScriptEngine implements ApplicationContextAware, ApplicationListe
 
     public Map<String, String> buildVueMap(){
 
+        // 从本地资源获取
         Map<String, String> vueMap = getVueMapFromClasspath();
 
+        // 从数据库获取
         getResources().forEach((k,v)->{
             if(StringUtils.isNotBlank(v.getVueMain())){
                 vueMap.put(k,v.getVueMain());
@@ -75,9 +77,10 @@ public class NKScriptEngine implements ApplicationContextAware, ApplicationListe
             }
         });
 
-        // if debug
+        // 从Debug上下文获取
         if(DebugHolder.debug()!=null){
             // load resource from debug context
+            System.out.println();
         }
 
         return vueMap;
