@@ -1,6 +1,8 @@
 package cn.nkpro.ts5.engine.doc;
 
 import cn.nkpro.ts5.basic.NKCustomObject;
+import cn.nkpro.ts5.engine.doc.model.DocDefHV;
+import cn.nkpro.ts5.engine.doc.model.DocDefIV;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.orm.mb.gen.DocDefI;
 import cn.nkpro.ts5.orm.mb.gen.DocDefIWithBLOBs;
@@ -12,10 +14,16 @@ public interface NKCard<DT,DDT> extends NKCustomObject {
     String POSITION_SIDEBAR = "sidebar";
 
     /**
-     * 获取组件名称
+     * 获取组件程序
      * @return string
      */
     String getCardHandler();
+
+    /**
+     * 获取组件名称
+     * @return string
+     */
+    String getCardName();
 
     String getPosition();
 
@@ -23,24 +31,24 @@ public interface NKCard<DT,DDT> extends NKCustomObject {
 
     String[] getDefComponentNames();
 
-    String getCardName();
+    // 配置方法
+    DDT deserializeDef(DocDefIV defI);
 
+    DDT afterGetDef(DocDefHV defHV, DocDefIV defIV, DDT def);
 
-    DDT def(DocDefIWithBLOBs defI);
+    // 解析数据
+    DT deserialize(Object data);
 
-    DT create(DocHV doc, DocHV preDoc, DocDefI defI) throws Exception;
+    // 创建方法
+    DT afterCreate(DocHV doc, DocHV preDoc, DT data, DDT def);
 
-    Object afterCreate(DocHV doc, DocHV preDoc, DT data, DDT def);
+    // 查询方法
+    DT afterGetData(DocHV doc, DT data, DDT def);
 
-    DT calculate(DocHV doc, DocDefI defI,String options) throws Exception;
+    // 计算方法
+    DT calculate(DocHV doc, DT data, DDT def, boolean isTrigger, String options);
 
-    @SuppressWarnings("all")
-    DT getData(DocHV doc, DocDefI defI) throws Exception;
-
-    DT afterGetData(DocHV doc, String data, String def);
-
-
-    Object deserializeDef(Object def);
-
-    Object deserialize(Object data);
+    // 更新方法
+    DT beforeUpdate(DocHV doc, DT data, DDT def, DT original);
+    DT afterUpdate(DocHV doc, DT data, DDT def, DT original);
 }

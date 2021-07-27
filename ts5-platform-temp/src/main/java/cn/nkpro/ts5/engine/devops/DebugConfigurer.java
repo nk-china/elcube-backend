@@ -1,6 +1,5 @@
 package cn.nkpro.ts5.engine.devops;
 
-import cn.nkpro.ts5.engine.doc.ThreadLocalClearInterceptor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;

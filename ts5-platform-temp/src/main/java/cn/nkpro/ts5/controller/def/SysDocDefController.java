@@ -58,7 +58,7 @@ public class SysDocDefController {
     @RequestMapping(value = "/type/detail/{docType}/{version}")
     public DocDefHV detail(
             @WsDocNote(value = "单据类型") @PathVariable("docType") String docType, @PathVariable String version){
-        return defDocTypeService.getDocDef(docType, version, true, true);
+        return defDocTypeService.getDocDef(docType, version);
     }
 
     @WsDocNote("4.预处理编辑单据配置")
@@ -100,7 +100,7 @@ public class SysDocDefController {
     @RequestMapping("/type/debug")
     public void debug(
             @WsDocNote("单据配置对象")@RequestBody DocDefHV def){
-        defDocTypeService.doDebug(def);
+        defDocTypeService.debug(def);
     }
 
     @WsDocNote("10.获取单据配置的Options")

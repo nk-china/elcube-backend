@@ -5,6 +5,7 @@ import cn.nkpro.ts5.basic.NKCustomObject;
 import cn.nkpro.ts5.basic.NKCustomObjectManager;
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.config.mybatis.pagination.PaginationContext;
+import cn.nkpro.ts5.config.redis.RedisSupport;
 import cn.nkpro.ts5.engine.devops.DebugHolder;
 import cn.nkpro.ts5.engine.doc.NKCard;
 import cn.nkpro.ts5.engine.doc.NKDocProcessor;
@@ -12,7 +13,7 @@ import cn.nkpro.ts5.engine.doc.NKDocStateInterceptor;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocDefIV;
 import cn.nkpro.ts5.engine.doc.service.NKDocDefService;
-import cn.nkpro.ts5.config.redis.RedisSupport;
+import cn.nkpro.ts5.exception.TfmsException;
 import cn.nkpro.ts5.orm.mb.gen.*;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
@@ -96,7 +97,16 @@ public class NKDocDefServiceImpl implements NKDocDefService {
 
     @Override
     public DocDefIV getCardDescribe(String cardHandlerName){
-        return BeanUtilz.copyFromObject(customObjectManager.getCustomObject(cardHandlerName,NKCard.class), DocDefIV.class);
+
+        NKCard nkCard = customObjectManager.getCustomObject(cardHandlerName, NKCard.class);
+
+        DocDefIV describe = new DocDefIV();
+        describe.setCardHandler(nkCard.getCardHandler());
+        describe.setCardName(nkCard.getCardName());
+        describe.setDataComponentName(nkCard.getDataComponentName());
+        describe.setDefComponentNames(nkCard.getDefComponentNames());
+
+        return describe;
     }
 
     /**
@@ -346,14 +356,6 @@ public class NKDocDefServiceImpl implements NKDocDefService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public void doDebug(DocDefHV docDefHV){
-        redisSupport.putHash(
-                "DEBUG:"+DebugHolder.debug(),
-                String.format("%s-%s", docDefHV.getDocType(), VersioningUtils.parseMajor(docDefHV.getVersion())),
-                docDefHV);
-    }
-
     /**
      * 获取运行时的单据配置
      * 根据单据类型 获取当前日期下 单据对应的配置信息
@@ -363,67 +365,67 @@ public class NKDocDefServiceImpl implements NKDocDefService {
     @Override
     public DocDefHV getRuntimeDocDef(String docType, Integer major){
 
-        // 判断当前请求是否debug，如果是，先尝试从debug环境中获取配置
-        Optional<DocDefHV> optionalDebug = Optional.ofNullable(DebugHolder.debug())
-                .map(debugId -> redisSupport.getIfAbsent("DEBUG:"+DebugHolder.debug(), String.format("%s-%s", docType, major), () -> null));
-        if(optionalDebug.isPresent()){
-            return optionalDebug.get();
-        }
+        return debugDef(docType,major).orElseGet(()->{
 
-        String version;
+            String version;
 
-        String today = DateTimeUtilz.todayShortString();
-        if(major == null){
-            // 查找最新版本
+            String today = DateTimeUtilz.todayShortString();
+            if(major == null){
+                // 查找最新版本
 
-            DocDefHExample example = new DocDefHExample();
-            example.createCriteria()
-                    .andDocTypeEqualTo(docType)
-                    .andValidFromLessThanOrEqualTo(today)
-                    .andValidToGreaterThanOrEqualTo(today)
-                    .andStateEqualTo("Active");
-            example.setOrderByClause("VERSION DESC");
+                DocDefHExample example = new DocDefHExample();
+                example.createCriteria()
+                        .andDocTypeEqualTo(docType)
+                        .andValidFromLessThanOrEqualTo(today)
+                        .andValidToGreaterThanOrEqualTo(today)
+                        .andStateEqualTo("Active");
+                example.setOrderByClause("VERSION DESC");
 
-            Optional<DocDefH> first = docDefHMapper
-                    .selectByExample(example, new RowBounds(0, 1))
+                Optional<DocDefH> first = docDefHMapper
+                        .selectByExample(example, new RowBounds(0, 1))
+                        .stream()
+                        .findFirst();
+
+                Assert.isTrue(first.isPresent(),String.format("单据类型[%s]的配置没有找到",docType));
+
+                version = first.get().getVersion();
+            }else{
+                DocDefHExample example = new DocDefHExample();
+                example.createCriteria()
+                        .andDocTypeEqualTo(docType)
+                        .andVersionLike(major+".%")
+                        .andValidFromLessThanOrEqualTo(today)
+                        .andValidToGreaterThanOrEqualTo(today)
+                        .andStateEqualTo("Active");
+
+                Optional<DocDefH> first = docDefHMapper
+                        .selectByExample(example, new RowBounds(0, 1))
+                        .stream()
+                        .findFirst();
+
+                Assert.isTrue(first.isPresent(),String.format("单据类型[%s]版本[%s]的配置没有找到",docType,major));
+
+                version = first.get().getVersion();
+            }
+
+            return Optional.ofNullable(fetchDocDef(docType,version, false,false))
                     .stream()
-                    .findFirst();
+                    .peek(def->{
 
-            Assert.isTrue(first.isPresent(),String.format("单据类型[%s]的配置没有找到",docType));
+                        deserializeDef(def);
+                        afterGetDef(def);
 
-            version = first.get().getVersion();
-        }else{
-            DocDefHExample example = new DocDefHExample();
-            example.createCriteria()
-                    .andDocTypeEqualTo(docType)
-                    .andVersionLike(major+".%")
-                    .andValidFromLessThanOrEqualTo(today)
-                    .andValidToGreaterThanOrEqualTo(today)
-                    .andStateEqualTo("Active");
-
-            Optional<DocDefH> first = docDefHMapper
-                    .selectByExample(example, new RowBounds(0, 1))
-                    .stream()
-                    .findFirst();
-
-            Assert.isTrue(first.isPresent(),String.format("单据类型[%s]版本[%s]的配置没有找到",docType,major));
-
-            version = first.get().getVersion();
-        }
-
-        return Optional.ofNullable(getDocDef(docType,version, false,false))
-                .stream()
-                .peek(def->{
-                    DocDefFlowExample flowExample = new DocDefFlowExample();
-                    flowExample.createCriteria()
-                            .andPreDocTypeEqualTo(docType)
-                            .andActiveEqualTo(1)
-                            .andVersionLike(VersioningUtils.parseMajor(version)+".%");
-                    flowExample.setOrderByClause("ORDER_BY");
-                    def.setFlows(docDefFlowMapper.selectByExample(flowExample));
-                })
-                .findFirst()
-                .orElse(null);
+                        DocDefFlowExample flowExample = new DocDefFlowExample();
+                        flowExample.createCriteria()
+                                .andPreDocTypeEqualTo(docType)
+                                .andActiveEqualTo(1)
+                                .andVersionLike(VersioningUtils.parseMajor(version)+".%");
+                        flowExample.setOrderByClause("ORDER_BY");
+                        def.setFlows(docDefFlowMapper.selectByExample(flowExample));
+                    })
+                    .findFirst()
+                    .orElse(null);
+        });
     }
 
     /**
@@ -434,7 +436,30 @@ public class NKDocDefServiceImpl implements NKDocDefService {
      * @return DocDefHV
      */
     @Override
-    public DocDefHV getDocDef(String docType, String version, boolean includeComponentMarkdown, boolean ignoreError){
+    public DocDefHV getDocDef(String docType, String version){
+        return deserializeDef(fetchDocDef(docType, version, true, true));
+    }
+
+    @Override
+    public void debug(DocDefHV docDefHV){
+        String debugCachedHash = String.format("DEBUG：%s", DebugHolder.debug());
+        String debugCachedKey  = String.format("%s-%s", docDefHV.getDocType(), VersioningUtils.parseMajor(docDefHV.getVersion()));
+        redisSupport.putHash(debugCachedHash,debugCachedKey,docDefHV);
+        redisSupport.expire(debugCachedHash,60*30);//30分钟
+    }
+
+    // 判断当前请求是否debug，如果是，先尝试从debug环境中获取配置
+    private Optional<DocDefHV> debugDef(String docType, Integer major){
+        String debugCachedHash = String.format("DEBUG：%s", DebugHolder.debug());
+        String debugCachedKey  = String.format("%s-%s", docType, major);
+
+        return Optional.ofNullable(DebugHolder.debug())
+                .map(debugId -> redisSupport.getIfAbsent(debugCachedHash, debugCachedKey, () -> null))
+                .map(this::deserializeDef)
+                .map(this::afterGetDef);
+    }
+
+    private DocDefHV fetchDocDef(String docType, String version, boolean includeComponentMarkdown, boolean ignoreError){
         String cacheKey = String.format("%s-%s",docType,version);
 
         DocDefHV docDefHV = redisSupport.getIfAbsent(Constants.CACHE_DEF_DOC,cacheKey,()->{
@@ -476,31 +501,50 @@ public class NKDocDefServiceImpl implements NKDocDefService {
             return def;
         });
 
-        docDefHV.getCards().forEach(item->{
-            Optional.ofNullable(customObjectManager.getCustomObjectIfExists(item.getCardHandler(),NKCard.class))
-                    .ifPresent(nkCard -> {
-                        item.setConfig(nkCard.def(item));
-                        item.setPosition(nkCard.getPosition());
-                        item.setDataComponentName(nkCard.getDataComponentName());
-                        item.setDefComponentNames(nkCard.getDefComponentNames());
-                    });
-            item.setCardContent(null);
-        });
-
         if(!ignoreError)
             Assert.notEmpty(docDefHV.getStatus(),String.format("单据类型[%s]的状态配置没有找到",docType));
 
         return docDefHV;
     }
 
-    @Override
-    public void runLoopCards(DocDefHV docDefHV, Function function) throws Exception{
+    private DocDefHV deserializeDef(DocDefHV docDefHV) {
 
+        runLoopCards(docDefHV,true, (nkCard,item)->{
+            item.setConfig(nkCard.deserializeDef(item));
+            item.setPosition(nkCard.getPosition());
+            item.setDataComponentName(nkCard.getDataComponentName());
+            item.setDefComponentNames(nkCard.getDefComponentNames());
+            item.setCardContent(null);
+        });
+
+        return docDefHV;
+    }
+
+    @SuppressWarnings("unchecked")
+    private DocDefHV afterGetDef(DocDefHV docDefHV) {
+
+        runLoopCards(docDefHV,false, (nkCard,item)->
+            item.setConfig(nkCard.afterGetDef(docDefHV, item, item.getConfig()))
+        );
+
+        return docDefHV;
+    }
+
+    @Override
+    public void runLoopCards(DocDefHV docDefHV, boolean ignoreError, Function function){
         for(DocDefIV docDefI : docDefHV.getCards()){
             // 找到对应的组件实现类
-            function.run(
-                    customObjectManager.getCustomObjectIfExists(docDefI.getCardKey(), NKCard.class),
-                    docDefI);
+            NKCard nkCard = customObjectManager.getCustomObjectIfExists(docDefI.getCardKey(), NKCard.class);
+            if(nkCard==null && !ignoreError){
+                throw new TfmsException(String.format("自定义对象[%s]不存在",docDefI.getCardHandler()));
+            }
+            try {
+                function.run(nkCard, docDefI);
+            }catch (Exception e){
+                if(!ignoreError){
+                    throw new TfmsException(e.getMessage(),e);
+                }
+            }
         }
     }
 //

@@ -5,8 +5,6 @@ import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocDefIV;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.exception.TfmsException;
-import cn.nkpro.ts5.orm.mb.gen.DocDefI;
-import cn.nkpro.ts5.orm.mb.gen.DocDefIWithBLOBs;
 import cn.nkpro.ts5.utils.SpringEmulated;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -17,7 +15,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
@@ -26,10 +23,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public abstract class NKAbstractCard<DT,DDT> implements NKCard<DT,DDT> {
 
     @Getter
-    protected String cardHandler;
+    private String cardHandler;
 
     @Getter
-    protected String cardName;
+    private String cardName;
 
     @Getter
     private String position = NKCard.POSITION_DEFAULT;
@@ -56,34 +53,26 @@ public abstract class NKAbstractCard<DT,DDT> implements NKCard<DT,DDT> {
     }
 
 
+    /**
+     * 预解析卡片配置
+     */
     @Override
     @SuppressWarnings("unchecked")
-    public final DDT def(DocDefIWithBLOBs docDefI){
+    public final DDT deserializeDef(DocDefIV docDefI){
         return (DDT) parse(docDefI.getCardContent(),getType(0));
     }
 
+    public DDT afterGetDef(DocDefHV defHV, DocDefIV defIV, DDT def){
+        return def;
+    }
+
     /**
-     * 单据创建时调用，初始化卡片数据，返回一个新的DT对象
-     * @param doc
-     * @param preDoc
-     * @param docDef
-     * @return
-     * @throws Exception
+     * 预解析数据，并转换成DT类型
      */
-    @SuppressWarnings("unchecked")
     @Override
-    public final DT create(DocHV doc, DocHV preDoc, DocDefI docDef) throws Exception{
-        Class<DT> typeDT = (Class<DT>) getType(0);
-
-        if(typeDT == Map.class){
-            return (DT) new HashMap<>();
-        }
-        if(typeDT == List.class){
-            return (DT) new ArrayList<>();
-        }
-
-        assert typeDT != null;
-        return typeDT.getConstructor().newInstance();
+    @SuppressWarnings("all")
+    public final DT deserialize(Object data){
+        return (DT) parse(data,getType(1));
     }
 
     @Override
@@ -91,23 +80,10 @@ public abstract class NKAbstractCard<DT,DDT> implements NKCard<DT,DDT> {
         return data;
     }
 
-    /**
-     * 加载数据，并转换成DT类型
-     * @param doc
-     * @return
-     * @throws Exception
-     */
-    @Override
-    @SuppressWarnings("all")
-    public final DT getData(DocHV doc, DocDefI defI) throws Exception {
-        // todo 从数据库中加载原始JSON数据
-        return (DT) doc.getData().get(defI.getCardKey());
-    }
 
     @Override
-    @SuppressWarnings("all")
-    public DT afterGetData(DocHV doc, String data, String def){
-        return (DT) parse(data,getType(0));
+    public DT afterGetData(DocHV doc, DT data, DDT def) {
+        return data;
     }
 
     /**
@@ -119,29 +95,18 @@ public abstract class NKAbstractCard<DT,DDT> implements NKCard<DT,DDT> {
      */
     @Override
     @SuppressWarnings("all")
-    public final DT calculate(DocHV doc, DocDefI defI,String options) throws Exception{
-        return (DT) doc.getData().get(defI.getCardKey());
+    public final DT calculate(DocHV doc, DT data, DDT def, boolean isTrigger, String options){
+        return data;
     }
 
-    /**
-     * 将数据转换成JSON，并存入DB
-     * @param doc
-     * @param docDef
-     * @param original
-     * @throws Exception
-     */
-    @SuppressWarnings("all")
-    public final void update(DocHV doc, DocDefHV docDef, DocHV original) throws Exception{
-        // todo
+    @Override
+    public DT beforeUpdate(DocHV doc, DT data, DDT def, DT original) {
+        return data;
     }
 
-
-    public final Object deserializeDef(Object def){
-        return parse(def, getType(1));
-    }
-
-    public final Object deserialize(Object data){
-        return parse(data, getType(0));
+    @Override
+    public final DT afterUpdate(DocHV doc, DT data, DDT def, DT original){
+        return data;
     }
 
     @SuppressWarnings("all")

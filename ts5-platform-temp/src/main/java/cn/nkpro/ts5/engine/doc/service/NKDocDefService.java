@@ -28,11 +28,11 @@ public interface NKDocDefService {
 
     List<DocDefH> getEntrance(String classify);
 
-    void doDebug(DocDefHV docDefHV);
+    void debug(DocDefHV docDefHV);
 
     DocDefHV getRuntimeDocDef(String docType, Integer major);
 
-    DocDefHV getDocDef(String docType, String version, boolean includeComponentMarkdown, boolean ignoreError);
+    DocDefHV getDocDef(String docType, String version);
 
     DocDefHV doEdit(DocDefHV docDefHV);
 
@@ -44,7 +44,7 @@ public interface NKDocDefService {
 
     DocDefHV doUpdate(DocDefHV defDocTypeBO, boolean force);
 
-    void runLoopCards(DocDefHV docDefHV, Function function) throws Exception;
+    void runLoopCards(DocDefHV docDefHV, boolean ignoreError, Function function) throws Exception;
 
     @FunctionalInterface
     interface Function {
