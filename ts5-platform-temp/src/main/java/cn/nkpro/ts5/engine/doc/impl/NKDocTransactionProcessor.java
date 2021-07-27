@@ -1,10 +1,12 @@
 package cn.nkpro.ts5.engine.doc.impl;
 
+import cn.nkpro.ts5.config.id.GUID;
+import cn.nkpro.ts5.config.id.SequenceSupport;
+import cn.nkpro.ts5.engine.doc.NKCard;
 import cn.nkpro.ts5.engine.doc.NKDocProcessor;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocHD;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
-import cn.nkpro.ts5.engine.doc.model.DocIV;
 import cn.nkpro.ts5.engine.doc.service.NKDocDefService;
 import cn.nkpro.ts5.engine.elasticearch.SearchEngine;
 import cn.nkpro.ts5.engine.elasticearch.model.DocHES;
@@ -12,16 +14,18 @@ import cn.nkpro.ts5.orm.mb.gen.DocH;
 import cn.nkpro.ts5.orm.mb.gen.DocHMapper;
 import cn.nkpro.ts5.orm.mb.gen.DocI;
 import cn.nkpro.ts5.orm.mb.gen.DocIMapper;
-import cn.nkpro.ts5.config.id.GUID;
-import cn.nkpro.ts5.config.id.SequenceSupport;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
+import cn.nkpro.ts5.utils.LocalSyncUtilz;
 import cn.nkpro.ts5.utils.VersioningUtils;
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.aop.framework.Advised;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.lang.reflect.Method;
 import java.util.Optional;
 
 @SuppressWarnings("unchecked")
@@ -203,10 +207,13 @@ public class NKDocTransactionProcessor implements NKDocProcessor {
                 docI.setCardContent(null);
             }
 
-            doc.getData().put(
-                    defIV.getCardKey(),
-                    card.afterUpdate(doc, cardData, defIV.getConfig(),cardDataOriginal)
-            );
+            doc.getData().put(defIV.getCardKey(),cardData);
+
+            // 调用 afterUpdated
+            if(isOverride(card)){
+                Object loopCardData = cardData;
+                LocalSyncUtilz.runAfterCommit(()-> card.afterUpdated(doc, loopCardData, defIV.getConfig()));
+            }
         });
 
         if(optionalOriginal.isPresent()){
@@ -235,13 +242,21 @@ public class NKDocTransactionProcessor implements NKDocProcessor {
                         )
                 );
 
-//        EvaluationContext context = spELManager.createContext(docBO);
-//        docBO.getDefinedDoc().getIndexRules()
-//                .forEach(indexRule -> {
-//                    Expression exp = spELManager.parser().parseExpression(indexRule.getRule());
-//                    setEsDocFiled(docIndex,indexRule.getField(),exp.getValue(context));
-//                });
-
         searchEngine.indexBeforeCommit(docHES);
+    }
+
+    private boolean isOverride(Object obj){
+        try {
+            if(AopUtils.isAopProxy(obj)){
+                obj = ((Advised)obj).getTargetSource().getTarget();
+            }
+
+            assert obj != null;
+            Method afterUpdated = obj.getClass().getDeclaredMethod("afterUpdated", DocHV.class, Object.class, Object.class);
+            return afterUpdated.getDeclaringClass() != NKCard.class;
+        } catch (Exception e) {
+
+            return false;
+        }
     }
 }

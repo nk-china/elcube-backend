@@ -6,6 +6,8 @@ import cn.nkpro.ts5.engine.doc.model.DocDefIV;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.orm.mb.gen.DocDefI;
 import cn.nkpro.ts5.orm.mb.gen.DocDefIWithBLOBs;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface NKCard<DT,DDT> extends NKCustomObject {
 
@@ -50,5 +52,7 @@ public interface NKCard<DT,DDT> extends NKCustomObject {
 
     // 更新方法
     DT beforeUpdate(DocHV doc, DT data, DDT def, DT original);
-    DT afterUpdate(DocHV doc, DT data, DDT def, DT original);
+
+    @Transactional(propagation = Propagation.NEVER)
+    default void afterUpdated(DocHV doc, DT data, DDT def){};
 }

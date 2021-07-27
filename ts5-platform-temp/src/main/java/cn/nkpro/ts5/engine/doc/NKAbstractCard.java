@@ -104,11 +104,6 @@ public abstract class NKAbstractCard<DT,DDT> implements NKCard<DT,DDT> {
         return data;
     }
 
-    @Override
-    public final DT afterUpdate(DocHV doc, DT data, DDT def, DT original){
-        return data;
-    }
-
     @SuppressWarnings("all")
     protected final Object parse(Object obj, Type targetType) {
 

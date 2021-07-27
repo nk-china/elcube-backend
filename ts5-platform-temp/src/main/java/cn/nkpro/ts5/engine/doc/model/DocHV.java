@@ -17,9 +17,12 @@ public class DocHV extends DocHD {
 
     private Map<String,Object> data;
 
+    private Map<String,Object> dynamics;
+
     public DocHV() {
         super();
-        this.data  = new HashMap<>();
+        this.data       = new HashMap<>();
+        this.dynamics   = new HashMap<>();
     }
     // 单据是否允许编辑，默认真
     private Boolean     writeable = true;
