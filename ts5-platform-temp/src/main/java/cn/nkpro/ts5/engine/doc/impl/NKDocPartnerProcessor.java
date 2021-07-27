@@ -17,7 +17,8 @@ public class NKDocPartnerProcessor extends NKDocTransactionProcessor {
     }
 
     @Override
-    public DocHV toCreate(DocDefHV def, DocHV preDoc) {
-        return new DocHV();
+    public DocHV toCreate(DocDefHV def, DocHV preDoc) throws Exception {
+        DocHV docHV = super.toCreate(def, preDoc);
+        return docHV;
     }
 }

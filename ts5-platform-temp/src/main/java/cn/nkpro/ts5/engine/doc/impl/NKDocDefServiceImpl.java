@@ -454,18 +454,20 @@ public class NKDocDefServiceImpl implements NKDocDefService {
                     .andDocTypeEqualTo(docType)
                     .andVersionEqualTo(version);
             docDefIExample.setOrderByClause("ORDER_BY");
-            def.setCards(BeanUtilz.copyFromList(docDefIMapper.selectByExampleWithBLOBs(docDefIExample),DocDefIV.class,(item)->{
-                item.setConfig(JSON.parse(item.getCardContent()));
-                item.setCardContent(null);
-
-                Optional.ofNullable(customObjectManager.getCustomObjectIfExists(item.getCardHandler(),NKCard.class))
-                        .ifPresent(nkCard -> {
-                            item.setDataComponentName(nkCard.getDataComponentName());
-                            item.setDefComponentNames(nkCard.getDefComponentNames());
-                        });
-            }));
+            def.setCards(BeanUtilz.copyFromList(docDefIMapper.selectByExampleWithBLOBs(docDefIExample),DocDefIV.class));
 
             return def;
+        });
+
+        docDefHV.getCards().forEach(item->{
+            Optional.ofNullable(customObjectManager.getCustomObjectIfExists(item.getCardHandler(),NKCard.class))
+                    .ifPresent(nkCard -> {
+                        item.setConfig(nkCard.def(item));
+                        item.setPosition(nkCard.getPosition());
+                        item.setDataComponentName(nkCard.getDataComponentName());
+                        item.setDefComponentNames(nkCard.getDefComponentNames());
+                    });
+            item.setCardContent(null);
         });
 
         if(!ignoreError)

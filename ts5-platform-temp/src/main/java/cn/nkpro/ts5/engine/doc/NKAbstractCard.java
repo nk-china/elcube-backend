@@ -2,8 +2,11 @@ package cn.nkpro.ts5.engine.doc;
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
+import cn.nkpro.ts5.engine.doc.model.DocDefIV;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
+import cn.nkpro.ts5.exception.TfmsException;
 import cn.nkpro.ts5.orm.mb.gen.DocDefI;
+import cn.nkpro.ts5.orm.mb.gen.DocDefIWithBLOBs;
 import cn.nkpro.ts5.utils.SpringEmulated;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -14,6 +17,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.*;
@@ -26,6 +30,9 @@ public abstract class NKAbstractCard<DT,DDT> implements NKCard<DT,DDT> {
 
     @Getter
     protected String cardName;
+
+    @Getter
+    private String position = NKCard.POSITION_DEFAULT;
 
     public NKAbstractCard(){
 
@@ -48,6 +55,13 @@ public abstract class NKAbstractCard<DT,DDT> implements NKCard<DT,DDT> {
         return ArrayUtils.EMPTY_STRING_ARRAY;
     }
 
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public final DDT def(DocDefIWithBLOBs docDefI){
+        return (DDT) parse(docDefI.getCardContent(),getType(0));
+    }
+
     /**
      * 单据创建时调用，初始化卡片数据，返回一个新的DT对象
      * @param doc
@@ -56,8 +70,7 @@ public abstract class NKAbstractCard<DT,DDT> implements NKCard<DT,DDT> {
      * @return
      * @throws Exception
      */
-    @SuppressWarnings("all")
-
+    @SuppressWarnings("unchecked")
     @Override
     public final DT create(DocHV doc, DocHV preDoc, DocDefI docDef) throws Exception{
         Class<DT> typeDT = (Class<DT>) getType(0);
@@ -69,6 +82,7 @@ public abstract class NKAbstractCard<DT,DDT> implements NKCard<DT,DDT> {
             return (DT) new ArrayList<>();
         }
 
+        assert typeDT != null;
         return typeDT.getConstructor().newInstance();
     }
 
@@ -131,19 +145,41 @@ public abstract class NKAbstractCard<DT,DDT> implements NKCard<DT,DDT> {
     }
 
     @SuppressWarnings("all")
-    protected final Object parse(Object obj, Type targetType){
-        if(targetType!=null && obj!=null){
-            // 简单判断一下，因为先转成string再parse效率会比较低
-            if(obj instanceof String){
-                return JSON.parseObject((String)obj,targetType);
-            }else if(obj instanceof List){
-                return new JSONArray((List) obj).toJavaObject(targetType);
-            }else if(obj instanceof Map){
-                return new JSONObject((Map) obj).toJavaObject(targetType);
+    protected final Object parse(Object obj, Type targetType) {
+
+        if(targetType!=null){
+            if(obj==null){
+
+                Class<?> clazz = (Class)targetType;
+                if(clazz.isInterface()){
+                    if(List.class.isAssignableFrom(clazz)){
+                        return new ArrayList<>();
+                    }
+                    if(Map.class.isAssignableFrom(clazz)){
+                        return new HashMap<>();
+                    }
+                    throw new TfmsException("卡片数据类型不支持 "+clazz.getName());
+                }else{
+                    try {
+                        return ((Class)targetType).getConstructor().newInstance();
+                    } catch (Exception e) {
+                        throw new TfmsException("卡片数据类型必须声明空构造方法 "+e.getMessage(),e);
+                    }
+                }
+
+            }else{
+                // 简单判断一下，因为先转成string再parse效率会比较低
+                if(obj instanceof String){
+                    return JSON.parseObject((String)obj,targetType);
+                }else if(obj instanceof List){
+                    return new JSONArray((List) obj).toJavaObject(targetType);
+                }else if(obj instanceof Map){
+                    return new JSONObject((Map) obj).toJavaObject(targetType);
+                }
+                return JSON.parseObject(JSON.toJSONString(obj),targetType);
             }
-            return JSON.parseObject(JSON.toJSONString(obj),targetType);
         }
-        return obj;
+        throw new TfmsException("不能解析卡片对象["+getClass()+"]的数据类型");
     }
 
     private final static Map<Class,Type[]> cache = new ConcurrentHashMap<>();
