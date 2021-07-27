@@ -4,6 +4,8 @@ import cn.nkpro.ts5.config.redis.EnvRedisTemplate;
 import cn.nkpro.ts5.config.redis.RedisSupport;
 import cn.nkpro.ts5.exception.TfmsException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -56,9 +58,9 @@ public class DefaultRedisSupportImpl<T> implements RedisSupport<T>,ApplicationCo
 
         HashOperations<String,String,T> hashOperations = redisTemplate.opsForHash();
         Map<String,T> value =  hashOperations.entries(hash);
-        if(value==null){
+        if(MapUtils.isEmpty(value)){
             value = mapper.apply();
-            if(value != null){
+            if(MapUtils.isNotEmpty(value)){
                 hashOperations.putAll(hash,value);
             }
         }

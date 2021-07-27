@@ -7,6 +7,7 @@ import cn.nkpro.ts5.engine.doc.NKDocProcessor;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocHD;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
+import cn.nkpro.ts5.engine.doc.model.DocIV;
 import cn.nkpro.ts5.engine.doc.service.NKDocDefService;
 import cn.nkpro.ts5.engine.elasticearch.SearchEngine;
 import cn.nkpro.ts5.engine.elasticearch.model.DocHES;
@@ -128,17 +129,21 @@ public class NKDocTransactionProcessor implements NKDocProcessor {
         docDefService.runLoopCards(def,false, (nkCard, docDefIV)->{
 
             // 获取行项目数据
-            Optional.ofNullable(doc.getItems().get(docDefIV.getCardKey()))
-                .ifPresent((docI -> {
+            DocI docI = doc.getItems().computeIfAbsent(docDefIV.getCardKey(),(key)->{
+                DocIV n = new DocIV();
+                n.setCardKey(key);
+                // warning: docId 作为保存时 insert 或 update 的判断，所以这里不要赋值
+                // n.setDocId(doc.getDocId());
+                return n;
+            });
 
-                    doc.getData().put(
-                        docDefIV.getCardKey(),
-                        nkCard.afterGetData(doc, nkCard.deserialize(docI.getCardContent()), docDefIV.getConfig())
-                    );
+            doc.getData().put(
+                docDefIV.getCardKey(),
+                nkCard.afterGetData(doc, nkCard.deserialize(docI.getCardContent()), docDefIV.getConfig())
+            );
 
-                    // 清除JSON，避免无效数据网络传输
-                    docI.setCardContent(null);
-                }));
+            // 清除JSON，避免无效数据网络传输
+            docI.setCardContent(null);
         });
 
         return doc;
@@ -170,7 +175,9 @@ public class NKDocTransactionProcessor implements NKDocProcessor {
 
         docDefService.runLoopCards(def,false, (card, defIV)->{
 
-            boolean existsOriginal = original !=null && original.getItems().containsKey(defIV.getCardKey());
+            boolean existsOriginal = original !=null
+                    && original.getItems().containsKey(defIV.getCardKey())
+                    && StringUtils.isNotBlank(original.getItems().get(defIV.getCardKey()).getDocId());
             Object cardDataOriginal = null;
             Object cardData = doc.getData().get(defIV.getCardKey());
 

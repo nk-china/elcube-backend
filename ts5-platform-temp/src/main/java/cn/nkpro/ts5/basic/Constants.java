@@ -13,6 +13,7 @@ public interface Constants {
     String CACHE_AUTH_LIMIT         = "CACHE_AUTH_LIMIT";
 
     String CACHE_DEF_CONSTANT       = "CACHE_DEF_CONSTANT";
+    String CACHE_DEF_SCRIPT         = "CACHE_DEF_SCRIPT";
     String CACHE_DEF_DOC            = "CACHE_DEF_DOC";
 
     String CACHE_DOC                = "CACHE_DOC";

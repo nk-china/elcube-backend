@@ -1,14 +1,27 @@
 package cn.nkpro.ts5.engine.script;
 
+import cn.nkpro.ts5.basic.Constants;
+import cn.nkpro.ts5.basic.NKCustomObject;
 import cn.nkpro.ts5.config.global.NKProperties;
+import cn.nkpro.ts5.config.redis.RedisSupport;
+import cn.nkpro.ts5.engine.devops.DebugHolder;
 import cn.nkpro.ts5.exception.TfmsException;
+import cn.nkpro.ts5.orm.mb.gen.CardDefHKey;
+import cn.nkpro.ts5.orm.mb.gen.CardDefHMapper;
+import cn.nkpro.ts5.orm.mb.gen.CardDefHWithBLOBs;
 import cn.nkpro.ts5.utils.ResourceUtils;
+import cn.nkpro.ts5.utils.ClassUtils;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
 import groovy.lang.GroovyObject;
 import lombok.SneakyThrows;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
@@ -17,7 +30,10 @@ import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -25,25 +41,57 @@ import java.util.stream.Collectors;
 @Component
 public class NKScriptEngine implements ApplicationContextAware, ApplicationListener<ContextRefreshedEvent> {
 
+    private ScriptEngineManager manager = new ScriptEngineManager();
+    private ScriptEngine engine = manager.getEngineByName("groovy");
+    private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
+    private ApplicationContext applicationContext;
+    private BeanDefinitionRegistry beanDefinitionRegistry;
+
     @Autowired@SuppressWarnings("all")
     private NKProperties properties;
+    @Autowired
+    private CardDefHMapper cardDefHMapper;
+    @Autowired
+    private RedisSupport<CardDefHWithBLOBs> redisSupport;
 
-    private ApplicationContext applicationContext;
 
-    private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
+    public Map<String, String> buildVueMap(){
 
-    public Map<String, String> getVueFromClasspath() {
+        Map<String, String> vueMap = getVueMapFromClasspath();
+
+        getResources().forEach((k,v)->{
+            if(StringUtils.isNotBlank(v.getVueMain())){
+                vueMap.put(k,v.getVueMain());
+            }
+            if(StringUtils.isNotBlank(v.getVueDefs())){
+                JSONArray array = JSON.parseArray(v.getVueDefs());
+                array.forEach((item)->{
+                    int index = array.indexOf(item);
+                    vueMap.put(k+"Def"+(index==0?"":index), (String) item);
+                });
+            }
+        });
+
+        // if debug
+        if(DebugHolder.debug()!=null){
+            // load resource from debug context
+        }
+
+        return vueMap;
+    }
+
+    private Map<String, String> getVueMapFromClasspath() {
 
         List<Resource> resources = new ArrayList<>();
 
         Arrays.stream(properties.getVueBasePackages())
-            .forEach(path->{
-                try {
-                    path = path.replaceAll("[.]","/");
-                    resources.addAll(Arrays.asList(resourcePatternResolver.getResources("classpath*:/"+path+"/**/*.vue")));
-                } catch (IOException ignored) {
-                }
-            });
+                .forEach(path->{
+                    try {
+                        path = path.replaceAll("[.]","/");
+                        resources.addAll(Arrays.asList(resourcePatternResolver.getResources("classpath*:/"+path+"/**/*.vue")));
+                    } catch (IOException ignored) {
+                    }
+                });
 
         return resources.stream()
                 .collect(Collectors.toMap(
@@ -52,78 +100,62 @@ public class NKScriptEngine implements ApplicationContextAware, ApplicationListe
                 ));
     }
 
-//    public void registerResourcesDefined() throws Exception {
-//
-//        Resource[] resources = resourcePatternResolver.getResources("classpath*:/nk/cards/*/*.groovy");
-//
-//        for(Resource resource : resources){
-//
-//            String packageName = getPackageName(resource);
-//
-//            Resource[] componentResources = resourcePatternResolver.getResources("classpath*:/nk/cards/"+packageName+"/**");
-//
-//            registerComponent(packageName,componentResources);
-//
-//            Arrays.stream(componentResources)
-//                    .forEach(System.out::println);
-//
-////            String groovyCode = ResourceUtils.readText(resource);
-////
-////            System.out.println(groovyCode);
-//
-//            //todo 跟DB数据进行对比，如DB不存在则写入DB
-//        }
-//    }
+    public void autoRegisterGroovyObject(String groovyName, String groovyCode){
 
-//    private void registerComponent(String componentKey, Resource[] resources){
-//
-//        Optional<DefComponentH> byId = componentHRepository.findById(componentKey);
-//        if(byId.isPresent()){
-//            if(byId.get().getModifyTime()!=null){
-//                return;
-//            }
-//        }
-//
-//        List<Resource> collect = Arrays.stream(resources)
-//                .filter(resource ->
-//                          Objects.requireNonNull(resource.getFilename()).endsWith(".groovy")
-//                        ||resource.getFilename().endsWith(".vue"))
-//                .collect(Collectors.toList());
-//        for(Resource resource : collect){
-//
-//            String filename = resource.getFilename();
-//            assert filename != null;
-//
-//            String type = filename.substring(  filename.lastIndexOf(".")+1);
-//            String code = filename.substring(0,filename.lastIndexOf("."));
-//            String content = ResourceUtils.readText(resource);
-//
-//
-//            DefComponentI componentI = new DefComponentI();
-//            componentI.setId(componentKey);
-//            componentI.setCode(code);
-//            componentI.setType(type);
-//            componentI.setContent(content);
-//            componentI.setActive(1);
-//            componentI.setCreateTime(new Timestamp(System.currentTimeMillis()));
-//            componentI.setModifyTime(componentI.getCreateTime());
-//
-//            componentIRepository.save(componentI);
-//
-//
-////            DefComponentIPK componentIPK = new DefComponentIPK();
-////            componentIPK.setId(componentKey);
-////            componentIPK.setKey(key);
-////
-////            Optional<DefComponentI> byIdI = componentIRepository.findById(componentIPK);
-////            if(byIdI.isPresent()){
-////            }
-//        }
-//    }
+        Class<?> clazz;
 
-    private String getPackageName(Resource resource) throws IOException {
-        String[] split = resource.getURL().toString().split("[/]");
-        return split[split.length-2];
+        try {
+            clazz = (Class<?>) engine.eval(groovyCode);
+        } catch (javax.script.ScriptException e) {
+            throw new RuntimeException(
+                    String.format("编译Groovy对象 [%s] 发生错误%s\n%s",
+                            groovyName,
+                            groovyCode,
+                            e.getMessage()));
+        }
+
+        String beanName = ClassUtils.decapitateClassName(clazz.getSimpleName());
+
+        Component component = clazz.getDeclaredAnnotation(Component.class);
+        if(component!=null && StringUtils.isNotBlank(component.value())){
+            beanName = component.value();
+        }
+        Service service = clazz.getDeclaredAnnotation(Service.class);
+        if(service!=null && StringUtils.isNotBlank(service.value())){
+            beanName = service.value();
+        }
+
+
+        // 避免非法重写spring的类
+        if(applicationContext.containsBean(beanName)){
+
+            Object exists = applicationContext.getBean(beanName);
+
+            if(!(exists instanceof GroovyObject)){
+                if(exists instanceof NKCustomObject){
+                    if(((NKCustomObject) exists).isFinal()){
+                        throw new RuntimeException(String.format("%s 不支持重写",exists.getClass().getName()));
+                    }
+                }else{
+                    throw new RuntimeException(String.format("%s 不支持重写",exists.getClass().getName()));
+                }
+            }
+        }
+
+        BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(clazz);
+        beanDefinitionRegistry.registerBeanDefinition(beanName,beanDefinitionBuilder.getBeanDefinition());
+    }
+
+    private void autoRegisterGroovyObject(){
+        getResources().forEach((k,v)-> autoRegisterGroovyObject(k,v.getGroovyMain()));
+    }
+
+    private Map<String, CardDefHWithBLOBs> getResources(){
+        return redisSupport.getHashIfAbsent(Constants.CACHE_DEF_SCRIPT,()->
+                cardDefHMapper.selectByExampleWithBLOBs(null)
+                        .stream()
+                        .collect(Collectors.toMap(CardDefHKey::getComponentName,v->v))
+        );
     }
 
     public String getClassName(String beanName) {
@@ -149,11 +181,12 @@ public class NKScriptEngine implements ApplicationContextAware, ApplicationListe
     @SneakyThrows
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextStartedEvent) {
-        //this.registerResourcesDefined();
+        this.autoRegisterGroovyObject();
     }
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
+        this.beanDefinitionRegistry = (BeanDefinitionRegistry) applicationContext.getAutowireCapableBeanFactory();
     }
 }

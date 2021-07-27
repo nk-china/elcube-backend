@@ -5,7 +5,6 @@ import cn.nkpro.ts5.engine.script.NKScriptEngine;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -20,8 +19,8 @@ public class SysCardResController {
     private NKScriptEngine scriptEngine;
 
     @WsDocNote("1.获取卡片信息")
-    @RequestMapping("/vueTemplates")
-    public Map<String, String> vueTemplates() throws IOException {
-        return scriptEngine.getVueFromClasspath();
+    @RequestMapping("/vue")
+    public Map<String, String> vueTemplates() {
+        return scriptEngine.buildVueMap();
     }
 }

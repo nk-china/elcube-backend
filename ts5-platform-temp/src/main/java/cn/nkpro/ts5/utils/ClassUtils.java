@@ -3,9 +3,9 @@ package cn.nkpro.ts5.utils;
 /**
  * Created by bean on 2020/8/3.
  */
-public abstract class SpringEmulated {
+public interface ClassUtils {
 
-    public static String decapitalize(String name) {
+    static String decapitateClassName(String name) {
         if (name == null || name.length() == 0) {
             return name;
         }

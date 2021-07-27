@@ -5,7 +5,7 @@ import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocDefIV;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.exception.TfmsException;
-import cn.nkpro.ts5.utils.SpringEmulated;
+import cn.nkpro.ts5.utils.ClassUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -182,6 +182,6 @@ public abstract class NKAbstractCard<DT,DDT> implements NKCard<DT,DDT> {
         if(service!=null && StringUtils.isNotBlank(service.value()))
             return service.value();
 
-        return SpringEmulated.decapitalize(clazz.getSimpleName());
+        return ClassUtils.decapitateClassName(clazz.getSimpleName());
     }
 }
