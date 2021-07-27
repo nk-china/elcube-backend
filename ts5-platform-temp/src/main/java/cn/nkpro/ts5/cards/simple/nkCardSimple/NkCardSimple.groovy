@@ -45,4 +45,29 @@ class NkCardSimple extends NKAbstractCard<NkCardSimpleData,NkCardSimpleDef> {
     void afterUpdated(DocHV doc, NkCardSimpleData data, NkCardSimpleDef cardDef) {
         log.info("DATA:"+JSON.toJSONString(data))
     }
+
+    static class NkCardSimpleData {
+
+        private String field
+
+        String getField() {
+            return field
+        }
+
+        void setField(String field) {
+            this.field = field
+        }
+    }
+
+    static class NkCardSimpleDef {
+        private String field
+
+        String getField() {
+            return field
+        }
+
+        void setField(String field) {
+            this.field = field
+        }
+    }
 }
