@@ -100,7 +100,7 @@ public class SysDocDefController {
     @RequestMapping("/type/debug")
     public void debug(
             @WsDocNote("单据配置对象")@RequestBody DocDefHV def){
-        defDocTypeService.debug(def);
+        defDocTypeService.setDebugDef(def);
     }
 
     @WsDocNote("10.获取单据配置的Options")

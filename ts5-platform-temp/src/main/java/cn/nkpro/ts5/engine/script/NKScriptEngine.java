@@ -4,7 +4,7 @@ import cn.nkpro.ts5.basic.Constants;
 import cn.nkpro.ts5.basic.NKCustomObject;
 import cn.nkpro.ts5.config.global.NKProperties;
 import cn.nkpro.ts5.config.redis.RedisSupport;
-import cn.nkpro.ts5.engine.devops.DebugHolder;
+import cn.nkpro.ts5.engine.devops.DebugSupport;
 import cn.nkpro.ts5.exception.TfmsException;
 import cn.nkpro.ts5.orm.mb.gen.CardDefHKey;
 import cn.nkpro.ts5.orm.mb.gen.CardDefHMapper;
@@ -53,6 +53,8 @@ public class NKScriptEngine implements ApplicationContextAware, ApplicationListe
     @Autowired@SuppressWarnings("all")
     private NKProperties properties;
     @Autowired@SuppressWarnings("all")
+    private DebugSupport debugSupport;
+    @Autowired@SuppressWarnings("all")
     private CardDefHMapper cardDefHMapper;
     @Autowired@SuppressWarnings("all")
     private RedisSupport<CardDefHWithBLOBs> redisSupport;
@@ -78,10 +80,10 @@ public class NKScriptEngine implements ApplicationContextAware, ApplicationListe
         });
 
         // 从Debug上下文获取
-        if(DebugHolder.debug()!=null){
-            // load resource from debug context
-            System.out.println();
-        }
+//        if(debugSupport.getDebugId()!=null){
+//            // load resource from debug context
+//            System.out.println();
+//        }
 
         return vueMap;
     }

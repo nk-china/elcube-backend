@@ -28,7 +28,7 @@ public interface NKDocDefService {
 
     List<DocDefH> getEntrance(String classify);
 
-    void debug(DocDefHV docDefHV);
+    void setDebugDef(DocDefHV docDefHV);
 
     DocDefHV getRuntimeDocDef(String docType, Integer major);
 

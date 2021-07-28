@@ -20,6 +20,8 @@ public class DebugConfigurer implements WebMvcConfigurer {
 
     @Autowired@SuppressWarnings("all")
     private ApplicationContext applicationContext;
+    @Autowired@SuppressWarnings("all")
+    private DebugSupport debugSupport;
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
@@ -32,11 +34,11 @@ public class DebugConfigurer implements WebMvcConfigurer {
         public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
             String debugId = request.getHeader("NK-Debug");
             if(StringUtils.isNotBlank(debugId)){
-                DebugHolder.debug(debugId);
-                if(DebugHolder.getDebugContext()==null){
+                debugSupport.setDebugId(debugId);
+                if(debugSupport.getDebugContext()==null){
                     GenericApplicationContext context = new GenericApplicationContext(applicationContext);
                     context.refresh();
-                    DebugHolder.setDebugContext(context);
+                    debugSupport.setDebugContext(context);
                 }
             }
             return true;
@@ -44,7 +46,7 @@ public class DebugConfigurer implements WebMvcConfigurer {
 
         @Override
         public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-            DebugHolder.remove();
+            debugSupport.remove();
         }
     }
 }

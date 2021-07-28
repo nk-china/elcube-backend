@@ -6,7 +6,7 @@ import cn.nkpro.ts5.basic.NKCustomObjectManager;
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.config.mybatis.pagination.PaginationContext;
 import cn.nkpro.ts5.config.redis.RedisSupport;
-import cn.nkpro.ts5.engine.devops.DebugHolder;
+import cn.nkpro.ts5.engine.devops.DebugSupport;
 import cn.nkpro.ts5.engine.doc.NKCard;
 import cn.nkpro.ts5.engine.doc.NKDocProcessor;
 import cn.nkpro.ts5.engine.doc.NKDocStateInterceptor;
@@ -41,6 +41,8 @@ public class NKDocDefServiceImpl implements NKDocDefService {
 
     @Autowired@SuppressWarnings("all")
     private RedisSupport<DocDefHV> redisSupport;
+    @Autowired@SuppressWarnings("all")
+    private DebugSupport debugSupport;
     @Autowired@SuppressWarnings("all")
     private NKCustomObjectManager customObjectManager;
 
@@ -356,6 +358,14 @@ public class NKDocDefServiceImpl implements NKDocDefService {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public void setDebugDef(DocDefHV docDefHV){
+        debugSupport.setDebugObject(String.format("@%s-%s",
+                docDefHV.getDocType(),
+                VersioningUtils.parseMajor(docDefHV.getVersion())
+        ),docDefHV);
+    }
+
     /**
      * 获取运行时的单据配置
      * 根据单据类型 获取当前日期下 单据对应的配置信息
@@ -365,7 +375,10 @@ public class NKDocDefServiceImpl implements NKDocDefService {
     @Override
     public DocDefHV getRuntimeDocDef(String docType, Integer major){
 
-        return debugDef(docType,major).orElseGet(()->{
+        // 判断当前请求是否debug，如果是，先尝试从debug环境中获取配置
+        Optional<DocDefHV> debugObject = debugSupport.getDebugObject(String.format("@%s-%s", docType, major));
+
+        DocDefHV defHV = debugObject.orElseGet(()->{
 
             String version;
 
@@ -408,24 +421,26 @@ public class NKDocDefServiceImpl implements NKDocDefService {
                 version = first.get().getVersion();
             }
 
-            return Optional.ofNullable(fetchDocDef(docType,version, false,false))
-                    .stream()
-                    .peek(def->{
-
-                        deserializeDef(def);
-                        afterGetDef(def);
-
-                        DocDefFlowExample flowExample = new DocDefFlowExample();
-                        flowExample.createCriteria()
-                                .andPreDocTypeEqualTo(docType)
-                                .andActiveEqualTo(1)
-                                .andVersionLike(VersioningUtils.parseMajor(version)+".%");
-                        flowExample.setOrderByClause("ORDER_BY");
-                        def.setFlows(docDefFlowMapper.selectByExample(flowExample));
-                    })
-                    .findFirst()
-                    .orElse(null);
+            return fetchDocDef(docType,version, false,false);
         });
+
+        return Optional.ofNullable(defHV)
+                .stream()
+                .peek(def->{
+
+                    deserializeDef(def);
+                    afterGetDef(def);
+
+                    DocDefFlowExample flowExample = new DocDefFlowExample();
+                    flowExample.createCriteria()
+                            .andPreDocTypeEqualTo(docType)
+                            .andActiveEqualTo(1)
+                            .andVersionLike(VersioningUtils.parseMajor(def.getVersion())+".%");
+                    flowExample.setOrderByClause("ORDER_BY");
+                    def.setFlows(docDefFlowMapper.selectByExample(flowExample));
+                })
+                .findFirst()
+                .orElse(null);
     }
 
     /**
@@ -438,25 +453,6 @@ public class NKDocDefServiceImpl implements NKDocDefService {
     @Override
     public DocDefHV getDocDef(String docType, String version){
         return deserializeDef(fetchDocDef(docType, version, true, true));
-    }
-
-    @Override
-    public void debug(DocDefHV docDefHV){
-        String debugCachedHash = String.format("DEBUG：%s", DebugHolder.debug());
-        String debugCachedKey  = String.format("%s-%s", docDefHV.getDocType(), VersioningUtils.parseMajor(docDefHV.getVersion()));
-        redisSupport.putHash(debugCachedHash,debugCachedKey,docDefHV);
-        redisSupport.expire(debugCachedHash,60*30);//30分钟
-    }
-
-    // 判断当前请求是否debug，如果是，先尝试从debug环境中获取配置
-    private Optional<DocDefHV> debugDef(String docType, Integer major){
-        String debugCachedHash = String.format("DEBUG：%s", DebugHolder.debug());
-        String debugCachedKey  = String.format("%s-%s", docType, major);
-
-        return Optional.ofNullable(DebugHolder.debug())
-                .map(debugId -> redisSupport.getIfAbsent(debugCachedHash, debugCachedKey, () -> null))
-                .map(this::deserializeDef)
-                .map(this::afterGetDef);
     }
 
     private DocDefHV fetchDocDef(String docType, String version, boolean includeComponentMarkdown, boolean ignoreError){
