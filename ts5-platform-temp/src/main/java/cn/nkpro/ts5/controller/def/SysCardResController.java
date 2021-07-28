@@ -21,6 +21,6 @@ public class SysCardResController {
     @WsDocNote("1.获取卡片信息")
     @RequestMapping("/vue")
     public Map<String, String> vueTemplates() {
-        return scriptEngine.buildVueMap();
+        return scriptEngine.getRuntimeVueMap();
     }
 }

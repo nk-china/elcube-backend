@@ -1,194 +1,127 @@
 package cn.nkpro.ts5.engine.script;
 
-import cn.nkpro.ts5.basic.Constants;
-import cn.nkpro.ts5.basic.NKCustomObject;
-import cn.nkpro.ts5.config.global.NKProperties;
-import cn.nkpro.ts5.config.redis.RedisSupport;
+import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
 import cn.nkpro.ts5.engine.devops.DebugSupport;
-import cn.nkpro.ts5.exception.TfmsException;
-import cn.nkpro.ts5.orm.mb.gen.CardDefHKey;
-import cn.nkpro.ts5.orm.mb.gen.CardDefHMapper;
-import cn.nkpro.ts5.orm.mb.gen.CardDefHWithBLOBs;
-import cn.nkpro.ts5.utils.ResourceUtils;
-import cn.nkpro.ts5.utils.ClassUtils;
+import cn.nkpro.ts5.engine.doc.NKCard;
+import cn.nkpro.ts5.orm.mb.gen.ScriptDefH;
+import cn.nkpro.ts5.orm.mb.gen.ScriptDefHWithBLOBs;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
-import groovy.lang.GroovyObject;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.aop.framework.Advised;
-import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.support.BeanDefinitionBuilder;
-import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
-import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
-import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
-import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Component
 public class NKScriptEngine implements ApplicationContextAware, ApplicationListener<ContextRefreshedEvent> {
 
-    private ScriptEngineManager manager = new ScriptEngineManager();
-    private ScriptEngine engine = manager.getEngineByName("groovy");
-    private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
     private ApplicationContext applicationContext;
-    private BeanDefinitionRegistry beanDefinitionRegistry;
 
-    @Autowired@SuppressWarnings("all")
-    private NKProperties properties;
-    @Autowired@SuppressWarnings("all")
+    @Autowired
+    private ClasspathResourceLoader classpathResourceLoader;
+    @Autowired
+    private GroovyManager groovyManager;
+    @Autowired
+    private ScriptDefManager scriptDefManager;
+    @Autowired
     private DebugSupport debugSupport;
-    @Autowired@SuppressWarnings("all")
-    private CardDefHMapper cardDefHMapper;
-    @Autowired@SuppressWarnings("all")
-    private RedisSupport<CardDefHWithBLOBs> redisSupport;
 
-
-    public Map<String, String> buildVueMap(){
-
+    public Map<String, String> getRuntimeVueMap(){
         // 从本地资源获取
-        Map<String, String> vueMap = getVueMapFromClasspath();
-
+        Map<String, String> vueMap = classpathResourceLoader.getVueMapFromClasspath();
         // 从数据库获取
-        getResources().forEach((k,v)->{
-            if(StringUtils.isNotBlank(v.getVueMain())){
-                vueMap.put(k,v.getVueMain());
-            }
-            if(StringUtils.isNotBlank(v.getVueDefs())){
-                JSONArray array = JSON.parseArray(v.getVueDefs());
-                array.forEach((item)->{
-                    int index = array.indexOf(item);
-                    vueMap.put(k+"Def"+(index==0?"":index), (String) item);
-                });
-            }
-        });
-
+        scriptDefManager.getActiveResources().forEach((script)-> putVueToMap(script,vueMap));
         // 从Debug上下文获取
-//        if(debugSupport.getDebugId()!=null){
-//            // load resource from debug context
-//            System.out.println();
-//        }
-
+        debugSupport.getDebugObjects("$").forEach(script-> putVueToMap((ScriptDefHWithBLOBs) script,vueMap));
         return vueMap;
     }
 
-    private Map<String, String> getVueMapFromClasspath() {
-
-        List<Resource> resources = new ArrayList<>();
-
-        Arrays.stream(properties.getVueBasePackages())
-                .forEach(path->{
-                    try {
-                        path = path.replaceAll("[.]","/");
-                        resources.addAll(Arrays.asList(resourcePatternResolver.getResources("classpath*:/"+path+"/**/*.vue")));
-                    } catch (IOException ignored) {
-                    }
-                });
-
-        return resources.stream()
-                .collect(Collectors.toMap(
-                        resource -> Objects.requireNonNull(resource.getFilename()).substring(0,resource.getFilename().length()-4),
-                        ResourceUtils::readText
-                ));
+    public void setDebugScript(ScriptDefHWithBLOBs scriptDefH){
+        debugSupport.setDebugClass(
+                groovyManager.compileGroovy(scriptDefH.getScriptName(), scriptDefH.getGroovyMain())
+        );
+        debugSupport.setDebugResource(String.format("$%s",scriptDefH.getScriptName()),scriptDefH);
     }
 
-    public void registerGroovyObject(String groovyName, String groovyCode){
+    public ScriptDefH getRuntimeScript(String scriptName, String version) {
 
-        Class<?> clazz;
+        if(StringUtils.equals(version,"@")){
+            // 查找debug版本
+            ScriptDefHWithBLOBs scriptDefH = (ScriptDefHWithBLOBs) debugSupport.getDebugObject(String.format("$%s", scriptName)).orElse(null);
+            if(scriptDefH != null)
+                return scriptDefH;
 
-        try {
-            clazz = (Class<?>) engine.eval(groovyCode);
-        } catch (ScriptException e) {
-            throw new RuntimeException(
-                    String.format("编译Groovy对象 [%s] 发生错误: %s",
-                            groovyName,
-                            e.getMessage()),e);
-        }
+            // 查找active版本
+            scriptDefH = scriptDefManager.getActiveResources()
+                    .stream()
+                    .filter(i->StringUtils.equals(i.getScriptName(),scriptName))
+                    .findFirst().orElse(null);
 
-        String beanName = ClassUtils.decapitateClassName(clazz.getSimpleName());
+            if(scriptDefH != null)
+                return scriptDefH;
 
-        Component component = clazz.getDeclaredAnnotation(Component.class);
-        if(component!=null && StringUtils.isNotBlank(component.value())){
-            beanName = component.value();
-        }
-        Service service = clazz.getDeclaredAnnotation(Service.class);
-        if(service!=null && StringUtils.isNotBlank(service.value())){
-            beanName = service.value();
-        }
+            // 如果数据库没有，尝试从classpath加载
+            List<String> groovyCode =  classpathResourceLoader.findResource(scriptName + ".groovy");
+            if(!groovyCode.isEmpty()){
+                List<String> vueMainCode = classpathResourceLoader.findResource(scriptName + ".vue");
+                List<String> vueDefsCode = classpathResourceLoader.findResource(scriptName + "Def*.vue");
+                scriptDefH = new ScriptDefHWithBLOBs();
+                scriptDefH.setScriptName(scriptName);
+                scriptDefH.setVersion(version);
+                scriptDefH.setGroovyMain(groovyCode.stream().findFirst().orElse(null));
+                scriptDefH.setVueMain(vueMainCode.stream().findFirst().orElse(null));
+                scriptDefH.setVueDefs(JSON.toJSONString(vueDefsCode));
 
+                Class<?> groovy = groovyManager.compileGroovy(scriptName, scriptDefH.getGroovyMain());
+                List interfaces = ClassUtils.getAllInterfaces(groovy);
 
-        // 避免非法重写spring的类
-        if(applicationContext.containsBean(beanName)){
+                scriptDefH.setScriptType(interfaces.contains(NKCard.class)?"Card":"Service");
 
-            Object exists = applicationContext.getBean(beanName);
-
-            if(!(exists instanceof GroovyObject)){
-                if(exists instanceof NKCustomObject){
-                    if(((NKCustomObject) exists).isFinal()){
-                        throw new RuntimeException(String.format("%s 不支持重写",exists.getClass().getName()));
-                    }
-                }else{
-                    throw new RuntimeException(String.format("%s 不支持重写",exists.getClass().getName()));
-                }
+                WsDocNote annotation = groovy.getAnnotation(WsDocNote.class);
+                scriptDefH.setScriptDesc(annotation!=null?annotation.value():scriptName);
+                return scriptDefH;
             }
+
+            // 都没有找到
+            return null;
+
         }
 
-        BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(clazz);
-        beanDefinitionRegistry.registerBeanDefinition(beanName,beanDefinitionBuilder.getBeanDefinition());
+        return scriptDefManager.getScript(scriptName,version);
     }
 
     private void autoRegisterGroovyObject(){
-        getResources().forEach((k,v)-> {
+        scriptDefManager.getActiveResources().forEach((script)-> {
             try {
-                registerGroovyObject(k, v.getGroovyMain());
+                groovyManager.registerGroovyObject(groovyManager.compileGroovy(script.getScriptName(), script.getGroovyMain()));
             }catch (RuntimeException e){
                 log.error(e.getMessage(),e);
             }
         });
     }
 
-    private Map<String, CardDefHWithBLOBs> getResources(){
-        return redisSupport.getHashIfAbsent(Constants.CACHE_DEF_SCRIPT,()->
-                cardDefHMapper.selectByExampleWithBLOBs(null)
-                        .stream()
-                        .collect(Collectors.toMap(CardDefHKey::getComponentName,v->v))
-        );
-    }
-
-    public String getClassName(String beanName) {
-        if(applicationContext.containsBean(beanName)){
-            Object bean = applicationContext.getBean(beanName);
-
-            if(AopUtils.isAopProxy(bean)){
-                try {
-                    bean = ((Advised)bean).getTargetSource().getTarget();
-                } catch (Exception e) {
-                    throw new TfmsException(e.getMessage(),e);
-                }
-            }
-
-            if(bean instanceof GroovyObject) {
-                return bean.getClass().getName();
-            }
-            return "0";
+    private void putVueToMap(ScriptDefHWithBLOBs script,Map<String, String> vueMap){
+        if(StringUtils.isNotBlank(script.getVueMain())){
+            vueMap.put(script.getScriptName(),script.getVueMain());
         }
-        return null;
+        if(StringUtils.isNotBlank(script.getVueDefs())){
+            JSONArray array = JSON.parseArray(script.getVueDefs());
+            array.forEach((item)->{
+                int index = array.indexOf(item);
+                vueMap.put(script.getScriptName()+"Def"+(index==0?"":index), (String) item);
+            });
+        }
     }
 
     @SneakyThrows
@@ -202,6 +135,5 @@ public class NKScriptEngine implements ApplicationContextAware, ApplicationListe
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
-        this.beanDefinitionRegistry = (BeanDefinitionRegistry) applicationContext.getAutowireCapableBeanFactory();
     }
 }

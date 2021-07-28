@@ -360,7 +360,7 @@ public class NKDocDefServiceImpl implements NKDocDefService {
 
     @Override
     public void setDebugDef(DocDefHV docDefHV){
-        debugSupport.setDebugObject(String.format("@%s-%s",
+        debugSupport.setDebugResource(String.format("@%s-%s",
                 docDefHV.getDocType(),
                 VersioningUtils.parseMajor(docDefHV.getVersion())
         ),docDefHV);

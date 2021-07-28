@@ -32,7 +32,7 @@
 		<!-- 2.0 -->
 		<table tableName="nk_constant_def"					enableDeleteByExample="true"  domainObjectName="ConstantDef"/>
 
-		<table tableName="nk_card_def_h"					enableDeleteByExample="false" domainObjectName="CardDefH" />
+		<table tableName="nk_script_def_h"					enableDeleteByExample="false" domainObjectName="ScriptDefH" />
 
 		<table tableName="nk_doc_h"		  					enableDeleteByExample="false" domainObjectName="DocH"/>
 		<table tableName="nk_doc_i"		 					enableDeleteByExample="false" domainObjectName="DocI"/>

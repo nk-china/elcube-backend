@@ -4,7 +4,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -31,22 +30,17 @@ public class DebugConfigurer implements WebMvcConfigurer {
     class DebugHandlerInterceptor implements HandlerInterceptor {
 
         @Override
-        public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
             String debugId = request.getHeader("NK-Debug");
             if(StringUtils.isNotBlank(debugId)){
-                debugSupport.setDebugId(debugId);
-                if(debugSupport.getDebugContext()==null){
-                    GenericApplicationContext context = new GenericApplicationContext(applicationContext);
-                    context.refresh();
-                    debugSupport.setDebugContext(context);
-                }
+                debugSupport.initThreadLocal(debugId);
             }
             return true;
         }
 
         @Override
-        public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
-            debugSupport.remove();
+        public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+            debugSupport.clearThreadLocal();
         }
     }
 }
