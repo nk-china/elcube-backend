@@ -1,16 +1,24 @@
 package cn.nkpro.ts5.engine.script;
 
+import cn.nkpro.ts5.basic.NKCustomObject;
+import cn.nkpro.ts5.basic.NKCustomObjectManager;
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
 import cn.nkpro.ts5.engine.devops.DebugSupport;
 import cn.nkpro.ts5.engine.doc.NKCard;
+import cn.nkpro.ts5.exception.TfmsException;
 import cn.nkpro.ts5.orm.mb.gen.ScriptDefH;
 import cn.nkpro.ts5.orm.mb.gen.ScriptDefHWithBLOBs;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
+import groovy.lang.GroovyObject;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.aop.framework.Advised;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -26,7 +34,6 @@ import java.util.Map;
 @Component
 public class NKScriptEngine implements ApplicationContextAware, ApplicationListener<ContextRefreshedEvent> {
 
-    private ApplicationContext applicationContext;
 
     @Autowired
     private ClasspathResourceLoader classpathResourceLoader;
@@ -36,6 +43,8 @@ public class NKScriptEngine implements ApplicationContextAware, ApplicationListe
     private ScriptDefManager scriptDefManager;
     @Autowired
     private DebugSupport debugSupport;
+    @Autowired
+    private NKCustomObjectManager customObjectManager;
 
     public Map<String, String> getRuntimeVueMap(){
         // 从本地资源获取
@@ -58,7 +67,8 @@ public class NKScriptEngine implements ApplicationContextAware, ApplicationListe
 
         if(StringUtils.equals(version,"@")){
             // 查找debug版本
-            ScriptDefHWithBLOBs scriptDefH = (ScriptDefHWithBLOBs) debugSupport.getDebugObject(String.format("$%s", scriptName)).orElse(null);
+            ScriptDefHWithBLOBs scriptDefH =
+                    (ScriptDefHWithBLOBs) debugSupport.getDebugObject(String.format("$%s", scriptName)).orElse(null);
             if(scriptDefH != null)
                 return scriptDefH;
 
@@ -93,8 +103,8 @@ public class NKScriptEngine implements ApplicationContextAware, ApplicationListe
                 return scriptDefH;
             }
 
-            // 都没有找到
-            return null;
+            // 都没有找到 查找InActive版本
+            return scriptDefManager.getLastVersion(scriptName);
 
         }
 
@@ -123,6 +133,93 @@ public class NKScriptEngine implements ApplicationContextAware, ApplicationListe
             });
         }
     }
+
+    public String getClassName(String beanName) {
+        /*
+         * 从上下文中获取beanName的对象
+         * 如果该对象是一个GroovyObject的实例，那么返回实例的className
+         */
+        Object bean = customObjectManager.getCustomObjectIfExists(beanName, NKCustomObject.class);
+        if(bean!=null){
+            if(AopUtils.isAopProxy(bean)){
+                try {
+                    bean = ((Advised)bean).getTargetSource().getTarget();
+                } catch (Exception e) {
+                    throw new TfmsException(e.getMessage(),e);
+                }
+            }
+
+            if(bean instanceof GroovyObject) {
+                return bean.getClass().getSimpleName();
+            }
+            return "0";
+        }
+
+        ScriptDefH scriptDefH = scriptDefManager.getLastVersion(beanName);;
+        if(scriptDefH!=null){
+            return scriptDefH.getScriptName();
+        }
+
+        return null;
+    }
+
+    @Data
+    @AllArgsConstructor
+    public static
+    class BeanDescribe{
+        String className;
+        boolean isGroovy;
+        String state;
+    }
+
+    public BeanDescribe getBeanDescribe(String beanName){
+
+        /*
+         * 从上下文中获取beanName的对象
+         * 如果该对象是一个GroovyObject的实例，那么返回实例的className
+         */
+        Object bean;
+        if(applicationContext.containsBean(beanName)){
+            bean = applicationContext.getBean(beanName);
+            return new BeanDescribe(bean.getClass().getName(), isGroovy(bean), "Active");
+        }
+
+        /*
+         * 从Debug上下文中获取beanName的对象
+         * 如果该对象是一个GroovyObject的实例，那么返回实例的className
+         */
+        ApplicationContext context = debugSupport.getDebugApplicationContext();
+        if (context!=null && context.containsBean(beanName)){
+            bean = context.getBean(beanName);
+            return new BeanDescribe(bean.getClass().getName(), isGroovy(bean), "Debug");
+        }
+
+        /*
+         * 如果spring 上下文没有找到，可能是这个bean没有被激活或调试
+         */
+        ScriptDefH scriptDefH = scriptDefManager.getLastVersion(beanName);;
+        if(scriptDefH!=null){
+            return new BeanDescribe(scriptDefH.getScriptName(), true, scriptDefH.getState());
+        }
+
+        return new BeanDescribe(null, false, null);
+    }
+
+    private boolean isGroovy(Object bean){
+        if(bean!=null){
+            if(AopUtils.isAopProxy(bean)){
+                try {
+                    bean = ((Advised)bean).getTargetSource().getTarget();
+                } catch (Exception e) {
+                    throw new TfmsException(e.getMessage(),e);
+                }
+            }
+            return bean instanceof GroovyObject;
+        }
+        return false;
+    }
+
+    private ApplicationContext applicationContext;
 
     @SneakyThrows
     @Override

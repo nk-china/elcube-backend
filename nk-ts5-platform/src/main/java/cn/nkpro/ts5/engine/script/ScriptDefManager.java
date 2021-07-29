@@ -23,6 +23,8 @@ public interface ScriptDefManager {
 
     List<ScriptDefHWithBLOBs> getActiveResources();
 
+    ScriptDefHWithBLOBs getLastVersion(String scriptName);
+
     ScriptDefH getScript(String scriptName, String version);
 
     @Transactional

@@ -1,6 +1,7 @@
 package cn.nkpro.ts5.engine.script;
 
 import cn.nkpro.ts5.basic.NKCustomObject;
+import cn.nkpro.ts5.basic.NKCustomObjectManager;
 import cn.nkpro.ts5.exception.TfmsException;
 import cn.nkpro.ts5.utils.ClassUtils;
 import groovy.lang.GroovyObject;
@@ -8,6 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.context.ApplicationContext;
@@ -73,26 +75,6 @@ public class GroovyManager implements ApplicationContextAware {
 
         BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(clazz);
         beanDefinitionRegistry.registerBeanDefinition(beanName,beanDefinitionBuilder.getBeanDefinition());
-    }
-
-    public String getClassName(String beanName) {
-        if(applicationContext.containsBean(beanName)){
-            Object bean = applicationContext.getBean(beanName);
-
-            if(AopUtils.isAopProxy(bean)){
-                try {
-                    bean = ((Advised)bean).getTargetSource().getTarget();
-                } catch (Exception e) {
-                    throw new TfmsException(e.getMessage(),e);
-                }
-            }
-
-            if(bean instanceof GroovyObject) {
-                return bean.getClass().getSimpleName();
-            }
-            return "0";
-        }
-        return null;
     }
 
     @Override

@@ -75,6 +75,19 @@ public class ScriptDefManagerImpl implements ScriptDefManager {
     }
 
     @Override
+    public ScriptDefHWithBLOBs getLastVersion(String scriptName){
+
+        ScriptDefHExample example = new ScriptDefHExample();
+        example.createCriteria().andScriptNameEqualTo(scriptName);
+        example.setOrderByClause("VERSION desc");
+
+        return scriptDefHMapper.selectByExampleWithBLOBs(example,new RowBounds(0,1))
+                .stream()
+                .findFirst()
+                .orElse(null);
+    }
+
+    @Override
     public ScriptDefH getScript(String scriptName,String version) {
 
         ScriptDefHKey key = new ScriptDefHKey();

@@ -91,7 +91,7 @@ public class SysScriptDefController {
 
     @WsDocNote("5.获取脚本的Groovy类名")
     @RequestMapping("/class/{beanName}")
-    public String className(@PathVariable("beanName") String beanName){
-        return groovyManager.getClassName(beanName);
+    public NKScriptEngine.BeanDescribe className(@PathVariable("beanName") String beanName){
+        return scriptEngine.getBeanDescribe(beanName);
     }
 }
