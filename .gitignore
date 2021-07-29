@@ -1,8 +1,13 @@
-/*/target/
+
 .idea
 **/*.iml
 *.iml
-/logs/
-/nk-tfms-platform-lcv/logs/
-**/application-local-*.yml
+
+/node_modules/
+yarn.lock
+package-lock.json
+
+/*/target/
+/*/logs/
+/**/application-local-*.yml
 

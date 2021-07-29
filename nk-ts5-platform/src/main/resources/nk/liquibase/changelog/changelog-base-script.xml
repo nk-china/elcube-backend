@@ -1,0 +1,26 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <!--
+    -->
+
+    <changeSet id="DEF_SCRIPT-01" author="bean">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="DEF_SCRIPT" />
+            </not>
+        </preConditions>
+        <comment />
+        <createTable tableName="DEF_SCRIPT" remarks="">
+            <column name="SCRIPT_ID"            type="${type.desc}"     remarks=""><constraints primaryKey="true" /></column>
+            <column name="SCRIPT_NAME"          type="${type.desc}"     remarks="" />
+            <column name="SCRIPT_CONTENT"       type="${type.clob}"     remarks="" />
+            <column name="UPDATED_TIME"         type="${type.date}"     remarks="" />
+            <column name="SCRIPT_DESC"          type="${type.desc}"     remarks="" />
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

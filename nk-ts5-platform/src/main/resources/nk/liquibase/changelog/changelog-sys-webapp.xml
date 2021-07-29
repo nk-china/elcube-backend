@@ -1,0 +1,62 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <!--
+    -->
+
+    <changeSet id="SYS_WEBAPP_MENU-01" author="bean">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="SYS_WEBAPP_MENU" />
+            </not>
+        </preConditions>
+        <comment />
+        <createTable tableName="SYS_WEBAPP_MENU" remarks="">
+            <column name="MENU_ID"             	type="${type.uuid}"     remarks=""><constraints primaryKey="true" /></column>
+            <column name="TITLE"             	type="${type.uuid}"     remarks="" />
+            <column name="SUB_TITLE"            type="${type.desc}"     remarks="" />
+            <column name="URL"             		type="${type.var} "     remarks="" />
+            <column name="PARENT_ID"            type="${type.uuid}"     remarks="" />
+            <column name="UPDATED_TIME"         type="${type.date}"     remarks="" />
+            <column name="ORDER_BY"             type="${type.int6}"     remarks="" />
+            <column name="ICON"             	type="${type.desc}"     remarks="" />
+            <column name="MENU_OPTIONS"         type="${type.clob}"     remarks="" />
+            <column name="AUTHORITY_OPTIONS"    type="${type.var} "     remarks="" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="SYS_WEBAPP_MENU_DATA_INIT.01" author="bean">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(1) FROM SYS_WEBAPP_MENU
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            insert into SYS_WEBAPP_MENU ( MENU_ID, TITLE, URL, PARENT_ID, UPDATED_TIME, ORDER_BY, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, SUB_TITLE) values ( 'home', '首页', '/apps/default', null, '1615450395', '10000', 'home', null, 'SYS:LOGIN', null);
+            insert into SYS_WEBAPP_MENU ( MENU_ID, TITLE, URL, PARENT_ID, UPDATED_TIME, ORDER_BY, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, SUB_TITLE) values ( 'task', '任务', '/apps/tasks', null, '1615450395', '20000', 'calendar', null, '@ZZ00:READ', null);
+            insert into SYS_WEBAPP_MENU ( MENU_ID, TITLE, URL, PARENT_ID, UPDATED_TIME, ORDER_BY, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, SUB_TITLE) values ( 'projects', '业务', '/apps/projects', null, '1615450395', '30000', 'project', null, '@ZZ00:READ', null);
+            insert into SYS_WEBAPP_MENU ( MENU_ID, TITLE, URL, PARENT_ID, UPDATED_TIME, ORDER_BY, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, SUB_TITLE) values ( 'docs', '交易', '/apps/docs', null, '1615450395', '40000', 'file-protect', null, '@ZZ00:READ', null);
+            insert into SYS_WEBAPP_MENU ( MENU_ID, TITLE, URL, PARENT_ID, UPDATED_TIME, ORDER_BY, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, SUB_TITLE) values ( 'partners', '交易伙伴', '/apps/partners', null, '1615450395', '50000', 'contacts', null, null, null);
+            insert into SYS_WEBAPP_MENU ( MENU_ID, TITLE, URL, PARENT_ID, UPDATED_TIME, ORDER_BY, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, SUB_TITLE) values ( 'divider-1', '&#45;&#45;', '-', null, '1615450395', '60000', null, null, null, null);
+            insert into SYS_WEBAPP_MENU ( MENU_ID, TITLE, URL, PARENT_ID, UPDATED_TIME, ORDER_BY, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, SUB_TITLE) values ( 'menus', '主菜单', '/apps/settings/menus', 'settings', '1615450395', '130000', null, null, 'SETTINGS:MENU', null);
+            insert into SYS_WEBAPP_MENU ( MENU_ID, TITLE, URL, PARENT_ID, UPDATED_TIME, ORDER_BY, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, SUB_TITLE) values ( 'settings', '设置', '/apps/settings', null, '1615450395', '130000', 'setting', null, null, null);
+            insert into SYS_WEBAPP_MENU ( MENU_ID, TITLE, URL, PARENT_ID, UPDATED_TIME, ORDER_BY, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, SUB_TITLE) values ( 'auth-limit', '授权限制', '/apps/settings/auth/limit', 'settings', '1615450395', '130001', null, null, 'SETTINGS:AUTH', null);
+            insert into SYS_WEBAPP_MENU ( MENU_ID, TITLE, URL, PARENT_ID, UPDATED_TIME, ORDER_BY, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, SUB_TITLE) values ( 'auth-perm', '权限定义', '/apps/settings/auth/perm', 'settings', '1615450395', '130002', null, null, 'SETTINGS:AUTH', null);
+            insert into SYS_WEBAPP_MENU ( MENU_ID, TITLE, URL, PARENT_ID, UPDATED_TIME, ORDER_BY, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, SUB_TITLE) values ( 'auth-group', '用户组', '/apps/settings/auth/group', 'settings', '1615450395', '130003', null, null, 'SETTINGS:AUTH', null);
+            insert into SYS_WEBAPP_MENU ( MENU_ID, TITLE, URL, PARENT_ID, UPDATED_TIME, ORDER_BY, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, SUB_TITLE) values ( 'def-doc', '单据类型', '/apps/def/doc', 'dev', '1615450395', '140000', null, null, 'DEF:DOC', null);
+            insert into SYS_WEBAPP_MENU ( MENU_ID, TITLE, URL, PARENT_ID, UPDATED_TIME, ORDER_BY, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, SUB_TITLE) values ( 'dev', '开发', '/apps/dev', null, '1615450395', '140000', 'deployment-unit', null, null, null);
+            insert into SYS_WEBAPP_MENU ( MENU_ID, TITLE, URL, PARENT_ID, UPDATED_TIME, ORDER_BY, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, SUB_TITLE) values ( 'def-project', '业务类型', '/apps/def/project', 'dev', '1615450395', '140001', null, null, 'DEF:PROJECT', null);
+            insert into SYS_WEBAPP_MENU ( MENU_ID, TITLE, URL, PARENT_ID, UPDATED_TIME, ORDER_BY, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, SUB_TITLE) values ( 'def-partner', '交易伙伴', '/apps/def/partner', 'dev', '1615450395', '140002', null, null, 'DEF:PATNER', null);
+            insert into SYS_WEBAPP_MENU ( MENU_ID, TITLE, URL, PARENT_ID, UPDATED_TIME, ORDER_BY, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, SUB_TITLE) values ( 'def-constant', '常量', '/apps/def/constant', 'dev', '1615450395', '140003', null, null, 'DEF:CONSTANT', null);
+            insert into SYS_WEBAPP_MENU ( MENU_ID, TITLE, URL, PARENT_ID, UPDATED_TIME, ORDER_BY, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, SUB_TITLE) values ( 'def-script', '脚本', '/apps/def/script', 'dev', '1615450395', '140004', null, null, 'DEF:SCRIPT', null);
+            insert into SYS_WEBAPP_MENU ( MENU_ID, TITLE, URL, PARENT_ID, UPDATED_TIME, ORDER_BY, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, SUB_TITLE) values ( 'def-bpm', '流程定义', '/apps/def/bpm/process/definitions', 'dev', '1615450395', '140005', null, null, 'DEF:BPM', null);
+            insert into SYS_WEBAPP_MENU ( MENU_ID, TITLE, URL, PARENT_ID, UPDATED_TIME, ORDER_BY, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, SUB_TITLE) values ( 'def-deploy', '部署', '/apps/def/deploy', 'dev', '1615450395', '140006', null, null, 'DEF:DEPLOY', null);
+            insert into SYS_WEBAPP_MENU ( MENU_ID, TITLE, URL, PARENT_ID, UPDATED_TIME, ORDER_BY, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, SUB_TITLE) values ( 'dev-ops', '开发', '/apps/devOps', null, '1615450395', '140000', 'tool', null, null, null);
+            insert into SYS_WEBAPP_MENU ( MENU_ID, TITLE, URL, PARENT_ID, UPDATED_TIME, ORDER_BY, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, SUB_TITLE) values ( 'bpm-instances', '流程实例', '/apps/bpm/process/instances', 'dev-ops', '1615450395', '120000', null, null, '@ZZ00:READ', null);
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

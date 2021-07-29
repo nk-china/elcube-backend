@@ -9,14 +9,19 @@
         <version>2.2.8.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>cn.nkpro.ts5.beebattle</groupId>
-    <artifactId>ts5-parent</artifactId>
+    <groupId>cn.nkpro</groupId>
+    <artifactId>nk-ts5-project</artifactId>
     <version>2.0-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <url>http://tfms.nkpro.cn</url>
+
+
+    <modules>
+        <module>nk-ts5-platform</module>
+        <module>nk-ts5-starter</module>
+    </modules>
+
 
     <properties>
         <evn.JAVA_HOME>/</evn.JAVA_HOME>
@@ -46,9 +51,6 @@
         </developer>
     </developers>
 
-    <modules>
-        <module>ts5-platform-temp</module>
-    </modules>
 
     <distributionManagement>
         <repository>
@@ -84,15 +86,15 @@
             <artifactId>activation</artifactId>
             <version>1.1.1</version>
         </dependency>
+
+
+
+
         <dependency>
-            <groupId>org.quartz-scheduler</groupId>
-            <artifactId>quartz</artifactId>
-            <version>2.2.1</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <optional>true</optional>
         </dependency>
-
-
-
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -116,6 +118,35 @@
     <build>
         <defaultGoal>clean compile package</defaultGoal>
         <plugins>
+            <plugin>
+                <groupId>org.codehaus.gmavenplus</groupId>
+                <artifactId>gmavenplus-plugin</artifactId>
+                <version>1.7.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>addSources</goal>
+                            <goal>addTestSources</goal>
+                            <goal>generateStubs</goal>
+                            <goal>compile</goal>
+                            <goal>generateTestStubs</goal>
+                            <goal>compileTests</goal>
+                            <goal>removeStubs</goal>
+                            <goal>removeTestStubs</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <sources>
+                        <source>
+                            <directory>${project.basedir}/src/main/java</directory>
+                            <includes>
+                                <include>**/*.groovy</include>
+                            </includes>
+                        </source>
+                    </sources>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
