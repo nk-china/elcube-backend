@@ -21,5 +21,7 @@ public interface Constants {
 
     String CACHE_SEQUENCE           = "CACHE_SYS_SEQUENCE";
 
+    String CACHE_DEBUG_CONTEXT      = "CACHE_DEBUG_CONTEXT";
+
     String SYS_STATE_BILL           = "BILL";
 }

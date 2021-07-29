@@ -376,7 +376,7 @@ public class NKDocDefServiceImpl implements NKDocDefService {
     public DocDefHV getRuntimeDocDef(String docType, Integer major){
 
         // 判断当前请求是否debug，如果是，先尝试从debug环境中获取配置
-        Optional<DocDefHV> debugObject = debugSupport.getDebugObject(String.format("@%s-%s", docType, major));
+        Optional<DocDefHV> debugObject = debugSupport.getDebugObjectWithLocalThread(String.format("@%s-%s", docType, major));
 
         DocDefHV defHV = debugObject.orElseGet(()->{
 

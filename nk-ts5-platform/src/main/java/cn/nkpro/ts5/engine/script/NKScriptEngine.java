@@ -8,6 +8,7 @@ import cn.nkpro.ts5.engine.doc.NKCard;
 import cn.nkpro.ts5.exception.TfmsException;
 import cn.nkpro.ts5.orm.mb.gen.ScriptDefH;
 import cn.nkpro.ts5.orm.mb.gen.ScriptDefHWithBLOBs;
+import cn.nkpro.ts5.utils.GroovyUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import groovy.lang.GroovyObject;
@@ -52,14 +53,11 @@ public class NKScriptEngine implements ApplicationContextAware, ApplicationListe
         // 从数据库获取
         scriptDefManager.getActiveResources().forEach((script)-> putVueToMap(script,vueMap));
         // 从Debug上下文获取
-        debugSupport.getDebugObjects("$").forEach(script-> putVueToMap((ScriptDefHWithBLOBs) script,vueMap));
+        debugSupport.getDebugObjectsWithLocalThread("$").forEach(script-> putVueToMap((ScriptDefHWithBLOBs) script,vueMap));
         return vueMap;
     }
 
     public void setDebugScript(ScriptDefHWithBLOBs scriptDefH){
-        debugSupport.setDebugClass(
-                groovyManager.compileGroovy(scriptDefH.getScriptName(), scriptDefH.getGroovyMain())
-        );
         debugSupport.setDebugResource(String.format("$%s",scriptDefH.getScriptName()),scriptDefH);
     }
 
@@ -68,7 +66,7 @@ public class NKScriptEngine implements ApplicationContextAware, ApplicationListe
         if(StringUtils.equals(version,"@")){
             // 查找debug版本
             ScriptDefHWithBLOBs scriptDefH =
-                    (ScriptDefHWithBLOBs) debugSupport.getDebugObject(String.format("$%s", scriptName)).orElse(null);
+                    (ScriptDefHWithBLOBs) debugSupport.getDebugObjectWithLocalThread(String.format("$%s", scriptName)).orElse(null);
             if(scriptDefH != null)
                 return scriptDefH;
 
@@ -93,7 +91,7 @@ public class NKScriptEngine implements ApplicationContextAware, ApplicationListe
                 scriptDefH.setVueMain(vueMainCode.stream().findFirst().orElse(null));
                 scriptDefH.setVueDefs(JSON.toJSONString(vueDefsCode));
 
-                Class<?> groovy = groovyManager.compileGroovy(scriptName, scriptDefH.getGroovyMain());
+                Class<?> groovy = GroovyUtils.compileGroovy(scriptName, scriptDefH.getGroovyMain());
                 List interfaces = ClassUtils.getAllInterfaces(groovy);
 
                 scriptDefH.setScriptType(interfaces.contains(NKCard.class)?"Card":"Service");
@@ -114,7 +112,7 @@ public class NKScriptEngine implements ApplicationContextAware, ApplicationListe
     private void autoRegisterGroovyObject(){
         scriptDefManager.getActiveResources().forEach((script)-> {
             try {
-                groovyManager.registerGroovyObject(groovyManager.compileGroovy(script.getScriptName(), script.getGroovyMain()));
+                groovyManager.registerGroovyObject(GroovyUtils.compileGroovy(script.getScriptName(), script.getGroovyMain()));
             }catch (RuntimeException e){
                 log.error(e.getMessage(),e);
             }
@@ -155,7 +153,7 @@ public class NKScriptEngine implements ApplicationContextAware, ApplicationListe
             return "0";
         }
 
-        ScriptDefH scriptDefH = scriptDefManager.getLastVersion(beanName);;
+        ScriptDefH scriptDefH = scriptDefManager.getLastVersion(beanName);
         if(scriptDefH!=null){
             return scriptDefH.getScriptName();
         }
@@ -181,7 +179,7 @@ public class NKScriptEngine implements ApplicationContextAware, ApplicationListe
         Object bean;
         if(applicationContext.containsBean(beanName)){
             bean = applicationContext.getBean(beanName);
-            return new BeanDescribe(bean.getClass().getName(), isGroovy(bean), "Active");
+            return new BeanDescribe(org.springframework.util.ClassUtils.getUserClass(getTargetBean(bean)).getSimpleName(), isGroovy(bean), "Active");
         }
 
         /*
@@ -191,18 +189,29 @@ public class NKScriptEngine implements ApplicationContextAware, ApplicationListe
         ApplicationContext context = debugSupport.getDebugApplicationContext();
         if (context!=null && context.containsBean(beanName)){
             bean = context.getBean(beanName);
-            return new BeanDescribe(bean.getClass().getName(), isGroovy(bean), "Debug");
+            return new BeanDescribe(org.springframework.util.ClassUtils.getUserClass(getTargetBean(bean)).getSimpleName(), isGroovy(bean), "Debug");
         }
 
         /*
          * 如果spring 上下文没有找到，可能是这个bean没有被激活或调试
          */
-        ScriptDefH scriptDefH = scriptDefManager.getLastVersion(beanName);;
+        ScriptDefH scriptDefH = scriptDefManager.getLastVersion(beanName);
         if(scriptDefH!=null){
             return new BeanDescribe(scriptDefH.getScriptName(), true, scriptDefH.getState());
         }
 
         return new BeanDescribe(null, false, null);
+    }
+
+    private Object getTargetBean(Object bean){
+        if(AopUtils.isAopProxy(bean)){
+            try {
+                bean = ((Advised)bean).getTargetSource().getTarget();
+            } catch (Exception e) {
+                throw new TfmsException(e.getMessage(),e);
+            }
+        }
+        return bean;
     }
 
     private boolean isGroovy(Object bean){
