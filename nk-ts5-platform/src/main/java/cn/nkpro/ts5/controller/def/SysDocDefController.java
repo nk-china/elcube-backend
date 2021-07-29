@@ -54,6 +54,12 @@ public class SysDocDefController {
         return defDocTypeService.getAllDocTypes();
     }
 
+    @WsDocNote("2.获取单据类型的所有版本")
+    @RequestMapping("/type/list/{docType}/{version}/{page}")
+    public List<DocDefH> list(@PathVariable String docType, @PathVariable String version, @PathVariable Integer page){
+        return defDocTypeService.getList(docType,version,page);
+    }
+
     @WsDocNote("3.获取单据配置详情")
     @RequestMapping(value = "/type/detail/{docType}/{version}")
     public DocDefHV detail(

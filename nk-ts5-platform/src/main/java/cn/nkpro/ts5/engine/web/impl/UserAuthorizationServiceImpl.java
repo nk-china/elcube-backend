@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.engine.web.impl;
 
 import cn.nkpro.ts5.basic.Constants;
-import cn.nkpro.ts5.basic.TfmsSpELManager;
+import cn.nkpro.ts5.engine.spel.TfmsSpELManager;
 import cn.nkpro.ts5.config.security.TfmsGrantedAuthority;
 import cn.nkpro.ts5.config.security.TfmsUserDetails;
 import cn.nkpro.ts5.engine.doc.model.DocHV;

@@ -1,11 +1,9 @@
 package cn.nkpro.ts5.engine.doc;
 
-import cn.nkpro.ts5.basic.NKCustomObject;
+import cn.nkpro.ts5.engine.co.NKCustomObject;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocDefIV;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
-import cn.nkpro.ts5.orm.mb.gen.DocDefI;
-import cn.nkpro.ts5.orm.mb.gen.DocDefIWithBLOBs;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 

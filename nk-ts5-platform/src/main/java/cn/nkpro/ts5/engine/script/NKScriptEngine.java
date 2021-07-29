@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.engine.script;
 
-import cn.nkpro.ts5.basic.NKCustomObject;
-import cn.nkpro.ts5.basic.NKCustomObjectManager;
+import cn.nkpro.ts5.engine.co.NKCustomObject;
+import cn.nkpro.ts5.engine.co.NKCustomObjectManager;
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
 import cn.nkpro.ts5.engine.devops.DebugSupport;
 import cn.nkpro.ts5.engine.doc.NKCard;

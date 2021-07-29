@@ -22,6 +22,8 @@ public interface NKDocDefService {
 
     List<DocDefH> getAllDocTypes();
 
+    List<DocDefH> getList(String docType, String version, int page);
+
     Map<String, Object> options(String classify);
 
     DocDefIV getCardDescribe(String cardHandlerName);

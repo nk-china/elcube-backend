@@ -1,10 +1,9 @@
 package cn.nkpro.ts5.engine.doc;
 
-import cn.nkpro.ts5.basic.NKCustomObject;
+import cn.nkpro.ts5.engine.co.NKCustomObject;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocHD;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
-import lombok.Getter;
 
 public interface NKDocProcessor extends NKCustomObject {
 

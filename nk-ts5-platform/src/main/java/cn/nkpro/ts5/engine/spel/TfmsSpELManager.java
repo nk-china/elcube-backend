@@ -1,5 +1,6 @@
-package cn.nkpro.ts5.basic;
+package cn.nkpro.ts5.engine.spel;
 
+import cn.nkpro.ts5.engine.co.NKCustomObjectManager;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.exception.TfmsException;
 import cn.nkpro.ts5.utils.BeanUtilz;

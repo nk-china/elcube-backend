@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.basic;
+package cn.nkpro.ts5.engine.co;
 
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;

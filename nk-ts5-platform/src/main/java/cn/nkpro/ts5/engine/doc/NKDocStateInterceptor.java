@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.engine.doc;
 
 
-import cn.nkpro.ts5.basic.NKCustomObject;
+import cn.nkpro.ts5.engine.co.NKCustomObject;
 
 /**
  * Created by bean on 2020/7/13.

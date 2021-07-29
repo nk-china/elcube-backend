@@ -1,8 +1,8 @@
 package cn.nkpro.ts5.engine.doc.impl;
 
 import cn.nkpro.ts5.basic.Constants;
-import cn.nkpro.ts5.basic.NKCustomObject;
-import cn.nkpro.ts5.basic.NKCustomObjectManager;
+import cn.nkpro.ts5.engine.co.NKCustomObject;
+import cn.nkpro.ts5.engine.co.NKCustomObjectManager;
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.config.mybatis.pagination.PaginationContext;
 import cn.nkpro.ts5.config.redis.RedisSupport;
@@ -83,6 +83,16 @@ public class NKDocDefServiceImpl implements NKDocDefService {
         PaginationContext context = PaginationContext.init();
         List<DocDefH> list = docDefHMapper.selectByExample(example, new RowBounds(from, rows));
         return new PageList<>(list,from, rows, context.getTotal());
+    }
+
+    @Override
+    public List<DocDefH> getList(String docType, String version, int page){
+        DocDefHExample example = new DocDefHExample();
+        example.createCriteria()
+                .andDocTypeEqualTo(docType)
+                .andVersionLike(VersioningUtils.parseMajor(version)+".%");
+        example.setOrderByClause("VERSION DESC");
+        return docDefHMapper.selectByExample(example, new RowBounds((page-1)*10, 10));
     }
 
 
@@ -167,6 +177,8 @@ public class NKDocDefServiceImpl implements NKDocDefService {
 
         Assert.hasText(docDefHV.getValidFrom(),"请设定有效起始日期");
         Assert.hasText(docDefHV.getValidTo(),  "请设定有效起始日期");
+
+        validateDef(docDefHV);
 
         DocDefH activeVersion = getActiveVersion(docDefHV.getDocType(), VersioningUtils.parseMajor(docDefHV.getVersion()));
         if(activeVersion!=null) {
@@ -360,12 +372,14 @@ public class NKDocDefServiceImpl implements NKDocDefService {
 
     @Override
     public void setDebugDef(DocDefHV docDefHV){
+
+        validateDef(docDefHV);
+
         debugSupport.setDebugResource(String.format("@%s-%s",
                 docDefHV.getDocType(),
                 VersioningUtils.parseMajor(docDefHV.getVersion())
         ),docDefHV);
     }
-
     /**
      * 获取运行时的单据配置
      * 根据单据类型 获取当前日期下 单据对应的配置信息
@@ -524,6 +538,19 @@ public class NKDocDefServiceImpl implements NKDocDefService {
         );
 
         return docDefHV;
+    }
+
+    /**
+     * 验证配置是否可运行
+     * @param docDefHV docDefHV
+     */
+    private void validateDef(DocDefHV docDefHV){
+
+        customObjectManager.getCustomObject(docDefHV.getRefObjectType(),NKCustomObject.class);
+
+        runLoopCards(docDefHV,false,(card, docDefIV)->{
+
+        });
     }
 
     @Override

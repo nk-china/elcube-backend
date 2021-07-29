@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.basic;
+package cn.nkpro.ts5.engine.co;
 
 import cn.nkpro.ts5.engine.devops.DebugSupport;
 import io.jsonwebtoken.lang.Assert;
@@ -24,11 +24,26 @@ public class NKCustomObjectManager implements ApplicationContextAware {
 
     private ApplicationContext applicationContext;
 
+
+    public <T extends NKCustomObject> Map<String,T> getCustomObjects(Class<T> clazz){
+
+        // 注意： 通过type从Spring上下文中获取bean时，只会从当前上下文中查找
+        // 所以需要从 applicationContext 获取一次以后，再从debug的applicationContext获取一次
+
+        Map<String,T> beansMap = applicationContext.getBeansOfType(clazz);
+
+        Optional.ofNullable(debugSupport.getDebugApplicationContext())
+                .ifPresent(applicationContext->{
+                    beansMap.putAll(applicationContext.getBeansOfType(clazz));
+                });
+        return beansMap;
+    }
+
     public List<NKCustomObjectDesc> getCustomObjectDescriptionList(Class<? extends NKCustomObject> clazz, boolean emptyValue, Predicate<Map.Entry<String,? extends NKCustomObject>> predicate){
         if(predicate==null){
             predicate = (e)-> true;
         }
-        List<NKCustomObjectDesc> list = getApplicationContext().getBeansOfType(clazz)
+        List<NKCustomObjectDesc> list = getCustomObjects(clazz)
                 .entrySet()
                 .stream()
                 .filter(predicate)
@@ -40,23 +55,16 @@ public class NKCustomObjectManager implements ApplicationContextAware {
         return list;
     }
 
+    public <T extends NKCustomObject> T getCustomObject(String beanName, Class<T> clazz){
+        Assert.isTrue(getApplicationContext().containsBean(beanName),String.format("自定义对象[%s]不存在或尚未激活",beanName));
+        return getApplicationContext().getBean(beanName,clazz);
+    }
+
     public <T extends NKCustomObject> T getCustomObjectIfExists(String beanName, Class<T> clazz){
         if(StringUtils.isNotBlank(beanName) && getApplicationContext().containsBean(beanName)){
             return getApplicationContext().getBean(beanName,clazz);
         }
         return null;
-    }
-
-    public <T extends NKCustomObject> T getCustomObject(String beanName, Class<T> clazz){
-        Assert.isTrue(getApplicationContext().containsBean(beanName),String.format("自定义对象[%s]不存在",beanName));
-        return getApplicationContext().getBean(beanName,clazz);
-    }
-
-    public <T extends NKCustomObject> Map<String,T> getCustomObjects(Class<T> clazz){
-         Map<String,T> beans = new HashMap<>();
-         Arrays.stream(getApplicationContext().getBeanNamesForType(clazz))
-                .forEach(name-> beans.put(name,getApplicationContext().getBean(name,clazz)));
-         return beans;
     }
 
     private ApplicationContext getApplicationContext(){

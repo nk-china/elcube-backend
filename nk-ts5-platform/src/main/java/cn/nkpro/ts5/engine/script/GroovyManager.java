@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.engine.script;
 
-import cn.nkpro.ts5.basic.NKCustomObject;
+import cn.nkpro.ts5.engine.co.NKCustomObject;
 import cn.nkpro.ts5.utils.ClassUtils;
 import groovy.lang.GroovyObject;
 import org.springframework.beans.BeansException;

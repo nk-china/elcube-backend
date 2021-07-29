@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.basic;
+package cn.nkpro.ts5.engine.spel;
 
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import org.springframework.context.annotation.Scope;
