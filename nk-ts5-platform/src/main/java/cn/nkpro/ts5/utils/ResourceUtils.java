@@ -15,32 +15,14 @@ public interface ResourceUtils {
 
         StringBuilder groovyCode = new StringBuilder();
 
-        InputStreamReader isr = null;
-        BufferedReader br = null;
-
-        try{
-            isr = new InputStreamReader(resource.getInputStream());
-            br = new BufferedReader(isr);
+        try (InputStreamReader isr = new InputStreamReader(resource.getInputStream()); BufferedReader br = new BufferedReader(isr)) {
             String line;
-            while((line=br.readLine())!=null){
+            while ((line = br.readLine()) != null) {
                 groovyCode.append(line);
                 groovyCode.append('\n');
             }
-        }catch (IOException e){
+        } catch (IOException e) {
             throw new Error(e);
-        }finally {
-            if(br!=null){
-                try {
-                    br.close();
-                } catch (IOException ignored) {
-                }
-            }
-            if(isr!=null){
-                try {
-                    isr.close();
-                } catch (IOException ignored) {
-                }
-            }
         }
 
         return groovyCode.toString();

@@ -10,7 +10,7 @@ import cn.nkpro.ts5.engine.web.WebMenuService;
 import cn.nkpro.ts5.config.redis.RedisSupport;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
-import cn.nkpro.ts5.utils.SecurityUtilz;
+import cn.nkpro.ts5.config.security.SecurityUtilz;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;

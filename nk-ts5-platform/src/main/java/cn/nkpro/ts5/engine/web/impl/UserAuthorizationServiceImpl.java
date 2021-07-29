@@ -11,7 +11,7 @@ import cn.nkpro.ts5.config.id.GUID;
 import cn.nkpro.ts5.config.redis.RedisSupport;
 import cn.nkpro.ts5.orm.mb.gen.*;
 import cn.nkpro.ts5.utils.BeanUtilz;
-import cn.nkpro.ts5.utils.SecurityUtilz;
+import cn.nkpro.ts5.config.security.SecurityUtilz;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;

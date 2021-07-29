@@ -7,7 +7,7 @@ import cn.nkpro.ts5.orm.mb.gen.ScriptDefHWithBLOBs;
 import cn.nkpro.ts5.utils.ClassUtils;
 import cn.nkpro.ts5.utils.GroovyUtils;
 import cn.nkpro.ts5.utils.OsUtils;
-import cn.nkpro.ts5.utils.SecurityUtilz;
+import cn.nkpro.ts5.config.security.SecurityUtilz;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

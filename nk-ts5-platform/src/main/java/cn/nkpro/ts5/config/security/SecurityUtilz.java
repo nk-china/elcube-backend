@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.utils;
+package cn.nkpro.ts5.config.security;
 
 import cn.nkpro.ts5.config.security.TfmsUserDetails;
 import org.springframework.security.core.Authentication;
