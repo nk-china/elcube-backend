@@ -288,20 +288,46 @@
                     <target>9</target>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <!--打包时，排除local开头的配置文件-->
-                        <exclude>application-local**</exclude>
-                        <exclude>logging-config.xml</exclude>
-                        <exclude>generatorConfig**.xml</exclude>
-                        <exclude>cn/nkpro/ts5/TS5PlatformApplication.class</exclude>
-                    </excludes>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <id>ts5-dev</id>
+            <build>
+                <defaultGoal>clean package</defaultGoal>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-jar-plugin</artifactId>
+                        <configuration>
+                            <excludes>
+                                <!--打包时，排除local开头的配置文件-->
+                                <exclude>application-local**</exclude>
+                                <exclude>logging-config.xml</exclude>
+                                <exclude>generatorConfig**.xml</exclude>
+                                <exclude>cn/nkpro/ts5/TS5PlatformApplication.class</exclude>
+                            </excludes>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>ts5-release</id>
+            <build>
+                <defaultGoal>clean package</defaultGoal>
+                <plugins>
+                    <plugin>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>
