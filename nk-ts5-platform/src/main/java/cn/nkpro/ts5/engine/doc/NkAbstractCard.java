@@ -44,6 +44,11 @@ public abstract class NkAbstractCard<DT,DDT> extends NkAbstractCustomScriptObjec
     }
 
     @Override
+    public boolean isDebug() {
+        return getScriptDef().isDebug();
+    }
+
+    @Override
     public String desc() {
         return beanName + " | " + cardName;
     }
@@ -56,9 +61,7 @@ public abstract class NkAbstractCard<DT,DDT> extends NkAbstractCustomScriptObjec
     @Override
     public final String[] getAutoDefComponentNames() {
 
-        ScriptDefHV scriptDef = properties.isComponentReloadClassPath() ?
-                super.loadScriptFromClassPath(this.beanName) :
-                this.scriptDef ;
+        ScriptDefHV scriptDef = scriptDefHV();
 
         if(scriptDef!=null && StringUtils.isNotBlank(scriptDef.getVueDefs())){
             JSONArray array = JSON.parseArray(scriptDef.getVueDefs());
@@ -72,12 +75,20 @@ public abstract class NkAbstractCard<DT,DDT> extends NkAbstractCustomScriptObjec
         return getDefComponentNames();
     }
 
+    private ScriptDefHV scriptDefHV(){
+        if(properties.isComponentReloadClassPath()){
+            ScriptDefHV defHV = super.loadScriptFromClassPath(this.beanName);
+            if(defHV!=null){
+                return defHV;
+            }
+        }
+        return this.scriptDef;
+    }
+
     @Override
     public Map<String,String> getVueTemplate(){
 
-        ScriptDefHV scriptDef = properties.isComponentReloadClassPath() ?
-                super.loadScriptFromClassPath(this.beanName) :
-                this.scriptDef ;
+        ScriptDefHV scriptDef = scriptDefHV();
 
         if(scriptDef!=null){
             Map<String,String> vueMap = new HashMap<>();

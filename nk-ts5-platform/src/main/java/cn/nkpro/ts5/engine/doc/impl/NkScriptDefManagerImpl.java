@@ -184,6 +184,9 @@ public class NkScriptDefManagerImpl implements NkScriptDefManager {
         scriptDefH.setState("Active");
         doUpdate(scriptDefH,false);
         debugContextManager.addActiveResource(scriptDefH);
+
+        redisSupport.delete(Constants.CACHE_DEF_SCRIPT);
+
         return scriptDefH;
     }
 

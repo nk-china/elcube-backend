@@ -51,4 +51,6 @@ public interface NkCard<DT,DDT> extends NkCustomObject {
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED, readOnly = true)
     default void afterUpdated(DocHV doc, DT data, DDT def){};
+
+    boolean isDebug();
 }

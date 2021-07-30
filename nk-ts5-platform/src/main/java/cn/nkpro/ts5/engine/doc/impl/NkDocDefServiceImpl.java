@@ -374,9 +374,10 @@ public class NkDocDefServiceImpl implements NkDocDefService {
 
         deserializeDef(defHV);
 
-        runLoopCards(defHV,false, (nkCard,item)->
-                item.setConfig(nkCard.afterGetDef(defHV, item, item.getConfig()))
-        );
+        runLoopCards(defHV,false, (nkCard,item)->{
+                item.setDebug(nkCard.isDebug());
+                item.setConfig(nkCard.afterGetDef(defHV, item, item.getConfig()));
+        });
 
         DocDefFlowExample flowExample = new DocDefFlowExample();
         flowExample.createCriteria()

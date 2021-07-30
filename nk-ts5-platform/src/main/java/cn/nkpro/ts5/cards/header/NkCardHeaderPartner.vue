@@ -47,7 +47,7 @@
 </template>
 
 <script>
-import Mixin from "Mixin";
+import { Mixin } from "nk-ts5-platform";
 export default {
     mixins:[new Mixin()],
     data(){

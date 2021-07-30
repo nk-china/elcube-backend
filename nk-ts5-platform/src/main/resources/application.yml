@@ -9,7 +9,7 @@ nk:
   compress:
     enabled: false #开发环境不压缩
   component-base-packages: cn.nkpro.ts5.cards
-  component-disable-online-editing: true
+  component-disable-online-editing: false
   component-reload-class-path: true
 #  aliyun:
 #    access-key-id: LTAI4G6YUdTBx8b9C8uR3gTU

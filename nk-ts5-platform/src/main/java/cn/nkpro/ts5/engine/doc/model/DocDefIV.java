@@ -13,4 +13,5 @@ public class DocDefIV extends DocDefIWithBLOBs {
     private String      position;
     // 卡片是否允许编辑，默认真
     private Boolean     writeable = true;
+    private boolean     debug;
 }
