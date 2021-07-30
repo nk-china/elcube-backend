@@ -55,23 +55,16 @@ public class SysDocDefController {
     }
 
     @WsDocNote("2.获取单据类型的所有版本")
-    @RequestMapping("/type/list/{docType}/{version}/{page}")
-    public List<DocDefH> list(@PathVariable String docType, @PathVariable String version, @PathVariable Integer page){
-        return defDocTypeService.getList(docType,version,page);
+    @RequestMapping("/type/list/{docType}/{page}")
+    public List<DocDefH> list(@PathVariable String docType, @PathVariable Integer page){
+        return defDocTypeService.getList(docType,page);
     }
 
     @WsDocNote("3.获取单据配置详情")
     @RequestMapping(value = "/type/detail/{docType}/{version}")
     public DocDefHV detail(
             @WsDocNote(value = "单据类型") @PathVariable("docType") String docType, @PathVariable String version){
-        return defDocTypeService.getDocDef(docType, version);
-    }
-
-    @WsDocNote("4.预处理编辑单据配置")
-    @RequestMapping("/type/edit")
-    public DocDefHV edit(
-            @WsDocNote("单据配置对象")@RequestBody DocDefHV def){
-        return defDocTypeService.doEdit(def);
+        return defDocTypeService.getDocDefForEdit(docType, version);
     }
 
     @WsDocNote("5.更新单据配置")
@@ -104,9 +97,9 @@ public class SysDocDefController {
 
     @WsDocNote("9.调试配置")
     @RequestMapping("/type/debug")
-    public void debug(
+    public DocDefHV debug(
             @WsDocNote("单据配置对象")@RequestBody DocDefHV def){
-        defDocTypeService.setDebugDef(def);
+        return defDocTypeService.doRun(def);
     }
 
     @WsDocNote("10.获取单据配置的Options")

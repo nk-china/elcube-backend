@@ -14,4 +14,5 @@ public class DocDefHV extends DocDefH {
     private List<DocDefFlow> flows;
     private List<DocDefIV> cards;
     private Map<String, String> lifeCycles;
+    private boolean debug;
 }

@@ -3,6 +3,7 @@ package cn.nkpro.ts5.engine.co;
 import cn.nkpro.ts5.basic.Constants;
 import cn.nkpro.ts5.config.redis.RedisSupport;
 import cn.nkpro.ts5.config.security.SecurityUtilz;
+import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.ScriptDefHV;
 import cn.nkpro.ts5.exception.TfmsException;
 import cn.nkpro.ts5.utils.GroovyUtils;
@@ -156,6 +157,10 @@ public class DebugContextManager implements ApplicationContextAware {
         if(resource instanceof ScriptDefHV){
             ((ScriptDefHV) resource).setDebug(true);
             registerScriptObject((ScriptDefHV) resource,debugApplicationContext);
+        }else if(resource instanceof DocDefHV){
+            ((DocDefHV) resource).setDebug(true);
+        }else{
+            throw new TfmsException(resource.getClass().getName() + " 不支持调试");
         }
 
         redisForResoure.putHash(String.format("DEBUG:%s", localDebugId.get()), key, resource);

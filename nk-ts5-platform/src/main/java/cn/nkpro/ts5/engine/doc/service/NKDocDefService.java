@@ -22,7 +22,7 @@ public interface NKDocDefService {
 
     List<DocDefH> getAllDocTypes();
 
-    List<DocDefH> getList(String docType, String version, int page);
+    List<DocDefH> getList(String docType, int page);
 
     Map<String, Object> options(String classify);
 
@@ -30,13 +30,11 @@ public interface NKDocDefService {
 
     List<DocDefH> getEntrance(String classify);
 
-    void setDebugDef(DocDefHV docDefHV);
+    DocDefHV doRun(DocDefHV docDefHV);
 
-    DocDefHV getRuntimeDocDef(String docType, Integer major);
+    DocDefHV getDocDefForRuntime(String docType);
 
-    DocDefHV getDocDef(String docType, String version);
-
-    DocDefHV doEdit(DocDefHV docDefHV);
+    DocDefHV getDocDefForEdit(String docType, String version);
 
     DocDefHV doBreach(DocDefHV docDefHV);
 

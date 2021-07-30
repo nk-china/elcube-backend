@@ -48,13 +48,6 @@ public class SysScriptDefController {
         return scriptService.getScript(scriptName,version);
     }
 
-    @WsDocNote("3.预处理编辑")
-    @RequestMapping("/edit")
-    public ScriptDefH edit(
-            @WsDocNote("脚本对象")@RequestBody ScriptDefHV script){
-        return scriptService.doEdit(script);
-    }
-
     @WsDocNote("4.复制")
     @RequestMapping("/breach")
     public ScriptDefH breach(

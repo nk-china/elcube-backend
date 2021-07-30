@@ -130,7 +130,7 @@ public class NKScriptDefManagerImpl implements NKScriptDefManager {
     public ScriptDefH doRun(ScriptDefHV scriptDefH){
 
         Assert.isTrue(!StringUtils.equals(scriptDefH.getVersion(),"@"),"IDE版本不能调试");
-        Assert.isTrue(!StringUtils.equals(scriptDefH.getState(),"Active"),"已激活的版本不能调试");
+        Assert.isTrue(StringUtils.equals(scriptDefH.getState(),"InActive"),"已激活的版本不能调试");
 
         doUpdate(scriptDefH,false);
         debugContextManager.addDebugResource("$"+scriptDefH.getScriptName(),scriptDefH);
@@ -139,9 +139,30 @@ public class NKScriptDefManagerImpl implements NKScriptDefManager {
 
     @Override
     @Transactional
-    public void doDelete(ScriptDefHV scriptDefH){
-        Assert.isTrue(StringUtils.equals(scriptDefH.getState(),"InActive"),"非未激活的版本不能删除");
-        scriptDefHMapper.deleteByPrimaryKey(scriptDefH);
+    public ScriptDefH doBreach(ScriptDefHV scriptDefH){
+
+        scriptDefH.setState("InActive");
+        scriptDefH.setVersion(UUID.randomUUID().toString());
+        scriptDefH.setCreatedTime(DateTimeUtilz.nowSeconds());
+        scriptDefH.setUpdatedTime(DateTimeUtilz.nowSeconds());
+        doUpdate(scriptDefH,false);
+        return scriptDefH;
+    }
+
+
+    @Override
+    @Transactional
+    public ScriptDefH doUpdate(ScriptDefHV scriptDefH, boolean force){
+
+        scriptDefH.setState(StringUtils.defaultIfBlank(scriptDefH.getState(),"InActive"));
+        scriptDefH.setUpdatedTime(DateTimeUtilz.nowSeconds());
+        if(scriptDefHMapper.selectByPrimaryKey(scriptDefH)==null){
+            scriptDefHMapper.insertSelective(scriptDefH);
+        }else{
+            scriptDefHMapper.updateByPrimaryKeySelective(scriptDefH);
+        }
+
+        return scriptDefH;
     }
 
     @Override
@@ -169,43 +190,9 @@ public class NKScriptDefManagerImpl implements NKScriptDefManager {
 
     @Override
     @Transactional
-    public ScriptDefH doBreach(ScriptDefHV scriptDefH){
-
-        scriptDefH.setState("InActive");
-        scriptDefH.setVersion(UUID.randomUUID().toString());
-        scriptDefH.setCreatedTime(DateTimeUtilz.nowSeconds());
-        scriptDefH.setUpdatedTime(DateTimeUtilz.nowSeconds());
-        doUpdate(scriptDefH,false);
-        return scriptDefH;
-    }
-
-    @Override
-    @Transactional
-    public ScriptDefH doEdit(ScriptDefHV scriptDefH){
-        if(StringUtils.equals(scriptDefH.getState(),"Active")){
-            ScriptDefH lastUpdatedVersion = getLastUpdatedVersion(scriptDefH.getScriptName(), VersioningUtils.parseMinor(scriptDefH.getVersion()));
-            // 增加Patch
-            scriptDefH.setVersion(VersioningUtils.nextPatch(lastUpdatedVersion.getVersion()));
-            scriptDefH.setState("InActive");
-            return doUpdate(scriptDefH,false);
-        }
-        return scriptDefH;
-    }
-
-
-    @Override
-    @Transactional
-    public ScriptDefH doUpdate(ScriptDefHV scriptDefH, boolean force){
-
-        scriptDefH.setState(StringUtils.defaultIfBlank(scriptDefH.getState(),"InActive"));
-        scriptDefH.setUpdatedTime(DateTimeUtilz.nowSeconds());
-        if(scriptDefHMapper.selectByPrimaryKey(scriptDefH)==null){
-            scriptDefHMapper.insertSelective(scriptDefH);
-        }else{
-            scriptDefHMapper.updateByPrimaryKeySelective(scriptDefH);
-        }
-
-        return scriptDefH;
+    public void doDelete(ScriptDefHV scriptDefH){
+        Assert.isTrue(StringUtils.equals(scriptDefH.getState(),"InActive"),"非未激活的版本不能删除");
+        scriptDefHMapper.deleteByPrimaryKey(scriptDefH);
     }
 
     /**

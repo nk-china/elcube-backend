@@ -43,9 +43,6 @@ public interface NKScriptDefManager extends ApplicationListener<ContextRefreshed
     ScriptDefH doBreach(ScriptDefHV scriptDefH);
 
     @Transactional
-    ScriptDefH doEdit(ScriptDefHV scriptDefH);
-
-    @Transactional
     ScriptDefH doUpdate(ScriptDefHV scriptDefH, boolean force);
 //
 //    @Transactional
