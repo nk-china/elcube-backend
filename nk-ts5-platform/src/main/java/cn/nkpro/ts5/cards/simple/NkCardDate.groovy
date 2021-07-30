@@ -28,11 +28,6 @@ class NkCardDate extends NKAbstractCard<Map,Map> {
         logger.debug(a as String);
 
     }
-
-    @Override
-    String[] getDefComponentNames() {
-        return ["NkCardDateDef"];
-    }
     //@Override
     String getComponentDesc() {
         return null

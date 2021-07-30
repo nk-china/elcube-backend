@@ -12,9 +12,4 @@ class NkCardHeaderPartner extends NKAbstractCard<Map,Map> {
     String getPosition() {
         return POSITION_HEADER
     }
-
-    @Override
-    String[] getDefComponentNames() {
-        return ["NkCardHeaderPartnerDef"]
-    }
 }

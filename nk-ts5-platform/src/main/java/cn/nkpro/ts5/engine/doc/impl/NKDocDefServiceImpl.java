@@ -114,7 +114,7 @@ public class NKDocDefServiceImpl implements NKDocDefService {
         describe.setBeanName(nkCard.getBeanName());
         describe.setCardName(nkCard.getCardName());
         describe.setDataComponentName(nkCard.getDataComponentName());
-        describe.setDefComponentNames(nkCard.getDefComponentNames());
+        describe.setDefComponentNames(nkCard.getAutoDefComponentNames());
 
         return describe;
     }
@@ -449,7 +449,7 @@ public class NKDocDefServiceImpl implements NKDocDefService {
             item.setConfig(nkCard.deserializeDef(item));
             item.setPosition(nkCard.getPosition());
             item.setDataComponentName(nkCard.getDataComponentName());
-            item.setDefComponentNames(nkCard.getDefComponentNames());
+            item.setDefComponentNames(nkCard.getAutoDefComponentNames());
             item.setCardContent(null);
         });
 

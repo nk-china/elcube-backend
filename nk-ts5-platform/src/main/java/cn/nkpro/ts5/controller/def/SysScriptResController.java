@@ -37,27 +37,12 @@ public class SysScriptResController {
 
     @WsDocNote("1.获取卡片信息")
     @RequestMapping("/vue")
-    public Map<String, String> vueTemplates() {
+    public Map<Object, Object> vueTemplates() {
 
-        Map<String,String> vueMap = new HashMap<>();
-        customObjectManager.getCustomObjects(NKCustomScriptObject.class)
+        Map<Object, Object> vueMap = new HashMap<>();
+        customObjectManager.getCustomObjects(NKCard.class)
                 .values()
-                .forEach(nkCard -> vueMap.putAll(buildCardVueMap(nkCard.getScriptDef())));
-        return vueMap;
-    }
-
-    private Map<String,String> buildCardVueMap(ScriptDefHWithBLOBs scriptDef){
-        Map<String,String> vueMap = new HashMap<>();
-        if(StringUtils.isNotBlank(scriptDef.getVueMain())){
-            vueMap.put(scriptDef.getScriptName(),scriptDef.getVueMain());
-        }
-        if(StringUtils.isNotBlank(scriptDef.getVueDefs())){
-            JSONArray array = JSON.parseArray(scriptDef.getVueDefs());
-            array.forEach((item)->{
-                int index = array.indexOf(item);
-                vueMap.put(scriptDef.getScriptName()+"Def"+(index==0?"":index), (String) item);
-            });
-        }
+                .forEach(nkCard -> vueMap.putAll(nkCard.getVueTemplate()));
         return vueMap;
     }
 

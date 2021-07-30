@@ -18,11 +18,6 @@ class NkCardSimple extends NKAbstractCard<NkCardSimpleData,NkCardSimpleDef> {
     NkDocEngineFrontService docEngineFrontService;
 
     @Override
-    String[] getDefComponentNames() {
-        return ["NkCardSimpleDef"]
-    }
-
-    @Override
     NkCardSimpleDef afterGetDef(DocDefHV defHV, DocDefIV defIV, NkCardSimpleDef cardDef) {
         log.info("DEF:"+JSON.toJSONString(cardDef))
         return cardDef

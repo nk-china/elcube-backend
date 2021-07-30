@@ -1,14 +1,13 @@
 package cn.nkpro.ts5.engine.doc;
 
 import cn.nkpro.ts5.engine.co.NKCustomObject;
-import cn.nkpro.ts5.engine.co.NKCustomScriptObject;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocDefIV;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
-import cn.nkpro.ts5.orm.mb.gen.ScriptDefH;
-import cn.nkpro.ts5.orm.mb.gen.ScriptDefHWithBLOBs;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Map;
 
 public interface NKCard<DT,DDT> extends NKCustomObject{
 
@@ -26,7 +25,9 @@ public interface NKCard<DT,DDT> extends NKCustomObject{
 
     String getDataComponentName();
 
-    String[] getDefComponentNames();
+    String[] getAutoDefComponentNames();
+
+    Map<String,String> getVueTemplate();
 
     // 配置方法
     DDT deserializeDef(DocDefIV defI);

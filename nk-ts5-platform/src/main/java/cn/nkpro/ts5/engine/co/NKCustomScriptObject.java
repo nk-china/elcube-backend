@@ -21,14 +21,13 @@ public abstract class NKCustomScriptObject implements NKCustomObject, Initializi
 
 
     @Autowired
-    private ClasspathResourceLoader classpathResourceLoader;
+    protected ClasspathResourceLoader classpathResourceLoader;
 
     @Getter
     protected String beanName;
 
-    @Setter
-    @Getter
-    private ScriptDefHV scriptDef;
+    @Setter@Getter
+    protected ScriptDefHV scriptDef;
 
     public NKCustomScriptObject() {
         this.beanName = parseComponentName();
@@ -41,7 +40,7 @@ public abstract class NKCustomScriptObject implements NKCustomObject, Initializi
         }
     }
 
-    private ScriptDefHV loadScriptFromClassPath(String scriptName) {
+    protected ScriptDefHV loadScriptFromClassPath(String scriptName) {
 
         List<String> groovyCode = classpathResourceLoader.findResource(scriptName + ".groovy");
         if (!groovyCode.isEmpty()) {
