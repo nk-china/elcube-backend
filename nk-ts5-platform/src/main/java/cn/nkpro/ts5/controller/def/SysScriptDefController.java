@@ -2,6 +2,7 @@ package cn.nkpro.ts5.controller.def;
 
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
+import cn.nkpro.ts5.config.global.NkProperties;
 import cn.nkpro.ts5.engine.doc.model.ScriptDefHV;
 import cn.nkpro.ts5.engine.doc.service.NkScriptDefManager;
 import cn.nkpro.ts5.orm.mb.gen.ScriptDefH;
@@ -20,6 +21,8 @@ public class SysScriptDefController {
 
     @Autowired@SuppressWarnings("all")
     private NkScriptDefManager scriptService;
+    @Autowired
+    private NkProperties properties;
 
     @WsDocNote("1、获取脚本列表")
     @RequestMapping("/page")
@@ -80,5 +83,11 @@ public class SysScriptDefController {
     public ScriptDefH debug(
             @WsDocNote("脚本对象")@RequestBody ScriptDefHV script){
         return scriptService.doRun(script);
+    }
+
+    @WsDocNote("9、是否禁用在线编辑")
+    @RequestMapping("/online/editing")
+    public boolean isComponentDisableOnlineEditing(){
+        return properties.isComponentDisableOnlineEditing();
     }
 }
