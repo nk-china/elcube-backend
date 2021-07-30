@@ -9,8 +9,8 @@ nk:
   compress:
     enabled: false #开发环境不压缩
   component-base-packages: cn.nkpro.ts5.cards
-  component-disable-online-editing: true
-  component-reload-class-path: true
+  component-disable-online-editing: false
+  component-reload-class-path: false
 #  aliyun:
 #    access-key-id: LTAI4G6YUdTBx8b9C8uR3gTU
 #    access-key-secret: zeqaRsOAOkwwTLK8E2QyR1aEcj6RAL
@@ -46,7 +46,7 @@ spring:
   main:
     allow-bean-definition-overriding: true
   datasource:
-    url: jdbc:mysql://121.36.76.251:3306/ts5_beebattle_dev
+    url: jdbc:mysql://192.168.1.149:3306/ts5_beebattle_dev
     username: root
     password: VTOZ8clUpSerX6hI
     driver-class-name: com.mysql.jdbc.Driver
@@ -58,7 +58,7 @@ spring:
       maximumPoolSize: 10
   redis:
     port: 6379
-    host: 119.3.228.18
+    host: 192.168.1.157
     password: 1qazxsw2
     jedis:
       pool:
@@ -68,7 +68,7 @@ spring:
         max-wait: 500ms
   elasticsearch:
     rest:
-      uris: ["http://119.3.228.18:9200"]
+      uris: ["http://192.168.1.157:9200"]
       username: elastic
       password: 1qazxsw2
       connection-timeout: 1s
