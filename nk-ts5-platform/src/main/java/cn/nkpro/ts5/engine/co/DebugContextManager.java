@@ -176,7 +176,7 @@ public class DebugContextManager implements ApplicationContextAware {
         Class<?> clazz = GroovyUtils.compileGroovy(scriptDef.getScriptName(), scriptDef.getGroovyMain());
 
         if(!ClassUtils.getAllSuperclasses(clazz).contains(NKCustomScriptObject.class)){
-            throw new RuntimeException("组件处理程序实现[ "+NKCustomScriptObject.class.getSimpleName()+" ]接口");
+            throw new RuntimeException("组件处理程序必须继承[ "+NKCustomScriptObject.class.getSimpleName()+" ]或其子类");
         }
 
         String beanName = cn.nkpro.ts5.utils.ClassUtils.decapitateBeanName(clazz);
