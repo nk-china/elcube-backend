@@ -5,11 +5,9 @@ import cn.nkpro.ts5.config.redis.RedisSupport;
 import cn.nkpro.ts5.config.security.SecurityUtilz;
 import cn.nkpro.ts5.engine.doc.model.ScriptDefHV;
 import cn.nkpro.ts5.exception.TfmsException;
-import cn.nkpro.ts5.orm.mb.gen.ScriptDefHWithBLOBs;
 import cn.nkpro.ts5.utils.GroovyUtils;
 import cn.nkpro.ts5.utils.OsUtils;
 import groovy.lang.GroovyObject;
-import io.jsonwebtoken.lang.Assert;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -163,7 +161,12 @@ public class DebugContextManager implements ApplicationContextAware {
         redisForResoure.putHash(String.format("DEBUG:%s", localDebugId.get()), key, resource);
     }
 
-    public void registerScriptObject(ScriptDefHV scriptDef,ApplicationContext context){
+    public void addActiveResource(ScriptDefHV scriptDef){
+        scriptDef.setDebug(false);
+        registerScriptObject(scriptDef, rootApplicationContext);
+    }
+
+    private void registerScriptObject(ScriptDefHV scriptDef,ApplicationContext context){
 
         Class<?> clazz = GroovyUtils.compileGroovy(scriptDef.getScriptName(), scriptDef.getGroovyMain());
 
@@ -174,7 +177,7 @@ public class DebugContextManager implements ApplicationContextAware {
         String beanName = cn.nkpro.ts5.utils.ClassUtils.decapitateBeanName(clazz);
 
         // 避免非法重写spring的类
-        if(getApplicationContext().containsBean(beanName)){
+        if(context.containsBean(beanName)){
 
             Object exists = context.getBean(beanName);
 

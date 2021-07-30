@@ -20,7 +20,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +27,7 @@ import org.springframework.util.Assert;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 /**
  * Created by bean on 2020/7/17.
@@ -134,6 +134,48 @@ public class NKScriptDefManagerImpl implements NKScriptDefManager {
 
         doUpdate(scriptDefH,false);
         debugContextManager.addDebugResource("$"+scriptDefH.getScriptName(),scriptDefH);
+        return scriptDefH;
+    }
+
+    @Override
+    @Transactional
+    public void doDelete(ScriptDefHV scriptDefH){
+        Assert.isTrue(StringUtils.equals(scriptDefH.getState(),"InActive"),"非未激活的版本不能删除");
+        scriptDefHMapper.deleteByPrimaryKey(scriptDefH);
+    }
+
+    @Override
+    @Transactional
+    public ScriptDefH doActive(ScriptDefHV scriptDefH){
+
+        Assert.isTrue(!StringUtils.equals(scriptDefH.getVersion(),"@"),"IDE版本不能激活");
+        Assert.isTrue(!StringUtils.equals(scriptDefH.getState(),"Active"),"已激活的版本不能激活");
+
+        // 清理已激活版本
+        ScriptDefHWithBLOBs record = new ScriptDefHWithBLOBs();
+        record.setState("History");
+        ScriptDefHExample example = new ScriptDefHExample();
+        example.createCriteria()
+                .andScriptNameEqualTo(scriptDefH.getScriptName())
+                .andStateEqualTo("Active");
+        scriptDefHMapper.updateByExampleSelective(record, example);
+
+        // 激活版本
+        scriptDefH.setState("Active");
+        doUpdate(scriptDefH,false);
+        debugContextManager.addActiveResource(scriptDefH);
+        return scriptDefH;
+    }
+
+    @Override
+    @Transactional
+    public ScriptDefH doBreach(ScriptDefHV scriptDefH){
+
+        scriptDefH.setState("InActive");
+        scriptDefH.setVersion(UUID.randomUUID().toString());
+        scriptDefH.setCreatedTime(DateTimeUtilz.nowSeconds());
+        scriptDefH.setUpdatedTime(DateTimeUtilz.nowSeconds());
+        doUpdate(scriptDefH,false);
         return scriptDefH;
     }
 
@@ -296,11 +338,10 @@ public class NKScriptDefManagerImpl implements NKScriptDefManager {
     @SneakyThrows
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
-        ApplicationContext applicationContext = debugContextManager.getApplicationContext();
-        if(contextRefreshedEvent.getApplicationContext()== applicationContext){
+        if(contextRefreshedEvent.getApplicationContext()== debugContextManager.getApplicationContext()){
             getActiveResources().forEach((scriptDef)-> {
                 try {
-                    debugContextManager.registerScriptObject(BeanUtilz.copyFromObject(scriptDef,ScriptDefHV.class),applicationContext);
+                    debugContextManager.addActiveResource(BeanUtilz.copyFromObject(scriptDef,ScriptDefHV.class));
                 }catch (RuntimeException e){
                     log.error(e.getMessage(),e);
                 }

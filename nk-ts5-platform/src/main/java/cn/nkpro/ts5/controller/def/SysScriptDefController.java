@@ -48,11 +48,18 @@ public class SysScriptDefController {
         return scriptService.getScript(scriptName,version);
     }
 
-    @WsDocNote("4.预处理编辑")
+    @WsDocNote("3.预处理编辑")
     @RequestMapping("/edit")
     public ScriptDefH edit(
             @WsDocNote("脚本对象")@RequestBody ScriptDefHV script){
         return scriptService.doEdit(script);
+    }
+
+    @WsDocNote("4.复制")
+    @RequestMapping("/breach")
+    public ScriptDefH breach(
+            @WsDocNote("脚本对象")@RequestBody ScriptDefHV script){
+        return scriptService.doBreach(script);
     }
 
     @WsDocNote("5.更新")
@@ -62,24 +69,24 @@ public class SysScriptDefController {
         return scriptService.doUpdate(script, false);
     }
 
-    @WsDocNote("9.调试")
+    @WsDocNote("6.激活")
+    @RequestMapping("/active")
+    public ScriptDefH active(
+            @WsDocNote("脚本对象")@RequestBody ScriptDefHV script){
+        return scriptService.doActive(script);
+    }
+
+    @WsDocNote("7.删除")
+    @RequestMapping("/delete")
+    public void delete(
+            @WsDocNote("脚本对象")@RequestBody ScriptDefHV script){
+        scriptService.doDelete(script);
+    }
+
+    @WsDocNote("8.调试")
     @RequestMapping("/debug")
     public ScriptDefH debug(
             @WsDocNote("脚本对象")@RequestBody ScriptDefHV script){
         return scriptService.doRun(script);
     }
-//
-//    @WsDocNote("3、通过脚本名称获取脚本")
-//    @CompressResponse
-//    @RequestMapping("/name")
-//    public DefScript getScriptByNname(String scriptName){
-//        return scriptService.getScriptByName(scriptName);
-//    }
-//
-//    @WsDocNote("4、保存脚本")
-//    @CompressResponse
-//    @RequestMapping("/update")
-//    public DefScript update(@RequestBody DefScript script){
-//        return scriptService.update(script);
-//    }
 }
