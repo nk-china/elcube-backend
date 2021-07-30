@@ -316,6 +316,7 @@
             <id>ts5-release</id>
             <build>
                 <defaultGoal>clean package</defaultGoal>
+                <finalName>nk-ts5-platform</finalName>
                 <plugins>
                     <plugin>
                         <groupId>org.springframework.boot</groupId>
