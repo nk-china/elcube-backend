@@ -1,8 +1,8 @@
 package cn.nkpro.ts5.engine.doc;
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
-import cn.nkpro.ts5.config.global.NKProperties;
-import cn.nkpro.ts5.engine.co.NKCustomScriptObject;
+import cn.nkpro.ts5.config.global.NkProperties;
+import cn.nkpro.ts5.engine.co.NkAbstractCustomScriptObject;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocDefIV;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
@@ -23,7 +23,7 @@ import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public abstract class NKAbstractCard<DT,DDT> extends NKCustomScriptObject implements NKCard<DT,DDT> {
+public abstract class NkAbstractCard<DT,DDT> extends NkAbstractCustomScriptObject implements NkCard<DT,DDT> {
 
     protected Logger log = LoggerFactory.getLogger(getClass());
 
@@ -31,12 +31,12 @@ public abstract class NKAbstractCard<DT,DDT> extends NKCustomScriptObject implem
     private String cardName;
 
     @Getter
-    private String position = NKCard.POSITION_DEFAULT;
+    private String position = NkCard.POSITION_DEFAULT;
 
     @Autowired
-    private NKProperties properties;
+    private NkProperties properties;
 
-    public NKAbstractCard(){
+    public NkAbstractCard(){
         super();
         this.cardName = Optional.ofNullable(getClass().getAnnotation(WsDocNote.class))
                 .map(WsDocNote::value)

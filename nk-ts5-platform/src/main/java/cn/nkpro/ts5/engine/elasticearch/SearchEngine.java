@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.engine.elasticearch;
 
-import cn.nkpro.ts5.config.global.NKProperties;
+import cn.nkpro.ts5.config.global.NkProperties;
 import cn.nkpro.ts5.engine.elasticearch.annotation.*;
 import cn.nkpro.ts5.engine.elasticearch.model.ESDoc;
 import cn.nkpro.ts5.utils.LocalSyncUtilz;
@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
 public class SearchEngine {
 
     @Autowired
-    private NKProperties properties;
+    private NkProperties properties;
     @Autowired
     private RestHighLevelClient client;
 

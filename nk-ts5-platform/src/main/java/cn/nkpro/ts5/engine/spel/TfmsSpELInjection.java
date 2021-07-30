@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.engine.spel;
 
-import cn.nkpro.ts5.engine.co.NKCustomObject;
+import cn.nkpro.ts5.engine.co.NkCustomObject;
 
-public interface TfmsSpELInjection extends NKCustomObject {
+public interface TfmsSpELInjection extends NkCustomObject {
     String getSpELName();
 }

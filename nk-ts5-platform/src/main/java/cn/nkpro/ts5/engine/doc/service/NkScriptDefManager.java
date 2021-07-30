@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * Created by bean on 2020/7/17.
  */
-public interface NKScriptDefManager extends ApplicationListener<ContextRefreshedEvent> {
+public interface NkScriptDefManager extends ApplicationListener<ContextRefreshedEvent> {
 
     PageList<ScriptDefH> getPage(String keyword,
                                  String version,

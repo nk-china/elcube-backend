@@ -4,7 +4,7 @@ import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocDefIV;
-import cn.nkpro.ts5.engine.doc.service.NKDocDefService;
+import cn.nkpro.ts5.engine.doc.service.NkDocDefService;
 import cn.nkpro.ts5.orm.mb.gen.DocDefH;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,7 +23,7 @@ import java.util.Map;
 public class SysDocDefController {
 
     @Autowired@SuppressWarnings("all")
-    private NKDocDefService defDocTypeService;
+    private NkDocDefService defDocTypeService;
 
     @WsDocNote("1.获取单据配置列表")
     @RequestMapping("/type/page")

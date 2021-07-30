@@ -1,19 +1,15 @@
 package cn.nkpro.ts5.controller.def;
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
-import cn.nkpro.ts5.engine.co.NKCustomObject;
+import cn.nkpro.ts5.engine.co.NkCustomObject;
 import cn.nkpro.ts5.engine.co.NKCustomObjectManager;
-import cn.nkpro.ts5.engine.co.NKCustomScriptObject;
-import cn.nkpro.ts5.engine.doc.NKCard;
+import cn.nkpro.ts5.engine.co.NkCustomScriptObject;
+import cn.nkpro.ts5.engine.doc.NkCard;
 import cn.nkpro.ts5.engine.doc.model.ScriptDefHV;
 import cn.nkpro.ts5.exception.TfmsException;
-import cn.nkpro.ts5.orm.mb.gen.ScriptDefHWithBLOBs;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONArray;
 import groovy.lang.GroovyObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +36,7 @@ public class SysScriptResController {
     public Map<Object, Object> vueTemplates() {
 
         Map<Object, Object> vueMap = new HashMap<>();
-        customObjectManager.getCustomObjects(NKCard.class)
+        customObjectManager.getCustomObjects(NkCard.class)
                 .values()
                 .forEach(nkCard -> vueMap.putAll(nkCard.getVueTemplate()));
         return vueMap;
@@ -50,10 +46,10 @@ public class SysScriptResController {
     @RequestMapping("/bean/{beanName}")
     public BeanDescribe className(@PathVariable("beanName") String beanName){
 
-        Object customObject = customObjectManager.getCustomObject(beanName, NKCustomObject.class);
+        Object customObject = customObjectManager.getCustomObject(beanName, NkCustomObject.class);
 
-        if(customObject instanceof NKCustomScriptObject){
-            ScriptDefHV scriptDef = ((NKCustomScriptObject) customObject).getScriptDef();
+        if(customObject instanceof NkCustomScriptObject){
+            ScriptDefHV scriptDef = ((NkCustomScriptObject) customObject).getScriptDef();
             if(scriptDef!=null){
                 return new BeanDescribe(
                         scriptDef.getScriptName(),

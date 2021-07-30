@@ -7,7 +7,7 @@ import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class NKElasticSearchAutoConfigurer implements ApplicationRunner {
+public class ESAutoConfigurer implements ApplicationRunner {
 
     @Autowired@SuppressWarnings("all")
     private SearchEngine searchEngine;

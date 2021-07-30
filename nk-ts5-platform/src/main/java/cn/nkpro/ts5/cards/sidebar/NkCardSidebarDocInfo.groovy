@@ -1,12 +1,12 @@
 package cn.nkpro.ts5.cards.sidebar
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote
-import cn.nkpro.ts5.engine.doc.NKAbstractCard
+import cn.nkpro.ts5.engine.doc.NkAbstractCard
 import org.springframework.stereotype.Component
 
 @WsDocNote("单据信息")
 @Component("NkCardSidebarDocInfo")
-class NkCardSidebarDocInfo extends NKAbstractCard<Map,Map> {
+class NkCardSidebarDocInfo extends NkAbstractCard<Map,Map> {
 
     @Override
     String getPosition() {

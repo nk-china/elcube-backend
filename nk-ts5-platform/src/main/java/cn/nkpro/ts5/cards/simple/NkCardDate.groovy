@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.cards.simple
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote
-import cn.nkpro.ts5.engine.doc.NKAbstractCard
+import cn.nkpro.ts5.engine.doc.NkAbstractCard
 import cn.nkpro.ts5.engine.doc.model.DocDefHV
 import cn.nkpro.ts5.engine.doc.model.DocHV
 import org.slf4j.Logger
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component
 
 @WsDocNote("日期")
 @Component("NkCardDate")
-class NkCardDate extends NKAbstractCard<Map,Map> {
+class NkCardDate extends NkAbstractCard<Map,Map> {
 
     Logger logger = LoggerFactory.getLogger(getClass());
 

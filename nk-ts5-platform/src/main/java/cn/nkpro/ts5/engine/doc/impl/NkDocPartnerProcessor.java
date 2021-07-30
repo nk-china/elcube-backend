@@ -3,7 +3,7 @@ package cn.nkpro.ts5.engine.doc.impl;
 import org.springframework.stereotype.Component;
 
 @Component("NKDocPartnerProcessor")
-public class NKDocPartnerProcessor extends NKDocTransactionProcessor {
+public class NkDocPartnerProcessor extends NkDocTransactionProcessor {
     @Override
     public EnumDocClassify classify() {
         return EnumDocClassify.PARTNER;

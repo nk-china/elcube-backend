@@ -2,7 +2,7 @@ package cn.nkpro.ts5.engine.co;
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
 import cn.nkpro.ts5.engine.doc.ClasspathResourceLoader;
-import cn.nkpro.ts5.engine.doc.NKCard;
+import cn.nkpro.ts5.engine.doc.NkCard;
 import cn.nkpro.ts5.engine.doc.model.ScriptDefHV;
 import cn.nkpro.ts5.utils.ClassUtils;
 import cn.nkpro.ts5.utils.GroovyUtils;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-public abstract class NKCustomScriptObject implements NKCustomObject, InitializingBean {
+public abstract class NkAbstractCustomScriptObject implements NkCustomScriptObject, InitializingBean {
 
 
     @Autowired
@@ -29,7 +29,7 @@ public abstract class NKCustomScriptObject implements NKCustomObject, Initializi
     @Setter@Getter
     protected ScriptDefHV scriptDef;
 
-    public NKCustomScriptObject() {
+    public NkAbstractCustomScriptObject() {
         this.beanName = parseComponentName();
     }
 
@@ -57,7 +57,7 @@ public abstract class NKCustomScriptObject implements NKCustomObject, Initializi
             Class<?> groovy = GroovyUtils.compileGroovy(scriptName, scriptDefH.getGroovyMain());
             List interfaces = org.apache.commons.lang.ClassUtils.getAllInterfaces(groovy);
 
-            scriptDefH.setScriptType(interfaces.contains(NKCard.class) ? "Card" : "Service");
+            scriptDefH.setScriptType(interfaces.contains(NkCard.class) ? "Card" : "Service");
 
             WsDocNote annotation = groovy.getAnnotation(WsDocNote.class);
             scriptDefH.setScriptDesc(annotation != null ? annotation.value() : scriptName);

@@ -2,11 +2,11 @@ package cn.nkpro.ts5.engine.doc.impl;
 
 import cn.nkpro.ts5.basic.Constants;
 import cn.nkpro.ts5.engine.co.NKCustomObjectManager;
-import cn.nkpro.ts5.engine.doc.NKDocProcessor;
+import cn.nkpro.ts5.engine.doc.NkDocProcessor;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocHD;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
-import cn.nkpro.ts5.engine.doc.service.NKDocDefService;
+import cn.nkpro.ts5.engine.doc.service.NkDocDefService;
 import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService;
 import cn.nkpro.ts5.config.redis.RedisSupport;
 import cn.nkpro.ts5.orm.mb.gen.*;
@@ -37,7 +37,7 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
     @Autowired@SuppressWarnings("all")
     private NKCustomObjectManager customObjectManager;
     @Autowired@SuppressWarnings("all")
-    private NKDocDefService docDefService;
+    private NkDocDefService docDefService;
 
     @Override
     public DocHV create(String docType, String preDocId) throws Exception {
@@ -50,7 +50,7 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
         DocDefHV def = docDefService.getDocDefForRuntime(docType);
 
         // 获取单据处理器
-        NKDocProcessor processor = customObjectManager.getCustomObject(def.getRefObjectType(), NKDocProcessor.class);
+        NkDocProcessor processor = customObjectManager.getCustomObject(def.getRefObjectType(), NkDocProcessor.class);
 
         // 创建单据
         return processor.toCreate(def, null);
@@ -85,7 +85,7 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
 
             // 获取单据处理器 并执行
             return customObjectManager
-                    .getCustomObject(def.getRefObjectType(), NKDocProcessor.class)
+                    .getCustomObject(def.getRefObjectType(), NkDocProcessor.class)
                     .detail(def, docHD);
         }
 
@@ -112,7 +112,7 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
 
         // 获取单据处理器 并执行
         return customObjectManager
-                .getCustomObject(def.getRefObjectType(), NKDocProcessor.class)
+                .getCustomObject(def.getRefObjectType(), NkDocProcessor.class)
                 .calculate(doc, fromCard, options);
     }
 
@@ -137,7 +137,7 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
 
         // 获取单据处理器 并执行
         return customObjectManager
-                .getCustomObject(def.getRefObjectType(), NKDocProcessor.class)
+                .getCustomObject(def.getRefObjectType(), NkDocProcessor.class)
                 .doUpdate(def,doc,original,"用户操作");
     }
 

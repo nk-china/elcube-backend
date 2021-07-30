@@ -4,12 +4,12 @@ import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
 @Data
-public class NKCustomObjectDesc {
+public class NkCustomObjectDesc {
 
     private String name;
     private String key;
 
-    public NKCustomObjectDesc(String key, String name){
+    public NkCustomObjectDesc(String key, String name){
         this.key = key;
         this.name = StringUtils.defaultIfBlank(name,key);
     }

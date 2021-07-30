@@ -3,9 +3,8 @@ package cn.nkpro.ts5.controller.def;
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
 import cn.nkpro.ts5.engine.doc.model.ScriptDefHV;
-import cn.nkpro.ts5.engine.doc.service.NKScriptDefManager;
+import cn.nkpro.ts5.engine.doc.service.NkScriptDefManager;
 import cn.nkpro.ts5.orm.mb.gen.ScriptDefH;
-import cn.nkpro.ts5.orm.mb.gen.ScriptDefHWithBLOBs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +19,7 @@ import org.springframework.web.bind.annotation.*;
 public class SysScriptDefController {
 
     @Autowired@SuppressWarnings("all")
-    private NKScriptDefManager scriptService;
+    private NkScriptDefManager scriptService;
 
     @WsDocNote("1、获取脚本列表")
     @RequestMapping("/page")

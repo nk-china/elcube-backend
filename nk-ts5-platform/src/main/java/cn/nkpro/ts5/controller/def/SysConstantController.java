@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.controller.def;
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
-import cn.nkpro.ts5.engine.doc.service.NKConstantService;
+import cn.nkpro.ts5.engine.doc.service.NkConstantService;
 import cn.nkpro.ts5.orm.mb.gen.ConstantDef;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,7 +20,7 @@ import java.util.List;
 public class SysConstantController {
 
     @Autowired
-    private NKConstantService constantService;
+    private NkConstantService constantService;
 
     @WsDocNote("11、加载常量列表")
     @RequestMapping("/list")

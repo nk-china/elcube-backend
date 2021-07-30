@@ -5,6 +5,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-@EnableConfigurationProperties(NKProperties.class)
-public class NKPropertiesConfigurer implements WebMvcConfigurer {
+@EnableConfigurationProperties(NkProperties.class)
+public class NkPropertiesConfigurer implements WebMvcConfigurer {
 }

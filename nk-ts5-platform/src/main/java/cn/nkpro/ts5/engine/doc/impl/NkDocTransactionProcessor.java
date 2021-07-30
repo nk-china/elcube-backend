@@ -2,13 +2,13 @@ package cn.nkpro.ts5.engine.doc.impl;
 
 import cn.nkpro.ts5.config.id.GUID;
 import cn.nkpro.ts5.config.id.SequenceSupport;
-import cn.nkpro.ts5.engine.doc.NKCard;
-import cn.nkpro.ts5.engine.doc.NKDocProcessor;
+import cn.nkpro.ts5.engine.doc.NkCard;
+import cn.nkpro.ts5.engine.doc.NkDocProcessor;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocHD;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.engine.doc.model.DocIV;
-import cn.nkpro.ts5.engine.doc.service.NKDocDefService;
+import cn.nkpro.ts5.engine.doc.service.NkDocDefService;
 import cn.nkpro.ts5.engine.elasticearch.SearchEngine;
 import cn.nkpro.ts5.engine.elasticearch.model.DocHES;
 import cn.nkpro.ts5.orm.mb.gen.DocH;
@@ -31,12 +31,12 @@ import java.util.Optional;
 
 @SuppressWarnings("unchecked")
 @Component("NKDocTransactionProcessor")
-public class NKDocTransactionProcessor implements NKDocProcessor {
+public class NkDocTransactionProcessor implements NkDocProcessor {
 
     @Autowired@SuppressWarnings("all")
     protected GUID guid;
     @Autowired@SuppressWarnings("all")
-    private NKDocDefService docDefService;
+    private NkDocDefService docDefService;
     @Autowired@SuppressWarnings("all")
     private SequenceSupport sequenceUtils;
     @Autowired@SuppressWarnings("all")
@@ -260,7 +260,7 @@ public class NKDocTransactionProcessor implements NKDocProcessor {
 
             assert obj != null;
             Method afterUpdated = obj.getClass().getDeclaredMethod("afterUpdated", DocHV.class, Object.class, Object.class);
-            return afterUpdated.getDeclaringClass() != NKCard.class;
+            return afterUpdated.getDeclaringClass() != NkCard.class;
         } catch (Exception e) {
 
             return false;

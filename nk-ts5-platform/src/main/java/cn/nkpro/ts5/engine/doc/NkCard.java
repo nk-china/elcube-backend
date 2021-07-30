@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.engine.doc;
 
-import cn.nkpro.ts5.engine.co.NKCustomObject;
+import cn.nkpro.ts5.engine.co.NkCustomObject;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocDefIV;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 
-public interface NKCard<DT,DDT> extends NKCustomObject{
+public interface NkCard<DT,DDT> extends NkCustomObject {
 
     String POSITION_DEFAULT = "default";
     String POSITION_HEADER  = "header";

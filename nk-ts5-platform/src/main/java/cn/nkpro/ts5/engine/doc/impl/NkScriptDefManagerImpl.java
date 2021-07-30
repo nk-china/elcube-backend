@@ -5,16 +5,15 @@ import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.config.mybatis.pagination.PaginationContext;
 import cn.nkpro.ts5.config.redis.RedisSupport;
 import cn.nkpro.ts5.engine.co.DebugContextManager;
-import cn.nkpro.ts5.engine.co.NKCustomObject;
+import cn.nkpro.ts5.engine.co.NkCustomObject;
 import cn.nkpro.ts5.engine.co.NKCustomObjectManager;
-import cn.nkpro.ts5.engine.co.NKCustomScriptObject;
+import cn.nkpro.ts5.engine.co.NkCustomScriptObject;
 import cn.nkpro.ts5.engine.doc.model.ScriptDefHV;
-import cn.nkpro.ts5.engine.doc.service.NKScriptDefManager;
+import cn.nkpro.ts5.engine.doc.service.NkScriptDefManager;
 import cn.nkpro.ts5.exception.TfmsException;
 import cn.nkpro.ts5.orm.mb.gen.*;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
-import cn.nkpro.ts5.utils.VersioningUtils;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -34,7 +33,7 @@ import java.util.UUID;
  */
 @Slf4j
 @Service
-public class NKScriptDefManagerImpl implements NKScriptDefManager {
+public class NkScriptDefManagerImpl implements NkScriptDefManager {
 
 
     @Autowired
@@ -109,10 +108,10 @@ public class NKScriptDefManagerImpl implements NKScriptDefManager {
     @Override
     public ScriptDefH getScript(String scriptName,String version) {
 
-        NKCustomObject customObject = customObjectManager.getCustomObjectIfExists(scriptName, NKCustomObject.class);
-        if(customObject instanceof NKCustomScriptObject){
-            if(StringUtils.equalsAny(version, ((NKCustomScriptObject) customObject).getScriptDef().getVersion())){
-                return ((NKCustomScriptObject) customObject).getScriptDef();
+        NkCustomObject customObject = customObjectManager.getCustomObjectIfExists(scriptName, NkCustomObject.class);
+        if(customObject instanceof NkCustomScriptObject){
+            if(StringUtils.equalsAny(version, ((NkCustomScriptObject) customObject).getScriptDef().getVersion())){
+                return ((NkCustomScriptObject) customObject).getScriptDef();
             }
         }
 

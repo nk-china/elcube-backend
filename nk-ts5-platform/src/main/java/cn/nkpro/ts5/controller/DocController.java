@@ -1,9 +1,9 @@
 package cn.nkpro.ts5.controller;
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
-import cn.nkpro.ts5.engine.doc.NKDocIndexService;
+import cn.nkpro.ts5.engine.doc.NkDocIndexService;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
-import cn.nkpro.ts5.engine.doc.service.NKDocDefService;
+import cn.nkpro.ts5.engine.doc.service.NkDocDefService;
 import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService;
 import cn.nkpro.ts5.engine.elasticearch.ESPageList;
 import cn.nkpro.ts5.engine.elasticearch.model.DocHES;
@@ -30,12 +30,12 @@ import java.util.List;
 public class DocController {
 
     @Autowired@SuppressWarnings("all")
-    private NKDocDefService docDefService;
+    private NkDocDefService docDefService;
 
     @Autowired@SuppressWarnings("all")
     private NkDocEngineFrontService docEngine;
     @Autowired@SuppressWarnings("all")
-    private NKDocIndexService docService;
+    private NkDocIndexService docService;
 //    @Autowired
 //    private TfmsDocEngineWithPerm docEngineWithPerm;
 //    @Autowired

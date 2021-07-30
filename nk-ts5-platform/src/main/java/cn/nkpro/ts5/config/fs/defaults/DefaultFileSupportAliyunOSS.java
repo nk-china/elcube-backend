@@ -2,7 +2,7 @@ package cn.nkpro.ts5.config.fs.defaults;
 
 import cn.nkpro.ts5.config.fs.FSConfig;
 import cn.nkpro.ts5.config.fs.properties.AliyunProperties;
-import cn.nkpro.ts5.config.global.NKProperties;
+import cn.nkpro.ts5.config.global.NkProperties;
 import cn.nkpro.ts5.exception.TfmsIllegalContentException;
 import cn.nkpro.ts5.config.fs.FSSupport;
 import cn.nkpro.ts5.config.fs.FileUploadStatus;
@@ -28,7 +28,7 @@ public class DefaultFileSupportAliyunOSS implements FSSupport<Map<String, Object
     private Format format = new SimpleDateFormat("yyyyMMdd/HHmmss/");
 
     @Autowired
-    private NKProperties tfmsProperties;
+    private NkProperties tfmsProperties;
     @Autowired
     private AliyunProperties aliyunProperties;
 

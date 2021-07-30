@@ -5,14 +5,14 @@ import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.config.mybatis.pagination.PaginationContext;
 import cn.nkpro.ts5.config.redis.RedisSupport;
 import cn.nkpro.ts5.engine.co.DebugContextManager;
-import cn.nkpro.ts5.engine.co.NKCustomObject;
+import cn.nkpro.ts5.engine.co.NkCustomObject;
 import cn.nkpro.ts5.engine.co.NKCustomObjectManager;
-import cn.nkpro.ts5.engine.doc.NKCard;
-import cn.nkpro.ts5.engine.doc.NKDocProcessor;
-import cn.nkpro.ts5.engine.doc.NKDocStateInterceptor;
+import cn.nkpro.ts5.engine.doc.NkCard;
+import cn.nkpro.ts5.engine.doc.NkDocProcessor;
+import cn.nkpro.ts5.engine.doc.NkDocStateInterceptor;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocDefIV;
-import cn.nkpro.ts5.engine.doc.service.NKDocDefService;
+import cn.nkpro.ts5.engine.doc.service.NkDocDefService;
 import cn.nkpro.ts5.exception.TfmsException;
 import cn.nkpro.ts5.orm.mb.gen.*;
 import cn.nkpro.ts5.utils.BeanUtilz;
@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
-public class NKDocDefServiceImpl implements NKDocDefService {
+public class NkDocDefServiceImpl implements NkDocDefService {
 
     @Autowired@SuppressWarnings("all")
     private RedisSupport<DocDefHV> redisSupport;
@@ -96,19 +96,19 @@ public class NKDocDefServiceImpl implements NKDocDefService {
 
     @Override
     public Map<String, Object> options(String classify){
-        Predicate<Map.Entry<String,? extends NKCustomObject>> predicate = StringUtils.isBlank(classify)?null:
-                (e)->StringUtils.equals(((NKDocProcessor)(e.getValue())).classify().name(),classify);
+        Predicate<Map.Entry<String,? extends NkCustomObject>> predicate = StringUtils.isBlank(classify)?null:
+                (e)->StringUtils.equals(((NkDocProcessor)(e.getValue())).classify().name(),classify);
         Map<String,Object> options = new HashMap<>();
-        options.put("docProcessors",        customObjectManager.getCustomObjectDescriptionList(NKDocProcessor.class,false,predicate));
-        options.put("docStateInterceptors", customObjectManager.getCustomObjectDescriptionList(NKDocStateInterceptor.class,true,null));
-        options.put("cards",                customObjectManager.getCustomObjectDescriptionList(NKCard.class,false,null));
+        options.put("docProcessors",        customObjectManager.getCustomObjectDescriptionList(NkDocProcessor.class,false,predicate));
+        options.put("docStateInterceptors", customObjectManager.getCustomObjectDescriptionList(NkDocStateInterceptor.class,true,null));
+        options.put("cards",                customObjectManager.getCustomObjectDescriptionList(NkCard.class,false,null));
         return options;
     }
 
     @Override
     public DocDefIV getCardDescribe(String cardHandlerName){
 
-        NKCard nkCard = customObjectManager.getCustomObject(cardHandlerName, NKCard.class);
+        NkCard nkCard = customObjectManager.getCustomObject(cardHandlerName, NkCard.class);
 
         DocDefIV describe = new DocDefIV();
         describe.setBeanName(nkCard.getBeanName());
@@ -159,7 +159,7 @@ public class NKDocDefServiceImpl implements NKDocDefService {
 
         // 数据有效性检查
         DocDefH lastUpdatedVersion  = getLastUpdatedVersion(docDefHV.getDocType());
-        NKDocProcessor docProcessor = customObjectManager.getCustomObject(docDefHV.getRefObjectType(), NKDocProcessor.class);
+        NkDocProcessor docProcessor = customObjectManager.getCustomObject(docDefHV.getRefObjectType(), NkDocProcessor.class);
 
         if(lastUpdatedVersion!=null){
             Assert.isTrue(StringUtils.equals(lastUpdatedVersion.getDocClassify(),docProcessor.classify().name()),"对象扩展分类不一致");
@@ -462,7 +462,7 @@ public class NKDocDefServiceImpl implements NKDocDefService {
      */
     private void validateDef(DocDefHV docDefHV){
 
-        customObjectManager.getCustomObject(docDefHV.getRefObjectType(),NKCustomObject.class);
+        customObjectManager.getCustomObject(docDefHV.getRefObjectType(), NkCustomObject.class);
 
         runLoopCards(docDefHV,false,(card, docDefIV)->{
 
@@ -473,7 +473,7 @@ public class NKDocDefServiceImpl implements NKDocDefService {
     public void runLoopCards(DocDefHV docDefHV, boolean ignoreError, Function function){
         for(DocDefIV docDefI : docDefHV.getCards()){
             // 找到对应的组件实现类
-            NKCard nkCard = customObjectManager.getCustomObjectIfExists(docDefI.getCardKey(), NKCard.class);
+            NkCard nkCard = customObjectManager.getCustomObjectIfExists(docDefI.getCardKey(), NkCard.class);
             if(nkCard==null && !ignoreError){
                 throw new TfmsException(String.format("自定义对象[%s]不存在",docDefI.getBeanName()));
             }

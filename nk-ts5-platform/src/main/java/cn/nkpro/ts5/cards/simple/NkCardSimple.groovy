@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.cards.simple
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote
-import cn.nkpro.ts5.engine.doc.NKAbstractCard
+import cn.nkpro.ts5.engine.doc.NkAbstractCard
 import cn.nkpro.ts5.engine.doc.model.DocDefHV
 import cn.nkpro.ts5.engine.doc.model.DocDefIV
 import cn.nkpro.ts5.engine.doc.model.DocHV
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component
 
 @WsDocNote("测试")
 @Component("NkCardSimple")
-class NkCardSimple extends NKAbstractCard<NkCardSimpleData,NkCardSimpleDef> {
+class NkCardSimple extends NkAbstractCard<NkCardSimpleData,NkCardSimpleDef> {
 
     @Autowired
     NkDocEngineFrontService docEngineFrontService;

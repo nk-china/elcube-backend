@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.engine.doc;
 
-import cn.nkpro.ts5.config.global.NKProperties;
+import cn.nkpro.ts5.config.global.NkProperties;
 import cn.nkpro.ts5.utils.ResourceUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -17,7 +17,7 @@ public class ClasspathResourceLoader {
 
     @Autowired
     @SuppressWarnings("all")
-    private NKProperties properties;
+    private NkProperties properties;
 
     private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 

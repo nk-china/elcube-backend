@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.config.redis;
 
-import cn.nkpro.ts5.config.global.NKProperties;
+import cn.nkpro.ts5.config.global.NkProperties;
 import cn.nkpro.ts5.config.redis.defaults.DefaultRedisSupportImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -11,12 +11,12 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 
 @Configuration
 @EnableConfigurationProperties({
-        NKProperties.class,
+        NkProperties.class,
 })
 public class RedisConfiguration {
 
     @Autowired
-    private NKProperties nkProperties;
+    private NkProperties nkProperties;
 
     /**
      * retemplate相关配置

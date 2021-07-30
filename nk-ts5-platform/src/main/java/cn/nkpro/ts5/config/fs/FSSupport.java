@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.config.fs;
 
-import cn.nkpro.ts5.config.global.NKProperties;
+import cn.nkpro.ts5.config.global.NkProperties;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface FSSupport<T> {
 
-    default String defaultPath(String rootPath, NKProperties tfmsProperties){
+    default String defaultPath(String rootPath, NkProperties tfmsProperties){
         String path = rootPath + tfmsProperties.getEnvKey();
         path += path.endsWith("/")?(".nk_temp/"):("/.nk_temp/");
         path += UUID.randomUUID().toString()+'/';

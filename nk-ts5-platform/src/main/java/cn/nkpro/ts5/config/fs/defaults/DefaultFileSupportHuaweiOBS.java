@@ -4,7 +4,7 @@ import cn.nkpro.ts5.config.fs.FSConfig;
 import cn.nkpro.ts5.exception.TfmsIllegalContentException;
 import cn.nkpro.ts5.config.fs.FSSupport;
 import cn.nkpro.ts5.config.fs.properties.HuaweiProperties;
-import cn.nkpro.ts5.config.global.NKProperties;
+import cn.nkpro.ts5.config.global.NkProperties;
 import cn.nkpro.ts5.config.fs.FileUploadStatus;
 import com.obs.services.ObsClient;
 import com.obs.services.ObsConfiguration;
@@ -30,7 +30,7 @@ public class DefaultFileSupportHuaweiOBS implements FSSupport<Map<String, Object
 
 
     @Autowired
-    private NKProperties tfmsProperties;
+    private NkProperties tfmsProperties;
     @Autowired
     private HuaweiProperties huawei;
 

@@ -17,12 +17,12 @@ import java.lang.reflect.InvocationTargetException;
  */
 @Configuration
 @AutoConfigureBefore(MybatisAutoConfiguration.class)
-@EnableConfigurationProperties(NKMybatisProperties.class)
+@EnableConfigurationProperties(NkMybatisProperties.class)
 @Qualifier("MyBatisConfiguration")
-public class NKMyBatisConfiguration {
+public class NkMyBatisConfiguration {
 
     @Autowired
-    private NKMybatisProperties properties;
+    private NkMybatisProperties properties;
 
     @Bean
     public PaginationInterceptor paginationInterceptor(){

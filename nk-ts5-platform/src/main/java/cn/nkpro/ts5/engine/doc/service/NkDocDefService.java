@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.engine.doc.service;
 
 import cn.nkpro.ts5.basic.PageList;
-import cn.nkpro.ts5.engine.doc.NKCard;
+import cn.nkpro.ts5.engine.doc.NkCard;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocDefIV;
 import cn.nkpro.ts5.orm.mb.gen.DocDefH;
@@ -9,7 +9,7 @@ import cn.nkpro.ts5.orm.mb.gen.DocDefH;
 import java.util.List;
 import java.util.Map;
 
-public interface NKDocDefService {
+public interface NkDocDefService {
 
     PageList<DocDefH> getPage(String docClassify,
                               String docType,
@@ -48,6 +48,6 @@ public interface NKDocDefService {
 
     @FunctionalInterface
     interface Function {
-        void run(NKCard card, DocDefIV docDefIV) throws Exception;
+        void run(NkCard card, DocDefIV docDefIV) throws Exception;
     }
 }

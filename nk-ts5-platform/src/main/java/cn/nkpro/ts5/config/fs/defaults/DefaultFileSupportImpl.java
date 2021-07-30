@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.config.fs.defaults;
 
 import cn.nkpro.ts5.config.fs.FSConfig;
-import cn.nkpro.ts5.config.global.NKProperties;
+import cn.nkpro.ts5.config.global.NkProperties;
 import cn.nkpro.ts5.engine.web.UserAccountService;
 import cn.nkpro.ts5.config.fs.FSSupport;
 import cn.nkpro.ts5.config.fs.FileUploadStatus;
@@ -26,7 +26,7 @@ public class DefaultFileSupportImpl implements FSSupport<Map<String, Object>> {
     private Format format = new SimpleDateFormat(String.format("yyyyMMdd%sHHmmss", File.separator));
 
     @Autowired
-    private NKProperties properties;
+    private NkProperties properties;
 
     @Autowired
     private UserAccountService accountService;

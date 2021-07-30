@@ -8,6 +8,6 @@ import java.util.Map;
 
 @Data
 @ConfigurationProperties(prefix = "mybatis")
-public class NKMybatisProperties {
+public class NkMybatisProperties {
     private String dialect = "cn.nkpro.ts5.config.mybatis.pagination.dialect.MySQLDialect";
 }

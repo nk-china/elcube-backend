@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.controller;
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
-import cn.nkpro.ts5.config.global.NKProperties;
+import cn.nkpro.ts5.config.global.NkProperties;
 import cn.nkpro.ts5.engine.web.UserQueryService;
 import cn.nkpro.ts5.engine.web.WebMenuService;
 import cn.nkpro.ts5.engine.web.model.WebMenuBO;
@@ -23,7 +23,7 @@ import java.util.List;
 public class WebAppController {
 
     @Autowired@SuppressWarnings("all")
-    private NKProperties properties;
+    private NkProperties properties;
 
     @Autowired@SuppressWarnings("all")
     private WebMenuService tfmsSysWebappMenuService;

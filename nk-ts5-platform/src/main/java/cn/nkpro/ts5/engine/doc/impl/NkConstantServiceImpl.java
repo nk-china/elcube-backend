@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.engine.doc.impl;
 
 import cn.nkpro.ts5.basic.Constants;
-import cn.nkpro.ts5.engine.doc.service.NKConstantService;
+import cn.nkpro.ts5.engine.doc.service.NkConstantService;
 import cn.nkpro.ts5.orm.mb.gen.ConstantDef;
 import cn.nkpro.ts5.orm.mb.gen.ConstantDefExample;
 import cn.nkpro.ts5.orm.mb.gen.ConstantDefMapper;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 
 @Service
-public class NKConstantServiceImpl implements NKConstantService {
+public class NkConstantServiceImpl implements NkConstantService {
 
     @Autowired
     private ConstantDefMapper constantMapper;

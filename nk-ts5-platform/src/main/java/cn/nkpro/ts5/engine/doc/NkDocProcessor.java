@@ -1,11 +1,11 @@
 package cn.nkpro.ts5.engine.doc;
 
-import cn.nkpro.ts5.engine.co.NKCustomObject;
+import cn.nkpro.ts5.engine.co.NkCustomObject;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocHD;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 
-public interface NKDocProcessor extends NKCustomObject {
+public interface NkDocProcessor extends NkCustomObject {
 
     enum EnumDocClassify {
         PARTNER,

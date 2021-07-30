@@ -23,7 +23,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 @Component
-public class NKDocIndexService {
+public class NkDocIndexService {
 
     @Autowired
     private SearchEngine searchEngine;
