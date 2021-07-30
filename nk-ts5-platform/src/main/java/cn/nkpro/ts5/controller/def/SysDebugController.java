@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.controller.def;
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
-import cn.nkpro.ts5.engine.devops.DebugSupport;
+import cn.nkpro.ts5.engine.co.DebugContextManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -19,23 +19,23 @@ import java.util.Collection;
 public class SysDebugController {
 
     @Autowired
-    private DebugSupport debugSupport;
+    private DebugContextManager debugSupport;
 
     @WsDocNote("1.获取正在调试的上下文列表")
     @RequestMapping("/contexts")
-    public Collection<DebugSupport.DebugContext> list(){
+    public Collection<DebugContextManager.ContextDescribe> list(){
         return debugSupport.getDebugContextList();
     }
 
     @WsDocNote("2.停止一个调试")
     @RequestMapping("/stop/{debugId}")
     public void stop(@PathVariable String debugId){
-        debugSupport.stopDebugContext(debugId);
+        debugSupport.removeContext(debugId);
     }
 
     @WsDocNote("3.创建一个调试")
     @RequestMapping("/start")
     public String start(@RequestParam String desc){
-        return debugSupport.startDebugContext(desc);
+        return debugSupport.createContext(desc);
     }
 }

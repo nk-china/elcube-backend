@@ -1,9 +1,12 @@
-package cn.nkpro.ts5.engine.script;
+package cn.nkpro.ts5.engine.doc.service;
 
 
 import cn.nkpro.ts5.basic.PageList;
+import cn.nkpro.ts5.engine.doc.model.ScriptDefHV;
 import cn.nkpro.ts5.orm.mb.gen.ScriptDefH;
 import cn.nkpro.ts5.orm.mb.gen.ScriptDefHWithBLOBs;
+import org.springframework.context.ApplicationListener;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -11,7 +14,7 @@ import java.util.List;
 /**
  * Created by bean on 2020/7/17.
  */
-public interface ScriptDefManager {
+public interface NKScriptDefManager extends ApplicationListener<ContextRefreshedEvent> {
 
     PageList<ScriptDefH> getPage(String keyword,
                                  String version,
@@ -28,10 +31,13 @@ public interface ScriptDefManager {
     ScriptDefH getScript(String scriptName, String version);
 
     @Transactional
-    ScriptDefH doEdit(ScriptDefHWithBLOBs scriptDefH);
+    ScriptDefH doRun(ScriptDefHV scriptDefH);
 
     @Transactional
-    ScriptDefH doUpdate(ScriptDefHWithBLOBs scriptDefH, boolean force);
+    ScriptDefH doEdit(ScriptDefHV scriptDefH);
+
+    @Transactional
+    ScriptDefH doUpdate(ScriptDefHV scriptDefH, boolean force);
 //
 //    @Transactional
 //    DefScript update(DefScript script);

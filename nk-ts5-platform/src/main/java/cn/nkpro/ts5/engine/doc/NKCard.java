@@ -1,13 +1,16 @@
 package cn.nkpro.ts5.engine.doc;
 
 import cn.nkpro.ts5.engine.co.NKCustomObject;
+import cn.nkpro.ts5.engine.co.NKCustomScriptObject;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocDefIV;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
+import cn.nkpro.ts5.orm.mb.gen.ScriptDefH;
+import cn.nkpro.ts5.orm.mb.gen.ScriptDefHWithBLOBs;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-public interface NKCard<DT,DDT> extends NKCustomObject {
+public interface NKCard<DT,DDT> extends NKCustomScriptObject {
 
     String POSITION_DEFAULT = "default";
     String POSITION_HEADER  = "header";

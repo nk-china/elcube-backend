@@ -1,31 +1,50 @@
-package cn.nkpro.ts5.engine.script;
+package cn.nkpro.ts5.engine.doc.impl;
 
 import cn.nkpro.ts5.basic.Constants;
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.config.mybatis.pagination.PaginationContext;
 import cn.nkpro.ts5.config.redis.RedisSupport;
+import cn.nkpro.ts5.engine.co.DebugContextManager;
+import cn.nkpro.ts5.engine.co.NKCustomObject;
+import cn.nkpro.ts5.engine.co.NKCustomObjectManager;
+import cn.nkpro.ts5.engine.co.NKCustomScriptObject;
+import cn.nkpro.ts5.engine.doc.model.ScriptDefHV;
+import cn.nkpro.ts5.engine.doc.service.NKScriptDefManager;
+import cn.nkpro.ts5.exception.TfmsException;
 import cn.nkpro.ts5.orm.mb.gen.*;
+import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
 import cn.nkpro.ts5.utils.VersioningUtils;
+import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.Assert;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by bean on 2020/7/17.
  */
+@Slf4j
 @Service
-public class ScriptDefManagerImpl implements ScriptDefManager {
+public class NKScriptDefManagerImpl implements NKScriptDefManager {
 
 
     @Autowired
     private RedisSupport<List<ScriptDefHWithBLOBs>> redisSupport;
     @Autowired
     private ScriptDefHMapper scriptDefHMapper;
+    @Autowired
+    private NKCustomObjectManager customObjectManager;
+    @Autowired
+    private DebugContextManager debugContextManager;
 
     @Override
     public PageList<ScriptDefH> getPage(String keyword,
@@ -90,16 +109,37 @@ public class ScriptDefManagerImpl implements ScriptDefManager {
     @Override
     public ScriptDefH getScript(String scriptName,String version) {
 
+        NKCustomObject customObject = customObjectManager.getCustomObjectIfExists(scriptName, NKCustomObject.class);
+        if(customObject instanceof NKCustomScriptObject){
+            if(StringUtils.equalsAny(version, ((NKCustomScriptObject) customObject).getScriptDef().getVersion())){
+                return ((NKCustomScriptObject) customObject).getScriptDef();
+            }
+        }
+
         ScriptDefHKey key = new ScriptDefHKey();
         key.setScriptName(scriptName);
         key.setVersion(version);
 
-        return scriptDefHMapper.selectByPrimaryKey(key);
+        return Optional
+                .ofNullable(scriptDefHMapper.selectByPrimaryKey(key))
+                .orElseThrow(()->new TfmsException("配置没有找到"));
     }
 
     @Override
     @Transactional
-    public ScriptDefH doEdit(ScriptDefHWithBLOBs scriptDefH){
+    public ScriptDefH doRun(ScriptDefHV scriptDefH){
+
+        Assert.isTrue(!StringUtils.equals(scriptDefH.getVersion(),"@"),"IDE版本不能调试");
+        Assert.isTrue(!StringUtils.equals(scriptDefH.getState(),"Active"),"已激活的版本不能调试");
+
+        doUpdate(scriptDefH,false);
+        debugContextManager.addDebugResource("$"+scriptDefH.getScriptName(),scriptDefH);
+        return scriptDefH;
+    }
+
+    @Override
+    @Transactional
+    public ScriptDefH doEdit(ScriptDefHV scriptDefH){
         if(StringUtils.equals(scriptDefH.getState(),"Active")){
             ScriptDefH lastUpdatedVersion = getLastUpdatedVersion(scriptDefH.getScriptName(), VersioningUtils.parseMinor(scriptDefH.getVersion()));
             // 增加Patch
@@ -113,7 +153,7 @@ public class ScriptDefManagerImpl implements ScriptDefManager {
 
     @Override
     @Transactional
-    public ScriptDefH doUpdate(ScriptDefHWithBLOBs scriptDefH, boolean force){
+    public ScriptDefH doUpdate(ScriptDefHV scriptDefH, boolean force){
 
         scriptDefH.setState(StringUtils.defaultIfBlank(scriptDefH.getState(),"InActive"));
         scriptDefH.setUpdatedTime(DateTimeUtilz.nowSeconds());
@@ -252,4 +292,19 @@ public class ScriptDefManagerImpl implements ScriptDefManager {
 //            ((JSONArray)data).toJavaList(DefScript.class)
 //                .forEach(this::update);
 //    }
+
+    @SneakyThrows
+    @Override
+    public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
+        ApplicationContext applicationContext = debugContextManager.getApplicationContext();
+        if(contextRefreshedEvent.getApplicationContext()== applicationContext){
+            getActiveResources().forEach((scriptDef)-> {
+                try {
+                    debugContextManager.registerScriptObject(BeanUtilz.copyFromObject(scriptDef,ScriptDefHV.class),applicationContext);
+                }catch (RuntimeException e){
+                    log.error(e.getMessage(),e);
+                }
+            });
+        }
+    }
 }

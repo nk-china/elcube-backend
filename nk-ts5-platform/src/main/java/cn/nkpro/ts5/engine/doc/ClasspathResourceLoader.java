@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.engine.script;
+package cn.nkpro.ts5.engine.doc;
 
 import cn.nkpro.ts5.config.global.NKProperties;
 import cn.nkpro.ts5.utils.ResourceUtils;
@@ -41,7 +41,7 @@ public class ClasspathResourceLoader {
                 ));
     }
 
-    List<String> findResource(String resourceName){
+    public List<String> findResource(String resourceName){
         try {
             for (String path : properties.getVueBasePackages()) {
                 Resource[] resources = resourcePatternResolver.getResources(String.format("classpath*:/%s/**/%s", packageToPath(path), resourceName));

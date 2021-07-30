@@ -5,12 +5,17 @@ import cn.nkpro.ts5.engine.doc.NKAbstractCard
 import cn.nkpro.ts5.engine.doc.model.DocDefHV
 import cn.nkpro.ts5.engine.doc.model.DocDefIV
 import cn.nkpro.ts5.engine.doc.model.DocHV
+import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService
 import com.alibaba.fastjson.JSON
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 @WsDocNote("测试")
 @Component("NkCardSimple")
 class NkCardSimple extends NKAbstractCard<NkCardSimpleData,NkCardSimpleDef> {
+
+    @Autowired
+    NkDocEngineFrontService docEngineFrontService;
 
     @Override
     String[] getDefComponentNames() {

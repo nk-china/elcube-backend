@@ -2,9 +2,8 @@ package cn.nkpro.ts5.controller.def;
 
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
-import cn.nkpro.ts5.engine.script.GroovyManager;
-import cn.nkpro.ts5.engine.script.NKScriptEngine;
-import cn.nkpro.ts5.engine.script.ScriptDefManager;
+import cn.nkpro.ts5.engine.doc.model.ScriptDefHV;
+import cn.nkpro.ts5.engine.doc.service.NKScriptDefManager;
 import cn.nkpro.ts5.orm.mb.gen.ScriptDefH;
 import cn.nkpro.ts5.orm.mb.gen.ScriptDefHWithBLOBs;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,12 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class SysScriptDefController {
 
     @Autowired@SuppressWarnings("all")
-    private NKScriptEngine scriptEngine;
-    @Autowired@SuppressWarnings("all")
-    private GroovyManager groovyManager;
-
-    @Autowired@SuppressWarnings("all")
-    private ScriptDefManager scriptService;
+    private NKScriptDefManager scriptService;
 
     @WsDocNote("1、获取脚本列表")
     @RequestMapping("/page")
@@ -51,28 +45,28 @@ public class SysScriptDefController {
     @WsDocNote("2、通过脚本ID获取脚本")
     @RequestMapping("/detail/{script}/{version}")
     public ScriptDefH detail(@PathVariable("script") String scriptName, @PathVariable String version){
-        return scriptEngine.getRuntimeScript(scriptName,version);
+        return scriptService.getScript(scriptName,version);
     }
 
     @WsDocNote("4.预处理编辑")
     @RequestMapping("/edit")
     public ScriptDefH edit(
-            @WsDocNote("脚本对象")@RequestBody ScriptDefHWithBLOBs script){
+            @WsDocNote("脚本对象")@RequestBody ScriptDefHV script){
         return scriptService.doEdit(script);
     }
 
     @WsDocNote("5.更新")
     @RequestMapping("/update")
     public ScriptDefH update(
-            @WsDocNote("脚本对象")@RequestBody ScriptDefHWithBLOBs script){
+            @WsDocNote("脚本对象")@RequestBody ScriptDefHV script){
         return scriptService.doUpdate(script, false);
     }
 
     @WsDocNote("9.调试")
     @RequestMapping("/debug")
-    public void debug(
-            @WsDocNote("脚本对象")@RequestBody ScriptDefHWithBLOBs script){
-        scriptEngine.setDebugScript(script);
+    public ScriptDefH debug(
+            @WsDocNote("脚本对象")@RequestBody ScriptDefHV script){
+        return scriptService.doRun(script);
     }
 //
 //    @WsDocNote("3、通过脚本名称获取脚本")
@@ -88,10 +82,4 @@ public class SysScriptDefController {
 //    public DefScript update(@RequestBody DefScript script){
 //        return scriptService.update(script);
 //    }
-
-    @WsDocNote("5.获取脚本的Groovy类名")
-    @RequestMapping("/class/{beanName}")
-    public NKScriptEngine.BeanDescribe className(@PathVariable("beanName") String beanName){
-        return scriptEngine.getBeanDescribe(beanName);
-    }
 }

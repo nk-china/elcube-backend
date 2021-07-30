@@ -1,6 +1,5 @@
 package cn.nkpro.ts5.engine.co;
 
-import cn.nkpro.ts5.engine.devops.DebugSupport;
 import io.jsonwebtoken.lang.Assert;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
@@ -19,11 +18,10 @@ import java.util.stream.Collectors;
 @Component
 public class NKCustomObjectManager implements ApplicationContextAware {
 
-    @Autowired
-    private DebugSupport debugSupport;
-
     private ApplicationContext applicationContext;
 
+    @Autowired@SuppressWarnings("all")
+    private DebugContextManager applicationContextManager;
 
     public <T extends NKCustomObject> Map<String,T> getCustomObjects(Class<T> clazz){
 
@@ -32,10 +30,9 @@ public class NKCustomObjectManager implements ApplicationContextAware {
 
         Map<String,T> beansMap = applicationContext.getBeansOfType(clazz);
 
-        Optional.ofNullable(debugSupport.getDebugApplicationContext())
-                .ifPresent(applicationContext->{
-                    beansMap.putAll(applicationContext.getBeansOfType(clazz));
-                });
+        if(applicationContextManager.getApplicationContext()!=applicationContext){
+            beansMap.putAll(applicationContextManager.getApplicationContext().getBeansOfType(clazz));
+        }
         return beansMap;
     }
 
@@ -56,20 +53,15 @@ public class NKCustomObjectManager implements ApplicationContextAware {
     }
 
     public <T extends NKCustomObject> T getCustomObject(String beanName, Class<T> clazz){
-        Assert.isTrue(getApplicationContext().containsBean(beanName),String.format("自定义对象[%s]不存在或尚未激活",beanName));
-        return getApplicationContext().getBean(beanName,clazz);
+        Assert.isTrue(applicationContextManager.getApplicationContext().containsBean(beanName),String.format("自定义对象[%s]不存在或尚未激活",beanName));
+        return applicationContextManager.getApplicationContext().getBean(beanName,clazz);
     }
 
     public <T extends NKCustomObject> T getCustomObjectIfExists(String beanName, Class<T> clazz){
-        if(StringUtils.isNotBlank(beanName) && getApplicationContext().containsBean(beanName)){
-            return getApplicationContext().getBean(beanName,clazz);
+        if(StringUtils.isNotBlank(beanName) && applicationContextManager.getApplicationContext().containsBean(beanName)){
+            return applicationContextManager.getApplicationContext().getBean(beanName,clazz);
         }
         return null;
-    }
-
-    private ApplicationContext getApplicationContext(){
-        return Optional.ofNullable(debugSupport.getDebugApplicationContext())
-                .orElse(this.applicationContext);
     }
 
     @Override

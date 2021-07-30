@@ -6,7 +6,7 @@ import cn.nkpro.ts5.engine.co.NKCustomObjectManager;
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.config.mybatis.pagination.PaginationContext;
 import cn.nkpro.ts5.config.redis.RedisSupport;
-import cn.nkpro.ts5.engine.devops.DebugSupport;
+import cn.nkpro.ts5.engine.co.DebugContextManager;
 import cn.nkpro.ts5.engine.doc.NKCard;
 import cn.nkpro.ts5.engine.doc.NKDocProcessor;
 import cn.nkpro.ts5.engine.doc.NKDocStateInterceptor;
@@ -42,7 +42,7 @@ public class NKDocDefServiceImpl implements NKDocDefService {
     @Autowired@SuppressWarnings("all")
     private RedisSupport<DocDefHV> redisSupport;
     @Autowired@SuppressWarnings("all")
-    private DebugSupport debugSupport;
+    private DebugContextManager debugContextManager;
     @Autowired@SuppressWarnings("all")
     private NKCustomObjectManager customObjectManager;
 
@@ -375,7 +375,7 @@ public class NKDocDefServiceImpl implements NKDocDefService {
 
         validateDef(docDefHV);
 
-        debugSupport.setDebugResource(String.format("@%s-%s",
+        debugContextManager.addDebugResource(String.format("@%s-%s",
                 docDefHV.getDocType(),
                 VersioningUtils.parseMajor(docDefHV.getVersion())
         ),docDefHV);
@@ -390,10 +390,9 @@ public class NKDocDefServiceImpl implements NKDocDefService {
     public DocDefHV getRuntimeDocDef(String docType, Integer major){
 
         // 判断当前请求是否debug，如果是，先尝试从debug环境中获取配置
-        Optional<DocDefHV> debugObject = debugSupport.getDebugObjectWithLocalThread(String.format("@%s-%s", docType, major));
+        DocDefHV defHV = debugContextManager.getDebugResources(String.format("@%s-%s", docType, major));
 
-        DocDefHV defHV = debugObject.orElseGet(()->{
-
+        if(defHV==null){
             String version;
 
             String today = DateTimeUtilz.todayShortString();
@@ -435,8 +434,8 @@ public class NKDocDefServiceImpl implements NKDocDefService {
                 version = first.get().getVersion();
             }
 
-            return fetchDocDef(docType,version, false,false);
-        });
+            defHV = fetchDocDef(docType,version, false,false);
+        }
 
         return Optional.ofNullable(defHV)
                 .stream()
