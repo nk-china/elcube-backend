@@ -8,20 +8,15 @@ import cn.nkpro.ts5.engine.doc.model.DocDefIV;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.engine.doc.model.ScriptDefHV;
 import cn.nkpro.ts5.exception.TfmsException;
-import cn.nkpro.ts5.orm.mb.gen.ScriptDefHWithBLOBs;
-import cn.nkpro.ts5.utils.ClassUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -61,7 +56,7 @@ public abstract class NKAbstractCard<DT,DDT> extends NKCustomScriptObject implem
     @Override
     public final String[] getAutoDefComponentNames() {
 
-        ScriptDefHV scriptDef = properties.isVueIdeFirst() ?
+        ScriptDefHV scriptDef = properties.isComponentReloadClassPath() ?
                 super.loadScriptFromClassPath(this.beanName) :
                 this.scriptDef ;
 
@@ -80,7 +75,7 @@ public abstract class NKAbstractCard<DT,DDT> extends NKCustomScriptObject implem
     @Override
     public Map<String,String> getVueTemplate(){
 
-        ScriptDefHV scriptDef = properties.isVueIdeFirst() ?
+        ScriptDefHV scriptDef = properties.isComponentReloadClassPath() ?
                 super.loadScriptFromClassPath(this.beanName) :
                 this.scriptDef ;
 

@@ -25,7 +25,7 @@ public class ClasspathResourceLoader {
 
         List<Resource> resources = new ArrayList<>();
 
-        Arrays.stream(properties.getVueBasePackages())
+        Arrays.stream(properties.getComponentBasePackages())
                 .forEach(path->{
                     try {
                         path = path.replaceAll("[.]","/");
@@ -43,7 +43,7 @@ public class ClasspathResourceLoader {
 
     public List<String> findResource(String resourceName){
         try {
-            for (String path : properties.getVueBasePackages()) {
+            for (String path : properties.getComponentBasePackages()) {
                 Resource[] resources = resourcePatternResolver.getResources(String.format("classpath*:/%s/**/%s", packageToPath(path), resourceName));
 
                 return Arrays.stream(resources)
