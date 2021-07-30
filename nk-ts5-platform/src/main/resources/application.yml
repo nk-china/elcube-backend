@@ -77,7 +77,7 @@ spring:
     enabled: false
     change-log: classpath:nk/liquibase/master.xml
     database-change-log-table: SYS_DATABASECHANGEDLOG
-    database-change-log-lock-table: SYS_DATABASECHANGEDLOG_LOK
+    database-change-log-lock-table: SYS_DATABASECHANGEDLOGLOCK
     drop-first: true
   devtools:
     restart:
