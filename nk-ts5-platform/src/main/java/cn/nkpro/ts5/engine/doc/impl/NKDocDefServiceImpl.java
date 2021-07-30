@@ -111,7 +111,7 @@ public class NKDocDefServiceImpl implements NKDocDefService {
         NKCard nkCard = customObjectManager.getCustomObject(cardHandlerName, NKCard.class);
 
         DocDefIV describe = new DocDefIV();
-        describe.setCardHandler(nkCard.getCardHandler());
+        describe.setBeanName(nkCard.getBeanName());
         describe.setCardName(nkCard.getCardName());
         describe.setDataComponentName(nkCard.getDataComponentName());
         describe.setDefComponentNames(nkCard.getDefComponentNames());
@@ -475,7 +475,7 @@ public class NKDocDefServiceImpl implements NKDocDefService {
             // 找到对应的组件实现类
             NKCard nkCard = customObjectManager.getCustomObjectIfExists(docDefI.getCardKey(), NKCard.class);
             if(nkCard==null && !ignoreError){
-                throw new TfmsException(String.format("自定义对象[%s]不存在",docDefI.getCardHandler()));
+                throw new TfmsException(String.format("自定义对象[%s]不存在",docDefI.getBeanName()));
             }
             try {
                 function.run(nkCard, docDefI);

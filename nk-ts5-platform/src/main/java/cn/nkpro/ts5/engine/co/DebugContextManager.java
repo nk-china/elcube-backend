@@ -175,7 +175,7 @@ public class DebugContextManager implements ApplicationContextAware {
 
         Class<?> clazz = GroovyUtils.compileGroovy(scriptDef.getScriptName(), scriptDef.getGroovyMain());
 
-        if(!ClassUtils.getAllInterfaces(clazz).contains(NKCustomScriptObject.class)){
+        if(!ClassUtils.getAllSuperclasses(clazz).contains(NKCustomScriptObject.class)){
             throw new RuntimeException("组件处理程序实现[ "+NKCustomScriptObject.class.getSimpleName()+" ]接口");
         }
 

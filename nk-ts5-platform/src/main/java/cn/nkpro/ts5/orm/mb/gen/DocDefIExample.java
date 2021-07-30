@@ -404,73 +404,73 @@ public class DocDefIExample {
             return (Criteria) this;
         }
 
-        public Criteria andCardHandlerIsNull() {
-            addCriterion("CARD_HANDLER is null");
+        public Criteria andBeanNameIsNull() {
+            addCriterion("BEAN_NAME is null");
             return (Criteria) this;
         }
 
-        public Criteria andCardHandlerIsNotNull() {
-            addCriterion("CARD_HANDLER is not null");
+        public Criteria andBeanNameIsNotNull() {
+            addCriterion("BEAN_NAME is not null");
             return (Criteria) this;
         }
 
-        public Criteria andCardHandlerEqualTo(String value) {
-            addCriterion("CARD_HANDLER =", value, "cardHandler");
+        public Criteria andBeanNameEqualTo(String value) {
+            addCriterion("BEAN_NAME =", value, "beanName");
             return (Criteria) this;
         }
 
-        public Criteria andCardHandlerNotEqualTo(String value) {
-            addCriterion("CARD_HANDLER <>", value, "cardHandler");
+        public Criteria andBeanNameNotEqualTo(String value) {
+            addCriterion("BEAN_NAME <>", value, "beanName");
             return (Criteria) this;
         }
 
-        public Criteria andCardHandlerGreaterThan(String value) {
-            addCriterion("CARD_HANDLER >", value, "cardHandler");
+        public Criteria andBeanNameGreaterThan(String value) {
+            addCriterion("BEAN_NAME >", value, "beanName");
             return (Criteria) this;
         }
 
-        public Criteria andCardHandlerGreaterThanOrEqualTo(String value) {
-            addCriterion("CARD_HANDLER >=", value, "cardHandler");
+        public Criteria andBeanNameGreaterThanOrEqualTo(String value) {
+            addCriterion("BEAN_NAME >=", value, "beanName");
             return (Criteria) this;
         }
 
-        public Criteria andCardHandlerLessThan(String value) {
-            addCriterion("CARD_HANDLER <", value, "cardHandler");
+        public Criteria andBeanNameLessThan(String value) {
+            addCriterion("BEAN_NAME <", value, "beanName");
             return (Criteria) this;
         }
 
-        public Criteria andCardHandlerLessThanOrEqualTo(String value) {
-            addCriterion("CARD_HANDLER <=", value, "cardHandler");
+        public Criteria andBeanNameLessThanOrEqualTo(String value) {
+            addCriterion("BEAN_NAME <=", value, "beanName");
             return (Criteria) this;
         }
 
-        public Criteria andCardHandlerLike(String value) {
-            addCriterion("CARD_HANDLER like", value, "cardHandler");
+        public Criteria andBeanNameLike(String value) {
+            addCriterion("BEAN_NAME like", value, "beanName");
             return (Criteria) this;
         }
 
-        public Criteria andCardHandlerNotLike(String value) {
-            addCriterion("CARD_HANDLER not like", value, "cardHandler");
+        public Criteria andBeanNameNotLike(String value) {
+            addCriterion("BEAN_NAME not like", value, "beanName");
             return (Criteria) this;
         }
 
-        public Criteria andCardHandlerIn(List<String> values) {
-            addCriterion("CARD_HANDLER in", values, "cardHandler");
+        public Criteria andBeanNameIn(List<String> values) {
+            addCriterion("BEAN_NAME in", values, "beanName");
             return (Criteria) this;
         }
 
-        public Criteria andCardHandlerNotIn(List<String> values) {
-            addCriterion("CARD_HANDLER not in", values, "cardHandler");
+        public Criteria andBeanNameNotIn(List<String> values) {
+            addCriterion("BEAN_NAME not in", values, "beanName");
             return (Criteria) this;
         }
 
-        public Criteria andCardHandlerBetween(String value1, String value2) {
-            addCriterion("CARD_HANDLER between", value1, value2, "cardHandler");
+        public Criteria andBeanNameBetween(String value1, String value2) {
+            addCriterion("BEAN_NAME between", value1, value2, "beanName");
             return (Criteria) this;
         }
 
-        public Criteria andCardHandlerNotBetween(String value1, String value2) {
-            addCriterion("CARD_HANDLER not between", value1, value2, "cardHandler");
+        public Criteria andBeanNameNotBetween(String value1, String value2) {
+            addCriterion("BEAN_NAME not between", value1, value2, "beanName");
             return (Criteria) this;
         }
 

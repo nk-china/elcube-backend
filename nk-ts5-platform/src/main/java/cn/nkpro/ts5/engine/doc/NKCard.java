@@ -10,17 +10,11 @@ import cn.nkpro.ts5.orm.mb.gen.ScriptDefHWithBLOBs;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-public interface NKCard<DT,DDT> extends NKCustomScriptObject {
+public interface NKCard<DT,DDT> extends NKCustomObject{
 
     String POSITION_DEFAULT = "default";
     String POSITION_HEADER  = "header";
     String POSITION_SIDEBAR = "sidebar";
-
-    /**
-     * 获取组件程序
-     * @return string
-     */
-    String getCardHandler();
 
     /**
      * 获取组件名称

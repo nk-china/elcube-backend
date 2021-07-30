@@ -7,7 +7,7 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DocDefI extends DocDefIKey implements Serializable {
-    private String cardHandler;
+    private String beanName;
 
     private String cardName;
 
@@ -32,12 +32,12 @@ public class DocDefI extends DocDefIKey implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @cn.nkpro.ts5.basic.wsdoc.annotation.CodeFieldNotes("")
-    public String getCardHandler() {
-        return cardHandler;
+    public String getBeanName() {
+        return beanName;
     }
 
-    public void setCardHandler(String cardHandler) {
-        this.cardHandler = cardHandler;
+    public void setBeanName(String beanName) {
+        this.beanName = beanName;
     }
 
     @cn.nkpro.ts5.basic.wsdoc.annotation.CodeFieldNotes("")

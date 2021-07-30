@@ -40,7 +40,7 @@ public class SysScriptResController {
     public Map<String, String> vueTemplates() {
 
         Map<String,String> vueMap = new HashMap<>();
-        customObjectManager.getCustomObjects(NKCard.class)
+        customObjectManager.getCustomObjects(NKCustomScriptObject.class)
                 .values()
                 .forEach(nkCard -> vueMap.putAll(buildCardVueMap(nkCard.getScriptDef())));
         return vueMap;
