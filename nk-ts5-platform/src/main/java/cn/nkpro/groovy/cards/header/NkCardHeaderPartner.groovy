@@ -1,15 +1,15 @@
-package cn.nkpro.ts5.cards.sidebar
+package cn.nkpro.groovy.cards.header
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote
 import cn.nkpro.ts5.engine.doc.abstracts.NkAbstractCard
 import org.springframework.stereotype.Component
 
-@WsDocNote("单据信息")
-@Component("NkCardSidebarDocInfo")
-class NkCardSidebarDocInfo extends NkAbstractCard<Map,Map> {
+@WsDocNote("交易伙伴抬头")
+@Component("NkCardHeaderPartner")
+class NkCardHeaderPartner extends NkAbstractCard<Map,Map> {
 
     @Override
     String getPosition() {
-        return POSITION_SIDEBAR
+        return POSITION_HEADER
     }
 }

@@ -1,12 +1,13 @@
-package cn.nkpro.ts5.cards.header
+package cn.nkpro.groovy.cards.header
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote
 import cn.nkpro.ts5.engine.doc.abstracts.NkAbstractCard
 import org.springframework.stereotype.Component
 
-@WsDocNote("交易伙伴抬头")
-@Component("NkCardHeaderPartner")
-class NkCardHeaderPartner extends NkAbstractCard<Map,Map> {
+
+@WsDocNote("交易抬头")
+@Component("NkCardHeaderDefault")
+class NkCardHeaderDefault extends NkAbstractCard<Map,Map> {
 
     @Override
     String getPosition() {

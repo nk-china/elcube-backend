@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.cards;
+package cn.nkpro.groovy.cards;
 
 import cn.nkpro.ts5.engine.doc.abstracts.NkAbstractCard;
 

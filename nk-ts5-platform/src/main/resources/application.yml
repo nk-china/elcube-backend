@@ -8,7 +8,9 @@ nk:
   password-strategy: ^.*(?=.{6,16})(?=.*\d)(?=.*[A-Z]{1,})(?=.*[a-z]{1,})(?=.*[.!@#$%^&*?\(\)]).*$
   compress:
     enabled: false #开发环境不压缩
-  component-base-packages: cn.nkpro.ts5.cards
+  component-base-packages:
+    - cn.nkpro.ts5.cards
+    - cn.nkpro.groovy
   component-disable-online-editing: false
   component-reload-class-path: true
 #  aliyun:

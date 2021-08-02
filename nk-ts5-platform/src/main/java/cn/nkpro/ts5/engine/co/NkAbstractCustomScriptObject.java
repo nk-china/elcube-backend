@@ -19,6 +19,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -44,31 +45,43 @@ public abstract class NkAbstractCustomScriptObject implements NkCustomScriptObje
     public final void afterPropertiesSet(){
         if(this.scriptDef==null){
             // 从classpath中加载资源
-            this.scriptDef = loadScriptFromClassPath(this.beanName);
+            this.scriptDef = loadScriptFromClassPath();
+        }
+        if(this.scriptDef==null){
+            scriptDef = new ScriptDefHV();
+            scriptDef.setScriptType("Unknown");
+            scriptDef.setScriptName(beanName);
+            scriptDef.setVersion("@");
+            scriptDef.setGroovyMain(null);
+            scriptDef.setVueMain(null);
+            scriptDef.setVueDefs(null);
+            scriptDef.setState("Active");
         }
     }
 
-    protected ScriptDefHV loadScriptFromClassPath(String scriptName) {
+    protected ScriptDefHV loadScriptFromClassPath() {
 
-        List<String> groovyCode = findResource(scriptName + ".groovy");
+        String className = getClass().getSimpleName();
+
+        List<String> groovyCode = findResource(className + ".groovy");
         if (!groovyCode.isEmpty()) {
-            List<String> vueMainCode = findResource(scriptName + ".vue");
-            List<String> vueDefsCode = findResource(scriptName + "Def*.vue");
+            List<String> vueMainCode = findResource(className + ".vue");
+            List<String> vueDefsCode = findResource(className + "Def*.vue");
             ScriptDefHV scriptDefH = new ScriptDefHV();
-            scriptDefH.setScriptName(scriptName);
+            scriptDefH.setScriptName(beanName);
             scriptDefH.setVersion("@");
             scriptDefH.setGroovyMain(groovyCode.stream().findFirst().orElse(null));
             scriptDefH.setVueMain(vueMainCode.stream().findFirst().orElse(null));
             scriptDefH.setVueDefs(JSON.toJSONString(vueDefsCode));
             scriptDefH.setState("Active");
 
-            Class<?> groovy = GroovyUtils.compileGroovy(scriptName, scriptDefH.getGroovyMain());
+            Class<?> groovy = GroovyUtils.compileGroovy(className, scriptDefH.getGroovyMain());
             List interfaces = org.apache.commons.lang.ClassUtils.getAllInterfaces(groovy);
 
             scriptDefH.setScriptType(interfaces.contains(NkCard.class) ? "Card" : "Service");
 
             WsDocNote annotation = groovy.getAnnotation(WsDocNote.class);
-            scriptDefH.setScriptDesc(annotation != null ? annotation.value() : scriptName);
+            scriptDefH.setScriptDesc(annotation != null ? annotation.value() : beanName);
             return scriptDefH;
         }
         return null;
@@ -93,13 +106,13 @@ public abstract class NkAbstractCustomScriptObject implements NkCustomScriptObje
 
     private List<String> findResource(String resourceName){
         try {
+            List<Resource> resources = new ArrayList<>();
             for (String path : properties.getComponentBasePackages()) {
-                Resource[] resources = resourcePatternResolver.getResources(String.format("classpath*:/%s/**/%s", packageToPath(path), resourceName));
-
-                return Arrays.stream(resources)
-                        .map(ResourceUtils::readText)
-                        .collect(Collectors.toList());
+                resources.addAll(Arrays.asList(resourcePatternResolver.getResources(String.format("classpath*:/%s/**/%s", packageToPath(path), resourceName))));
             }
+            return resources.stream()
+                    .map(ResourceUtils::readText)
+                    .collect(Collectors.toList());
         }catch (Exception e){
             e.printStackTrace();
         }
