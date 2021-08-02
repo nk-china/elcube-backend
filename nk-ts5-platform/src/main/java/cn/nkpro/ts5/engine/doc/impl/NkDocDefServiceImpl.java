@@ -441,7 +441,7 @@ public class NkDocDefServiceImpl implements NkDocDefService {
         docTypeFlows.values()
                 .forEach(list->
                         flows.addAll(list.stream()
-                                .filter(item->StringUtils.equals(item.getPreDocType(),docType))
+                                .filter(item->StringUtils.equals(item.getDocType(),docType))
                                 .collect(Collectors.toList()))
                 );
 
