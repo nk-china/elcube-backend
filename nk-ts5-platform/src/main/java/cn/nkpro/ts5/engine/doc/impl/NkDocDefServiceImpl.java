@@ -70,14 +70,20 @@ public class NkDocDefServiceImpl implements NkDocDefService {
         DocDefHExample example = new DocDefHExample();
 
         DocDefHExample.Criteria criteria = example.createCriteria();
-        if(StringUtils.isNotBlank(docClassify))
+        if(StringUtils.isNotBlank(docClassify)){
             criteria.andDocClassifyEqualTo(docClassify);
-        if(StringUtils.isNotBlank(docType))
+        }
+        if(StringUtils.isNotBlank(docType)){
             criteria.andDocTypeEqualTo(docType);
-        if(StringUtils.isNotBlank(state))
+        }
+        if(StringUtils.isNotBlank(state)){
             criteria.andStateEqualTo(state);
-        if(StringUtils.isNotBlank(keyword))
+        }else{
+            criteria.andStateIn(Arrays.asList("Active","InActive"));
+        }
+        if(StringUtils.isNotBlank(keyword)){
             criteria.andDocNameLike(String.format("%%%s%%",keyword));
+        }
         if(StringUtils.isNotBlank(orderField)){
             example.setOrderByClause(String.format("%s %s",orderField,order));
         }
