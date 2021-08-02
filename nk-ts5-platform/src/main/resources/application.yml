@@ -22,7 +22,6 @@ nk:
 #    obs:
 #      bucket: tfms
 
-
 server:
   port: 9200
   compression:
@@ -37,6 +36,8 @@ spring:
     name: nk-ts5-beebattle-dev
   profiles:
     active: default
+  aop:
+    proxy-target-class: false
   servlet:
     multipart:
       max-file-size: 30MB
@@ -83,6 +84,7 @@ spring:
     restart:
       enabled: true
       exclude: META-INF/maven/**,META-INF/resources/**,resources/**,static/**,public/**,templates/**,**/*Test.class,**/*Tests.class,git.properties,META-INF/build-info.properties,**/*.vue,**/*.nk.json
+
 
 
 logging:
