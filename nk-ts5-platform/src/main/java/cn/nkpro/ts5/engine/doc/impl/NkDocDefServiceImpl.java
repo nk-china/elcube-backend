@@ -112,11 +112,9 @@ public class NkDocDefServiceImpl implements NkDocDefService {
         Map<String,Object> options = new HashMap<>();
         options.put("docProcessors",            customObjectManager.getCustomObjectDescriptionList(NkDocProcessor.class,            false,predicate));
         options.put("docStateInterceptors",     customObjectManager.getCustomObjectDescriptionList(NkDocStateInterceptor.class,     true,null));
-        options.put("docCalculateInterceptors", customObjectManager.getCustomObjectDescriptionList(NkDocCalculateInterceptor.class, true,null));
+        options.put("docExecuteInterceptors",   customObjectManager.getCustomObjectDescriptionList(NkDocExecuteInterceptor.class, true,null));
         options.put("docCommittedInterceptors", customObjectManager.getCustomObjectDescriptionList(NkDocCommittedInterceptor.class, true,null));
-        options.put("docCopyInterceptors",      customObjectManager.getCustomObjectDescriptionList(NkDocCopyInterceptor.class,      true,null));
         options.put("docCreateInterceptors",    customObjectManager.getCustomObjectDescriptionList(NkDocCreateInterceptor.class,    true,null));
-        options.put("docDeleteInterceptors",    customObjectManager.getCustomObjectDescriptionList(NkDocDeleteInterceptor.class,    true,null));
         options.put("docUpdateInterceptors",    customObjectManager.getCustomObjectDescriptionList(NkDocUpdateInterceptor.class,    true,null));
         options.put("docFlowInterceptors",      customObjectManager.getCustomObjectDescriptionList(NkDocFlowInterceptor.class,      true,null));
         options.put("cards",                    customObjectManager.getCustomObjectDescriptionList(NkCard.class,                    false,null));
@@ -218,6 +216,9 @@ public class NkDocDefServiceImpl implements NkDocDefService {
         docDefHV.getLifeCycles()
                 .forEach(cycle->{
                     if(StringUtils.isNotBlank(cycle.getDocCycle())&&StringUtils.isNotBlank(cycle.getRefObjectType())){
+
+                        customObjectManager.assertExists(cycle.getRefObjectType());
+
                         cycle.setDocType(docDefHV.getDocType());
                         cycle.setVersion(docDefHV.getVersion());
                         cycle.setOrderBy(docDefHV.getLifeCycles().indexOf(cycle));

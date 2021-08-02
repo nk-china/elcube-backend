@@ -8,6 +8,7 @@ import cn.nkpro.ts5.engine.doc.model.DocHV;
 /**
  * Created by bean on 2020/7/13.
  */
+@SuppressWarnings("unused")
 public interface NkDocCreateInterceptor extends NkCustomObject {
     default DocHV apply(DocHV doc, DocHV ref, NkDocCycle cycle){return doc;}
 }

@@ -4,6 +4,7 @@ import cn.nkpro.ts5.engine.co.NkCustomScriptObject;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import lombok.Getter;
 
+@SuppressWarnings("unused")
 public interface NkDocFlowInterceptor extends NkCustomScriptObject {
 
     default FlowDescribe apply(DocHV docHV){return FlowDescribe.visible();}
@@ -21,11 +22,10 @@ public interface NkDocFlowInterceptor extends NkCustomScriptObject {
             this.visibleDesc = visibleDesc;
         }
 
-        @SuppressWarnings("unused")
+        @SuppressWarnings("all")
         public static FlowDescribe visible(){
             return new FlowDescribe(true,null);
         }
-        @SuppressWarnings("unused")
         public static FlowDescribe invisible(String visibleDesc){
             return new FlowDescribe(false,visibleDesc);
         }

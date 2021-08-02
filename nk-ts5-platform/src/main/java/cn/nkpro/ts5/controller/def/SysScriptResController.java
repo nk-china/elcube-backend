@@ -46,7 +46,16 @@ public class SysScriptResController {
     @RequestMapping("/bean/{beanName}")
     public BeanDescribe className(@PathVariable("beanName") String beanName){
 
-        Object customObject = customObjectManager.getCustomObject(beanName, NkCustomObject.class);
+        Object customObject = customObjectManager.getCustomObjectIfExists(beanName, NkCustomObject.class);
+
+        if(customObject==null){
+            return new BeanDescribe(
+                    null,
+                    false,
+                    "@",
+                    "NotFound",
+                    false);
+        }
 
         if(customObject instanceof NkCustomScriptObject){
             ScriptDefHV scriptDef = ((NkCustomScriptObject) customObject).getScriptDef();

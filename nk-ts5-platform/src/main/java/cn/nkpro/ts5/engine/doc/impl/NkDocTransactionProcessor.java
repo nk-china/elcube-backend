@@ -6,7 +6,7 @@ import cn.nkpro.ts5.engine.co.NKCustomObjectManager;
 import cn.nkpro.ts5.engine.doc.NkCard;
 import cn.nkpro.ts5.engine.doc.NkDocCycle;
 import cn.nkpro.ts5.engine.doc.NkDocProcessor;
-import cn.nkpro.ts5.engine.doc.interceptor.NkDocCalculateInterceptor;
+import cn.nkpro.ts5.engine.doc.interceptor.NkDocExecuteInterceptor;
 import cn.nkpro.ts5.engine.doc.interceptor.NkDocCommittedInterceptor;
 import cn.nkpro.ts5.engine.doc.interceptor.NkDocCreateInterceptor;
 import cn.nkpro.ts5.engine.doc.interceptor.NkDocUpdateInterceptor;
@@ -121,7 +121,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
 
         DocHV loopDoc = processCycle(doc, NkDocCycle.beforeCalculate, (beanName)->
                 customObjectManager
-                        .getCustomObject(beanName, NkDocCalculateInterceptor.class)
+                        .getCustomObject(beanName, NkDocExecuteInterceptor.class)
                         .apply(doc, NkDocCycle.beforeCalculate)
         );
 
@@ -143,7 +143,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
 
         return processCycle(doc, NkDocCycle.afterCalculated, (beanName)->
                 customObjectManager
-                        .getCustomObject(beanName, NkDocCalculateInterceptor.class)
+                        .getCustomObject(beanName, NkDocExecuteInterceptor.class)
                         .apply(doc, NkDocCycle.afterCalculated)
         );
     }

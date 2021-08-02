@@ -9,6 +9,7 @@ import cn.nkpro.ts5.engine.doc.model.DocHV;
 /**
  * Created by bean on 2020/7/13.
  */
-public interface NkDocCalculateInterceptor extends NkCustomObject {
+@SuppressWarnings("unused")
+public interface NkDocExecuteInterceptor extends NkCustomObject {
     default DocHV apply(DocHV doc, NkDocCycle cycle){return doc;}
 }

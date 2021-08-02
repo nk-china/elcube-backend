@@ -64,6 +64,11 @@ public class NKCustomObjectManager implements ApplicationContextAware {
         return null;
     }
 
+    public boolean assertExists(String beanName){
+        Assert.isTrue(applicationContextManager.getApplicationContext().containsBean(beanName),String.format("自定义对象[%s]不存在或尚未激活",beanName));
+        return true;
+    }
+
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
