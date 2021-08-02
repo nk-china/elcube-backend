@@ -441,7 +441,7 @@ public class NkDocDefServiceImpl implements NkDocDefService {
         docTypeFlows.values()
                 .forEach(list->
                         flows.addAll(list.stream()
-                                .filter(item->StringUtils.equals(item.getDocType(),docType))
+                                .filter(item->StringUtils.equalsAny(docType,item.getPreDocType()))
                                 .collect(Collectors.toList()))
                 );
 
@@ -472,7 +472,7 @@ public class NkDocDefServiceImpl implements NkDocDefService {
                 item.setConfig(nkCard.afterGetDef(defHV, item, item.getConfig()));
         });
 
-        defHV.setFlows(getDocTypeFlows(docType));
+        defHV.setNextFlows(getDocTypeFlows(docType));
 
         return defHV;
     }

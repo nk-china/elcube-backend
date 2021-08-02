@@ -203,7 +203,7 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
     private DocHV processDef(DocHV docHV){
 
         docHV.getDef()
-                .getFlows()
+                .getNextFlows()
                 .forEach(flow->{
                     String[] splitState = StringUtils.split(flow.getPreDocState(), ',');
                     boolean visibleState = ArrayUtils.contains(splitState,docHV.getDocState()) || ArrayUtils.contains(splitState,"@");
