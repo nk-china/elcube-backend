@@ -10,6 +10,7 @@ import cn.nkpro.ts5.engine.co.NKCustomObjectManager;
 import cn.nkpro.ts5.engine.doc.NkCard;
 import cn.nkpro.ts5.engine.doc.NkDocProcessor;
 import cn.nkpro.ts5.engine.doc.NkDocStateInterceptor;
+import cn.nkpro.ts5.engine.doc.model.DocDefFlowV;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocDefIV;
 import cn.nkpro.ts5.engine.doc.service.NkDocDefService;
@@ -40,6 +41,8 @@ public class NkDocDefServiceImpl implements NkDocDefService {
 
     @Autowired@SuppressWarnings("all")
     private RedisSupport<DocDefHV> redisSupport;
+    @Autowired@SuppressWarnings("all")
+    private RedisSupport<List<DocDefFlowV>> redisSupportFlows;
     @Autowired@SuppressWarnings("all")
     private DebugContextManager debugContextManager;
     @Autowired@SuppressWarnings("all")
@@ -206,7 +209,7 @@ public class NkDocDefServiceImpl implements NkDocDefService {
                     flow.setPreDocState(StringUtils.defaultIfBlank(flow.getPreDocState(),"@"));
                     flow.setDocType(docDefHV.getDocType());
                     flow.setVersion(docDefHV.getVersion());
-                    flow.setActive(StringUtils.equals(docDefHV.getState(),"Active")?1:0);
+                    flow.setState(docDefHV.getState());
                     flow.setOrderBy(docDefHV.getFlows().indexOf(flow));
                     flow.setUpdatedTime(DateTimeUtilz.nowSeconds());
 
@@ -252,6 +255,31 @@ public class NkDocDefServiceImpl implements NkDocDefService {
         return docDefHV;
     }
 
+    private void clearActiveVersion(String docType){
+
+        {
+            DocDefH record = new DocDefH();
+            record.setState("History");
+
+            DocDefHExample example = new DocDefHExample();
+            example.createCriteria()
+                    .andDocTypeEqualTo(docType)
+                    .andStateEqualTo("Active");
+            docDefHMapper.updateByExampleSelective(record, example);
+        }
+
+        {
+            DocDefFlow record = new DocDefFlow();
+            record.setState("History");
+
+            DocDefFlowExample example = new DocDefFlowExample();
+            example.createCriteria()
+                    .andDocTypeEqualTo(docType)
+                    .andStateEqualTo("Active");
+            docDefFlowMapper.updateByExampleSelective(record, example);
+        }
+    }
+
     /**
      * 激活配置，增加Minor
      * @param docDefHV DocDefHV
@@ -267,18 +295,16 @@ public class NkDocDefServiceImpl implements NkDocDefService {
         validateDef(docDefHV);
 
         // 清理已激活版本
-        DocDefH record = new DocDefH();
-        record.setState("History");
-        DocDefHExample example = new DocDefHExample();
-        example.createCriteria()
-                .andDocTypeEqualTo(docDefHV.getDocType())
-                .andStateEqualTo("Active");
-        docDefHMapper.updateByExampleSelective(record, example);
+        clearActiveVersion(docDefHV.getDocType());
 
+        // 设置新版本
         docDefHV.setState("Active");
 
         docDefHV = doUpdate(docDefHV,false);
-        redisSupport.delete(Constants.CACHE_DEF_DOC,docDefHV.getDocType());
+        // 一旦单据激活，则删除单据配置
+        redisSupport.delete(Constants.CACHE_DEF_DOC_TYPES,docDefHV.getDocType());
+        // 一旦单据激活，则删除所有的业务流缓存，避免数据不一致
+        redisSupport.delete(Constants.CACHE_DEF_DOC_FLOWS);
 
         return docDefHV;
     }
@@ -353,6 +379,43 @@ public class NkDocDefServiceImpl implements NkDocDefService {
                 .sorted(Comparator.comparing(DocDefH::getDocName))
                 .collect(Collectors.toList());
     }
+
+    private List<DocDefFlowV> getDocTypeFlows(String docType){
+        // 从缓存中获取已激活的单据业务流
+        Map<String, List<DocDefFlowV>> docTypeFlows = redisSupportFlows.getHashIfAbsent(Constants.CACHE_DEF_DOC_FLOWS, () -> {
+            DocDefFlowExample flowExample = new DocDefFlowExample();
+            flowExample.createCriteria()
+                    .andStateEqualTo("Active");
+            flowExample.setOrderByClause("ORDER_BY");
+
+            Map<String, List<DocDefFlowV>> flows = new HashMap<>();
+
+            docDefFlowMapper.selectByExample(flowExample)
+                    .forEach(item ->
+                            flows.computeIfAbsent(
+                                    item.getDocType(),
+                                    (key) -> new ArrayList<>()
+                            ).add(BeanUtilz.copyFromObject(item,DocDefFlowV.class))
+                    );
+
+            return flows;
+        });
+
+        // 从调试上下文中获取正在调试的单据业务流
+        List<DocDefHV> debugResources = debugContextManager.getDebugResources("@");
+        debugResources.forEach(docDefHV -> docTypeFlows.put(docDefHV.getDocType(),docDefHV.getFlows()));
+
+        // 合并业务流
+        List<DocDefFlowV> flows = new ArrayList<>();
+        docTypeFlows.values()
+                .forEach(list->
+                        flows.addAll(list.stream()
+                                .filter(item->StringUtils.equals(item.getPreDocType(),docType))
+                                .collect(Collectors.toList()))
+                );
+
+        return flows;
+    }
     /**
      * 获取运行时的单据配置
      * 根据单据类型 获取当前日期下 单据对应的配置信息
@@ -365,12 +428,11 @@ public class NkDocDefServiceImpl implements NkDocDefService {
 
         // 判断当前请求是否debug，如果是，先尝试从debug环境中获取配置
         DocDefHV defHV = Optional.ofNullable(
-            (DocDefHV)(debugContextManager.getDebugResources(String.format("@%s", docType)))
+            (DocDefHV)(debugContextManager.getDebugResource(String.format("@%s", docType)))
         ).orElse(
-            redisSupport.getIfAbsent(Constants.CACHE_DEF_DOC,docType,()-> getLastActiveVersion(docType))
+            redisSupport.getIfAbsent(Constants.CACHE_DEF_DOC_TYPES,docType,()-> getLastActiveVersion(docType))
         );
         Assert.notNull(defHV,String.format("单据类型[%s]版本的配置没有找到或尚未激活",docType));
-
 
         deserializeDef(defHV);
 
@@ -379,12 +441,7 @@ public class NkDocDefServiceImpl implements NkDocDefService {
                 item.setConfig(nkCard.afterGetDef(defHV, item, item.getConfig()));
         });
 
-        DocDefFlowExample flowExample = new DocDefFlowExample();
-        flowExample.createCriteria()
-                .andPreDocTypeEqualTo(docType)
-                .andActiveEqualTo(1);
-        flowExample.setOrderByClause("ORDER_BY");
-        defHV.setFlows(docDefFlowMapper.selectByExample(flowExample));
+        defHV.setFlows(getDocTypeFlows(docType));
 
         return defHV;
     }
@@ -398,7 +455,7 @@ public class NkDocDefServiceImpl implements NkDocDefService {
      */
     @Override
     public DocDefHV getDocDefForEdit(String docType, String version){
-        DocDefHV docDefHV = debugContextManager.getDebugResources(String.format("@%s", docType));
+        DocDefHV docDefHV = debugContextManager.getDebugResource(String.format("@%s", docType));
         if(docDefHV!=null && StringUtils.equals(docDefHV.getVersion(),version)){
             return docDefHV;
         }
@@ -431,7 +488,7 @@ public class NkDocDefServiceImpl implements NkDocDefService {
                 .andDocTypeEqualTo(docType)
                 .andVersionEqualTo(version);
         flowExample.setOrderByClause("ORDER_BY");
-        def.setFlows(docDefFlowMapper.selectByExample(flowExample));
+        def.setFlows(BeanUtilz.copyFromList(docDefFlowMapper.selectByExample(flowExample),DocDefFlowV.class));
 
         // cards
         DocDefIExample docDefIExample = new DocDefIExample();

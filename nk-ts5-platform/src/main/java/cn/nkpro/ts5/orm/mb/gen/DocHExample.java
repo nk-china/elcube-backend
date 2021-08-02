@@ -344,52 +344,62 @@ public class DocHExample {
             return (Criteria) this;
         }
 
-        public Criteria andDefVersionEqualTo(Integer value) {
+        public Criteria andDefVersionEqualTo(String value) {
             addCriterion("DEF_VERSION =", value, "defVersion");
             return (Criteria) this;
         }
 
-        public Criteria andDefVersionNotEqualTo(Integer value) {
+        public Criteria andDefVersionNotEqualTo(String value) {
             addCriterion("DEF_VERSION <>", value, "defVersion");
             return (Criteria) this;
         }
 
-        public Criteria andDefVersionGreaterThan(Integer value) {
+        public Criteria andDefVersionGreaterThan(String value) {
             addCriterion("DEF_VERSION >", value, "defVersion");
             return (Criteria) this;
         }
 
-        public Criteria andDefVersionGreaterThanOrEqualTo(Integer value) {
+        public Criteria andDefVersionGreaterThanOrEqualTo(String value) {
             addCriterion("DEF_VERSION >=", value, "defVersion");
             return (Criteria) this;
         }
 
-        public Criteria andDefVersionLessThan(Integer value) {
+        public Criteria andDefVersionLessThan(String value) {
             addCriterion("DEF_VERSION <", value, "defVersion");
             return (Criteria) this;
         }
 
-        public Criteria andDefVersionLessThanOrEqualTo(Integer value) {
+        public Criteria andDefVersionLessThanOrEqualTo(String value) {
             addCriterion("DEF_VERSION <=", value, "defVersion");
             return (Criteria) this;
         }
 
-        public Criteria andDefVersionIn(List<Integer> values) {
+        public Criteria andDefVersionLike(String value) {
+            addCriterion("DEF_VERSION like", value, "defVersion");
+            return (Criteria) this;
+        }
+
+        public Criteria andDefVersionNotLike(String value) {
+            addCriterion("DEF_VERSION not like", value, "defVersion");
+            return (Criteria) this;
+        }
+
+        public Criteria andDefVersionIn(List<String> values) {
             addCriterion("DEF_VERSION in", values, "defVersion");
             return (Criteria) this;
         }
 
-        public Criteria andDefVersionNotIn(List<Integer> values) {
+        public Criteria andDefVersionNotIn(List<String> values) {
             addCriterion("DEF_VERSION not in", values, "defVersion");
             return (Criteria) this;
         }
 
-        public Criteria andDefVersionBetween(Integer value1, Integer value2) {
+        public Criteria andDefVersionBetween(String value1, String value2) {
             addCriterion("DEF_VERSION between", value1, value2, "defVersion");
             return (Criteria) this;
         }
 
-        public Criteria andDefVersionNotBetween(Integer value1, Integer value2) {
+        public Criteria andDefVersionNotBetween(String value1, String value2) {
             addCriterion("DEF_VERSION not between", value1, value2, "defVersion");
             return (Criteria) this;
         }

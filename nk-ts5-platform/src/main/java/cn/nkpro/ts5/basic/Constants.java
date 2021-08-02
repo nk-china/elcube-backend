@@ -14,7 +14,8 @@ public interface Constants {
 
     String CACHE_DEF_CONSTANT       = "CACHE_DEF_CONSTANT";
     String CACHE_DEF_SCRIPT         = "CACHE_DEF_SCRIPT";
-    String CACHE_DEF_DOC            = "CACHE_DEF_DOC";
+    String CACHE_DEF_DOC_TYPES      = "CACHE_DEF_DOC";
+    String CACHE_DEF_DOC_FLOWS      = "CACHE_DEF_DOC_FLOWS";
 
     String CACHE_DOC                = "CACHE_DOC";
     String CACHE_DOC_HISTORY        = "CACHE_DOC_HISTORY";

@@ -544,63 +544,73 @@ public class DocDefFlowExample {
             return (Criteria) this;
         }
 
-        public Criteria andActiveIsNull() {
-            addCriterion("ACTIVE is null");
+        public Criteria andStateIsNull() {
+            addCriterion("STATE is null");
             return (Criteria) this;
         }
 
-        public Criteria andActiveIsNotNull() {
-            addCriterion("ACTIVE is not null");
+        public Criteria andStateIsNotNull() {
+            addCriterion("STATE is not null");
             return (Criteria) this;
         }
 
-        public Criteria andActiveEqualTo(Integer value) {
-            addCriterion("ACTIVE =", value, "active");
+        public Criteria andStateEqualTo(String value) {
+            addCriterion("STATE =", value, "state");
             return (Criteria) this;
         }
 
-        public Criteria andActiveNotEqualTo(Integer value) {
-            addCriterion("ACTIVE <>", value, "active");
+        public Criteria andStateNotEqualTo(String value) {
+            addCriterion("STATE <>", value, "state");
             return (Criteria) this;
         }
 
-        public Criteria andActiveGreaterThan(Integer value) {
-            addCriterion("ACTIVE >", value, "active");
+        public Criteria andStateGreaterThan(String value) {
+            addCriterion("STATE >", value, "state");
             return (Criteria) this;
         }
 
-        public Criteria andActiveGreaterThanOrEqualTo(Integer value) {
-            addCriterion("ACTIVE >=", value, "active");
+        public Criteria andStateGreaterThanOrEqualTo(String value) {
+            addCriterion("STATE >=", value, "state");
             return (Criteria) this;
         }
 
-        public Criteria andActiveLessThan(Integer value) {
-            addCriterion("ACTIVE <", value, "active");
+        public Criteria andStateLessThan(String value) {
+            addCriterion("STATE <", value, "state");
             return (Criteria) this;
         }
 
-        public Criteria andActiveLessThanOrEqualTo(Integer value) {
-            addCriterion("ACTIVE <=", value, "active");
+        public Criteria andStateLessThanOrEqualTo(String value) {
+            addCriterion("STATE <=", value, "state");
             return (Criteria) this;
         }
 
-        public Criteria andActiveIn(List<Integer> values) {
-            addCriterion("ACTIVE in", values, "active");
+        public Criteria andStateLike(String value) {
+            addCriterion("STATE like", value, "state");
             return (Criteria) this;
         }
 
-        public Criteria andActiveNotIn(List<Integer> values) {
-            addCriterion("ACTIVE not in", values, "active");
+        public Criteria andStateNotLike(String value) {
+            addCriterion("STATE not like", value, "state");
             return (Criteria) this;
         }
 
-        public Criteria andActiveBetween(Integer value1, Integer value2) {
-            addCriterion("ACTIVE between", value1, value2, "active");
+        public Criteria andStateIn(List<String> values) {
+            addCriterion("STATE in", values, "state");
             return (Criteria) this;
         }
 
-        public Criteria andActiveNotBetween(Integer value1, Integer value2) {
-            addCriterion("ACTIVE not between", value1, value2, "active");
+        public Criteria andStateNotIn(List<String> values) {
+            addCriterion("STATE not in", values, "state");
+            return (Criteria) this;
+        }
+
+        public Criteria andStateBetween(String value1, String value2) {
+            addCriterion("STATE between", value1, value2, "state");
+            return (Criteria) this;
+        }
+
+        public Criteria andStateNotBetween(String value1, String value2) {
+            addCriterion("STATE not between", value1, value2, "state");
             return (Criteria) this;
         }
 

@@ -75,7 +75,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
 
         // 系统字段
         doc.setCreatedTime(DateTimeUtilz.nowSeconds());
-        doc.setDefVersion(VersioningUtils.parseMajorInteger(def.getVersion()));
+        doc.setDefVersion(def.getVersion());
 
         // 引用数据
         //doc.setPreDoc(preDoc);
@@ -84,7 +84,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         docDefService.runLoopCards(def,false, (card, defIV)->
             doc.getData().put(
                 defIV.getCardKey(),
-                card.afterCreate(doc,preDoc,defIV.getConfig(),card.deserialize(null))
+                card.afterCreate(doc,preDoc,card.deserialize(null),defIV.getConfig())
             )
         );
 

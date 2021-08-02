@@ -24,10 +24,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.stereotype.Component;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -207,8 +204,23 @@ public class DebugContextManager implements ApplicationContextAware {
      * 获取当前debug的缓存中获取单个资源
      */
     @SuppressWarnings("all")
-    public <T> T getDebugResources(String key){
-        return (T) redisForResoure.getIfAbsent(String.format("DEBUG:%s", localDebugId.get()),key,()->null);
+    public <T> T getDebugResource(String key){
+        if(localDebugId.get()!=null){
+            return (T) redisForResoure.getIfAbsent(String.format("DEBUG:%s", localDebugId.get()),key,()->null);
+        }
+        return null;
+    }
+    @SuppressWarnings("all")
+    public <T> List<T> getDebugResources(String keyPrefix){
+        if(localDebugId.get()!=null){
+            return redisForResoure.getHashIfAbsent(String.format("DEBUG:%s", localDebugId.get()), () -> null)
+                    .entrySet()
+                    .stream()
+                    .filter(e -> e.getKey().startsWith(keyPrefix))
+                    .map(e -> (T) e.getValue())
+                    .collect(Collectors.toList());
+        }
+        return Collections.emptyList();
     }
 
     /**

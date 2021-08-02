@@ -11,7 +11,7 @@ public class DocH implements Serializable {
 
     private String classify;
 
-    private Integer defVersion;
+    private String defVersion;
 
     private String docType;
 
@@ -71,11 +71,11 @@ public class DocH implements Serializable {
     }
 
     @cn.nkpro.ts5.basic.wsdoc.annotation.CodeFieldNotes("")
-    public Integer getDefVersion() {
+    public String getDefVersion() {
         return defVersion;
     }
 
-    public void setDefVersion(Integer defVersion) {
+    public void setDefVersion(String defVersion) {
         this.defVersion = defVersion;
     }
 

@@ -9,7 +9,7 @@ import java.io.Serializable;
 public class DocDefFlow extends DocDefFlowKey implements Serializable {
     private String refObjectType;
 
-    private Integer active;
+    private String state;
 
     private Long updatedTime;
 
@@ -33,12 +33,12 @@ public class DocDefFlow extends DocDefFlowKey implements Serializable {
     }
 
     @cn.nkpro.ts5.basic.wsdoc.annotation.CodeFieldNotes("")
-    public Integer getActive() {
-        return active;
+    public String getState() {
+        return state;
     }
 
-    public void setActive(Integer active) {
-        this.active = active;
+    public void setState(String state) {
+        this.state = state;
     }
 
     @cn.nkpro.ts5.basic.wsdoc.annotation.CodeFieldNotes("")

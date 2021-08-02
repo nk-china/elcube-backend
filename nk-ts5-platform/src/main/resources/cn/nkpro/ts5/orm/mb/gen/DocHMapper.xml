@@ -8,7 +8,7 @@
     -->
     <id column="DOC_ID" jdbcType="VARCHAR" property="docId" />
     <result column="CLASSIFY" jdbcType="VARCHAR" property="classify" />
-    <result column="DEF_VERSION" jdbcType="INTEGER" property="defVersion" />
+    <result column="DEF_VERSION" jdbcType="VARCHAR" property="defVersion" />
     <result column="DOC_TYPE" jdbcType="VARCHAR" property="docType" />
     <result column="DOC_NAME" jdbcType="VARCHAR" property="docName" />
     <result column="DOC_DESC" jdbcType="VARCHAR" property="docDesc" />
@@ -145,7 +145,7 @@
       PRE_DOC_ID, PARTNER_ID, IDENTIFICATION, 
       REF_OBJECT_ID, BUSINESS_KEY, CREATED_TIME, 
       UPDATED_TIME)
-    values (#{docId,jdbcType=VARCHAR}, #{classify,jdbcType=VARCHAR}, #{defVersion,jdbcType=INTEGER}, 
+    values (#{docId,jdbcType=VARCHAR}, #{classify,jdbcType=VARCHAR}, #{defVersion,jdbcType=VARCHAR}, 
       #{docType,jdbcType=VARCHAR}, #{docName,jdbcType=VARCHAR}, #{docDesc,jdbcType=VARCHAR}, 
       #{docNumber,jdbcType=VARCHAR}, #{docState,jdbcType=VARCHAR}, #{docTags,jdbcType=VARCHAR}, 
       #{preDocId,jdbcType=VARCHAR}, #{partnerId,jdbcType=VARCHAR}, #{identification,jdbcType=VARCHAR}, 
@@ -216,7 +216,7 @@
         #{classify,jdbcType=VARCHAR},
       </if>
       <if test="defVersion != null">
-        #{defVersion,jdbcType=INTEGER},
+        #{defVersion,jdbcType=VARCHAR},
       </if>
       <if test="docType != null">
         #{docType,jdbcType=VARCHAR},
@@ -283,7 +283,7 @@
         CLASSIFY = #{record.classify,jdbcType=VARCHAR},
       </if>
       <if test="record.defVersion != null">
-        DEF_VERSION = #{record.defVersion,jdbcType=INTEGER},
+        DEF_VERSION = #{record.defVersion,jdbcType=VARCHAR},
       </if>
       <if test="record.docType != null">
         DOC_TYPE = #{record.docType,jdbcType=VARCHAR},
@@ -337,7 +337,7 @@
     update nk_doc_h
     set DOC_ID = #{record.docId,jdbcType=VARCHAR},
       CLASSIFY = #{record.classify,jdbcType=VARCHAR},
-      DEF_VERSION = #{record.defVersion,jdbcType=INTEGER},
+      DEF_VERSION = #{record.defVersion,jdbcType=VARCHAR},
       DOC_TYPE = #{record.docType,jdbcType=VARCHAR},
       DOC_NAME = #{record.docName,jdbcType=VARCHAR},
       DOC_DESC = #{record.docDesc,jdbcType=VARCHAR},
@@ -366,7 +366,7 @@
         CLASSIFY = #{classify,jdbcType=VARCHAR},
       </if>
       <if test="defVersion != null">
-        DEF_VERSION = #{defVersion,jdbcType=INTEGER},
+        DEF_VERSION = #{defVersion,jdbcType=VARCHAR},
       </if>
       <if test="docType != null">
         DOC_TYPE = #{docType,jdbcType=VARCHAR},
@@ -417,7 +417,7 @@
     -->
     update nk_doc_h
     set CLASSIFY = #{classify,jdbcType=VARCHAR},
-      DEF_VERSION = #{defVersion,jdbcType=INTEGER},
+      DEF_VERSION = #{defVersion,jdbcType=VARCHAR},
       DOC_TYPE = #{docType,jdbcType=VARCHAR},
       DOC_NAME = #{docName,jdbcType=VARCHAR},
       DOC_DESC = #{docDesc,jdbcType=VARCHAR},
