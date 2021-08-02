@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.cards.sidebar
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote
-import cn.nkpro.ts5.engine.doc.NkAbstractCard
+import cn.nkpro.ts5.engine.doc.abstracts.NkAbstractCard
 import org.springframework.stereotype.Component
 
 @WsDocNote("单据信息")

@@ -2,8 +2,14 @@ package cn.nkpro.ts5.engine.doc.impl;
 
 import cn.nkpro.ts5.config.id.GUID;
 import cn.nkpro.ts5.config.id.SequenceSupport;
+import cn.nkpro.ts5.engine.co.NKCustomObjectManager;
 import cn.nkpro.ts5.engine.doc.NkCard;
+import cn.nkpro.ts5.engine.doc.NkDocCycle;
 import cn.nkpro.ts5.engine.doc.NkDocProcessor;
+import cn.nkpro.ts5.engine.doc.interceptor.NkDocCalculateInterceptor;
+import cn.nkpro.ts5.engine.doc.interceptor.NkDocCommittedInterceptor;
+import cn.nkpro.ts5.engine.doc.interceptor.NkDocCreateInterceptor;
+import cn.nkpro.ts5.engine.doc.interceptor.NkDocUpdateInterceptor;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocHD;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
@@ -11,14 +17,10 @@ import cn.nkpro.ts5.engine.doc.model.DocIV;
 import cn.nkpro.ts5.engine.doc.service.NkDocDefService;
 import cn.nkpro.ts5.engine.elasticearch.SearchEngine;
 import cn.nkpro.ts5.engine.elasticearch.model.DocHES;
-import cn.nkpro.ts5.orm.mb.gen.DocH;
-import cn.nkpro.ts5.orm.mb.gen.DocHMapper;
-import cn.nkpro.ts5.orm.mb.gen.DocI;
-import cn.nkpro.ts5.orm.mb.gen.DocIMapper;
+import cn.nkpro.ts5.orm.mb.gen.*;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
 import cn.nkpro.ts5.utils.LocalSyncUtilz;
-import cn.nkpro.ts5.utils.VersioningUtils;
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.aop.framework.Advised;
@@ -27,7 +29,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("unchecked")
 @Component("NKDocTransactionProcessor")
@@ -45,6 +50,9 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
     private DocIMapper docIMapper;
     @Autowired@SuppressWarnings("all")
     private SearchEngine searchEngine;
+
+    @Autowired@SuppressWarnings("all")
+    private NKCustomObjectManager customObjectManager;
 
     @Override
     public EnumDocClassify classify() {
@@ -81,27 +89,43 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         //doc.setPreDoc(preDoc);
         doc.setDef(def);
 
+        DocHV loopDoc = processCycle(doc, NkDocCycle.beforeCreate, (beanName)->
+                customObjectManager
+                        .getCustomObject(beanName, NkDocCreateInterceptor.class)
+                        .apply(doc,preDoc, NkDocCycle.beforeCreate)
+        );
+
         docDefService.runLoopCards(def,false, (card, defIV)->
-            doc.getData().put(
+                loopDoc.getData().put(
                 defIV.getCardKey(),
-                card.afterCreate(doc,preDoc,card.deserialize(null),defIV.getConfig())
+                card.afterCreate(loopDoc,preDoc,card.deserialize(null),defIV.getConfig())
             )
         );
 
-        return doc;
+        return processCycle(doc, NkDocCycle.afterCreated, (beanName)->
+                customObjectManager
+                        .getCustomObject(beanName, NkDocCreateInterceptor.class)
+                        .apply(doc,preDoc, NkDocCycle.afterCreated)
+        );
     }
 
     @Override
     public DocHV calculate(DocHV doc, String fromCard, String options) throws Exception {
 
         docDefService.runLoopCards(doc.getDef(),false, (card, defIV)->
-            doc.getData().put(
+                doc.getData().put(
                     defIV.getCardKey(),
                     card.deserialize(doc.getData().get(defIV.getCardKey()))
             )
         );
 
-        docDefService.runLoopCards(doc.getDef(),false, (card, defIV)->{
+        DocHV loopDoc = processCycle(doc, NkDocCycle.beforeCalculate, (beanName)->
+                customObjectManager
+                        .getCustomObject(beanName, NkDocCalculateInterceptor.class)
+                        .apply(doc, NkDocCycle.beforeCalculate)
+        );
+
+        docDefService.runLoopCards(loopDoc.getDef(),false, (card, defIV)->{
 
             // 是否为触发计算的卡片
             boolean isTrigger = StringUtils.equals(fromCard,defIV.getCardKey());
@@ -109,14 +133,19 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
             // 获取计算函数的自定义选项
             String itemOptions = isTrigger?options:null;
 
-            Object cardData = doc.getData().get(defIV.getCardKey());
+            Object cardData = loopDoc.getData().get(defIV.getCardKey());
 
-            doc.getData().put(
+            loopDoc.getData().put(
                     defIV.getCardKey(),
-                    card.calculate(doc, cardData, defIV.getConfig(), isTrigger, itemOptions)
+                    card.calculate(loopDoc, cardData, defIV.getConfig(), isTrigger, itemOptions)
             );
         });
-        return doc;
+
+        return processCycle(doc, NkDocCycle.afterCalculated, (beanName)->
+                customObjectManager
+                        .getCustomObject(beanName, NkDocCalculateInterceptor.class)
+                        .apply(doc, NkDocCycle.afterCalculated)
+        );
     }
 
     @Override
@@ -152,6 +181,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
     @SuppressWarnings("unchecked")
     @Override
     public DocHV doUpdate(DocDefHV def, DocHV doc, DocHV original, String optSource) throws Exception {
+
         // 原始单据
         Optional<DocHV> optionalOriginal = Optional.ofNullable(original);
 
@@ -164,13 +194,17 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
             doc.setCreatedTime(doc.getUpdatedTime());
         }
 
-        // todo 检查单据状态是否合法，即符合单据配置中的 状态流
-
         docDefService.runLoopCards(doc.getDef(),false, (card, defIV)->
                 doc.getData().put(
                         defIV.getCardKey(),
                         card.deserialize(doc.getData().get(defIV.getCardKey()))
                 )
+        );
+
+        DocHV finalDoc = processCycle(doc, NkDocCycle.beforeUpdate, (beanName)->
+                customObjectManager
+                        .getCustomObject(beanName, NkDocUpdateInterceptor.class)
+                        .apply(doc, original, NkDocCycle.beforeUpdate)
         );
 
         docDefService.runLoopCards(def,false, (card, defIV)->{
@@ -179,13 +213,13 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
                     && original.getItems().containsKey(defIV.getCardKey())
                     && StringUtils.isNotBlank(original.getItems().get(defIV.getCardKey()).getDocId());
             Object cardDataOriginal = null;
-            Object cardData = doc.getData().get(defIV.getCardKey());
+            Object cardData = finalDoc.getData().get(defIV.getCardKey());
 
             if(existsOriginal){
                 cardDataOriginal = original.getData().get(defIV.getCardKey());
             }
 
-            cardData = card.beforeUpdate(doc, cardData, defIV.getConfig(), cardDataOriginal);
+            cardData = card.beforeUpdate(finalDoc, cardData, defIV.getConfig(), cardDataOriginal);
 
             // 如果原始单据数据存在则更新，否则插入数据
             if(existsOriginal){
@@ -196,42 +230,57 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
                 docIMapper.updateByPrimaryKeyWithBLOBs(docI);
 
                 // 将更新后的数据放回到doc
-                doc.getItems().put(defIV.getCardKey(),docI);
+                finalDoc.getItems().put(defIV.getCardKey(),docI);
                 docI.setCardContent(null);
             }else{
 
                 DocI docI = new DocI();
-                docI.setDocId(doc.getDocId());
+                docI.setDocId(finalDoc.getDocId());
                 docI.setCardKey(defIV.getCardKey());
-                docI.setCreatedTime(doc.getUpdatedTime());
-                docI.setUpdatedTime(doc.getUpdatedTime());
+                docI.setCreatedTime(finalDoc.getUpdatedTime());
+                docI.setUpdatedTime(finalDoc.getUpdatedTime());
                 docI.setCardContent(JSON.toJSONString(cardData));
 
                 docIMapper.insert(docI);
 
                 // 将更新后的数据放回到doc
-                doc.getItems().put(defIV.getCardKey(),docI);
+                finalDoc.getItems().put(defIV.getCardKey(),docI);
                 docI.setCardContent(null);
             }
 
-            doc.getData().put(defIV.getCardKey(),cardData);
+            finalDoc.getData().put(defIV.getCardKey(),cardData);
 
-            // 调用 afterUpdated
+            // 调用 卡片 afterUpdated
             if(isOverride(card)){
                 Object loopCardData = cardData;
-                LocalSyncUtilz.runAfterCommit(()-> card.afterUpdated(doc, loopCardData, defIV.getConfig()));
+                LocalSyncUtilz.runAfterCommit(()-> card.afterUpdated(finalDoc, loopCardData, defIV.getConfig()));
             }
         });
 
         if(optionalOriginal.isPresent()){
-            docHMapper.updateByPrimaryKeySelective(doc);
+            docHMapper.updateByPrimaryKeySelective(finalDoc);
         }else{
-            docHMapper.insert(doc);
+            docHMapper.insert(finalDoc);
         }
 
-        index(doc);
+        index(finalDoc);
 
-        return doc;
+        DocHV returnDoc = processCycle(doc, NkDocCycle.afterUpdated, (beanName)->
+                customObjectManager
+                        .getCustomObject(beanName, NkDocUpdateInterceptor.class)
+                        .apply(doc, original, NkDocCycle.afterUpdated)
+        );
+
+        LocalSyncUtilz.runAfterCommit(()->
+                processCycle(doc, NkDocCycle.afterUpdateCommitted, (beanName)->{
+                            customObjectManager
+                                    .getCustomObject(beanName, NkDocCommittedInterceptor.class)
+                                    .apply(doc, NkDocCycle.afterUpdateCommitted);
+                            return doc;
+                })
+        );
+
+        return returnDoc;
     }
 
     private void index(DocHV doc){
@@ -266,4 +315,20 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
             return false;
         }
     }
+
+    private DocHV processCycle(DocHV doc, NkDocCycle cycleName, Function<String, DocHV> function){
+
+        List<DocDefCycle> collect =  doc.getDef().getLifeCycles()
+                .stream()
+                .filter(cycle -> StringUtils.equals(cycle.getDocCycle(), cycleName.name()))
+                .collect(Collectors.toList());
+
+        for(DocDefCycle cycle : collect){
+            doc = function.apply(cycle.getRefObjectType());
+        }
+
+        return doc;
+    }
+
+
 }

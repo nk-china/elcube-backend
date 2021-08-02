@@ -9,7 +9,7 @@ import cn.nkpro.ts5.engine.co.NkCustomObject;
 import cn.nkpro.ts5.engine.co.NKCustomObjectManager;
 import cn.nkpro.ts5.engine.doc.NkCard;
 import cn.nkpro.ts5.engine.doc.NkDocProcessor;
-import cn.nkpro.ts5.engine.doc.NkDocStateInterceptor;
+import cn.nkpro.ts5.engine.doc.interceptor.*;
 import cn.nkpro.ts5.engine.doc.model.DocDefFlowV;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocDefIV;
@@ -56,6 +56,8 @@ public class NkDocDefServiceImpl implements NkDocDefService {
     private DocDefStateMapper docDefStateMapper;
     @Autowired@SuppressWarnings("all")
     private DocDefFlowMapper docDefFlowMapper;
+    @Autowired@SuppressWarnings("all")
+    private DocDefCycleMapper docDefCycleMapper;
 
     @Override
     public PageList<DocDefH> getPage(String docClassify,
@@ -108,9 +110,16 @@ public class NkDocDefServiceImpl implements NkDocDefService {
         Predicate<Map.Entry<String,? extends NkCustomObject>> predicate = StringUtils.isBlank(classify)?null:
                 (e)->StringUtils.equals(((NkDocProcessor)(e.getValue())).classify().name(),classify);
         Map<String,Object> options = new HashMap<>();
-        options.put("docProcessors",        customObjectManager.getCustomObjectDescriptionList(NkDocProcessor.class,false,predicate));
-        options.put("docStateInterceptors", customObjectManager.getCustomObjectDescriptionList(NkDocStateInterceptor.class,true,null));
-        options.put("cards",                customObjectManager.getCustomObjectDescriptionList(NkCard.class,false,null));
+        options.put("docProcessors",            customObjectManager.getCustomObjectDescriptionList(NkDocProcessor.class,            false,predicate));
+        options.put("docStateInterceptors",     customObjectManager.getCustomObjectDescriptionList(NkDocStateInterceptor.class,     true,null));
+        options.put("docCalculateInterceptors", customObjectManager.getCustomObjectDescriptionList(NkDocCalculateInterceptor.class, true,null));
+        options.put("docCommittedInterceptors", customObjectManager.getCustomObjectDescriptionList(NkDocCommittedInterceptor.class, true,null));
+        options.put("docCopyInterceptors",      customObjectManager.getCustomObjectDescriptionList(NkDocCopyInterceptor.class,      true,null));
+        options.put("docCreateInterceptors",    customObjectManager.getCustomObjectDescriptionList(NkDocCreateInterceptor.class,    true,null));
+        options.put("docDeleteInterceptors",    customObjectManager.getCustomObjectDescriptionList(NkDocDeleteInterceptor.class,    true,null));
+        options.put("docUpdateInterceptors",    customObjectManager.getCustomObjectDescriptionList(NkDocUpdateInterceptor.class,    true,null));
+        options.put("docFlowInterceptors",      customObjectManager.getCustomObjectDescriptionList(NkDocFlowInterceptor.class,      true,null));
+        options.put("cards",                    customObjectManager.getCustomObjectDescriptionList(NkCard.class,                    false,null));
         return options;
     }
 
@@ -200,6 +209,23 @@ public class NkDocDefServiceImpl implements NkDocDefService {
                     docDefStateMapper.insertSelective(state);
                 });
 
+        // cycles
+        DocDefCycleExample cycleExample = new DocDefCycleExample();
+        cycleExample.createCriteria()
+                .andDocTypeEqualTo(docDefHV.getDocType())
+                .andVersionEqualTo(docDefHV.getVersion());
+        docDefCycleMapper.deleteByExample(cycleExample);
+        docDefHV.getLifeCycles()
+                .forEach(cycle->{
+                    if(StringUtils.isNotBlank(cycle.getDocCycle())&&StringUtils.isNotBlank(cycle.getRefObjectType())){
+                        cycle.setDocType(docDefHV.getDocType());
+                        cycle.setVersion(docDefHV.getVersion());
+                        cycle.setOrderBy(docDefHV.getLifeCycles().indexOf(cycle));
+                        cycle.setUpdatedTime(DateTimeUtilz.nowSeconds());
+                        docDefCycleMapper.insert(cycle);
+                    }
+                });
+
         // flow
         docDefHV.setDocEntrance(0);
 
@@ -218,7 +244,6 @@ public class NkDocDefServiceImpl implements NkDocDefService {
                     flow.setState(docDefHV.getState());
                     flow.setOrderBy(docDefHV.getFlows().indexOf(flow));
                     flow.setUpdatedTime(DateTimeUtilz.nowSeconds());
-
                     docDefFlowMapper.insert(flow);
 
                     // 设置入口单据标识
@@ -226,7 +251,6 @@ public class NkDocDefServiceImpl implements NkDocDefService {
                         docDefHV.setDocEntrance(1);
                     }
                 });
-
 
         // components
         DocDefIExample defIExample = new DocDefIExample();
@@ -495,6 +519,14 @@ public class NkDocDefServiceImpl implements NkDocDefService {
                 .andVersionEqualTo(version);
         flowExample.setOrderByClause("ORDER_BY");
         def.setFlows(BeanUtilz.copyFromList(docDefFlowMapper.selectByExample(flowExample),DocDefFlowV.class));
+
+        // cycles
+        DocDefCycleExample cycleExample = new DocDefCycleExample();
+        cycleExample.createCriteria()
+                .andDocTypeEqualTo(docType)
+                .andVersionEqualTo(version);
+        cycleExample.setOrderByClause("ORDER_BY");
+        def.setLifeCycles(docDefCycleMapper.selectByExample(cycleExample));
 
         // cards
         DocDefIExample docDefIExample = new DocDefIExample();

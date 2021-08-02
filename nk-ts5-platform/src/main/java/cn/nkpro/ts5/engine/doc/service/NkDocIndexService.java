@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.engine.doc;
+package cn.nkpro.ts5.engine.doc.service;
 
 import cn.nkpro.ts5.engine.elasticearch.ESPageList;
 import cn.nkpro.ts5.engine.elasticearch.SearchEngine;

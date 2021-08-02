@@ -1,27 +1,35 @@
 package cn.nkpro.ts5.engine.co;
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
-import cn.nkpro.ts5.engine.doc.ClasspathResourceLoader;
+import cn.nkpro.ts5.config.global.NkProperties;
 import cn.nkpro.ts5.engine.doc.NkCard;
 import cn.nkpro.ts5.engine.doc.model.ScriptDefHV;
 import cn.nkpro.ts5.utils.ClassUtils;
 import cn.nkpro.ts5.utils.GroovyUtils;
+import cn.nkpro.ts5.utils.ResourceUtils;
 import com.alibaba.fastjson.JSON;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
+import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public abstract class NkAbstractCustomScriptObject implements NkCustomScriptObject, InitializingBean {
 
-
     @Autowired
-    protected ClasspathResourceLoader classpathResourceLoader;
+    private NkProperties properties;
+
+    private ResourcePatternResolver resourcePatternResolver = new PathMatchingResourcePatternResolver();
 
     @Getter
     protected String beanName;
@@ -42,10 +50,10 @@ public abstract class NkAbstractCustomScriptObject implements NkCustomScriptObje
 
     protected ScriptDefHV loadScriptFromClassPath(String scriptName) {
 
-        List<String> groovyCode = classpathResourceLoader.findResource(scriptName + ".groovy");
+        List<String> groovyCode = findResource(scriptName + ".groovy");
         if (!groovyCode.isEmpty()) {
-            List<String> vueMainCode = classpathResourceLoader.findResource(scriptName + ".vue");
-            List<String> vueDefsCode = classpathResourceLoader.findResource(scriptName + "Def*.vue");
+            List<String> vueMainCode = findResource(scriptName + ".vue");
+            List<String> vueDefsCode = findResource(scriptName + "Def*.vue");
             ScriptDefHV scriptDefH = new ScriptDefHV();
             scriptDefH.setScriptName(scriptName);
             scriptDefH.setVersion("@");
@@ -81,5 +89,31 @@ public abstract class NkAbstractCustomScriptObject implements NkCustomScriptObje
             return service.value();
 
         return ClassUtils.decapitateClassName(clazz.getSimpleName());
+    }
+
+    private List<String> findResource(String resourceName){
+        try {
+            for (String path : properties.getComponentBasePackages()) {
+                Resource[] resources = resourcePatternResolver.getResources(String.format("classpath*:/%s/**/%s", packageToPath(path), resourceName));
+
+                return Arrays.stream(resources)
+                        .map(ResourceUtils::readText)
+                        .collect(Collectors.toList());
+            }
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+        return Collections.emptyList();
+    }
+
+    private String packageToPath(String packageName){
+        packageName = packageName.replaceAll("[.]","/");
+        if(packageName.startsWith("/")){
+            packageName = packageName.substring(1);
+        }
+        if(packageName.endsWith("/")){
+            packageName = packageName.substring(0,packageName.length()-1);
+        }
+        return packageName;
     }
 }

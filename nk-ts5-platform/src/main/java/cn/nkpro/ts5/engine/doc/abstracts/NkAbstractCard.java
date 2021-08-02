@@ -1,8 +1,9 @@
-package cn.nkpro.ts5.engine.doc;
+package cn.nkpro.ts5.engine.doc.abstracts;
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
 import cn.nkpro.ts5.config.global.NkProperties;
 import cn.nkpro.ts5.engine.co.NkAbstractCustomScriptObject;
+import cn.nkpro.ts5.engine.doc.NkCard;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocDefIV;
 import cn.nkpro.ts5.engine.doc.model.DocHV;

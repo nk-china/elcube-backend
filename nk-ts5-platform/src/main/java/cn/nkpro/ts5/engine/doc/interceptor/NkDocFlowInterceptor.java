@@ -1,14 +1,14 @@
-package cn.nkpro.ts5.engine.doc;
+package cn.nkpro.ts5.engine.doc.interceptor;
 
-import cn.nkpro.ts5.engine.co.NkAbstractCustomScriptObject;
+import cn.nkpro.ts5.engine.co.NkCustomScriptObject;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import lombok.Getter;
 
-public abstract class NkDocFlowInterceptor extends NkAbstractCustomScriptObject {
-    public abstract FlowDescribe apply(DocHV docHV);
+public interface NkDocFlowInterceptor extends NkCustomScriptObject {
 
+    default FlowDescribe apply(DocHV docHV){return FlowDescribe.visible();}
 
-    public static class FlowDescribe{
+    class FlowDescribe{
 
         @Getter
         private boolean visible;
@@ -21,9 +21,11 @@ public abstract class NkDocFlowInterceptor extends NkAbstractCustomScriptObject 
             this.visibleDesc = visibleDesc;
         }
 
+        @SuppressWarnings("unused")
         public static FlowDescribe visible(){
             return new FlowDescribe(true,null);
         }
+        @SuppressWarnings("unused")
         public static FlowDescribe invisible(String visibleDesc){
             return new FlowDescribe(false,visibleDesc);
         }
