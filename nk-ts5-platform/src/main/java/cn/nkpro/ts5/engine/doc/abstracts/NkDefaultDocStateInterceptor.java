@@ -5,5 +5,7 @@ import cn.nkpro.ts5.engine.doc.interceptor.NkDocStateInterceptor;
 import org.springframework.stereotype.Component;
 
 @Component("NkDefaultDocStateInterceptor")
-public class NkDefaultDocStateInterceptor extends NkAbstractCustomScriptObject implements NkDocStateInterceptor {
+public class NkDefaultDocStateInterceptor
+        extends NkAbstractCustomScriptObject
+        implements NkDocStateInterceptor {
 }
