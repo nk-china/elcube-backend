@@ -19,7 +19,7 @@
 </template>
 
 <script>
-import {MixinDef} from "nk-ts5-platform";
+import { MixinDef } from "nk-ts5-platform";
 export default {
     mixins:[new MixinDef({})],
     created() {

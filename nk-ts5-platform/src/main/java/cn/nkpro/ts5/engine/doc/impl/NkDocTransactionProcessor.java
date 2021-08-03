@@ -2,6 +2,7 @@ package cn.nkpro.ts5.engine.doc.impl;
 
 import cn.nkpro.ts5.config.id.GUID;
 import cn.nkpro.ts5.config.id.SequenceSupport;
+import cn.nkpro.ts5.engine.bpm.NkBpmTaskService;
 import cn.nkpro.ts5.engine.co.NKCustomObjectManager;
 import cn.nkpro.ts5.engine.doc.NkCard;
 import cn.nkpro.ts5.engine.doc.NkDocCycle;
@@ -22,6 +23,7 @@ import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
 import cn.nkpro.ts5.utils.LocalSyncUtilz;
 import com.alibaba.fastjson.JSON;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
@@ -50,7 +52,8 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
     private DocIMapper docIMapper;
     @Autowired@SuppressWarnings("all")
     private SearchEngine searchEngine;
-
+    @Autowired@SuppressWarnings("all")
+    private NkBpmTaskService bpmTaskService;
     @Autowired@SuppressWarnings("all")
     private NKCustomObjectManager customObjectManager;
 
@@ -263,6 +266,15 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
                 Object cardData = finalDoc.getData().get(defIV.getCardKey());
                 card.stateChanged(doc, original, cardData, defIV.getConfig());
             });
+
+            // 启动工作流
+            if(CollectionUtils.isNotEmpty(def.getBpms())){
+                def.getBpms()
+                    .stream()
+                    .filter(bpm->StringUtils.equals(doc.getDocState(),bpm.getStartBy()))
+                    .findFirst()
+                    .ifPresent(bpm-> bpmTaskService.start(bpm.getProcessKey(), doc.getDocId()));
+            }
         }
 
 
@@ -290,6 +302,22 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         );
 
         return returnDoc;
+    }
+
+    @Override
+    public void doOnBpmKilled(DocHV docHV, String processKey, String optSource) throws Exception {
+        if(CollectionUtils.isNotEmpty(docHV.getDef().getBpms())){
+
+            DocDefBpm docDefBpm = docHV.getDef().getBpms()
+                    .stream().filter(i -> StringUtils.equals(i.getProcessKey(), processKey))
+                    .findFirst()
+                    .orElse(null);
+
+            if(docDefBpm!=null){
+                docHV.setDocState(docDefBpm.getRollbackTo());
+                this.doUpdate(docHV.getDef(),docHV,docHV,optSource);
+            }
+        }
     }
 
     private void index(DocHV doc){

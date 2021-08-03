@@ -96,6 +96,9 @@ public class DocHES extends ESDoc {
     @ESField(type= ESFieldType.Keyword)
     private String partnerId;
 
+    @ESField(type= ESFieldType.Keyword)
+    private String processInstanceId;
+
     @ESField(type= ESFieldType.Text,analyzer = ESAnalyzerType.standard, copyToKeyword = true, original = true)
     private String partnerName;
 }

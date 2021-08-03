@@ -160,6 +160,15 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
         }
     }
 
+    @Override
+    public void onBpmKilled(String docId, String processKey, String optSource) throws Exception {
+        DocHV docHV = detail(docId);
+        customObjectManager.getCustomObject(docHV.getDef().getRefObjectType(), NkDocProcessor.class)
+                .doOnBpmKilled(docHV, processKey, optSource);
+        // 事务提交后清空缓存
+        LocalSyncUtilz.runAfterCommit(()-> redisSupport.delete(Constants.CACHE_DOC, docId));
+    }
+
 
     private void validate(DocHV doc){
         Assert.hasText(doc.getDocId(),"单据ID不能为空");

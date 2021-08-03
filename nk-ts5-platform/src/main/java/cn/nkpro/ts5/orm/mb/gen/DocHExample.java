@@ -1174,6 +1174,76 @@ public class DocHExample {
             return (Criteria) this;
         }
 
+        public Criteria andProcessInstanceIdIsNull() {
+            addCriterion("PROCESS_INSTANCE_ID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessInstanceIdIsNotNull() {
+            addCriterion("PROCESS_INSTANCE_ID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessInstanceIdEqualTo(String value) {
+            addCriterion("PROCESS_INSTANCE_ID =", value, "processInstanceId");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessInstanceIdNotEqualTo(String value) {
+            addCriterion("PROCESS_INSTANCE_ID <>", value, "processInstanceId");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessInstanceIdGreaterThan(String value) {
+            addCriterion("PROCESS_INSTANCE_ID >", value, "processInstanceId");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessInstanceIdGreaterThanOrEqualTo(String value) {
+            addCriterion("PROCESS_INSTANCE_ID >=", value, "processInstanceId");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessInstanceIdLessThan(String value) {
+            addCriterion("PROCESS_INSTANCE_ID <", value, "processInstanceId");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessInstanceIdLessThanOrEqualTo(String value) {
+            addCriterion("PROCESS_INSTANCE_ID <=", value, "processInstanceId");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessInstanceIdLike(String value) {
+            addCriterion("PROCESS_INSTANCE_ID like", value, "processInstanceId");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessInstanceIdNotLike(String value) {
+            addCriterion("PROCESS_INSTANCE_ID not like", value, "processInstanceId");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessInstanceIdIn(List<String> values) {
+            addCriterion("PROCESS_INSTANCE_ID in", values, "processInstanceId");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessInstanceIdNotIn(List<String> values) {
+            addCriterion("PROCESS_INSTANCE_ID not in", values, "processInstanceId");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessInstanceIdBetween(String value1, String value2) {
+            addCriterion("PROCESS_INSTANCE_ID between", value1, value2, "processInstanceId");
+            return (Criteria) this;
+        }
+
+        public Criteria andProcessInstanceIdNotBetween(String value1, String value2) {
+            addCriterion("PROCESS_INSTANCE_ID not between", value1, value2, "processInstanceId");
+            return (Criteria) this;
+        }
+
         public Criteria andCreatedTimeIsNull() {
             addCriterion("CREATED_TIME is null");
             return (Criteria) this;

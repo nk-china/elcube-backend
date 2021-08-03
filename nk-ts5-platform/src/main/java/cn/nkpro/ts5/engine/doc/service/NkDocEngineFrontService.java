@@ -11,4 +11,6 @@ public interface NkDocEngineFrontService {
     DocHV calculate(DocHV doc, String fromCard, String options) throws Exception;
 
     DocHV doUpdate(DocHV doc) throws Exception;
+
+    void onBpmKilled(String docId, String processKey, String optSource) throws Exception;
 }

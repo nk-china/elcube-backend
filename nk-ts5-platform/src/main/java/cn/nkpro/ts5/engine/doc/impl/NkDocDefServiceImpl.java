@@ -58,6 +58,8 @@ public class NkDocDefServiceImpl implements NkDocDefService {
     private DocDefFlowMapper docDefFlowMapper;
     @Autowired@SuppressWarnings("all")
     private DocDefCycleMapper docDefCycleMapper;
+    @Autowired@SuppressWarnings("all")
+    private DocDefBpmMapper docDefBpmMapper;
 
     @Override
     public PageList<DocDefH> getPage(String docClassify,
@@ -226,6 +228,25 @@ public class NkDocDefServiceImpl implements NkDocDefService {
                         docDefCycleMapper.insert(cycle);
                     }
                 });
+
+        // bpm
+        DocDefBpmExample bpmExample = new DocDefBpmExample();
+        bpmExample.createCriteria()
+                .andDocTypeEqualTo(docDefHV.getDocType())
+                .andVersionEqualTo(docDefHV.getVersion());
+        docDefBpmMapper.deleteByExample(bpmExample);
+        docDefHV.getBpms()
+                .forEach(bpm->{
+                    if(StringUtils.isNotBlank(bpm.getProcessKey())&&StringUtils.isNotBlank(bpm.getStartBy())){
+
+                        bpm.setDocType(docDefHV.getDocType());
+                        bpm.setVersion(docDefHV.getVersion());
+                        bpm.setOrderBy(docDefHV.getBpms().indexOf(bpm));
+                        bpm.setUpdatedTime(DateTimeUtilz.nowSeconds());
+                        docDefBpmMapper.insert(bpm);
+                    }
+                });
+
 
         // flow
         docDefHV.setDocEntrance(0);
@@ -528,6 +549,14 @@ public class NkDocDefServiceImpl implements NkDocDefService {
                 .andVersionEqualTo(version);
         cycleExample.setOrderByClause("ORDER_BY");
         def.setLifeCycles(docDefCycleMapper.selectByExample(cycleExample));
+
+        // bpm
+        DocDefBpmExample bpmExample = new DocDefBpmExample();
+        bpmExample.createCriteria()
+                .andDocTypeEqualTo(docType)
+                .andVersionEqualTo(version);
+        bpmExample.setOrderByClause("ORDER_BY");
+        def.setBpms(docDefBpmMapper.selectByExample(bpmExample));
 
         // cards
         DocDefIExample docDefIExample = new DocDefIExample();

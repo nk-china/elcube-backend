@@ -41,6 +41,7 @@
 		<table tableName="nk_doc_def_state"				 	enableDeleteByExample="true"  domainObjectName="DocDefState"/>
 		<table tableName="nk_doc_def_cycle"				 	enableDeleteByExample="true"  domainObjectName="DocDefCycle"/>
 		<table tableName="nk_doc_def_flow"				 	enableDeleteByExample="true"  domainObjectName="DocDefFlow"/>
+		<table tableName="nk_doc_def_bpm"					enableDeleteByExample="true"  domainObjectName="DocDefBpm"/>
 
 		<!-- 基础组件 -->
 
@@ -71,7 +72,6 @@
 		<table tableName="def_doc_type"					 	enableDeleteByExample="false"/>
 		<table tableName="def_doc_component"			 	enableDeleteByExample="true"/>
 		<table tableName="def_doc_index_rule"			 	enableDeleteByExample="true"/>
-		<table tableName="def_doc_bpm"					 	enableDeleteByExample="true"/>
 		<table tableName="def_doc_props"				 	enableDeleteByExample="true"/>
 
 		<table tableName="def_doc_partner_role"			 	enableDeleteByExample="true"/>

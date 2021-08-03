@@ -40,6 +40,8 @@ public class DocH implements Serializable {
 
     private String businessKey;
 
+    private String processInstanceId;
+
     private Long createdTime;
 
     private Long updatedTime;
@@ -190,6 +192,15 @@ public class DocH implements Serializable {
 
     public void setBusinessKey(String businessKey) {
         this.businessKey = businessKey;
+    }
+
+    @cn.nkpro.ts5.basic.wsdoc.annotation.CodeFieldNotes("")
+    public String getProcessInstanceId() {
+        return processInstanceId;
+    }
+
+    public void setProcessInstanceId(String processInstanceId) {
+        this.processInstanceId = processInstanceId;
     }
 
     @cn.nkpro.ts5.basic.wsdoc.annotation.CodeFieldNotes("")

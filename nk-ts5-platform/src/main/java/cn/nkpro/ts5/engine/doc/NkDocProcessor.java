@@ -20,4 +20,6 @@ public interface NkDocProcessor extends NkCustomObject {
     DocHV toCreate(DocDefHV def, DocHV preDoc) throws Exception;
 
     DocHV doUpdate(DocDefHV def, DocHV doc, DocHV original, String optSource) throws Exception;
+
+    void doOnBpmKilled(DocHV docHV, String processKey, String optSource) throws Exception;
 }
