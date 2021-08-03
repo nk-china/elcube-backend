@@ -11,7 +11,7 @@ import java.util.Map;
 
 @Data
 public class DocDefHV extends DocDefH {
-    private List<DocDefState> status;
+    private List<DocDefStateV> status;
     private List<DocDefFlowV> flows;
     private List<DocDefFlowV> nextFlows;
     private List<DocDefBpm> bpms;

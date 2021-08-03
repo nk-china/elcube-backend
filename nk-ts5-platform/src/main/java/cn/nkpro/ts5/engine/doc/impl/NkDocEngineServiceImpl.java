@@ -5,10 +5,7 @@ import cn.nkpro.ts5.config.redis.RedisSupport;
 import cn.nkpro.ts5.engine.co.NKCustomObjectManager;
 import cn.nkpro.ts5.engine.doc.NkDocProcessor;
 import cn.nkpro.ts5.engine.doc.interceptor.NkDocFlowInterceptor;
-import cn.nkpro.ts5.engine.doc.model.DocDefFlowV;
-import cn.nkpro.ts5.engine.doc.model.DocDefHV;
-import cn.nkpro.ts5.engine.doc.model.DocHD;
-import cn.nkpro.ts5.engine.doc.model.DocHV;
+import cn.nkpro.ts5.engine.doc.model.*;
 import cn.nkpro.ts5.engine.doc.service.NkDocDefService;
 import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService;
 import cn.nkpro.ts5.exception.TfmsException;
@@ -28,7 +25,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -211,26 +208,36 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
      */
     private DocHV processDef(DocHV docHV){
 
+        Map<String, DocDefStateV> cache = new LinkedHashMap<>();
         docHV.getDef()
-                .getNextFlows()
-                .forEach(flow->{
-                    String[] splitState = StringUtils.split(flow.getPreDocState(), ',');
-                    boolean visibleState = ArrayUtils.contains(splitState,docHV.getDocState()) || ArrayUtils.contains(splitState,"@");
-
-                    if(!visibleState){
-                        flow.setVisibleDesc("状态不满足条件");
+                .getStatus()
+                .forEach(state->{
+                    if(StringUtils.equalsAny(docHV.getDocState(),state.getPreDocState(),state.getDocState())){
+                        cache.putIfAbsent(state.getDocState(),state);
                     }
-
-                    // 处理 单据业务流的自定义条件
-                    if(visibleState && StringUtils.isNotBlank(flow.getRefObjectType())){
-                        NkDocFlowInterceptor.FlowDescribe flowDescribe = applyDocFlowInterceptor(flow.getRefObjectType(), docHV);
-                        if(!flowDescribe.isVisible()){
-                            flow.setVisibleDesc(flowDescribe.getVisibleDesc());
-                        }
-                    }
-
-                    flow.setVisible(visibleState);
                 });
+        docHV.getDef().setStatus(new ArrayList<>(cache.values()));
+
+        docHV.getDef()
+            .getNextFlows()
+            .forEach(flow->{
+                String[] splitState = StringUtils.split(flow.getPreDocState(), ',');
+                boolean visibleState = ArrayUtils.contains(splitState,docHV.getDocState()) || ArrayUtils.contains(splitState,"@");
+
+                if(!visibleState){
+                    flow.setVisibleDesc("状态不满足条件");
+                }
+
+                // 处理 单据业务流的自定义条件
+                if(visibleState && StringUtils.isNotBlank(flow.getRefObjectType())){
+                    NkDocFlowInterceptor.FlowDescribe flowDescribe = applyDocFlowInterceptor(flow.getRefObjectType(), docHV);
+                    if(!flowDescribe.isVisible()){
+                        flow.setVisibleDesc(flowDescribe.getVisibleDesc());
+                    }
+                }
+
+                flow.setVisible(visibleState);
+            });
 
         return docHV;
     }

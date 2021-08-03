@@ -13,6 +13,7 @@ import cn.nkpro.ts5.engine.doc.interceptor.*;
 import cn.nkpro.ts5.engine.doc.model.DocDefFlowV;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocDefIV;
+import cn.nkpro.ts5.engine.doc.model.DocDefStateV;
 import cn.nkpro.ts5.engine.doc.service.NkDocDefService;
 import cn.nkpro.ts5.exception.TfmsException;
 import cn.nkpro.ts5.orm.mb.gen.*;
@@ -532,7 +533,7 @@ public class NkDocDefServiceImpl implements NkDocDefService {
                 .andDocTypeEqualTo(docType)
                 .andVersionEqualTo(version);
         stateExample.setOrderByClause("ORDER_BY");
-        def.setStatus(docDefStateMapper.selectByExample(stateExample));
+        def.setStatus(BeanUtilz.copyFromList(docDefStateMapper.selectByExample(stateExample), DocDefStateV.class));
 
         // flows
         DocDefFlowExample flowExample = new DocDefFlowExample();
