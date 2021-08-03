@@ -44,7 +44,7 @@ public interface NkDocDefService {
 
     DocDefHV doUpdate(DocDefHV defDocTypeBO, boolean force);
 
-    void runLoopCards(DocDefHV docDefHV, boolean ignoreError, Function function) throws Exception;
+    void runLoopCards(DocDefHV docDefHV, boolean ignoreError, Function function);
 
     @FunctionalInterface
     interface Function {

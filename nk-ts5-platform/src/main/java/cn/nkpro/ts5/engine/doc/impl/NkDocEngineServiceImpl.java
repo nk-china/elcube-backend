@@ -66,7 +66,7 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
     }
 
     @Override
-    public DocHV detail(String docId) throws Exception {
+    public DocHV detail(String docId) {
 
         // 获取单据抬头和行项目数据
         DocHD docHD = redisSupport.getIfAbsent(Constants.CACHE_DOC, docId,()->{
@@ -161,7 +161,7 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
     }
 
     @Override
-    public void onBpmKilled(String docId, String processKey, String optSource) throws Exception {
+    public void onBpmKilled(String docId, String processKey, String optSource) {
         DocHV docHV = detail(docId);
         customObjectManager.getCustomObject(docHV.getDef().getRefObjectType(), NkDocProcessor.class)
                 .doOnBpmKilled(docHV, processKey, optSource);

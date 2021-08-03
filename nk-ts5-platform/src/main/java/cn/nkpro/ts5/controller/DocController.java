@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.controller;
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
-import cn.nkpro.ts5.engine.doc.service.NkDocIndexService;
+import cn.nkpro.ts5.engine.elasticearch.NkIndexService;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.engine.doc.service.NkDocDefService;
 import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService;
@@ -35,7 +35,7 @@ public class DocController {
     @Autowired@SuppressWarnings("all")
     private NkDocEngineFrontService docEngine;
     @Autowired@SuppressWarnings("all")
-    private NkDocIndexService docService;
+    private NkIndexService docService;
 //    @Autowired
 //    private TfmsDocEngineWithPerm docEngineWithPerm;
 //    @Autowired

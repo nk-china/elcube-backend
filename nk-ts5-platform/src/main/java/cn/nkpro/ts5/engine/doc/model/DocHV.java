@@ -13,6 +13,10 @@ import java.util.Map;
 @Data
 public class DocHV extends DocHD {
 
+    private String docTypeDesc;
+
+    private String docStateDesc;
+
     private DocDefHV def;
 
     private Map<String,Object> data;

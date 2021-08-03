@@ -4,7 +4,7 @@ import cn.nkpro.ts5.engine.doc.model.DocHV;
 
 public interface NkDocEngineFrontService {
 
-    DocHV detail(String docId) throws Exception;
+    DocHV detail(String docId);
 
     DocHV create(String docType, String preDocId) throws Exception;
 
@@ -12,5 +12,5 @@ public interface NkDocEngineFrontService {
 
     DocHV doUpdate(DocHV doc) throws Exception;
 
-    void onBpmKilled(String docId, String processKey, String optSource) throws Exception;
+    void onBpmKilled(String docId, String processKey, String optSource);
 }

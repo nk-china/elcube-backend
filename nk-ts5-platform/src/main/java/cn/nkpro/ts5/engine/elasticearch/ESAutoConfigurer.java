@@ -1,5 +1,6 @@
 package cn.nkpro.ts5.engine.elasticearch;
 
+import cn.nkpro.ts5.engine.elasticearch.model.BpmTaskES;
 import cn.nkpro.ts5.engine.elasticearch.model.DocHES;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
@@ -15,5 +16,7 @@ public class ESAutoConfigurer implements ApplicationRunner {
     @Override
     public void run(ApplicationArguments args) throws Exception {
         searchEngine.createIndices(DocHES.class);
+        //searchEngine.deleteIndices(BpmTaskES.class);
+        searchEngine.createIndices(BpmTaskES.class);
     }
 }

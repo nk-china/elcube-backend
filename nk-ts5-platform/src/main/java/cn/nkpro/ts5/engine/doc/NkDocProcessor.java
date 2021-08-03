@@ -13,13 +13,13 @@ public interface NkDocProcessor extends NkCustomObject {
     }
     EnumDocClassify classify();
 
-    DocHV calculate(DocHV doc, String fromCard, String options) throws Exception;
+    DocHV calculate(DocHV doc, String fromCard, String options);
 
-    DocHV detail  (DocDefHV def, DocHD docHV) throws Exception;
+    DocHV detail  (DocDefHV def, DocHD docHV);
 
-    DocHV toCreate(DocDefHV def, DocHV preDoc) throws Exception;
+    DocHV toCreate(DocDefHV def, DocHV preDoc);
 
-    DocHV doUpdate(DocDefHV def, DocHV doc, DocHV original, String optSource) throws Exception;
+    DocHV doUpdate(DocDefHV def, DocHV doc, DocHV original, String optSource);
 
-    void doOnBpmKilled(DocHV docHV, String processKey, String optSource) throws Exception;
+    void doOnBpmKilled(DocHV docHV, String processKey, String optSource);
 }

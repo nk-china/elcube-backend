@@ -11,8 +11,6 @@ public class CamundaConfiguration extends SpringBootProcessEnginePlugin {
     @Override
     public void preInit(SpringProcessEngineConfiguration processEngineConfiguration) {
         super.preInit(processEngineConfiguration);
-        System.out.println(processEngineConfiguration);
-//        processEngineConfiguration.setCustomEventHandlers();
     }
 
     @Override

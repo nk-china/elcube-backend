@@ -261,7 +261,6 @@ public class SearchEngine {
             client.indices()
                     .delete(new DeleteIndexRequest(documentIndex(document)), RequestOptions.DEFAULT);
         }
-
     }
 
     @SuppressWarnings("deprecation")

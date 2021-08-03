@@ -5,7 +5,9 @@ import cn.nkpro.ts5.engine.bpm.NkBpmTaskService;
 import cn.nkpro.ts5.engine.bpm.model.BpmInstance;
 import cn.nkpro.ts5.engine.bpm.model.BpmTask;
 import cn.nkpro.ts5.engine.bpm.model.BpmTaskComplete;
+import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService;
 import cn.nkpro.ts5.utils.BeanUtilz;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
@@ -24,6 +26,9 @@ public class NkBpmTaskServiceImpl implements NkBpmTaskService {
 
     @Autowired
     private ProcessEngine processEngine;
+
+    @Autowired
+    private NkDocEngineFrontService docEngine;
 
     private static Set<String> logActivityTypes = new HashSet<>();
     static {
@@ -308,4 +313,21 @@ public class NkBpmTaskServiceImpl implements NkBpmTaskService {
 //        @Override
 //        public void setPrincipal(Principal principal) {}
 //    };
+
+    @Override
+    @Transactional
+    public void deleteProcessInstance(String instanceId, String deleteReason){
+        ProcessInstance processInstance = processEngine.getRuntimeService().createProcessInstanceQuery()
+                .processInstanceId(instanceId)
+                .singleResult();
+
+        if(StringUtils.isNotBlank(processInstance.getBusinessKey())){
+            docEngine.onBpmKilled(
+                    processInstance.getBusinessKey(),
+                    processInstance.getProcessDefinitionId().split(":")[0],
+                    "强制结束流程");
+        }
+
+        processEngine.getRuntimeService().deleteProcessInstance(instanceId,"强制结束流程");
+    }
 }

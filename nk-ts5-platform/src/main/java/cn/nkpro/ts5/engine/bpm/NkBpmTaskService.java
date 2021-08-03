@@ -26,4 +26,5 @@ public interface NkBpmTaskService {
 
     void revoke(String instanceId);
 
+    void deleteProcessInstance(String instanceId, String deleteReason);
 }

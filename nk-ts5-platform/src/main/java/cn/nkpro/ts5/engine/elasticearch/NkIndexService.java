@@ -1,10 +1,8 @@
-package cn.nkpro.ts5.engine.doc.service;
+package cn.nkpro.ts5.engine.elasticearch;
 
-import cn.nkpro.ts5.engine.elasticearch.ESPageList;
-import cn.nkpro.ts5.engine.elasticearch.SearchEngine;
 import cn.nkpro.ts5.engine.elasticearch.model.ESDoc;
-import cn.nkpro.ts5.exception.TfmsException;
 import cn.nkpro.ts5.engine.web.UserAuthorizationService;
+import cn.nkpro.ts5.exception.TfmsException;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -23,7 +21,7 @@ import org.springframework.stereotype.Component;
 import java.io.IOException;
 
 @Component
-public class NkDocIndexService {
+public class NkIndexService {
 
     @Autowired
     private SearchEngine searchEngine;

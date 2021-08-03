@@ -67,7 +67,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
     }
 
     @Override
-    public DocHV toCreate(DocDefHV def, DocHV preDoc) throws Exception {
+    public DocHV toCreate(DocDefHV def, DocHV preDoc) {
 
         Optional<DocHV> optPreDoc = Optional.ofNullable(preDoc);
 
@@ -113,7 +113,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
     }
 
     @Override
-    public DocHV calculate(DocHV doc, String fromCard, String options) throws Exception {
+    public DocHV calculate(DocHV doc, String fromCard, String options){
 
         docDefService.runLoopCards(doc.getDef(),false, (card, defIV)->
                 doc.getData().put(
@@ -152,7 +152,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
     }
 
     @Override
-    public DocHV detail(DocDefHV def, DocHD docHD) throws Exception {
+    public DocHV detail(DocDefHV def, DocHD docHD) {
 
         DocHV doc = BeanUtilz.copyFromObject(docHD, DocHV.class);
         doc.setDef(def);
@@ -178,12 +178,20 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
             docI.setCardContent(null);
         });
 
+        //docHES.setTags(StringUtils.split(docBO.getDocTags(),','));
+        doc.setDocTypeDesc(String.format("%s | %s",doc.getDocType(),doc.getDef().getDocName()));
+        doc.getDef().getStatus().stream()
+                .filter(defDocStatus -> StringUtils.equals(defDocStatus.getDocState(),doc.getDocState()))
+                .findAny().ifPresent(state ->
+                        doc.setDocStateDesc(String.format("%s | %s",state.getDocState(),state.getDocStateDesc()))
+                );
+
         return doc;
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    public DocHV doUpdate(DocDefHV def, DocHV doc, DocHV original, String optSource) throws Exception {
+    public DocHV doUpdate(DocDefHV def, DocHV doc, DocHV original, String optSource) {
 
         // 原始单据
         Optional<DocHV> optionalOriginal = Optional.ofNullable(original);
@@ -305,7 +313,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
     }
 
     @Override
-    public void doOnBpmKilled(DocHV docHV, String processKey, String optSource) throws Exception {
+    public void doOnBpmKilled(DocHV docHV, String processKey, String optSource) {
         if(CollectionUtils.isNotEmpty(docHV.getDef().getBpms())){
 
             DocDefBpm docDefBpm = docHV.getDef().getBpms()
@@ -321,21 +329,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
     }
 
     private void index(DocHV doc){
-
-        DocHES docHES = BeanUtilz.copyFromObject(doc, DocHES.class);
-
-        //docHES.setTags(StringUtils.split(docBO.getDocTags(),','));
-        docHES.setDocTypeDesc(String.format("%s | %s",doc.getDocType(),doc.getDef().getDocName()));
-        doc.getDef().getStatus().stream()
-                .filter(defDocStatus -> StringUtils.equals(defDocStatus.getDocState(),doc.getDocState()))
-                .findAny()
-                .ifPresent(state ->
-                        docHES.setDocStateDesc(
-                                String.format("%s | %s",state.getDocState(),state.getDocStateDesc())
-                        )
-                );
-
-        searchEngine.indexBeforeCommit(docHES);
+        searchEngine.indexBeforeCommit(BeanUtilz.copyFromObject(doc, DocHES.class));
     }
 
     private boolean isOverride(Object obj){
