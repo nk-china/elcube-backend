@@ -32,7 +32,7 @@ server:
     mime-types: application/javascript,text/css,application/json,application/xml,text/html,text/xml,text/plain
     min-response-size: 2KB
   servlet:
-    context-path: /ts5-api
+    context-path: /
 
 spring:
   application:
