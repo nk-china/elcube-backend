@@ -253,9 +253,18 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
             // 调用 卡片 afterUpdated
             if(isOverride(card)){
                 Object loopCardData = cardData;
-                LocalSyncUtilz.runAfterCommit(()-> card.afterUpdated(finalDoc, loopCardData, defIV.getConfig()));
+                LocalSyncUtilz.runAfterCommit(()-> card.updateCommitted(finalDoc, loopCardData, defIV.getConfig()));
             }
         });
+
+        if(original==null || !StringUtils.equals(doc.getDocState(),original.getDocState())){
+            // 单据状态发生变化
+            docDefService.runLoopCards(def,false, (card, defIV)->{
+                Object cardData = finalDoc.getData().get(defIV.getCardKey());
+                card.stateChanged(doc, original, cardData, defIV.getConfig());
+            });
+        }
+
 
         if(optionalOriginal.isPresent()){
             docHMapper.updateByPrimaryKeySelective(finalDoc);

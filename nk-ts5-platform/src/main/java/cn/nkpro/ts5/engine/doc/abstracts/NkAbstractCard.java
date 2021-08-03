@@ -56,7 +56,10 @@ public abstract class NkAbstractCard<DT,DDT> extends NkAbstractCustomScriptObjec
 
     @Override
     public String getDataComponentName() {
-        return beanName;
+        if(StringUtils.isNotBlank(scriptDef.getVueMain())){
+            return beanName;
+        }
+        return null;
     }
 
     @Override
@@ -163,6 +166,11 @@ public abstract class NkAbstractCard<DT,DDT> extends NkAbstractCustomScriptObjec
     @Override
     public DT beforeUpdate(DocHV doc, DT data, DDT def, DT original) {
         return data;
+    }
+
+    @Override
+    public void stateChanged(DocHV doc, DocHV original, DT data, DDT def){
+
     }
 
     @SuppressWarnings("all")

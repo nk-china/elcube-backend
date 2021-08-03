@@ -41,11 +41,6 @@ class NkCardSimple extends NkAbstractCard<NkCardSimpleData,NkCardSimpleDef> {
         return data
     }
 
-    @Override
-    void afterUpdated(DocHV doc, NkCardSimpleData data, NkCardSimpleDef cardDef) {
-        log.info("DATA:"+JSON.toJSONString(data))
-    }
-
     static class NkCardSimpleData {
 
         private String field
