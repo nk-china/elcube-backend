@@ -1,6 +1,9 @@
 package cn.nkpro.ts5.config.security;
 
-import cn.nkpro.ts5.config.security.validate.*;
+import cn.nkpro.ts5.config.security.validate.TfmsPasswordAuthenticationFilter;
+import cn.nkpro.ts5.config.security.validate.TfmsPasswordAuthenticationProvider;
+import cn.nkpro.ts5.config.security.validate.TfmsTokenAuthenticationFilter;
+import cn.nkpro.ts5.config.security.validate.TfmsTokenAuthenticationProvider;
 import cn.nkpro.ts5.utils.JwtHelper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -11,7 +14,6 @@ import org.springframework.security.config.BeanIds;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -64,7 +66,8 @@ public class TfmsWebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .authenticationEntryPoint(authenticationEntryPoint())
                 .and()
             .addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-            .addFilterBefore(passwordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+            .addFilterBefore(passwordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+        ;
 
     }
 
@@ -104,10 +107,4 @@ public class TfmsWebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected TfmsAuthenticationEntryPoint authenticationEntryPoint(){
         return new TfmsAuthenticationEntryPoint();
     }
-
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        web.ignoring().antMatchers("/public/weChat/weChatSendEmail");
-    }
-
 }

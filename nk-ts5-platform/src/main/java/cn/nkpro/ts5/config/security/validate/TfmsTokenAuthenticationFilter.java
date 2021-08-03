@@ -24,10 +24,8 @@ import java.util.Objects;
  * Created by bean on 2019/12/30.
  */
 public class TfmsTokenAuthenticationFilter extends GenericFilterBean {
-    @Autowired
-    private DefaultRedisSupportImpl redisSupport;
 
-    protected AuthenticationManager authenticationManager;
+    private AuthenticationManager authenticationManager;
 
     private AuthenticationEntryPoint authenticationEntryPoint;
 
@@ -45,9 +43,10 @@ public class TfmsTokenAuthenticationFilter extends GenericFilterBean {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated()) {
 
+                String nkApp    = StringUtils.defaultString(obtainParam(request, "NK-App"));
                 String tokenStr = obtainParam(request, "NK-Token");
-//                String tokenStr=obtainParam(request,redisSupport.get())
-                if (StringUtils.isNotBlank(tokenStr)) {
+
+                if (StringUtils.isNoneBlank(nkApp, tokenStr)) {
 
                     TfmsTokenAuthentication nkAuthentication = new TfmsTokenAuthentication(tokenStr);
 

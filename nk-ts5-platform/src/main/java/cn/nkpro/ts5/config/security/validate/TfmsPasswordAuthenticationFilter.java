@@ -41,10 +41,12 @@ public class TfmsPasswordAuthenticationFilter extends GenericFilterBean {
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
             if (authentication == null || !authentication.isAuthenticated()) {
 
+                String nkApp    = StringUtils.defaultString(obtainParam(request, "NK-App"));
+
                 String username = StringUtils.defaultString(obtainParam(request, "username"));
                 String password = StringUtils.defaultString(obtainParam(request, "password"));
 
-                if (StringUtils.isNoneBlank(username, password)) {
+                if (StringUtils.isNoneBlank(nkApp, username, password)) {
                     TfmsPasswordAuthentication nkAuthentication = new TfmsPasswordAuthentication(username, password);
                     try {
                         Authentication responseAuthentication = authenticationManager.authenticate(nkAuthentication);

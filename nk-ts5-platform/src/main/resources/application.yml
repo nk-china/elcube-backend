@@ -97,5 +97,15 @@ mybatis:
   config-location: classpath:/mybatis-configuration.xml
   dialect: cn.nkpro.ts5.config.mybatis.pagination.dialect.MySQLDialect
 
-flowable:
-  database-schema-update: false
+camunda:
+  bpm:
+    database:
+      schema-update: true
+    admin-user:
+      id: admin
+      password: nk@2020
+    filter:
+      create: All tasks
+    webapp:
+      application-path: bpm
+      index-redirect-enabled: false
