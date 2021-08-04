@@ -2,6 +2,7 @@ package cn.nkpro.ts5.engine.bpm.model;
 
 import lombok.Data;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -17,6 +18,9 @@ public class BpmTask {
     private String processInstanceId;
     private String createTime;
     private String assignee;
+
+    private Date startTime;
+    private Date endTime;
 
     // instance props
     private String businessKey;

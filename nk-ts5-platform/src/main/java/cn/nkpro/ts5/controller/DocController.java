@@ -24,7 +24,7 @@ import java.util.List;
  * Created by bean on 2020/6/9.
  */
 @PreAuthorize("authenticated")
-@WsDocNote("13.单据")
+@WsDocNote("3.单据")
 @RestController
 @RequestMapping("/doc")
 public class DocController {

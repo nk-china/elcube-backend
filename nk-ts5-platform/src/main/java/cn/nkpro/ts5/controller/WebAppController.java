@@ -17,7 +17,7 @@ import java.util.List;
  * Created by bean on 2019/12/18.
  */
 
-@WsDocNote("2.UI控制器")
+@WsDocNote("1.UI控制器")
 @RequestMapping("/webapp")
 @RestController
 public class WebAppController {

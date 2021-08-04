@@ -1,8 +1,8 @@
 package cn.nkpro.ts5.engine.bpm.impl;
 
 import cn.nkpro.ts5.engine.bpm.NkBpmDefService;
-import cn.nkpro.ts5.engine.bpm.model.DeploymentV;
-import cn.nkpro.ts5.engine.bpm.model.ProcessDefinitionV;
+import cn.nkpro.ts5.engine.bpm.model.BpmDeployment;
+import cn.nkpro.ts5.engine.bpm.model.BpmProcessDefinition;
 import cn.nkpro.ts5.exception.TfmsException;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import org.apache.commons.lang3.StringUtils;
@@ -30,7 +30,7 @@ public class NkBpmDefServiceImpl implements NkBpmDefService {
     private ProcessEngine processEngine;
 
     @Override
-    public DeploymentV deploy(ProcessDefinitionV definition){
+    public BpmDeployment deploy(BpmProcessDefinition definition){
 
         ProcessDefinition existsDefinition = processEngine.getRepositoryService()
                 .createProcessDefinitionQuery()
@@ -48,16 +48,16 @@ public class NkBpmDefServiceImpl implements NkBpmDefService {
                     .createDeployment()
                     .addString(definition.getResourceName(),definition.getBpmnXml())
                     .deploy(),
-                DeploymentV.class
+                BpmDeployment.class
         );
     }
 
     @Override
-    public ProcessDefinitionV getProcessDefinition(String definitionId){
-        ProcessDefinitionV definition = BeanUtilz.copyFromObject(processEngine.getRepositoryService()
+    public BpmProcessDefinition getProcessDefinition(String definitionId){
+        BpmProcessDefinition definition = BeanUtilz.copyFromObject(processEngine.getRepositoryService()
                 .createProcessDefinitionQuery()
                 .processDefinitionId(definitionId)
-                .singleResult(),ProcessDefinitionV.class);
+                .singleResult(), BpmProcessDefinition.class);
 
         definition.setBpmnXml(getBpmnXml(definition.getDeploymentId(),definition.getResourceName()));
 

@@ -16,7 +16,7 @@ import java.util.List;
 /**
  * Created by bean on 2019/12/18.
  */
-@WsDocNote("C1.菜单设置")
+@WsDocNote("11.菜单设置")
 @RequestMapping("/settings/menu")
 @RestController
 @PreAuthorize("hasAnyAuthority('*:*','SETTINGS:*','SETTINGS:MENU')")

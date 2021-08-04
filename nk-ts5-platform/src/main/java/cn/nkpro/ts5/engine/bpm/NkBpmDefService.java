@@ -1,17 +1,16 @@
 package cn.nkpro.ts5.engine.bpm;
 
 
-import cn.nkpro.ts5.engine.bpm.model.DeploymentV;
-import cn.nkpro.ts5.engine.bpm.model.ProcessDefinitionV;
-import org.camunda.bpm.engine.repository.Deployment;
+import cn.nkpro.ts5.engine.bpm.model.BpmDeployment;
+import cn.nkpro.ts5.engine.bpm.model.BpmProcessDefinition;
 
 import java.util.List;
 
 public interface NkBpmDefService {
 
-    DeploymentV deploy(ProcessDefinitionV definition);
+    BpmDeployment deploy(BpmProcessDefinition definition);
 
-    ProcessDefinitionV getProcessDefinition(String definitionId);
+    BpmProcessDefinition getProcessDefinition(String definitionId);
 
     List<Object> getAllDeployments();
 }

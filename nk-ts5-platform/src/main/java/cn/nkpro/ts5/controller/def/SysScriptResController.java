@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * Created by bean on 2020/1/15.
  */
-@WsDocNote("D2.脚本资源")
+@WsDocNote("35.[DevDef]脚本资源")
 @RestController
 @RequestMapping("/def/resources")
 public class SysScriptResController {

@@ -21,7 +21,7 @@ import java.util.Map;
  */
 
 @PreAuthorize("authenticated")
-@WsDocNote("1.用户验证服务")
+@WsDocNote("2.用户验证服务")
 @RestController
 @RequestMapping("/authentication")
 public class AuthController {

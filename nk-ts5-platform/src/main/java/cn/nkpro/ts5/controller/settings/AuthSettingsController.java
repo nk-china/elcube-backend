@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@WsDocNote("C2.权限设置")
+@WsDocNote("12.权限设置")
 @RestController
 @RequestMapping("/settings/auth")
 @PreAuthorize("hasAnyAuthority('*:*','SETTINGS:*','SETTINGS:AUTH')")

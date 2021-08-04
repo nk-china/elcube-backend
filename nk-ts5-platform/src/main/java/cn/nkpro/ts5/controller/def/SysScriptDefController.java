@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  * Created by bean on 2020/7/17.
  */
-@WsDocNote("D3.脚本配置")
+@WsDocNote("34.[DevDef]脚本配置")
 @RestController
 @RequestMapping("/def/script")
 @PreAuthorize("hasAnyAuthority('*:*','DEF:*','DEF:SCRIPT')")

@@ -3,7 +3,7 @@ package cn.nkpro.ts5.engine.bpm.model;
 import lombok.Data;
 
 @Data
-public class ProcessDefinitionV{
+public class BpmProcessDefinition {
         private String id;
         private String deploymentId;
         private String key;

@@ -13,7 +13,7 @@ import java.util.Collection;
 /**
  * Created by bean on 2020/7/17.
  */
-@WsDocNote("调试工具")
+@WsDocNote("31.[DevDef]调试工具")
 @RestController
 @RequestMapping("/debug")
 public class SysDebugController {

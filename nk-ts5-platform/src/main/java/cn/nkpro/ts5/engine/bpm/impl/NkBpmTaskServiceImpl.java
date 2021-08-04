@@ -1,5 +1,6 @@
 package cn.nkpro.ts5.engine.bpm.impl;
 
+import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.config.security.SecurityUtilz;
 import cn.nkpro.ts5.engine.bpm.NkBpmTaskService;
 import cn.nkpro.ts5.engine.bpm.model.BpmInstance;
@@ -7,10 +8,10 @@ import cn.nkpro.ts5.engine.bpm.model.BpmTask;
 import cn.nkpro.ts5.engine.bpm.model.BpmTaskComplete;
 import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService;
 import cn.nkpro.ts5.utils.BeanUtilz;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
+import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +19,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -30,20 +33,12 @@ public class NkBpmTaskServiceImpl implements NkBpmTaskService {
     @Autowired
     private NkDocEngineFrontService docEngine;
 
-    private static Set<String> logActivityTypes = new HashSet<>();
-    static {
-        logActivityTypes.add("startEvent");
-        logActivityTypes.add("stopEvent");
-        logActivityTypes.add("userTask");
-        logActivityTypes.add("serviceTask");
-    }
-
     @Override
     @Transactional
     public ProcessInstance start(String key, String docId){
 
         Map<String,Object> variables = new HashMap<>();
-        variables.put("NK_START_USER_ID", SecurityUtilz.getUser().getId());
+        variables.put("NK@START_USER_ID", SecurityUtilz.getUser().getId());
 
         return processEngine.getRuntimeService()
                 .startProcessInstanceByKey(
@@ -64,16 +59,60 @@ public class NkBpmTaskServiceImpl implements NkBpmTaskService {
                 .singleResult();
         Assert.notNull(task,"任务不存在");
 
-        //Authentication.setAuthenticationContext(authenticationContext);
-
-        //processEngine.getTaskService().setAssignee(bpmTask.getTaskId(), Authentication.getAuthenticatedUserId());
-
         String comment = bpmTask.getFlowName() + (StringUtils.isNotBlank(bpmTask.getComment())?(" | "+ bpmTask.getComment()):"");
-        processEngine.getTaskService().addComment(bpmTask.getTaskId(),task.getProcessInstanceId(),comment);
+        processEngine.getTaskService().createComment(bpmTask.getTaskId(),task.getProcessInstanceId(),comment);
 
         bpmTask.getVariables().put("nkFlowId",bpmTask.getFlow());
         processEngine.getTaskService().complete(bpmTask.getTaskId(),bpmTask.getVariables());
     }
+
+    @Override
+    public PageList<BpmInstance> processInstancePage(Integer from,Integer rows){
+
+        HistoricProcessInstanceQuery query = processEngine.getHistoryService()
+                .createHistoricProcessInstanceQuery()
+                .orderByProcessInstanceStartTime()
+                .desc();
+
+        return new PageList<>(
+                BeanUtilz.copyFromList(query.listPage(from, rows),BpmInstance.class),
+                from,
+                rows,
+                query.count());
+    }
+
+    @Override
+    public BpmInstance processInstanceDetail(String instanceId){
+
+        BpmInstance processInstance = BeanUtilz.copyFromObject(
+                processEngine.getHistoryService()
+                    .createHistoricProcessInstanceQuery()
+                    .processInstanceId(instanceId)
+                    .singleResult(),BpmInstance.class);
+
+        Assert.notNull(processInstance, "流程实例不存在");
+
+        processInstance.setBpmTask(BeanUtilz.copyFromList(
+                processEngine.getHistoryService()
+                        .createHistoricTaskInstanceQuery()
+                        .processInstanceId(instanceId)
+                        .list(),BpmTask.class));
+
+        if(StringUtils.equals(processInstance.getState(),"ACTIVE")){
+            processInstance.setBpmVariables(processEngine.getRuntimeService()
+                    .getVariables(instanceId));
+        }
+
+        return processInstance;
+    }
+
+
+
+
+
+
+
+
 
     @Override
     public Boolean taskExists(String taskId) {
@@ -328,6 +367,7 @@ public class NkBpmTaskServiceImpl implements NkBpmTaskService {
                     "强制结束流程");
         }
 
+        processEngine.getRuntimeService().setVariable(instanceId,"NK@DELETE",true);
         processEngine.getRuntimeService().deleteProcessInstance(instanceId,"强制结束流程");
     }
 }

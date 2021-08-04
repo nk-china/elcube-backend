@@ -16,7 +16,7 @@ import java.util.Map;
 /**
  * Created by bean on 2020/1/15.
  */
-@WsDocNote("D1.单据配置")
+@WsDocNote("33.[DevDef]单据配置")
 @RestController
 @RequestMapping("/def/doc")
 @PreAuthorize("hasAnyAuthority('*:*','DEF:*','DEF:DOCTYPE')")

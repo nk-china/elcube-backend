@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 @Data
 public class BpmInstance {
@@ -27,6 +28,10 @@ public class BpmInstance {
     private String deleteReason;
 
     private Boolean revokeAble;
+
+    private List<BpmTask> bpmTask;
+
+    private Map<String, Object> bpmVariables;
 
     private List<BpmActivity> activities;
 }

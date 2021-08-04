@@ -19,10 +19,10 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * Created by bean on 2020/7/21.
  */
-@WsDocNote("14.工作流")
+@WsDocNote("4.工作流")
 @RestController
-@RequestMapping("/bpm")
-public class BPMController {
+@RequestMapping("/task")
+public class TaskController {
 
     @Autowired
     private NkBpmTaskService bpmTaskService;

@@ -1,5 +1,6 @@
 package cn.nkpro.ts5.engine.bpm;
 
+import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.engine.bpm.model.BpmInstance;
 import cn.nkpro.ts5.engine.bpm.model.BpmTask;
 import cn.nkpro.ts5.engine.bpm.model.BpmTaskComplete;
@@ -15,6 +16,10 @@ public interface NkBpmTaskService {
 
     @Transactional
     void complete(BpmTaskComplete bpmTask);
+
+    PageList<BpmInstance> processInstancePage(Integer from, Integer rows);
+
+    BpmInstance processInstanceDetail(String instanceId);
 
     Boolean taskExists(String taskId);
 

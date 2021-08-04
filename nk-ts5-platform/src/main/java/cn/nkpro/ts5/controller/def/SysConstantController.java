@@ -13,7 +13,7 @@ import java.util.List;
 
 /**
  */
-@WsDocNote("D6.常量管理控制器")
+@WsDocNote("32.[DevDef]常量")
 @RequestMapping("/sys/constant")
 @RestController
 @PreAuthorize("hasAnyAuthority('*:*','DEF:*','DEF:CONSTANT')")

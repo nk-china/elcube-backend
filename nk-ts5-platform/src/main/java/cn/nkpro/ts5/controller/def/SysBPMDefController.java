@@ -2,8 +2,8 @@ package cn.nkpro.ts5.controller.def;
 
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
-import cn.nkpro.ts5.engine.bpm.model.DeploymentV;
-import cn.nkpro.ts5.engine.bpm.model.ProcessDefinitionV;
+import cn.nkpro.ts5.engine.bpm.model.BpmDeployment;
+import cn.nkpro.ts5.engine.bpm.model.BpmProcessDefinition;
 import cn.nkpro.ts5.engine.bpm.NkBpmDefService;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import org.apache.commons.lang3.StringUtils;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  * Created by bean on 2020/7/17.
  */
-@WsDocNote("S5.工作流配置")
+@WsDocNote("36.[DevDef]工作流配置")
 @RestController
 @RequestMapping("/def/bpm")
 @PreAuthorize("hasAnyAuthority('*:*','DEF:*','DEF:BPM')")
@@ -30,7 +30,7 @@ public class SysBPMDefController {
 
     @WsDocNote("1.拉取定义")
     @RequestMapping(value = "/process/definitions")
-    public PageList<ProcessDefinitionV> processDefinitions(
+    public PageList<BpmProcessDefinition> processDefinitions(
             @WsDocNote("查询条目")@RequestParam(value = "latest",       required = false, defaultValue = "false") Boolean latest,
             @WsDocNote("查询条目")@RequestParam(value = "keyword",      required = false) String key,
             @WsDocNote("查询条目")@RequestParam(value = "orderField",   required = false) String orderField,
@@ -65,26 +65,26 @@ public class SysBPMDefController {
         }
 
         return new PageList<>(
-                BeanUtilz.copyFromList(query.listPage(from,rows), ProcessDefinitionV.class),
+                BeanUtilz.copyFromList(query.listPage(from,rows), BpmProcessDefinition.class),
                 from,
                 rows,
                 query.count());
     }
     @WsDocNote("2.拉取定义详情")
     @RequestMapping(value = "/process/definition/detail")
-    public ProcessDefinitionV processDefinitionDetail(String definitionId){
+    public BpmProcessDefinition processDefinitionDetail(String definitionId){
         return defBpmService.getProcessDefinition(definitionId);
     }
 
     @WsDocNote("3.部署流程定义")
     @RequestMapping(value = "/deploy",method = RequestMethod.POST)
-    public DeploymentV deploy(@RequestBody ProcessDefinitionV definition){
+    public BpmDeployment deploy(@RequestBody BpmProcessDefinition definition){
         return defBpmService.deploy(definition);
     }
 
     @WsDocNote("4.拉取部署记录")
     @RequestMapping(value = "/deployments")
-    public PageList<DeploymentV> deployments(
+    public PageList<BpmDeployment> deployments(
             @WsDocNote("起始条目")@RequestParam("from") Integer from,
             @WsDocNote("查询条目")@RequestParam("rows") Integer rows){
 
@@ -94,7 +94,7 @@ public class SysBPMDefController {
         return new PageList<>(
                 BeanUtilz.copyFromList(query.orderByDeploymentTime().desc()
                         .orderByDeploymentName().desc()
-                        .listPage(from,rows), DeploymentV.class),
+                        .listPage(from,rows), BpmDeployment.class),
                 from,
                 rows,
                 query.count());
