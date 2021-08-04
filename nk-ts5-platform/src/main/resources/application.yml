@@ -86,6 +86,8 @@ spring:
     restart:
       enabled: true
       exclude: META-INF/maven/**,META-INF/resources/**,resources/**,static/**,public/**,templates/**,**/*Test.class,**/*Tests.class,git.properties,META-INF/build-info.properties,**/*.vue,**/*.nk.json
+  jpa:
+    show-sql: true
 
 
 

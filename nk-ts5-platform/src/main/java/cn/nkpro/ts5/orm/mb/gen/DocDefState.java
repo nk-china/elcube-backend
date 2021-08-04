@@ -25,6 +25,8 @@ public class DocDefState extends DocDefStateKey implements Serializable {
      */
     private Integer editPerm;
 
+    private Integer displayPrimary;
+
     private Long updatedTime;
 
     /**
@@ -106,6 +108,15 @@ public class DocDefState extends DocDefStateKey implements Serializable {
      */
     public void setEditPerm(Integer editPerm) {
         this.editPerm = editPerm;
+    }
+
+    @cn.nkpro.ts5.basic.wsdoc.annotation.CodeFieldNotes("")
+    public Integer getDisplayPrimary() {
+        return displayPrimary;
+    }
+
+    public void setDisplayPrimary(Integer displayPrimary) {
+        this.displayPrimary = displayPrimary;
     }
 
     @cn.nkpro.ts5.basic.wsdoc.annotation.CodeFieldNotes("")

@@ -15,11 +15,11 @@ public interface NkDocProcessor extends NkCustomObject {
 
     DocHV calculate(DocHV doc, String fromCard, String options);
 
-    DocHV detail  (DocDefHV def, DocHD docHV);
+    DocHV detail  (DocDefHV def, DocHD docHD);
 
     DocHV toCreate(DocDefHV def, DocHV preDoc);
 
-    DocHV doUpdate(DocDefHV def, DocHV doc, DocHV original, String optSource);
+    DocHV doUpdate(DocHV doc, DocHV original, String optSource);
 
     void doOnBpmKilled(DocHV docHV, String processKey, String optSource);
 }

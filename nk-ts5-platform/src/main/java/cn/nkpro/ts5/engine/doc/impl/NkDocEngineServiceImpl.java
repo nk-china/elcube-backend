@@ -2,12 +2,14 @@ package cn.nkpro.ts5.engine.doc.impl;
 
 import cn.nkpro.ts5.basic.Constants;
 import cn.nkpro.ts5.config.redis.RedisSupport;
+import cn.nkpro.ts5.config.security.SecurityUtilz;
 import cn.nkpro.ts5.engine.co.NKCustomObjectManager;
 import cn.nkpro.ts5.engine.doc.NkDocProcessor;
 import cn.nkpro.ts5.engine.doc.interceptor.NkDocFlowInterceptor;
 import cn.nkpro.ts5.engine.doc.model.*;
 import cn.nkpro.ts5.engine.doc.service.NkDocDefService;
 import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService;
+import cn.nkpro.ts5.engine.task.NkBpmTaskService;
 import cn.nkpro.ts5.exception.TfmsException;
 import cn.nkpro.ts5.orm.mb.gen.DocHMapper;
 import cn.nkpro.ts5.orm.mb.gen.DocIExample;
@@ -37,14 +39,17 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
     @Autowired@SuppressWarnings("all")
     private DocIMapper docIMapper;
     @Autowired@SuppressWarnings("all")
-    private RedisSupport<DocHV> redisSupport;
+    private RedisSupport<DocHD> redisSupport;
     @Autowired@SuppressWarnings("all")
     private NKCustomObjectManager customObjectManager;
     @Autowired@SuppressWarnings("all")
     private NkDocDefService docDefService;
+    @Autowired@SuppressWarnings("all")
+    private NkBpmTaskService bpmTaskService;
+
 
     @Override
-    public DocHV create(String docType, String preDocId) throws Exception {
+    public DocHV create(String docType, String preDocId) {
 
         // 获取前序单据
         DocHV preDoc = StringUtils.isBlank(preDocId) || StringUtils.equalsIgnoreCase(preDocId,"@") ? null : detail(preDocId);
@@ -62,13 +67,27 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
         return processor.toCreate(def, preDoc);
     }
 
+
+    @Override
+    public DocHV detailView(String docId) {
+        DocHV docHV = detail(docId);
+
+        if(StringUtils.isNotBlank(docHV.getProcessInstanceId())){
+            docHV.setBpmTask(
+                    bpmTaskService.taskByBusinessAndAssignee(docId, SecurityUtilz.getUser().getId())
+            );
+        }
+
+        return processViewDef(docHV);
+    }
+
     @Override
     public DocHV detail(String docId) {
 
         // 获取单据抬头和行项目数据
         DocHD docHD = redisSupport.getIfAbsent(Constants.CACHE_DOC, docId,()->{
 
-            DocHV doc = BeanUtilz.copyFromObject(docHMapper.selectByPrimaryKey(docId), DocHV.class);
+            DocHD doc = BeanUtilz.copyFromObject(docHMapper.selectByPrimaryKey(docId), DocHV.class);
 
             if(doc!=null){
 
@@ -90,11 +109,9 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
             DocDefHV def = docDefService.getDocDefForRuntime(docHD.getDocType());
 
             // 获取单据处理器 并执行
-            return processDef(
-                customObjectManager
+            return customObjectManager
                     .getCustomObject(def.getRefObjectType(), NkDocProcessor.class)
-                    .detail(def, docHD)
-            );
+                    .detail(def, docHD);
         }
 
         return null;
@@ -106,7 +123,7 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
      */
     @Override
     @Transactional(propagation = Propagation.NEVER)
-    public DocHV calculate(DocHV doc, String fromCard, String options) throws Exception {
+    public DocHV calculate(DocHV doc, String fromCard, String options) {
 
         validate(doc);
 
@@ -126,7 +143,21 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
 
     @Override
     @Transactional
-    public DocHV doUpdate(DocHV doc) throws Exception {
+    public DocHV doUpdateView(DocHV docHV){
+        docHV = doUpdate(docHV);
+
+        if(StringUtils.isNotBlank(docHV.getProcessInstanceId())){
+            docHV.setBpmTask(
+                    bpmTaskService.taskByBusinessAndAssignee(docHV.getDocId(), SecurityUtilz.getUser().getId())
+            );
+        }
+
+        return processViewDef(docHV);
+    }
+
+    @Override
+    @Transactional
+    public DocHV doUpdate(DocHV doc) {
 
         validate(doc);
 
@@ -146,11 +177,11 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
         }
 
         try{
+            doc.setDef(def);
             // 获取单据处理器 并执行
-            return processDef(customObjectManager
+            return customObjectManager
                             .getCustomObject(def.getRefObjectType(), NkDocProcessor.class)
-                            .doUpdate(def, doc, optionalOriginal.orElse(null),"用户操作")
-            );
+                            .doUpdate(doc, optionalOriginal.orElse(null),"用户操作");
         }finally {
             // 事务提交后清空缓存
             LocalSyncUtilz.runAfterCommit(()-> redisSupport.delete(Constants.CACHE_DOC, doc.getDocId()));
@@ -206,7 +237,7 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
     /**
      * 处理可创建的后续单据类型
      */
-    private DocHV processDef(DocHV docHV){
+    private DocHV processViewDef(DocHV docHV){
 
         Map<String, DocDefStateV> cache = new LinkedHashMap<>();
         docHV.getDef()

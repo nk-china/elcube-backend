@@ -8,6 +8,7 @@ import cn.nkpro.ts5.engine.task.model.BpmInstance;
 import cn.nkpro.ts5.engine.task.model.BpmTask;
 import cn.nkpro.ts5.engine.task.model.BpmTaskComplete;
 import cn.nkpro.ts5.engine.task.model.BpmTaskTransition;
+import cn.nkpro.ts5.exception.TfmsException;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -82,10 +83,7 @@ public class NkBpmTaskServiceImpl implements NkBpmTaskService {
         );
 
         // 获取流程图内所有的节点
-        List<? extends PvmActivity> activities = (
-                (PvmScope) processEngine.getRepositoryService()
-                    .getProcessDefinition(processInstance.getProcessDefinitionId())
-            ).getActivities();
+        List<? extends PvmActivity> activities = getProcessDefinitionActivities(processInstance.getProcessDefinitionId());
 
         // 获取实例备注
         List<Comment> comments = processEngine.getTaskService()
@@ -133,25 +131,7 @@ public class NkBpmTaskServiceImpl implements NkBpmTaskService {
                         }
 
                         // 当前任务节点的对外连接线
-                        activities.stream()
-                                //如果是会签节点，那么 activityId 格式为： activityId#multiInstanceBody
-                            .filter(activity -> StringUtils.equals(activity.getId().split("#")[0],task.getTaskDefinitionKey()))
-                            .findFirst()
-                            .ifPresent(activity ->
-                                task.setTransitions(
-                                    activity.getOutgoingTransitions()
-                                        .stream()
-                                        .map(pvmTransition -> {
-                                            BpmTaskTransition transition = BeanUtilz.copyFromObject(pvmTransition,BpmTaskTransition.class);
-                                            transition.setName(StringUtils.firstNonBlank(
-                                                    transition.getName(),
-                                                    (String) pvmTransition.getProperty("name"),
-                                                    transition.getId())
-                                            );
-                                            return transition;
-                                        }).collect(Collectors.toList())
-                                )
-                            );
+                        task.setTransitions(getTaskTransition(activities,task.getTaskDefinitionKey()));
                     }
                 }
             )
@@ -213,70 +193,76 @@ public class NkBpmTaskServiceImpl implements NkBpmTaskService {
     }
 
     @Override
+    public BpmTask taskByBusinessAndAssignee(String businessKey, String assignee){
+
+        List<Task> tasks = processEngine.getTaskService()
+                .createTaskQuery()
+                .processInstanceBusinessKey(businessKey)
+                .active()
+                .or()
+                    .taskCandidateUser(assignee)
+                    .taskAssignee(assignee)
+                .endOr()
+                .listPage(0,1);
+
+        if(!tasks.isEmpty()){
+
+            Task task = tasks.get(0);
+
+            BpmTask bpmTask = BeanUtilz.copyFromObject(task, BpmTask.class);
+
+            ProcessInstance processInstance = processEngine.getRuntimeService()
+                    .createProcessInstanceQuery()
+                    .processInstanceId(task.getProcessInstanceId())
+                    .singleResult();
+
+            // 获取流程图内所有的节点
+            List<? extends PvmActivity> activities = getProcessDefinitionActivities(task.getProcessDefinitionId());
+
+            // 当前任务节点的对外连接线
+            bpmTask.setTransitions(getTaskTransition(activities, task.getTaskDefinitionKey()));
+
+            return bpmTask;
+        }
+
+        return null;
+    }
+
+    @Override
     public Boolean taskExists(String taskId) {
         return processEngine.getTaskService()
                 .createTaskQuery()
                 .taskId(taskId).count()>0;
     }
 
-    @Override
-    public BpmTask task(String taskId){
+    // 获取流程图内所有的节点
+    private List<? extends PvmActivity> getProcessDefinitionActivities(String processDefinitionId){
+        return (
+                (PvmScope) processEngine.getRepositoryService()
+                        .getProcessDefinition(processDefinitionId)
+        ).getActivities();
+    }
 
-        Task task = processEngine.getTaskService()
-                .createTaskQuery()
-                .taskId(taskId)
-                .singleResult();
+    // 当前任务节点的对外连接线
+    private List<BpmTaskTransition> getTaskTransition(List<? extends PvmActivity> activities, String taskDefinitionKey){
+        // 当前任务节点的对外连接线
+        PvmActivity pvmActivity = activities.stream()
+                //如果是会签节点，那么 activityId 格式为： activityId#multiInstanceBody
+                .filter(activity -> StringUtils.equals(activity.getId().split("#")[0],taskDefinitionKey))
+                .findFirst()
+                .orElseThrow(()->new TfmsException("没有找到流程任务定义"));
 
-        Assert.notNull(task,"任务不存在");
-
-        ProcessInstance processInstance = processEngine.getRuntimeService()
-                .createProcessInstanceQuery()
-                .processInstanceId(task.getProcessInstanceId())
-                .singleResult();
-
-        BpmTask bpmTask = new BpmTask();
-
-
-//        if(StringUtils.isNotBlank(processInstance.getBusinessKey())){
-//            BizDoc bizDoc = docEngineWithPerm.getDetailHasDocPermForController(processInstance.getBusinessKey());
-//            BeanUtilz.copyFromObject(bizDoc,      bpmTask);
-//        }
-//
-//        BeanUtilz.copyFromObject(processInstance, bpmTask);
-//        BeanUtilz.copyFromObject(task,            bpmTask);
-//
-//
-//
-//        FlowElement flowElement = processEngine.getRepositoryService().getBpmnModel(task.getProcessDefinitionId())
-//                .getFlowElement(task.getTaskDefinitionKey());
-//
-//        List<String> button = NkBPMUtils.getProperty(flowElement, "button");
-//
-//        if(button!=null){
-//            bpmTask.setFlows(
-//                    button
-//                            .stream()
-//                            .map(btn->{
-//                                BpmTaskFlow flow = new BpmTaskFlow();
-//                                flow.setId(btn);
-//                                return flow;
-//                            })
-//                            .collect(Collectors.toList())
-//            );
-//        }else{
-//            bpmTask.setFlows(
-//                    ((FlowNode) flowElement).getOutgoingFlows()
-//                            .stream()
-//                            .map(sequenceFlow -> {
-//                                BpmTaskFlow flow = new BpmTaskFlow();
-//                                BeanUtilz.copyFromObject(sequenceFlow,flow);
-//                                return flow;
-//                            })
-//                            .collect(Collectors.toList())
-//            );
-//        }
-
-        return bpmTask;
+        return pvmActivity.getOutgoingTransitions()
+                .stream()
+                .map(pvmTransition -> {
+                    BpmTaskTransition transition = BeanUtilz.copyFromObject(pvmTransition,BpmTaskTransition.class);
+                    transition.setName(StringUtils.firstNonBlank(
+                            transition.getName(),
+                            (String) pvmTransition.getProperty("name"),
+                            transition.getId())
+                    );
+                    return transition;
+                }).collect(Collectors.toList());
     }
 
     @Override

@@ -744,6 +744,66 @@ public class DocDefStateExample {
             return (Criteria) this;
         }
 
+        public Criteria andDisplayPrimaryIsNull() {
+            addCriterion("DISPLAY_PRIMARY is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDisplayPrimaryIsNotNull() {
+            addCriterion("DISPLAY_PRIMARY is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDisplayPrimaryEqualTo(Integer value) {
+            addCriterion("DISPLAY_PRIMARY =", value, "displayPrimary");
+            return (Criteria) this;
+        }
+
+        public Criteria andDisplayPrimaryNotEqualTo(Integer value) {
+            addCriterion("DISPLAY_PRIMARY <>", value, "displayPrimary");
+            return (Criteria) this;
+        }
+
+        public Criteria andDisplayPrimaryGreaterThan(Integer value) {
+            addCriterion("DISPLAY_PRIMARY >", value, "displayPrimary");
+            return (Criteria) this;
+        }
+
+        public Criteria andDisplayPrimaryGreaterThanOrEqualTo(Integer value) {
+            addCriterion("DISPLAY_PRIMARY >=", value, "displayPrimary");
+            return (Criteria) this;
+        }
+
+        public Criteria andDisplayPrimaryLessThan(Integer value) {
+            addCriterion("DISPLAY_PRIMARY <", value, "displayPrimary");
+            return (Criteria) this;
+        }
+
+        public Criteria andDisplayPrimaryLessThanOrEqualTo(Integer value) {
+            addCriterion("DISPLAY_PRIMARY <=", value, "displayPrimary");
+            return (Criteria) this;
+        }
+
+        public Criteria andDisplayPrimaryIn(List<Integer> values) {
+            addCriterion("DISPLAY_PRIMARY in", values, "displayPrimary");
+            return (Criteria) this;
+        }
+
+        public Criteria andDisplayPrimaryNotIn(List<Integer> values) {
+            addCriterion("DISPLAY_PRIMARY not in", values, "displayPrimary");
+            return (Criteria) this;
+        }
+
+        public Criteria andDisplayPrimaryBetween(Integer value1, Integer value2) {
+            addCriterion("DISPLAY_PRIMARY between", value1, value2, "displayPrimary");
+            return (Criteria) this;
+        }
+
+        public Criteria andDisplayPrimaryNotBetween(Integer value1, Integer value2) {
+            addCriterion("DISPLAY_PRIMARY not between", value1, value2, "displayPrimary");
+            return (Criteria) this;
+        }
+
         public Criteria andUpdatedTimeIsNull() {
             addCriterion("UPDATED_TIME is null");
             return (Criteria) this;

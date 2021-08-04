@@ -24,9 +24,9 @@ public interface NkBpmTaskService {
     @Transactional
     void complete(BpmTaskComplete bpmTask);
 
-    Boolean taskExists(String taskId);
+    BpmTask taskByBusinessAndAssignee(String businessKey, String assignee);
 
-    BpmTask task(String taskId);
+    Boolean taskExists(String taskId);
 
     List<BpmInstance> getProcessInfoByDocId(String docId);
 

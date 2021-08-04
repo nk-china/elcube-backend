@@ -192,7 +192,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
 
     @SuppressWarnings("unchecked")
     @Override
-    public DocHV doUpdate(DocDefHV def, DocHV doc, DocHV original, String optSource) {
+    public DocHV doUpdate(DocHV doc, DocHV original, String optSource) {
 
         // 原始单据
         Optional<DocHV> optionalOriginal = Optional.ofNullable(original);
@@ -219,7 +219,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
                         .apply(doc, original, NkDocCycle.beforeUpdate)
         );
 
-        docDefService.runLoopCards(def,false, (card, defIV)->{
+        docDefService.runLoopCards(doc.getDef(),false, (card, defIV)->{
 
             boolean existsOriginal = original !=null
                     && original.getItems().containsKey(defIV.getCardKey())
@@ -271,14 +271,14 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
 
         if(original==null || !StringUtils.equals(doc.getDocState(),original.getDocState())){
             // 单据状态发生变化
-            docDefService.runLoopCards(def,false, (card, defIV)->{
+            docDefService.runLoopCards(doc.getDef(),false, (card, defIV)->{
                 Object cardData = finalDoc.getData().get(defIV.getCardKey());
                 card.stateChanged(doc, original, cardData, defIV.getConfig());
             });
 
             // 启动工作流
-            if(CollectionUtils.isNotEmpty(def.getBpms())){
-                def.getBpms()
+            if(CollectionUtils.isNotEmpty(doc.getDef().getBpms())){
+                doc.getDef().getBpms()
                     .stream()
                     .filter(bpm->StringUtils.equals(doc.getDocState(),bpm.getStartBy()))
                     .findFirst()
@@ -327,7 +327,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
 
             if(docDefBpm!=null){
                 docHV.setDocState(docDefBpm.getRollbackTo());
-                this.doUpdate(docHV.getDef(),docHV,docHV,optSource);
+                this.doUpdate(docHV,docHV,optSource);
             }
         }
     }

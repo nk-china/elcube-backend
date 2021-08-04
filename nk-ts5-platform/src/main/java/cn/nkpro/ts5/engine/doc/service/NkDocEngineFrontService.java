@@ -1,16 +1,15 @@
 package cn.nkpro.ts5.engine.doc.service;
 
+import cn.nkpro.ts5.engine.doc.NkDocEngine;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
+import org.springframework.transaction.annotation.Transactional;
 
-public interface NkDocEngineFrontService {
+public interface NkDocEngineFrontService extends NkDocEngine {
 
-    DocHV detail(String docId);
+    DocHV detailView(String docId);
 
-    DocHV create(String docType, String preDocId) throws Exception;
-
-    DocHV calculate(DocHV doc, String fromCard, String options) throws Exception;
-
-    DocHV doUpdate(DocHV doc) throws Exception;
+    @Transactional
+    DocHV doUpdateView(DocHV docHV);
 
     void onBpmKilled(String docId, String processKey, String optSource);
 }

@@ -59,7 +59,7 @@ public class DocController {
     @WsDocNote("3.拉取交易详情")
     @RequestMapping(value = "/detail/{docId}",method = RequestMethod.GET)
     public DocHV get(@PathVariable("docId") String docId) throws Exception {
-        return docEngine.detail(docId);
+        return docEngine.detailView(docId);
     }
 //
 //    @ResponseCompress
@@ -154,7 +154,7 @@ public class DocController {
         }else {
             info = browser.getName() + "/" + version.getVersion();
         }
-        return docEngine.doUpdate(doc);
+        return docEngine.doUpdateView(doc);
     }
 //
 //    
