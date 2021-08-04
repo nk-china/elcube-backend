@@ -25,6 +25,7 @@ import cn.nkpro.ts5.utils.LocalSyncUtilz;
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -281,7 +282,10 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
                     .stream()
                     .filter(bpm->StringUtils.equals(doc.getDocState(),bpm.getStartBy()))
                     .findFirst()
-                    .ifPresent(bpm-> bpmTaskService.start(bpm.getProcessKey(), doc.getDocId()));
+                    .ifPresent(bpm-> {
+                        ProcessInstance instance = bpmTaskService.start(bpm.getProcessKey(), doc.getDocId());
+                        doc.setProcessInstanceId(instance.getProcessInstanceId());
+                    });
             }
         }
 

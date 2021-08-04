@@ -73,16 +73,13 @@ public class NkBpmTaskServiceImpl implements NkBpmTaskService {
                 .processInstanceId(processInstance.getId())
                 .list();
 
-//        if(StringUtils.equals(processInstance.getState(),"ACTIVE")){
-//            processInstance.setBpmVariables(processEngine.getRuntimeService().getVariables(processInstance.getId()));
-//        }else{
-            processInstance.setBpmVariables(
-                variables
-                    .stream()
-                    .filter(instance->StringUtils.equals(instance.getExecutionId(),processInstance.getId()))
-                    .collect(Collectors.toMap(HistoricVariableInstance::getName,HistoricVariableInstance::getValue))
-            );
-//        }
+        // 设置实例变量
+        processInstance.setBpmVariables(
+            variables
+                .stream()
+                .filter(instance->StringUtils.equals(instance.getExecutionId(),processInstance.getId()))
+                .collect(Collectors.toMap(HistoricVariableInstance::getName,HistoricVariableInstance::getValue))
+        );
 
         // 获取流程图内所有的节点
         List<? extends PvmActivity> activities = (

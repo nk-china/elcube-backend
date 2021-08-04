@@ -23,6 +23,8 @@ public class BpmTask {
     private String assignee;
     private List<String> candidate;
 
+    private String deleteReason;
+
     private Date startTime;
     private Date endTime;
 
