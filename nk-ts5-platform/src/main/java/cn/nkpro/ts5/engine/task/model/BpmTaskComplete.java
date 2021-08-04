@@ -9,8 +9,7 @@ import lombok.Data;
 @Data
 public class BpmTaskComplete {
     private String taskId;
-    private String flow;
-    private String flowName;
     private String comment;
+    private BpmTaskTransition transition;
     private JSONObject variables = new JSONObject();
 }

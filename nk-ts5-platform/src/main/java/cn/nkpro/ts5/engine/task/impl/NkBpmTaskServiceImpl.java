@@ -7,11 +7,15 @@ import cn.nkpro.ts5.engine.task.model.BpmInstance;
 import cn.nkpro.ts5.engine.task.model.BpmTask;
 import cn.nkpro.ts5.engine.task.model.BpmTaskComplete;
 import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService;
+import cn.nkpro.ts5.engine.task.model.BpmTaskTransition;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
+import org.camunda.bpm.engine.impl.pvm.PvmActivity;
+import org.camunda.bpm.engine.impl.pvm.PvmScope;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +26,7 @@ import org.springframework.util.Assert;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Service
@@ -60,11 +65,51 @@ public class NkBpmTaskServiceImpl implements NkBpmTaskService {
 
         Assert.notNull(processInstance, "流程实例不存在");
 
-        processInstance.setBpmTask(BeanUtilz.copyFromList(
+        ProcessDefinition processDefinition = processEngine.getRepositoryService()
+                .getProcessDefinition(processInstance.getProcessDefinitionId());
+
+        // 获取流程图内所有的节点
+        List<? extends PvmActivity> activities = ((PvmScope) processDefinition).getActivities();
+
+        processInstance.setBpmTask(
+            BeanUtilz.copyFromList(
                 processEngine.getHistoryService()
-                        .createHistoricTaskInstanceQuery()
-                        .processInstanceId(instanceId)
-                        .list(),BpmTask.class));
+                    .createHistoricTaskInstanceQuery()
+                    .processInstanceId(instanceId)
+                    .orderByHistoricActivityInstanceStartTime().asc()
+                    .list(),
+                BpmTask.class,
+                (task)->{
+                    if(task.getEndTime()==null){
+
+                        // 任务的流程变量
+                        task.setBpmVariables(processEngine.getTaskService()
+                                .getVariables(task.getId()));
+
+                        // 当前任务节点的对外连接线
+                        activities.stream()
+                                //如果是会签节点，那么 activityId 格式为： activityId#multiInstanceBody
+                            .filter(activity -> StringUtils.equals(activity.getId().split("#")[0],task.getTaskDefinitionKey()))
+                            .findFirst()
+                            .ifPresent(activity ->
+                                task.setTransitions(
+                                    activity.getOutgoingTransitions()
+                                        .stream()
+                                        .map(pvmTransition -> {
+                                            BpmTaskTransition transition = BeanUtilz.copyFromObject(pvmTransition,BpmTaskTransition.class);
+                                            transition.setName(StringUtils.firstNonBlank(
+                                                    transition.getName(),
+                                                    (String) pvmTransition.getProperty("name"),
+                                                    transition.getId())
+                                            );
+                                            return transition;
+                                        }).collect(Collectors.toList())
+                                )
+                            );
+                    }
+                }
+            )
+        );
 
         if(StringUtils.equals(processInstance.getState(),"ACTIVE")){
             processInstance.setBpmVariables(processEngine.getRuntimeService()
@@ -97,7 +142,7 @@ public class NkBpmTaskServiceImpl implements NkBpmTaskService {
     public ProcessInstance start(String key, String docId){
 
         Map<String,Object> variables = new HashMap<>();
-        variables.put("NK@START_USER_ID", SecurityUtilz.getUser().getId());
+        variables.put("NK$START_USER_ID", SecurityUtilz.getUser().getId());
 
         return processEngine.getRuntimeService()
                 .startProcessInstanceByKey(
@@ -110,7 +155,8 @@ public class NkBpmTaskServiceImpl implements NkBpmTaskService {
     @Override
     @Transactional
     public void complete(BpmTaskComplete bpmTask){
-        Assert.notNull(bpmTask.getTaskId(),"任务ID不能为空");
+        Assert.notNull(bpmTask.getTaskId(),     "任务ID不能为空");
+        Assert.notNull(bpmTask.getTransition(), "任务流转不能为空");
 
         Task task = processEngine.getTaskService()
                 .createTaskQuery()
@@ -118,13 +164,11 @@ public class NkBpmTaskServiceImpl implements NkBpmTaskService {
                 .singleResult();
         Assert.notNull(task,"任务不存在");
 
-        String comment = bpmTask.getFlowName() + (StringUtils.isNotBlank(bpmTask.getComment())?(" | "+ bpmTask.getComment()):"");
+        String comment = bpmTask.getTransition().getName() + (StringUtils.isNotBlank(bpmTask.getComment())?(" | "+ bpmTask.getComment()):"");
         processEngine.getTaskService().createComment(bpmTask.getTaskId(),task.getProcessInstanceId(),comment);
-
-        bpmTask.getVariables().put("nkFlowId",bpmTask.getFlow());
-        processEngine.getTaskService().complete(bpmTask.getTaskId(),bpmTask.getVariables());
+        processEngine.getTaskService().setVariable(task.getId(),"NK$TRANSITION_ID",bpmTask.getTransition().getId());
+        processEngine.getTaskService().complete(bpmTask.getTaskId());
     }
-
 
     @Override
     public Boolean taskExists(String taskId) {
@@ -149,6 +193,7 @@ public class NkBpmTaskServiceImpl implements NkBpmTaskService {
                 .singleResult();
 
         BpmTask bpmTask = new BpmTask();
+
 
 //        if(StringUtils.isNotBlank(processInstance.getBusinessKey())){
 //            BizDoc bizDoc = docEngineWithPerm.getDetailHasDocPermForController(processInstance.getBusinessKey());

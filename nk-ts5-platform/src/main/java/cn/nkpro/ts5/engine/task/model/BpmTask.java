@@ -4,6 +4,7 @@ import lombok.Data;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by bean on 2020/7/22.
@@ -16,6 +17,7 @@ public class BpmTask {
     private String taskDefinitionKey;
     private String processDefinitionId;
     private String processInstanceId;
+    private String activityInstanceId;
     private String createTime;
     private String assignee;
 
@@ -33,5 +35,7 @@ public class BpmTask {
     private String classify;
 
     // flows
-    private List<BpmTaskFlow> flows;
+    private List<BpmTaskTransition> transitions;
+    // variables
+    private Map<String, Object> bpmVariables;
 }

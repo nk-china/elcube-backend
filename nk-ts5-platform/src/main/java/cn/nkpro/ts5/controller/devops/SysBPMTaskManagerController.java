@@ -4,12 +4,10 @@ import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
 import cn.nkpro.ts5.engine.task.NkBpmTaskService;
 import cn.nkpro.ts5.engine.task.model.BpmInstance;
+import cn.nkpro.ts5.engine.task.model.BpmTaskComplete;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * Created by bean on 2020/7/17.
@@ -35,15 +33,23 @@ public class SysBPMTaskManagerController {
     @RequestMapping(value = "/instance/detail")
     @ResponseBody
     public BpmInstance processInstanceDetail(
-            @WsDocNote("任务Id")@RequestParam("instanceId") String instanceId) throws Exception {
+            @WsDocNote("任务Id")@RequestParam("instanceId") String instanceId) {
         return bpmTaskService.processInstanceDetail(instanceId);
     }
 
-    @WsDocNote("3.强制终止流程实例")
+    @WsDocNote("3.强制执行任务")
+    @RequestMapping(value = "/instance/complete")
+    @ResponseBody
+    public void processCompleteTask(
+            @WsDocNote("任务Id")@RequestBody BpmTaskComplete taskComplete) {
+        bpmTaskService.complete(taskComplete);
+    }
+
+    @WsDocNote("4.强制终止流程实例")
     @RequestMapping(value = "/instance/kill")
     @ResponseBody
     public void processInstanceKill(
-            @WsDocNote("任务Id")@RequestParam("instanceId") String instanceId) throws Exception {
+            @WsDocNote("任务Id")@RequestParam("instanceId") String instanceId) {
         bpmTaskService.deleteProcessInstance(instanceId,"强制删除");
     }
 }
