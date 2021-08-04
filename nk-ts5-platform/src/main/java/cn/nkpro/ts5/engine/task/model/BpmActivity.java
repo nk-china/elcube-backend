@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.engine.bpm.model;
+package cn.nkpro.ts5.engine.task.model;
 
 import lombok.Data;
 
@@ -8,8 +8,6 @@ import java.util.List;
 public class BpmActivity {
     private String taskId;
     private String activityName;
-    private Long startDate;
-    private Long endDate;
     private String assignee;
     private String user;
 

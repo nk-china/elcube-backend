@@ -2,8 +2,8 @@ package cn.nkpro.ts5.controller.devops;
 
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
-import cn.nkpro.ts5.engine.bpm.NkBpmTaskService;
-import cn.nkpro.ts5.engine.bpm.model.BpmInstance;
+import cn.nkpro.ts5.engine.task.NkBpmTaskService;
+import cn.nkpro.ts5.engine.task.model.BpmInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;

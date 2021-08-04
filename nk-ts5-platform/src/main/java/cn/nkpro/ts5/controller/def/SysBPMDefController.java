@@ -2,9 +2,9 @@ package cn.nkpro.ts5.controller.def;
 
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
-import cn.nkpro.ts5.engine.bpm.model.BpmDeployment;
-import cn.nkpro.ts5.engine.bpm.model.BpmProcessDefinition;
-import cn.nkpro.ts5.engine.bpm.NkBpmDefService;
+import cn.nkpro.ts5.engine.task.model.BpmDeployment;
+import cn.nkpro.ts5.engine.task.model.BpmProcessDefinition;
+import cn.nkpro.ts5.engine.task.NkBpmDefService;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.ProcessEngine;

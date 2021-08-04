@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.engine.bpm.model;
+package cn.nkpro.ts5.engine.task.model;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.Data;

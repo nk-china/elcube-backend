@@ -1,19 +1,13 @@
 package cn.nkpro.groovy.cards.bpm
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote
-import cn.nkpro.ts5.engine.bpm.NkBpmTaskService
 import cn.nkpro.ts5.engine.doc.abstracts.NkAbstractCard
 import cn.nkpro.ts5.engine.doc.model.DocHV
-import org.apache.commons.lang3.StringUtils
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 @WsDocNote("工作流")
 @Component("NkCardBpm")
 class NkCardBpm extends NkAbstractCard<BpmData,BpmDef>{
-
-    @Autowired
-    private NkBpmTaskService bpmTaskService
 
     @Override
     BpmData beforeUpdate(DocHV doc, BpmData data, BpmDef bpmDef, BpmData original) {

@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.engine.bpm.model;
+package cn.nkpro.ts5.engine.task.model;
 
 import lombok.Data;
 
@@ -19,9 +19,6 @@ public class BpmInstance {
 
     private Date startTime;
     private Date endTime;
-
-    private Long startDate;
-    private Long endDate;
 
     private String startUserId;
     private String startUser;

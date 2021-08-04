@@ -2,7 +2,7 @@ package cn.nkpro.ts5.engine.doc.impl;
 
 import cn.nkpro.ts5.config.id.GUID;
 import cn.nkpro.ts5.config.id.SequenceSupport;
-import cn.nkpro.ts5.engine.bpm.NkBpmTaskService;
+import cn.nkpro.ts5.engine.task.NkBpmTaskService;
 import cn.nkpro.ts5.engine.co.NKCustomObjectManager;
 import cn.nkpro.ts5.engine.doc.NkCard;
 import cn.nkpro.ts5.engine.doc.NkDocCycle;

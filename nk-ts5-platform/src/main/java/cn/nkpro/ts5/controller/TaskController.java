@@ -1,14 +1,12 @@
 package cn.nkpro.ts5.controller;
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
-import cn.nkpro.ts5.config.security.SecurityUtilz;
-import cn.nkpro.ts5.engine.bpm.NkBpmTaskService;
+import cn.nkpro.ts5.engine.task.NkBpmTaskService;
 import cn.nkpro.ts5.engine.elasticearch.ESPageList;
 import cn.nkpro.ts5.engine.elasticearch.NkIndexService;
 import cn.nkpro.ts5.engine.elasticearch.model.BpmTaskES;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

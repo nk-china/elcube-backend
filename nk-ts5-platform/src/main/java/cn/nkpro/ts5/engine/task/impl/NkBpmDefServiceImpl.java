@@ -1,14 +1,13 @@
-package cn.nkpro.ts5.engine.bpm.impl;
+package cn.nkpro.ts5.engine.task.impl;
 
-import cn.nkpro.ts5.engine.bpm.NkBpmDefService;
-import cn.nkpro.ts5.engine.bpm.model.BpmDeployment;
-import cn.nkpro.ts5.engine.bpm.model.BpmProcessDefinition;
+import cn.nkpro.ts5.engine.task.NkBpmDefService;
+import cn.nkpro.ts5.engine.task.model.BpmDeployment;
+import cn.nkpro.ts5.engine.task.model.BpmProcessDefinition;
 import cn.nkpro.ts5.exception.TfmsException;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
-import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,16 +16,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Service
 public class NkBpmDefServiceImpl implements NkBpmDefService {
 
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private ProcessEngine processEngine;
 
     @Override
@@ -62,34 +56,6 @@ public class NkBpmDefServiceImpl implements NkBpmDefService {
         definition.setBpmnXml(getBpmnXml(definition.getDeploymentId(),definition.getResourceName()));
 
         return definition;
-    }
-
-    @Override
-    public List<Object> getAllDeployments(){
-        ProcessDefinitionQuery query = processEngine.getRepositoryService()
-                .createProcessDefinitionQuery()
-                .latestVersion();
-
-        List<ProcessDefinition> definitions = new ArrayList<>();
-        long count = query.count();
-        int from = 0;
-        int rows = 1000;
-        do{
-            definitions.addAll(query.listPage(from,rows));
-            from+=rows;
-        }while(from < count);
-        return definitions.stream()
-                .map(definition -> {
-                    Map<String,Object> map = new HashMap<>();
-
-                    map.put("key",definition.getKey());
-                    map.put("name",definition.getName());
-                    map.put("deploymentId",definition.getDeploymentId());
-                    map.put("resourceName",definition.getResourceName());
-
-                    return map;
-                })
-                .collect(Collectors.toList());
     }
 
     private String getBpmnXml(String deploymentId, String resourceName) {

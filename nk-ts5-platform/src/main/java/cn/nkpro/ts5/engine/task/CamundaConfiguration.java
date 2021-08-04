@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.engine.bpm;
+package cn.nkpro.ts5.engine.task;
 
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.spring.SpringProcessEngineConfiguration;
