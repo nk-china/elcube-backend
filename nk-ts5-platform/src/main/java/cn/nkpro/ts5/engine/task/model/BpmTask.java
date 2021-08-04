@@ -18,8 +18,10 @@ public class BpmTask {
     private String processDefinitionId;
     private String processInstanceId;
     private String activityInstanceId;
+    private String executionId;
     private String createTime;
     private String assignee;
+    private List<String> candidate;
 
     private Date startTime;
     private Date endTime;
@@ -34,6 +36,7 @@ public class BpmTask {
     private String docType;
     private String classify;
 
+    private List<String> comments;
     // flows
     private List<BpmTaskTransition> transitions;
     // variables

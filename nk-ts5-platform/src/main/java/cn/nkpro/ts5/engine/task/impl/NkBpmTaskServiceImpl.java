@@ -2,31 +2,33 @@ package cn.nkpro.ts5.engine.task.impl;
 
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.config.security.SecurityUtilz;
+import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService;
 import cn.nkpro.ts5.engine.task.NkBpmTaskService;
 import cn.nkpro.ts5.engine.task.model.BpmInstance;
 import cn.nkpro.ts5.engine.task.model.BpmTask;
 import cn.nkpro.ts5.engine.task.model.BpmTaskComplete;
-import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService;
 import cn.nkpro.ts5.engine.task.model.BpmTaskTransition;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstanceQuery;
+import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
-import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Comment;
+import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 @Service
@@ -65,12 +67,34 @@ public class NkBpmTaskServiceImpl implements NkBpmTaskService {
 
         Assert.notNull(processInstance, "流程实例不存在");
 
-        ProcessDefinition processDefinition = processEngine.getRepositoryService()
-                .getProcessDefinition(processInstance.getProcessDefinitionId());
+        // 获取所有流程变量
+        List<HistoricVariableInstance> variables = processEngine.getHistoryService()
+                .createHistoricVariableInstanceQuery()
+                .processInstanceId(processInstance.getId())
+                .list();
+
+//        if(StringUtils.equals(processInstance.getState(),"ACTIVE")){
+//            processInstance.setBpmVariables(processEngine.getRuntimeService().getVariables(processInstance.getId()));
+//        }else{
+            processInstance.setBpmVariables(
+                variables
+                    .stream()
+                    .filter(instance->StringUtils.equals(instance.getExecutionId(),processInstance.getId()))
+                    .collect(Collectors.toMap(HistoricVariableInstance::getName,HistoricVariableInstance::getValue))
+            );
+//        }
 
         // 获取流程图内所有的节点
-        List<? extends PvmActivity> activities = ((PvmScope) processDefinition).getActivities();
+        List<? extends PvmActivity> activities = (
+                (PvmScope) processEngine.getRepositoryService()
+                    .getProcessDefinition(processInstance.getProcessDefinitionId())
+            ).getActivities();
 
+        // 获取实例备注
+        List<Comment> comments = processEngine.getTaskService()
+                .getProcessInstanceComments(processInstance.getId());
+
+        // 获取实例下的所有任务
         processInstance.setBpmTask(
             BeanUtilz.copyFromList(
                 processEngine.getHistoryService()
@@ -80,11 +104,36 @@ public class NkBpmTaskServiceImpl implements NkBpmTaskService {
                     .list(),
                 BpmTask.class,
                 (task)->{
+
+                    // 设置任务的备注
+                    task.setComments(
+                        comments.stream()
+                                .filter(comment -> StringUtils.equals(comment.getTaskId(),task.getId()))
+                                .map(Comment::getFullMessage)
+                                .collect(Collectors.toList())
+                    );
+
+                    // 任务的流程变量
+                    task.setBpmVariables(
+                        variables
+                            .stream()
+                            .filter(instance->StringUtils.equals(instance.getExecutionId(),task.getExecutionId()))
+                            .collect(Collectors.toMap(HistoricVariableInstance::getName,HistoricVariableInstance::getValue))
+                    );
+
+                    // 如果任务是活动的，获取更详细的信息
                     if(task.getEndTime()==null){
 
-                        // 任务的流程变量
-                        task.setBpmVariables(processEngine.getTaskService()
-                                .getVariables(task.getId()));
+                        // 获取任务候选人
+                        if(StringUtils.isBlank(task.getAssignee())){
+                            task.setCandidate(
+                                processEngine.getTaskService().getIdentityLinksForTask(task.getId())
+                                    .stream()
+                                    .filter(identityLink -> StringUtils.equals(identityLink.getType(),"candidate"))
+                                    .map(IdentityLink::getUserId)
+                                    .collect(Collectors.toList())
+                            );
+                        }
 
                         // 当前任务节点的对外连接线
                         activities.stream()
@@ -110,11 +159,6 @@ public class NkBpmTaskServiceImpl implements NkBpmTaskService {
                 }
             )
         );
-
-        if(StringUtils.equals(processInstance.getState(),"ACTIVE")){
-            processInstance.setBpmVariables(processEngine.getRuntimeService()
-                    .getVariables(instanceId));
-        }
 
         return processInstance;
     }
@@ -166,9 +210,9 @@ public class NkBpmTaskServiceImpl implements NkBpmTaskService {
         Assert.notNull(task,"任务不存在");
 
         String comment = bpmTask.getTransition().getName() + (StringUtils.isNotBlank(bpmTask.getComment())?(" | "+ bpmTask.getComment()):"");
+        processEngine.getTaskService().setAssignee(bpmTask.getTaskId(),SecurityUtilz.getUser().getId());
         processEngine.getTaskService().createComment(bpmTask.getTaskId(),task.getProcessInstanceId(),comment);
-        processEngine.getTaskService().setVariable(task.getId(),"NK$TRANSITION_ID",bpmTask.getTransition().getId());
-        processEngine.getTaskService().complete(bpmTask.getTaskId());
+        processEngine.getTaskService().complete(bpmTask.getTaskId(), Collections.singletonMap("NK$TRANSITION_ID",bpmTask.getTransition().getId()));
     }
 
     @Override
