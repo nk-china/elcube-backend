@@ -130,11 +130,11 @@ public class NkBpmTaskServiceImpl implements NkBpmTaskService {
             docEngine.onBpmKilled(
                     processInstance.getBusinessKey(),
                     processInstance.getProcessDefinitionId().split(":")[0],
-                    "强制结束流程");
+                    deleteReason);
         }
 
-        processEngine.getRuntimeService().setVariable(instanceId,"NK@DELETE",true);
-        processEngine.getRuntimeService().deleteProcessInstance(instanceId,"强制结束流程");
+        processEngine.getRuntimeService().setVariable(instanceId,"NK$DELETE",deleteReason);
+        processEngine.getRuntimeService().deleteProcessInstance(instanceId,deleteReason);
     }
 
     @Override
@@ -143,6 +143,7 @@ public class NkBpmTaskServiceImpl implements NkBpmTaskService {
 
         Map<String,Object> variables = new HashMap<>();
         variables.put("NK$START_USER_ID", SecurityUtilz.getUser().getId());
+        variables.put("NK$BUSINESS_KEY",docId);
 
         return processEngine.getRuntimeService()
                 .startProcessInstanceByKey(

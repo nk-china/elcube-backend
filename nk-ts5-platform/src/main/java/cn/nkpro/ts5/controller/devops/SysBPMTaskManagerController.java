@@ -49,7 +49,8 @@ public class SysBPMTaskManagerController {
     @RequestMapping(value = "/instance/kill")
     @ResponseBody
     public void processInstanceKill(
-            @WsDocNote("任务Id")@RequestParam("instanceId") String instanceId) {
-        bpmTaskService.deleteProcessInstance(instanceId,"强制删除");
+            @WsDocNote("任务Id")@RequestParam("instanceId") String instanceId,
+            @WsDocNote("删除原因")@RequestParam("deleteReason") String deleteReason) {
+        bpmTaskService.deleteProcessInstance(instanceId,deleteReason);
     }
 }
