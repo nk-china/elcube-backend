@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.exception;
 
 import cn.nkpro.ts5.engine.doc.NkCard;
-import cn.nkpro.ts5.exception.abstracts.TfmsException;
+import cn.nkpro.ts5.exception.abstracts.TfmsRuntimeException;
 import lombok.Getter;
 
 /**
@@ -9,7 +9,7 @@ import lombok.Getter;
  * 组件运行时异常：卡片，脚本等
  * Created by bean on 2020/1/15.
  */
-public class TfmsComponentException extends TfmsException {
+public class TfmsComponentException extends TfmsRuntimeException {
 
     @Getter
     private NkCard card;

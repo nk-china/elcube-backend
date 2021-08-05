@@ -1,5 +1,6 @@
 package cn.nkpro.ts5.engine.doc;
 
+import cn.nkpro.ts5.engine.doc.impl.ThreadLocalContextHolder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;

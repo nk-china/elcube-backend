@@ -9,7 +9,6 @@ import cn.nkpro.ts5.engine.task.model.BpmTask;
 import cn.nkpro.ts5.engine.task.model.BpmTaskComplete;
 import cn.nkpro.ts5.engine.task.model.BpmTaskTransition;
 import cn.nkpro.ts5.exception.TfmsDefineException;
-import cn.nkpro.ts5.exception.abstracts.TfmsException;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.ProcessEngine;

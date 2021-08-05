@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.engine.doc;
+package cn.nkpro.ts5.engine.doc.impl;
 
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -9,9 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 
 public class ThreadLocalContextHolder {
-    private final static ThreadLocal<List<String>>            threadLocal     = new ThreadLocal<>();
+    private final static ThreadLocal<List<String>>       threadLocalLock = new ThreadLocal<>();
     private final static ThreadLocal<Map<String, DocHV>> threadLocalDocs = new ThreadLocal<>();
     private final static ThreadLocal<DocHV>              threadLocalRuntimeDoc = new ThreadLocal<>();
 
@@ -32,7 +33,7 @@ public class ThreadLocalContextHolder {
     }
     */
 
-    public static synchronized DocHV getBizDoc(String docId){
+    static synchronized DocHV getDoc(String docId, Function<String, DocHV> function){
 
         if(TransactionSynchronizationManager.isSynchronizationActive()){
             TransactionSynchronizationManager.registerSynchronization(transactionSync);
@@ -43,10 +44,19 @@ public class ThreadLocalContextHolder {
             docMap = new ConcurrentHashMap<>();
             threadLocalDocs.set(docMap);
         }
-        return docMap.get(docId);
+
+        DocHV docHV = docMap.get(docId);
+        if(docHV==null){
+            docHV = function.apply(docId);
+            if(docHV!=null){
+                docMap.put(docId,docHV);
+            }
+        }
+
+        return docHV;
     }
 
-    public static synchronized void setBizDoc(DocHV doc){
+    public static synchronized void setDoc(DocHV doc){
 
         if(TransactionSynchronizationManager.isSynchronizationActive()){
             TransactionSynchronizationManager.registerSynchronization(transactionSync);
@@ -65,11 +75,11 @@ public class ThreadLocalContextHolder {
             threadLocalDocs.get().remove(docId);
     }
 
-    public static synchronized void lockBizDoc(String docId){
-        List<String> locks = threadLocal.get();
+    public static synchronized void lockDoc(String docId){
+        List<String> locks = threadLocalLock.get();
         if(locks==null){
             locks = new Vector<>();
-            threadLocal.set(locks);
+            threadLocalLock.set(locks);
         }
         if(locks.contains(docId)){
             throw new RuntimeException("禁止在组件中对当前单据进行读取与更新操作");
@@ -77,8 +87,8 @@ public class ThreadLocalContextHolder {
         locks.add(docId);
     }
 
-    public static synchronized void unlockBizDoc(String docId){
-        List<String> locks = threadLocal.get();
+    public static synchronized void unlockDoc(String docId){
+        List<String> locks = threadLocalLock.get();
         if(locks!=null)
             locks.remove(docId);
     }
@@ -96,7 +106,7 @@ public class ThreadLocalContextHolder {
     }
 
     public static void clear(){
-        threadLocal.remove();
+        threadLocalLock.remove();
         threadLocalDocs.remove();
         threadLocalRuntimeDoc.remove();
     }

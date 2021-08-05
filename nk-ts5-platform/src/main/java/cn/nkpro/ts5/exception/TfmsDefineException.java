@@ -1,13 +1,13 @@
 package cn.nkpro.ts5.exception;
 
-import cn.nkpro.ts5.exception.abstracts.TfmsException;
+import cn.nkpro.ts5.exception.abstracts.TfmsRuntimeException;
 
 /**
  *
  * 配置 或组件编码 不正确
  * Created by bean on 2020/1/15.
  */
-public class TfmsDefineException extends TfmsException {
+public class TfmsDefineException extends TfmsRuntimeException {
 
 
     public TfmsDefineException(String message) {

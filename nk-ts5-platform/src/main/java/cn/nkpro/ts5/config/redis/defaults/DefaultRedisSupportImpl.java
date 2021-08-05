@@ -2,9 +2,12 @@ package cn.nkpro.ts5.config.redis.defaults;
 
 import cn.nkpro.ts5.config.redis.EnvRedisTemplate;
 import cn.nkpro.ts5.config.redis.RedisSupport;
-import cn.nkpro.ts5.exception.abstracts.TfmsException;
+import cn.nkpro.ts5.exception.TfmsException;
+import cn.nkpro.ts5.exception.TfmsSystemException;
+import cn.nkpro.ts5.exception.abstracts.TfmsRuntimeException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
@@ -26,6 +29,8 @@ public class DefaultRedisSupportImpl<T> implements RedisSupport<T>,ApplicationCo
 
     @Autowired
     private EnvRedisTemplate<T> redisTemplate;
+    @Autowired
+    private EnvRedisTemplate<String> stringRedisTemplate;
 
     @Scheduled(cron = "0 * * * * ?")
     public void heartbeat(){
@@ -33,10 +38,10 @@ public class DefaultRedisSupportImpl<T> implements RedisSupport<T>,ApplicationCo
     }
 
 
-    public T getIfAbsent(String hash,String hashKey,Function<T> mapper) throws TfmsException {
+    public T getIfAbsent(String hash,String hashKey,Function<T> mapper) throws TfmsRuntimeException {
         return getIfAbsent(hash, hashKey, false, mapper);
     }
-    public T getIfAbsent(String hash,String hashKey,boolean cacheNullValue,Function<T> mapper) throws TfmsException {
+    public T getIfAbsent(String hash,String hashKey,boolean cacheNullValue,Function<T> mapper) throws TfmsRuntimeException {
         Assert.notNull(hash,"hash不能为空");
         Assert.notNull(hashKey,"hashKey不能为空");
 
@@ -85,11 +90,11 @@ public class DefaultRedisSupportImpl<T> implements RedisSupport<T>,ApplicationCo
         redisTemplate.opsForHash().put(hash,key,value);
     }
 
-    public T getIfAbsent(String key, Function<T> mapper) throws TfmsException {
+    public T getIfAbsent(String key, Function<T> mapper) throws TfmsRuntimeException {
         return getIfAbsent(key, false, mapper);
     }
 
-    public T getIfAbsent(String key,boolean cacheNullValue,Function<T> mapper) throws TfmsException {
+    public T getIfAbsent(String key,boolean cacheNullValue,Function<T> mapper) throws TfmsRuntimeException {
         Assert.notNull(key,"key不能为空");
 
         ValueOperations<String, T> valueOperations = redisTemplate.opsForValue();
@@ -119,6 +124,36 @@ public class DefaultRedisSupportImpl<T> implements RedisSupport<T>,ApplicationCo
         Assert.notNull(hashKey,"hashKey不能为空");
         Assert.isTrue(hashKey.length>0,"hashKey不能为空");
         redisTemplate.opsForHash().delete(hash,hashKey);
+    }
+
+    @Override
+    public void unLock(String key, String value){
+        ValueOperations<String, String> ops = stringRedisTemplate.opsForValue();
+        String s = ops.get("LOCK:" + key);
+        if(s!=null && StringUtils.equals(s,value)){
+            stringRedisTemplate.delete("LOCK:" + key);
+        }
+    }
+
+    @Override
+    public boolean lock(String key, String value, int expire) {
+        ValueOperations<String, String> ops = stringRedisTemplate.opsForValue();
+        int i=0;
+        do{
+            Boolean ret = ops.setIfAbsent("LOCK:"+key, value, expire, TimeUnit.SECONDS);
+            if(ret != null && ret){
+                return true;
+            }
+            log.debug("尝试获取锁[{}]失败，1s后重试", key);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new TfmsSystemException(e.getMessage(),e);
+            }
+        }while (++i <= expire);
+        log.info("尝试获取锁[{}]失败，请检查是否有死锁", key);
+
+        return false;
     }
 
     @Override

@@ -1,9 +1,8 @@
 package cn.nkpro.ts5.exception;
 
 
-import cn.nkpro.ts5.exception.*;
 import cn.nkpro.ts5.exception.abstracts.TfmsCaution;
-import cn.nkpro.ts5.exception.abstracts.TfmsException;
+import cn.nkpro.ts5.exception.abstracts.TfmsRuntimeException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
@@ -38,7 +37,7 @@ public class GlobalExceptionHandler {
         // 系统错误
         codes.put(TfmsComponentException.class,501);
         codes.put(TfmsDefineException.class,501);
-        codes.put(TfmsException.class,501);
+        codes.put(TfmsRuntimeException.class,501);
     }
 
     @ExceptionHandler(value = Exception.class)

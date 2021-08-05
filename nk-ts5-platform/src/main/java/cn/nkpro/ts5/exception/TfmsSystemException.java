@@ -1,13 +1,13 @@
 package cn.nkpro.ts5.exception;
 
-import cn.nkpro.ts5.exception.abstracts.TfmsException;
+import cn.nkpro.ts5.exception.abstracts.TfmsRuntimeException;
 
 /**
  *
  * 系统异常
  * Created by bean on 2020/1/15.
  */
-public class TfmsSystemException extends TfmsException {
+public class TfmsSystemException extends TfmsRuntimeException {
 
 
     public TfmsSystemException(String message) {

@@ -32,8 +32,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -289,7 +293,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
             }
         }
 
-
+        finalDoc.setIdentification(random());
         if(optionalOriginal.isPresent()){
             docHMapper.updateByPrimaryKeySelective(finalDoc);
         }else{
@@ -365,5 +369,8 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         return doc;
     }
 
-
+    private String random(){
+        return new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date())+
+                new DecimalFormat("00000").format(Math.random()*10000);
+    }
 }

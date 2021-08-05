@@ -81,9 +81,7 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
         return processViewDef(docHV);
     }
 
-    @Override
-    public DocHV detail(String docId) {
-
+    private DocHV detailFromDB(String docId){
         // 获取单据抬头和行项目数据
         DocHD docHD = redisSupport.getIfAbsent(Constants.CACHE_DOC, docId,()->{
 
@@ -115,6 +113,11 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
         }
 
         return null;
+    }
+
+    @Override
+    public DocHV detail(String docId) {
+        return ThreadLocalContextHolder.getDoc(docId, this::detailFromDB);
     }
 
     /**
@@ -171,18 +174,28 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
                 docDefService.getDocDefForRuntime(docType)
         );
 
-        if(!optionalOriginal.isPresent()){
-
+        if(optionalOriginal.isPresent()){
+            // 修改
+            Assert.isTrue(StringUtils.equals(doc.getIdentification(),optionalOriginal.get().getIdentification()),
+                    "单据被其他用户修改，请刷新后重试");
+        }else{
+            // 新建
             validateFlow(def,detail(doc.getPreDocId()));
         }
 
+        boolean lock = false;
+        String  lockId = UUID.randomUUID().toString();
         try{
+            lock = redisSupport.lock(doc.getDocId(), lockId, 10);
+            Assert.isTrue(lock,"单据被其他用户锁定，请稍后再试");
+
             doc.setDef(def);
             // 获取单据处理器 并执行
             return customObjectManager
                             .getCustomObject(def.getRefObjectType(), NkDocProcessor.class)
                             .doUpdate(doc, optionalOriginal.orElse(null),"用户操作");
         }finally {
+            if(lock) redisSupport.unLock(doc.getDocId(), lockId);
             // 事务提交后清空缓存
             LocalSyncUtilz.runAfterCommit(()-> redisSupport.delete(Constants.CACHE_DOC, doc.getDocId()));
         }

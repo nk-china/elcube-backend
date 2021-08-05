@@ -6,7 +6,6 @@ import cn.nkpro.ts5.config.security.SecurityUtilz;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.ScriptDefHV;
 import cn.nkpro.ts5.exception.TfmsSystemException;
-import cn.nkpro.ts5.exception.abstracts.TfmsException;
 import cn.nkpro.ts5.utils.GroovyUtils;
 import cn.nkpro.ts5.utils.OsUtils;
 import groovy.lang.GroovyObject;
