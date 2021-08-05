@@ -20,12 +20,13 @@ import java.util.List;
 @EnableConfigurationProperties(CompressProperties.class)
 public class CompressResponseConfigurer implements InitializingBean {
 
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private RequestMappingHandlerAdapter requestMappingHandlerAdapter;
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
         List<HandlerMethodReturnValueHandler> unmodifiableList = requestMappingHandlerAdapter.getReturnValueHandlers();
+        assert unmodifiableList != null;
         List<HandlerMethodReturnValueHandler> list = new ArrayList<>(unmodifiableList.size());
         for (HandlerMethodReturnValueHandler returnValueHandler : unmodifiableList) {
             if (returnValueHandler instanceof RequestResponseBodyMethodProcessor) {
