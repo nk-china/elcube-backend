@@ -1,11 +1,11 @@
-package cn.nkpro.ts5.config.global;
+package cn.nkpro.ts5.exception;
 
 
-import cn.nkpro.ts5.exception.TfmsAccessDeniedException;
-import cn.nkpro.ts5.exception.TfmsCaution;
-import cn.nkpro.ts5.exception.TfmsComponentException;
-import cn.nkpro.ts5.exception.TfmsException;
+import cn.nkpro.ts5.exception.*;
+import cn.nkpro.ts5.exception.abstracts.TfmsCaution;
+import cn.nkpro.ts5.exception.abstracts.TfmsException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -21,48 +21,41 @@ import java.util.Map;
 @Slf4j
 public class GlobalExceptionHandler {
 
+    private static Map<Class<? extends Throwable>,Integer> codes = new HashMap<>();
+
+    static {
+        // 用户操作错误或警告提示
+        codes.put(TfmsCaution.class,400);
+        codes.put(IllegalArgumentException.class,400);
+
+        // 用户未登陆 或 token失效
+        codes.put(AccessDeniedException.class,401);
+        codes.put(AuthenticationException.class,401);
+
+        // 没有权限，拒绝访问
+        codes.put(TfmsAccessDeniedException.class,403);
+
+        // 系统错误
+        codes.put(TfmsComponentException.class,501);
+        codes.put(TfmsDefineException.class,501);
+        codes.put(TfmsException.class,501);
+    }
+
     @ExceptionHandler(value = Exception.class)
     public ModelAndView errorHandler(HttpServletRequest request,
                                      HttpServletResponse response, Exception ex) {
 
         log.error(ex.getMessage(),ex);
 
+        response.setStatus(codes.getOrDefault(ex.getClass(),500));
+
         MappingJackson2JsonView view = new MappingJackson2JsonView();
         Map<String, Object> attributes = new HashMap<>();
+
+        attributes.put("code", response.getStatus());
         attributes.put("msg", ex.getMessage());
         attributes.put("url", request.getRequestURI().substring(request.getContextPath().length()));
 
-
-        if(ex instanceof TfmsComponentException){
-            if(ex.getCause() instanceof TfmsCaution){
-                response.setStatus(400);
-                attributes.put("msg", ex.getCause().getMessage());
-            }else{
-                response.setStatus(501);
-            }
-        }else
-
-        if(ex instanceof TfmsCaution){
-            response.setStatus(400);
-        }else
-
-        if(ex instanceof AuthenticationException){
-            response.setStatus(401);
-        }else
-
-        if(ex instanceof TfmsAccessDeniedException){
-            response.setStatus(403);
-        }else
-
-        if(ex instanceof TfmsException){
-            response.setStatus(501);
-        }else
-
-        {
-            response.setStatus(500);
-        }
-
-        attributes.put("code", response.getStatus());
         view.setAttributesMap(attributes);
         ModelAndView mav = new ModelAndView("error");
         mav.setView(view);

@@ -1,9 +1,9 @@
-package cn.nkpro.ts5.exception;
+package cn.nkpro.ts5.exception.abstracts;
 
 /**
  * Created by bean on 2020/1/15.
  */
-public class TfmsException extends RuntimeException {
+public abstract class TfmsException extends RuntimeException {
 
     public TfmsException(String message){
         super(message);

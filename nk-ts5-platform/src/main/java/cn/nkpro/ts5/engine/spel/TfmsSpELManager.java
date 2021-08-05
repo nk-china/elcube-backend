@@ -1,8 +1,8 @@
 package cn.nkpro.ts5.engine.spel;
 
-import cn.nkpro.ts5.engine.co.NKCustomObjectManager;
+import cn.nkpro.ts5.engine.co.NkCustomObjectManager;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
-import cn.nkpro.ts5.exception.TfmsException;
+import cn.nkpro.ts5.exception.TfmsDefineException;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +28,7 @@ public class TfmsSpELManager {
 
 
     @Autowired@SuppressWarnings("all")
-    private NKCustomObjectManager customObjectManager;
+    private NkCustomObjectManager customObjectManager;
 
     public EvaluationContext createContext(DocHV doc){
         StandardEvaluationContext ctx = new StandardEvaluationContext(make(doc));
@@ -102,7 +102,7 @@ public class TfmsSpELManager {
                 String value = parser.parseExpression(SpEL).getValue(context,String.class);
                 input = input.replace(expression, StringUtils.defaultString(value));
             }catch (ParseException | EvaluationException e){
-                throw new TfmsException(String.format("表达式%s错误",SpEL),e);
+                throw new TfmsDefineException(String.format("表达式%s错误",SpEL),e);
             }
         }
 

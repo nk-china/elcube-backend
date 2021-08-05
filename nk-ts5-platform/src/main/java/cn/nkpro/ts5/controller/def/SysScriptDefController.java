@@ -2,7 +2,7 @@ package cn.nkpro.ts5.controller.def;
 
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
-import cn.nkpro.ts5.config.global.NkProperties;
+import cn.nkpro.ts5.config.NkProperties;
 import cn.nkpro.ts5.engine.doc.model.ScriptDefHV;
 import cn.nkpro.ts5.engine.doc.service.NkScriptDefManager;
 import cn.nkpro.ts5.orm.mb.gen.ScriptDefH;

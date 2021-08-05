@@ -4,17 +4,21 @@ import cn.nkpro.ts5.exception.abstracts.TfmsException;
 
 /**
  *
- * 配置 或组件编码 不正确
+ * 系统异常
  * Created by bean on 2020/1/15.
  */
-public class TfmsDefineException extends TfmsException {
+public class TfmsSystemException extends TfmsException {
 
 
-    public TfmsDefineException(String message) {
+    public TfmsSystemException(String message) {
         super(message);
     }
 
-    public TfmsDefineException(String message, Throwable cause) {
+    public TfmsSystemException(Throwable cause){
+        super(cause);
+    }
+
+    public TfmsSystemException(String message, Throwable cause) {
         super(message, cause);
     }
 

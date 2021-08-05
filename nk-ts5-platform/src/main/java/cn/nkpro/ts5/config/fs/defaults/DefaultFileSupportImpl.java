@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.config.fs.defaults;
 
 import cn.nkpro.ts5.config.fs.FSConfig;
-import cn.nkpro.ts5.config.global.NkProperties;
+import cn.nkpro.ts5.config.NkProperties;
 import cn.nkpro.ts5.engine.web.UserAccountService;
 import cn.nkpro.ts5.config.fs.FSSupport;
 import cn.nkpro.ts5.config.fs.FileUploadStatus;

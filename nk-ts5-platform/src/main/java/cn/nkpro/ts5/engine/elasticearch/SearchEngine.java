@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.engine.elasticearch;
 
-import cn.nkpro.ts5.config.global.NkProperties;
+import cn.nkpro.ts5.config.NkProperties;
 import cn.nkpro.ts5.engine.elasticearch.annotation.*;
 import cn.nkpro.ts5.engine.elasticearch.model.ESDoc;
 import cn.nkpro.ts5.utils.LocalSyncUtilz;

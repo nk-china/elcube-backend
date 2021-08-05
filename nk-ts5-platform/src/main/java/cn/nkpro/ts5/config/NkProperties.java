@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.config.global;
+package cn.nkpro.ts5.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;

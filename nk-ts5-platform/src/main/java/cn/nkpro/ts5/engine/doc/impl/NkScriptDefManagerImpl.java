@@ -5,12 +5,12 @@ import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.config.mybatis.pagination.PaginationContext;
 import cn.nkpro.ts5.config.redis.RedisSupport;
 import cn.nkpro.ts5.engine.co.DebugContextManager;
+import cn.nkpro.ts5.engine.co.NkCustomObjectManager;
 import cn.nkpro.ts5.engine.co.NkCustomObject;
-import cn.nkpro.ts5.engine.co.NKCustomObjectManager;
 import cn.nkpro.ts5.engine.co.NkCustomScriptObject;
 import cn.nkpro.ts5.engine.doc.model.ScriptDefHV;
 import cn.nkpro.ts5.engine.doc.service.NkScriptDefManager;
-import cn.nkpro.ts5.exception.TfmsException;
+import cn.nkpro.ts5.exception.TfmsDefineException;
 import cn.nkpro.ts5.orm.mb.gen.*;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
@@ -41,7 +41,7 @@ public class NkScriptDefManagerImpl implements NkScriptDefManager {
     @Autowired
     private ScriptDefHMapper scriptDefHMapper;
     @Autowired
-    private NKCustomObjectManager customObjectManager;
+    private NkCustomObjectManager customObjectManager;
     @Autowired
     private DebugContextManager debugContextManager;
 
@@ -121,7 +121,7 @@ public class NkScriptDefManagerImpl implements NkScriptDefManager {
 
         return Optional
                 .ofNullable(scriptDefHMapper.selectByPrimaryKey(key))
-                .orElseThrow(()->new TfmsException("配置没有找到"));
+                .orElseThrow(()->new TfmsDefineException("配置没有找到"));
     }
 
     @Override

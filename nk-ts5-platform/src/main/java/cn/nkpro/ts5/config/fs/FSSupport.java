@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.config.fs;
 
-import cn.nkpro.ts5.config.global.NkProperties;
+import cn.nkpro.ts5.config.NkProperties;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
 

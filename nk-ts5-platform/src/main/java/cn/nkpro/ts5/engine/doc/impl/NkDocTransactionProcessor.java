@@ -3,7 +3,7 @@ package cn.nkpro.ts5.engine.doc.impl;
 import cn.nkpro.ts5.config.id.GUID;
 import cn.nkpro.ts5.config.id.SequenceSupport;
 import cn.nkpro.ts5.engine.task.NkBpmTaskService;
-import cn.nkpro.ts5.engine.co.NKCustomObjectManager;
+import cn.nkpro.ts5.engine.co.NkCustomObjectManager;
 import cn.nkpro.ts5.engine.doc.NkCard;
 import cn.nkpro.ts5.engine.doc.NkDocCycle;
 import cn.nkpro.ts5.engine.doc.NkDocProcessor;
@@ -56,7 +56,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
     @Autowired@SuppressWarnings("all")
     private NkBpmTaskService bpmTaskService;
     @Autowired@SuppressWarnings("all")
-    private NKCustomObjectManager customObjectManager;
+    private NkCustomObjectManager customObjectManager;
 
     @Override
     public EnumDocClassify classify() {

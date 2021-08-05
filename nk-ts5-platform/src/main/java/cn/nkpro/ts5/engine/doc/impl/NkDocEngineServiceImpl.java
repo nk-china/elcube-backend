@@ -3,14 +3,14 @@ package cn.nkpro.ts5.engine.doc.impl;
 import cn.nkpro.ts5.basic.Constants;
 import cn.nkpro.ts5.config.redis.RedisSupport;
 import cn.nkpro.ts5.config.security.SecurityUtilz;
-import cn.nkpro.ts5.engine.co.NKCustomObjectManager;
+import cn.nkpro.ts5.engine.co.NkCustomObjectManager;
 import cn.nkpro.ts5.engine.doc.NkDocProcessor;
 import cn.nkpro.ts5.engine.doc.interceptor.NkDocFlowInterceptor;
 import cn.nkpro.ts5.engine.doc.model.*;
 import cn.nkpro.ts5.engine.doc.service.NkDocDefService;
 import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService;
 import cn.nkpro.ts5.engine.task.NkBpmTaskService;
-import cn.nkpro.ts5.exception.TfmsException;
+import cn.nkpro.ts5.exception.TfmsDefineException;
 import cn.nkpro.ts5.orm.mb.gen.DocHMapper;
 import cn.nkpro.ts5.orm.mb.gen.DocIExample;
 import cn.nkpro.ts5.orm.mb.gen.DocIKey;
@@ -41,7 +41,7 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
     @Autowired@SuppressWarnings("all")
     private RedisSupport<DocHD> redisSupport;
     @Autowired@SuppressWarnings("all")
-    private NKCustomObjectManager customObjectManager;
+    private NkCustomObjectManager customObjectManager;
     @Autowired@SuppressWarnings("all")
     private NkDocDefService docDefService;
     @Autowired@SuppressWarnings("all")
@@ -221,15 +221,15 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
                 .stream()
                 .filter(item -> StringUtils.equals(item.getPreDocType(), preDocType))
                 .findFirst()
-                .orElseThrow(()->new TfmsException("没有找到业务流配置"));
+                .orElseThrow(()->new TfmsDefineException("没有找到业务流配置"));
 
         if(!StringUtils.equals(flowV.getPreDocState(),preDocState)){
-            throw new TfmsException("状态不满足条件");
+            throw new TfmsDefineException("状态不满足条件");
         }
         if(StringUtils.isNotBlank(flowV.getRefObjectType())){
             NkDocFlowInterceptor.FlowDescribe flowDescribe = applyDocFlowInterceptor(flowV.getRefObjectType(), preDoc);
             if(!flowDescribe.isVisible()){
-                throw new TfmsException(flowDescribe.getVisibleDesc());
+                throw new TfmsDefineException(flowDescribe.getVisibleDesc());
             }
         }
     }

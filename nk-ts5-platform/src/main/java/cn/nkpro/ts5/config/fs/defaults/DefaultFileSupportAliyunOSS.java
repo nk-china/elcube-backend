@@ -1,11 +1,10 @@
 package cn.nkpro.ts5.config.fs.defaults;
 
 import cn.nkpro.ts5.config.fs.FSConfig;
-import cn.nkpro.ts5.config.fs.properties.AliyunProperties;
-import cn.nkpro.ts5.config.global.NkProperties;
-import cn.nkpro.ts5.exception.TfmsIllegalContentException;
 import cn.nkpro.ts5.config.fs.FSSupport;
 import cn.nkpro.ts5.config.fs.FileUploadStatus;
+import cn.nkpro.ts5.config.fs.properties.AliyunProperties;
+import cn.nkpro.ts5.config.NkProperties;
 import com.aliyun.oss.HttpMethod;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
@@ -86,7 +85,7 @@ public class DefaultFileSupportAliyunOSS implements FSSupport<Map<String, Object
 
     @Override
     public FileUploadStatus upload(MultipartFile file) {
-        throw new TfmsIllegalContentException("不支持操作");
+        throw new RuntimeException("不支持操作");
     }
 
     @Override

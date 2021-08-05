@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.config.redis;
 
-import cn.nkpro.ts5.exception.TfmsException;
+import cn.nkpro.ts5.exception.abstracts.TfmsException;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import java.util.Collection;

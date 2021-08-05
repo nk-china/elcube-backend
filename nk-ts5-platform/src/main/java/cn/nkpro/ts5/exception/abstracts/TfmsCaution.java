@@ -1,9 +1,9 @@
-package cn.nkpro.ts5.exception;
+package cn.nkpro.ts5.exception.abstracts;
 
 /**
  * 警告
  */
-public abstract class TfmsCaution extends TfmsException {
+public abstract class TfmsCaution extends RuntimeException {
 
     public TfmsCaution(String message) {
         super(message);

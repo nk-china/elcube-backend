@@ -2,9 +2,8 @@ package cn.nkpro.ts5.config.redis.defaults;
 
 import cn.nkpro.ts5.config.redis.EnvRedisTemplate;
 import cn.nkpro.ts5.config.redis.RedisSupport;
-import cn.nkpro.ts5.exception.TfmsException;
+import cn.nkpro.ts5.exception.abstracts.TfmsException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;

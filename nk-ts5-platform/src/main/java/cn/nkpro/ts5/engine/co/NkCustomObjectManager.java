@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  * Created by bean on 2020/7/24.
  */
 @Component
-public class NKCustomObjectManager implements ApplicationContextAware {
+public class NkCustomObjectManager implements ApplicationContextAware {
 
     private ApplicationContext applicationContext;
 

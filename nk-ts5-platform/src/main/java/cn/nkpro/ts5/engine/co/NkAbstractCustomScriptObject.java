@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.engine.co;
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
-import cn.nkpro.ts5.config.global.NkProperties;
+import cn.nkpro.ts5.config.NkProperties;
 import cn.nkpro.ts5.engine.doc.NkCard;
 import cn.nkpro.ts5.engine.doc.model.ScriptDefHV;
 import cn.nkpro.ts5.utils.ClassUtils;

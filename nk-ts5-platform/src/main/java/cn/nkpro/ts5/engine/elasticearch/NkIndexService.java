@@ -2,7 +2,8 @@ package cn.nkpro.ts5.engine.elasticearch;
 
 import cn.nkpro.ts5.engine.elasticearch.model.ESDoc;
 import cn.nkpro.ts5.engine.web.UserAuthorizationService;
-import cn.nkpro.ts5.exception.TfmsException;
+import cn.nkpro.ts5.exception.TfmsSystemException;
+import cn.nkpro.ts5.exception.abstracts.TfmsException;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -108,7 +109,7 @@ public class NkIndexService {
         try {
             return searchEngine.searchPage(docType,sourceBuilder);
         } catch (IOException e) {
-            throw new TfmsException(e);
+            throw new TfmsSystemException(e);
         }
     }
 }

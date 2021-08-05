@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.controller;
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
-import cn.nkpro.ts5.config.global.NkProperties;
+import cn.nkpro.ts5.config.NkProperties;
 import cn.nkpro.ts5.engine.web.UserQueryService;
 import cn.nkpro.ts5.engine.web.WebMenuService;
 import cn.nkpro.ts5.engine.web.model.WebMenuBO;

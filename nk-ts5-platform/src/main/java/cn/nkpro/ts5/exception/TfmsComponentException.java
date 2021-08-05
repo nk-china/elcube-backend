@@ -1,20 +1,22 @@
 package cn.nkpro.ts5.exception;
 
+import cn.nkpro.ts5.engine.doc.NkCard;
+import cn.nkpro.ts5.exception.abstracts.TfmsException;
 import lombok.Getter;
 
 /**
  *
- * 组件异常
+ * 组件运行时异常：卡片，脚本等
  * Created by bean on 2020/1/15.
  */
 public class TfmsComponentException extends TfmsException {
 
     @Getter
-    private String componentName;
+    private NkCard card;
 
-    public TfmsComponentException(String componentName, Throwable cause) {
-        super(String.format("组件[%s]发生错误：%s",componentName,cause.getMessage()), cause);
-        this.componentName = componentName;
+    public TfmsComponentException(NkCard card, Throwable cause) {
+        super(String.format("组件[%s]发生错误：%s",card.getCardName(),cause.getMessage()), cause);
+        this.card = card;
     }
 
     @Override

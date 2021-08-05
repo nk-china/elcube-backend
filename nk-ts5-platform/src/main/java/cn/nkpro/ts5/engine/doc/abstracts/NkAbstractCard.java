@@ -1,14 +1,14 @@
 package cn.nkpro.ts5.engine.doc.abstracts;
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
-import cn.nkpro.ts5.config.global.NkProperties;
+import cn.nkpro.ts5.config.NkProperties;
 import cn.nkpro.ts5.engine.co.NkAbstractCustomScriptObject;
 import cn.nkpro.ts5.engine.doc.NkCard;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocDefIV;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.engine.doc.model.ScriptDefHV;
-import cn.nkpro.ts5.exception.TfmsException;
+import cn.nkpro.ts5.exception.TfmsDefineException;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -187,12 +187,12 @@ public abstract class NkAbstractCard<DT,DDT> extends NkAbstractCustomScriptObjec
                     if(Map.class.isAssignableFrom(clazz)){
                         return new HashMap<>();
                     }
-                    throw new TfmsException("卡片数据类型不支持 "+clazz.getName());
+                    throw new TfmsDefineException("卡片数据类型不支持 "+clazz.getName());
                 }else{
                     try {
                         return ((Class)targetType).getConstructor().newInstance();
                     } catch (Exception e) {
-                        throw new TfmsException("卡片数据类型必须声明空构造方法 "+e.getMessage(),e);
+                        throw new TfmsDefineException("卡片数据类型必须声明空构造方法 "+e.getMessage(),e);
                     }
                 }
 
@@ -208,7 +208,7 @@ public abstract class NkAbstractCard<DT,DDT> extends NkAbstractCustomScriptObjec
                 return JSON.parseObject(JSON.toJSONString(obj),targetType);
             }
         }
-        throw new TfmsException("不能解析卡片对象["+getClass()+"]的数据类型");
+        throw new TfmsDefineException("不能解析卡片对象["+getClass()+"]的数据类型");
     }
 
     private final static Map<Class,Type[]> cache = new ConcurrentHashMap<>();

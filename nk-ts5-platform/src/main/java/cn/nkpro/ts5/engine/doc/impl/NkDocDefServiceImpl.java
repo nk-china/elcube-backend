@@ -6,7 +6,7 @@ import cn.nkpro.ts5.config.mybatis.pagination.PaginationContext;
 import cn.nkpro.ts5.config.redis.RedisSupport;
 import cn.nkpro.ts5.engine.co.DebugContextManager;
 import cn.nkpro.ts5.engine.co.NkCustomObject;
-import cn.nkpro.ts5.engine.co.NKCustomObjectManager;
+import cn.nkpro.ts5.engine.co.NkCustomObjectManager;
 import cn.nkpro.ts5.engine.doc.NkCard;
 import cn.nkpro.ts5.engine.doc.NkDocProcessor;
 import cn.nkpro.ts5.engine.doc.interceptor.*;
@@ -15,7 +15,8 @@ import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocDefIV;
 import cn.nkpro.ts5.engine.doc.model.DocDefStateV;
 import cn.nkpro.ts5.engine.doc.service.NkDocDefService;
-import cn.nkpro.ts5.exception.TfmsException;
+import cn.nkpro.ts5.exception.TfmsComponentException;
+import cn.nkpro.ts5.exception.TfmsDefineException;
 import cn.nkpro.ts5.orm.mb.gen.*;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
@@ -47,7 +48,7 @@ public class NkDocDefServiceImpl implements NkDocDefService {
     @Autowired@SuppressWarnings("all")
     private DebugContextManager debugContextManager;
     @Autowired@SuppressWarnings("all")
-    private NKCustomObjectManager customObjectManager;
+    private NkCustomObjectManager customObjectManager;
 
     @Autowired@SuppressWarnings("all")
     private DocDefHMapper docDefHMapper;
@@ -602,13 +603,13 @@ public class NkDocDefServiceImpl implements NkDocDefService {
             // 找到对应的组件实现类
             NkCard nkCard = customObjectManager.getCustomObjectIfExists(docDefI.getCardKey(), NkCard.class);
             if(nkCard==null && !ignoreError){
-                throw new TfmsException(String.format("自定义对象[%s]不存在",docDefI.getBeanName()));
+                throw new TfmsDefineException(String.format("自定义对象[%s]不存在",docDefI.getBeanName()));
             }
             try {
                 function.run(nkCard, docDefI);
             }catch (Exception e){
                 if(!ignoreError){
-                    throw new TfmsException(e.getMessage(),e);
+                    throw new TfmsComponentException(nkCard,e);
                 }
             }
         }

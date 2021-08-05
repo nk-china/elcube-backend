@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.engine.web.impl;
 
 import cn.nkpro.ts5.basic.Constants;
-import cn.nkpro.ts5.config.global.NkProperties;
+import cn.nkpro.ts5.config.NkProperties;
 import cn.nkpro.ts5.engine.web.model.UserAccountBO;
 import cn.nkpro.ts5.orm.mb.gen.SysAccount;
 import cn.nkpro.ts5.orm.mb.gen.SysAccountExample;

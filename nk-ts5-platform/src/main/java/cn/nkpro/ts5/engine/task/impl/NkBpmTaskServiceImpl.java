@@ -8,7 +8,8 @@ import cn.nkpro.ts5.engine.task.model.BpmInstance;
 import cn.nkpro.ts5.engine.task.model.BpmTask;
 import cn.nkpro.ts5.engine.task.model.BpmTaskComplete;
 import cn.nkpro.ts5.engine.task.model.BpmTaskTransition;
-import cn.nkpro.ts5.exception.TfmsException;
+import cn.nkpro.ts5.exception.TfmsDefineException;
+import cn.nkpro.ts5.exception.abstracts.TfmsException;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -250,7 +251,7 @@ public class NkBpmTaskServiceImpl implements NkBpmTaskService {
                 //如果是会签节点，那么 activityId 格式为： activityId#multiInstanceBody
                 .filter(activity -> StringUtils.equals(activity.getId().split("#")[0],taskDefinitionKey))
                 .findFirst()
-                .orElseThrow(()->new TfmsException("没有找到流程任务定义"));
+                .orElseThrow(()->new TfmsDefineException("没有找到流程任务定义"));
 
         return pvmActivity.getOutgoingTransitions()
                 .stream()

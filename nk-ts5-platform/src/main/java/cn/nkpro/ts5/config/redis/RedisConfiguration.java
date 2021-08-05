@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.config.redis;
 
-import cn.nkpro.ts5.config.global.NkProperties;
+import cn.nkpro.ts5.config.NkProperties;
 import cn.nkpro.ts5.config.redis.defaults.DefaultRedisSupportImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

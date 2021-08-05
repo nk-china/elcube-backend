@@ -1,12 +1,12 @@
 package cn.nkpro.ts5.controller.def;
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
+import cn.nkpro.ts5.engine.co.NkCustomObjectManager;
 import cn.nkpro.ts5.engine.co.NkCustomObject;
-import cn.nkpro.ts5.engine.co.NKCustomObjectManager;
 import cn.nkpro.ts5.engine.co.NkCustomScriptObject;
 import cn.nkpro.ts5.engine.doc.NkCard;
 import cn.nkpro.ts5.engine.doc.model.ScriptDefHV;
-import cn.nkpro.ts5.exception.TfmsException;
+import cn.nkpro.ts5.exception.TfmsSystemException;
 import groovy.lang.GroovyObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,7 +29,7 @@ import java.util.Map;
 public class SysScriptResController {
 
     @Autowired@SuppressWarnings("all")
-    private NKCustomObjectManager customObjectManager;
+    private NkCustomObjectManager customObjectManager;
 
     @WsDocNote("1.获取卡片信息")
     @RequestMapping("/vue")
@@ -84,7 +84,7 @@ public class SysScriptResController {
             try {
                 bean = ((Advised)bean).getTargetSource().getTarget();
             } catch (Exception e) {
-                throw new TfmsException(e.getMessage(),e);
+                throw new TfmsSystemException(e.getMessage(),e);
             }
         }
         return bean;
