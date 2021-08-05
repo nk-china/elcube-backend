@@ -12,25 +12,14 @@ import java.util.Map;
  */
 @EqualsAndHashCode(callSuper = false)
 @Data
-public class DocHV extends DocHD {
-
-    private String docTypeDesc;
-
-    private String docStateDesc;
-
-    private DocDefHV def;
-
-    private Map<String,Object> data;
-
-    private Map<String,Object> dynamics;
-    // 单据是否允许编辑，默认真
-    private Boolean     writeable = true;
+public class DocHV extends DocHBasis {
 
     private BpmTask bpmTask;
 
+    // 单据是否允许编辑，默认真
+    private Boolean writeable = true;
+
     public DocHV() {
         super();
-        this.data       = new HashMap<>();
-        this.dynamics   = new HashMap<>();
     }
 }

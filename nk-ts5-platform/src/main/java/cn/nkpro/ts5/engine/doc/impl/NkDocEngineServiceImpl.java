@@ -39,7 +39,7 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
     @Autowired@SuppressWarnings("all")
     private DocIMapper docIMapper;
     @Autowired@SuppressWarnings("all")
-    private RedisSupport<DocHD> redisSupport;
+    private RedisSupport<DocHPersistent> redisSupport;
     @Autowired@SuppressWarnings("all")
     private NkCustomObjectManager customObjectManager;
     @Autowired@SuppressWarnings("all")
@@ -83,9 +83,9 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
 
     private DocHV detailFromDB(String docId){
         // 获取单据抬头和行项目数据
-        DocHD docHD = redisSupport.getIfAbsent(Constants.CACHE_DOC, docId,()->{
+        DocHPersistent docHPersistent = redisSupport.getIfAbsent(Constants.CACHE_DOC, docId,()->{
 
-            DocHD doc = BeanUtilz.copyFromObject(docHMapper.selectByPrimaryKey(docId), DocHV.class);
+            DocHPersistent doc = BeanUtilz.copyFromObject(docHMapper.selectByPrimaryKey(docId), DocHV.class);
 
             if(doc!=null){
 
@@ -101,15 +101,15 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
         });
 
         // 处理数据
-        if(docHD != null){
+        if(docHPersistent != null){
 
             // 获取单据DEF
-            DocDefHV def = docDefService.getDocDefForRuntime(docHD.getDocType());
+            DocDefHV def = docDefService.getDocDefForRuntime(docHPersistent.getDocType());
 
             // 获取单据处理器 并执行
             return customObjectManager
                     .getCustomObject(def.getRefObjectType(), NkDocProcessor.class)
-                    .detail(def, docHD);
+                    .detail(def, docHPersistent);
         }
 
         return null;

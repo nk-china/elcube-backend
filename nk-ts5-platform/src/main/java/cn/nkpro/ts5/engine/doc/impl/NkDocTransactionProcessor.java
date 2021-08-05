@@ -2,17 +2,15 @@ package cn.nkpro.ts5.engine.doc.impl;
 
 import cn.nkpro.ts5.config.id.GUID;
 import cn.nkpro.ts5.config.id.SequenceSupport;
+import cn.nkpro.ts5.engine.doc.interceptor.*;
+import cn.nkpro.ts5.engine.doc.service.NkDocHistoryService;
 import cn.nkpro.ts5.engine.task.NkBpmTaskService;
 import cn.nkpro.ts5.engine.co.NkCustomObjectManager;
 import cn.nkpro.ts5.engine.doc.NkCard;
 import cn.nkpro.ts5.engine.doc.NkDocCycle;
 import cn.nkpro.ts5.engine.doc.NkDocProcessor;
-import cn.nkpro.ts5.engine.doc.interceptor.NkDocExecuteInterceptor;
-import cn.nkpro.ts5.engine.doc.interceptor.NkDocCommittedInterceptor;
-import cn.nkpro.ts5.engine.doc.interceptor.NkDocCreateInterceptor;
-import cn.nkpro.ts5.engine.doc.interceptor.NkDocUpdateInterceptor;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
-import cn.nkpro.ts5.engine.doc.model.DocHD;
+import cn.nkpro.ts5.engine.doc.model.DocHPersistent;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.engine.doc.model.DocIV;
 import cn.nkpro.ts5.engine.doc.service.NkDocDefService;
@@ -23,6 +21,7 @@ import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
 import cn.nkpro.ts5.utils.LocalSyncUtilz;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -34,10 +33,7 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Method;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -61,6 +57,8 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
     private NkBpmTaskService bpmTaskService;
     @Autowired@SuppressWarnings("all")
     private NkCustomObjectManager customObjectManager;
+    @Autowired
+    private NkDocHistoryService docHistoryService;
 
     @Override
     public EnumDocClassify classify() {
@@ -157,7 +155,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
     }
 
     @Override
-    public DocHV detail(DocDefHV def, DocHD docHD) {
+    public DocHV detail(DocDefHV def, DocHPersistent docHD) {
 
         DocHV doc = BeanUtilz.copyFromObject(docHD, DocHV.class);
         doc.setDef(def);
@@ -217,25 +215,25 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
                 )
         );
 
-        DocHV finalDoc = processCycle(doc, NkDocCycle.beforeUpdate, (beanName)->
+        DocHV loopDoc = processCycle(doc, NkDocCycle.beforeUpdate, (beanName)->
                 customObjectManager
                         .getCustomObject(beanName, NkDocUpdateInterceptor.class)
                         .apply(doc, original, NkDocCycle.beforeUpdate)
         );
 
-        docDefService.runLoopCards(doc.getDef(),false, (card, defIV)->{
+        docDefService.runLoopCards(loopDoc.getDef(),false, (card, defIV)->{
 
             boolean existsOriginal = original !=null
                     && original.getItems().containsKey(defIV.getCardKey())
                     && StringUtils.isNotBlank(original.getItems().get(defIV.getCardKey()).getDocId());
             Object cardDataOriginal = null;
-            Object cardData = finalDoc.getData().get(defIV.getCardKey());
+            Object cardData = loopDoc.getData().get(defIV.getCardKey());
 
             if(existsOriginal){
                 cardDataOriginal = original.getData().get(defIV.getCardKey());
             }
 
-            cardData = card.beforeUpdate(finalDoc, cardData, defIV.getConfig(), cardDataOriginal);
+            cardData = card.beforeUpdate(loopDoc, cardData, defIV.getConfig(), cardDataOriginal);
 
             // 如果原始单据数据存在则更新，否则插入数据
             if(existsOriginal){
@@ -246,78 +244,96 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
                 docIMapper.updateByPrimaryKeyWithBLOBs(docI);
 
                 // 将更新后的数据放回到doc
-                finalDoc.getItems().put(defIV.getCardKey(),docI);
+                loopDoc.getItems().put(defIV.getCardKey(),docI);
                 docI.setCardContent(null);
             }else{
 
                 DocI docI = new DocI();
-                docI.setDocId(finalDoc.getDocId());
+                docI.setDocId(loopDoc.getDocId());
                 docI.setCardKey(defIV.getCardKey());
-                docI.setCreatedTime(finalDoc.getUpdatedTime());
-                docI.setUpdatedTime(finalDoc.getUpdatedTime());
+                docI.setCreatedTime(loopDoc.getUpdatedTime());
+                docI.setUpdatedTime(loopDoc.getUpdatedTime());
                 docI.setCardContent(JSON.toJSONString(cardData));
 
                 docIMapper.insert(docI);
 
                 // 将更新后的数据放回到doc
-                finalDoc.getItems().put(defIV.getCardKey(),docI);
+                loopDoc.getItems().put(defIV.getCardKey(),docI);
                 docI.setCardContent(null);
             }
 
-            finalDoc.getData().put(defIV.getCardKey(),cardData);
+            loopDoc.getData().put(defIV.getCardKey(),cardData);
 
             // 调用 卡片 afterUpdated
             if(isOverride(card)){
                 Object loopCardData = cardData;
-                LocalSyncUtilz.runAfterCommit(()-> card.updateCommitted(finalDoc, loopCardData, defIV.getConfig()));
+                LocalSyncUtilz.runAfterCommit(()-> card.updateCommitted(loopDoc, loopCardData, defIV.getConfig()));
             }
         });
 
-        if(original==null || !StringUtils.equals(doc.getDocState(),original.getDocState())){
+        if(original==null || !StringUtils.equals(loopDoc.getDocState(),original.getDocState())){
             // 单据状态发生变化
-            docDefService.runLoopCards(doc.getDef(),false, (card, defIV)->{
-                Object cardData = finalDoc.getData().get(defIV.getCardKey());
-                card.stateChanged(doc, original, cardData, defIV.getConfig());
+            docDefService.runLoopCards(loopDoc.getDef(),false, (card, defIV)->{
+                Object cardData = loopDoc.getData().get(defIV.getCardKey());
+                card.stateChanged(loopDoc, original, cardData, defIV.getConfig());
             });
 
             // 启动工作流
-            if(CollectionUtils.isNotEmpty(doc.getDef().getBpms())){
-                doc.getDef().getBpms()
+            if(CollectionUtils.isNotEmpty(loopDoc.getDef().getBpms())){
+                loopDoc.getDef().getBpms()
                     .stream()
-                    .filter(bpm->StringUtils.equals(doc.getDocState(),bpm.getStartBy()))
+                    .filter(bpm->StringUtils.equals(loopDoc.getDocState(),bpm.getStartBy()))
                     .findFirst()
                     .ifPresent(bpm-> {
-                        ProcessInstance instance = bpmTaskService.start(bpm.getProcessKey(), doc.getDocId());
-                        doc.setProcessInstanceId(instance.getProcessInstanceId());
+                        ProcessInstance instance = bpmTaskService.start(bpm.getProcessKey(), loopDoc.getDocId());
+                        loopDoc.setProcessInstanceId(instance.getProcessInstanceId());
                     });
             }
         }
 
-        finalDoc.setIdentification(random());
+        processCycle(loopDoc, NkDocCycle.afterUpdated, (beanName)->{
+            customObjectManager
+                    .getCustomObject(beanName, NkDocUpdateInterceptor.class)
+                    .apply(loopDoc, original, NkDocCycle.afterUpdated);
+            return loopDoc;
+        });
+
+        // 数据更新前后对比
+        List<String> changedCard = new ArrayList<>();
+        docDefService.runLoopCards(loopDoc.getDef(),false, (card, defIV)->{
+            if(optionalOriginal.isPresent()){
+
+                Object o1 =  loopDoc.getData().get(defIV.getCardKey());
+                Object o2 = original.getData().get(defIV.getCardKey());
+
+                if(!Objects.equals(JSONObject.toJSONString(o1),JSONObject.toJSONString(o2))){
+                    changedCard.add(defIV.getCardKey());
+                }
+            }else{
+                changedCard.add(defIV.getCardKey());
+            }
+        });
+
+        loopDoc.setIdentification(random());
         if(optionalOriginal.isPresent()){
-            docHMapper.updateByPrimaryKeySelective(finalDoc);
+            docHMapper.updateByPrimaryKeySelective(loopDoc);
         }else{
-            docHMapper.insert(finalDoc);
+            docHMapper.insert(loopDoc);
         }
+        docHistoryService.doAddVersion(loopDoc,original,changedCard,optSource);
 
-        index(finalDoc);
-
-        DocHV returnDoc = processCycle(doc, NkDocCycle.afterUpdated, (beanName)->
-                customObjectManager
-                        .getCustomObject(beanName, NkDocUpdateInterceptor.class)
-                        .apply(doc, original, NkDocCycle.afterUpdated)
-        );
+        index(loopDoc);
 
         LocalSyncUtilz.runAfterCommit(()->
-                processCycle(doc, NkDocCycle.afterUpdateCommitted, (beanName)->{
+                processCycle(loopDoc, NkDocCycle.afterUpdateCommitted, (beanName)->{
                             customObjectManager
                                     .getCustomObject(beanName, NkDocCommittedInterceptor.class)
-                                    .apply(doc, NkDocCycle.afterUpdateCommitted);
-                            return doc;
+                                    .apply(loopDoc, NkDocCycle.afterUpdateCommitted);
+                            return loopDoc;
                 })
         );
 
-        return returnDoc;
+        return loopDoc;
     }
 
     @Override

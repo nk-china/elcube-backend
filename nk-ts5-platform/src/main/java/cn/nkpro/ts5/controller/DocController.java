@@ -1,6 +1,8 @@
 package cn.nkpro.ts5.controller;
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
+import cn.nkpro.ts5.engine.doc.model.DocHHistory;
+import cn.nkpro.ts5.engine.doc.service.NkDocHistoryService;
 import cn.nkpro.ts5.engine.elasticearch.NkIndexService;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.engine.doc.service.NkDocDefService;
@@ -8,6 +10,7 @@ import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService;
 import cn.nkpro.ts5.engine.elasticearch.ESPageList;
 import cn.nkpro.ts5.engine.elasticearch.model.DocHES;
 import cn.nkpro.ts5.orm.mb.gen.DocDefH;
+import cn.nkpro.ts5.orm.mb.gen.SysLogDocRecord;
 import com.alibaba.fastjson.JSONObject;
 import eu.bitwalker.useragentutils.Browser;
 import eu.bitwalker.useragentutils.UserAgent;
@@ -36,6 +39,8 @@ public class DocController {
     private NkDocEngineFrontService docEngine;
     @Autowired@SuppressWarnings("all")
     private NkIndexService docService;
+    @Autowired
+    private NkDocHistoryService docHistoryService;
 //    @Autowired
 //    private TfmsDocEngineWithPerm docEngineWithPerm;
 //    @Autowired
@@ -55,11 +60,24 @@ public class DocController {
         return docDefService.getEntrance(classify);
     }
 
-    
+
     @WsDocNote("3.拉取交易详情")
     @RequestMapping(value = "/detail/{docId}",method = RequestMethod.GET)
-    public DocHV get(@PathVariable("docId") String docId) throws Exception {
+    public DocHV get(@PathVariable("docId") String docId) {
         return docEngine.detailView(docId);
+    }
+
+
+    @WsDocNote("4、拉取交易历史版本")
+    @RequestMapping(value = "/detail/snapshots/{docId}/{offset}",method = RequestMethod.GET)
+    public List<SysLogDocRecord> getHistories(@PathVariable("docId") String docId,@PathVariable("offset") Integer offset) {
+        return docHistoryService.getHistories(docId,offset);
+    }
+
+    @WsDocNote("5.拉取交易历史版本详情")
+    @RequestMapping(value = "/detail/snapshot/{historyId}",method = RequestMethod.GET)
+    public DocHHistory getHistory(@PathVariable("historyId") String historyId) {
+        return docHistoryService.getDetail(historyId);
     }
 //
 //    @ResponseCompress
@@ -67,13 +85,6 @@ public class DocController {
 //    @RequestMapping(value = "/items/list",method = RequestMethod.POST)
 //    public ESPageList<IndexDocItem> itemList(@RequestBody JSONObject params) {
 //        return docService.query(IndexDocItem.class, params,null);
-//    }
-//
-//    @ResponseCompress
-//    @WsDocNote("3、拉取交易历史版本")
-//    @RequestMapping(value = "/detail/histories/{docId}",method = RequestMethod.GET)
-//    public List<SysLogDocRecord> getHistorys(@PathVariable("docId") String docId) {
-//        return historyService.getHistorys(docId);
 //    }
 //
 //    @ResponseCompress

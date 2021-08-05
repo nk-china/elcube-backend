@@ -11,13 +11,13 @@ import java.util.Map;
 /**
  * 单据数据对象，缓存到redis的单据数据格式
  */
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 @Data
-public class DocHD extends DocH {
+public class DocHPersistent extends DocH {
 
     private Map<String, DocI> items;
 
-    DocHD() {
+    DocHPersistent() {
         this.items = new HashMap<>();
     }
 }
