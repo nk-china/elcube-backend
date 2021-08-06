@@ -62,5 +62,5 @@ public interface NkCard<DT,DDT> extends NkCustomObject {
 
     boolean isDebug();
 
-    default boolean ignoreDataDiff(){return false;}
+    default boolean enableDataDiff(){return true;}
 }

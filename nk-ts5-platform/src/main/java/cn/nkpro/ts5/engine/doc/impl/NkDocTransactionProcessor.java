@@ -350,19 +350,18 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         // 数据更新前后对比
         List<String> changedCard = new ArrayList<>();
         docDefService.runLoopCards(loopDoc.getDef(),false, (card, defIV)->{
-            if(card.ignoreDataDiff())
-                return;
+            if(card.enableDataDiff()){
+                if(optionalOriginal.isPresent()){
 
-            if(optionalOriginal.isPresent()){
+                    Object o1 =  loopDoc.getData().get(defIV.getCardKey());
+                    Object o2 = original.getData().get(defIV.getCardKey());
 
-                Object o1 =  loopDoc.getData().get(defIV.getCardKey());
-                Object o2 = original.getData().get(defIV.getCardKey());
-
-                if(!Objects.equals(JSONObject.toJSONString(o1),JSONObject.toJSONString(o2))){
+                    if(!Objects.equals(JSONObject.toJSONString(o1),JSONObject.toJSONString(o2))){
+                        changedCard.add(defIV.getCardKey());
+                    }
+                }else{
                     changedCard.add(defIV.getCardKey());
                 }
-            }else{
-                changedCard.add(defIV.getCardKey());
             }
         });
 

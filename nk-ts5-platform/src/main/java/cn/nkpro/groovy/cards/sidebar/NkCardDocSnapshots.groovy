@@ -25,8 +25,8 @@ class NkCardDocSnapshots extends NkAbstractCard<List<SysLogDocRecord>,Map> {
     }
 
     @Override
-    boolean ignoreDataDiff() {
-        return true
+    boolean enableDataDiff() {
+        return false
     }
 /**
      * 打开单据时，自定义获取数据
