@@ -9,14 +9,6 @@ import org.springframework.stereotype.Component
 @Component("NkCardBpm")
 class NkCardBpm extends NkAbstractCard<BpmData,BpmDef>{
 
-    @Override
-    BpmData beforeUpdate(DocHV doc, BpmData data, BpmDef bpmDef, BpmData original) {
-        return data
-    }
-
-    @Override
-    void stateChanged(DocHV doc, DocHV original, BpmData data, BpmDef bpmDef) {
-    }
 }
 @SuppressWarnings("unused")
 class BpmData{

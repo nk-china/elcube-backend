@@ -103,17 +103,32 @@ public class DocController {
         return docEngine.create(docType,preDocId);
     }
 
-    
+
     @WsDocNote("7、计算")
     @RequestMapping(value = "/calculate",method = RequestMethod.POST)
     public DocHV calculate(
-            @WsDocNote(value="单据JSON") @RequestBody CalcModel calcModel) throws Exception {
+            @WsDocNote(value="单据JSON") @RequestBody CalcModel calcModel) {
         return docEngine.calculate(calcModel.getDoc(),calcModel.getFromCard(),calcModel.getOptions());
+    }
+
+    @WsDocNote("8、简单调用")
+    @RequestMapping(value = "/call",method = RequestMethod.POST)
+    public Object call(
+            @WsDocNote(value="单据JSON") @RequestBody CallModel calcModel) {
+        return docEngine.call(calcModel.getDoc(),calcModel.getFromCard(),calcModel.getMethod(), calcModel.getOptions());
     }
 
     @Data
     static class CalcModel extends DocHV{
         String fromCard;
+        String options;
+        DocHV doc;
+    }
+
+    @Data
+    static class CallModel extends DocHV{
+        String fromCard;
+        String method;
         String options;
         DocHV doc;
     }

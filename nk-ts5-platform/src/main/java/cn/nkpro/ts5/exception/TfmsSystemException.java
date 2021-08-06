@@ -26,4 +26,16 @@ public class TfmsSystemException extends TfmsRuntimeException {
     public void printStackTrace() {
         super.printStackTrace();
     }
+
+    public static TfmsSystemException of(String message){
+        return new TfmsSystemException(message);
+    }
+
+    public static TfmsSystemException of(Throwable cause){
+        return new TfmsSystemException(cause);
+    }
+
+    public static TfmsSystemException of(String message,Throwable cause){
+        return new TfmsSystemException(message, cause);
+    }
 }

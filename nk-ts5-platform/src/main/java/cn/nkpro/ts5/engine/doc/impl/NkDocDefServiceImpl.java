@@ -601,7 +601,7 @@ public class NkDocDefServiceImpl implements NkDocDefService {
     public void runLoopCards(DocDefHV docDefHV, boolean ignoreError, Function function){
         for(DocDefIV docDefI : docDefHV.getCards()){
             // 找到对应的组件实现类
-            NkCard nkCard = customObjectManager.getCustomObjectIfExists(docDefI.getCardKey(), NkCard.class);
+            NkCard nkCard = customObjectManager.getCustomObjectIfExists(docDefI.getBeanName(), NkCard.class);
             if(nkCard==null && !ignoreError){
                 throw new TfmsDefineException(String.format("自定义对象[%s]不存在",docDefI.getBeanName()));
             }

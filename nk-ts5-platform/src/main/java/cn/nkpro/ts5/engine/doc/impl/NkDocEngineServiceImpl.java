@@ -143,6 +143,29 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
                 .getCustomObject(def.getRefObjectType(), NkDocProcessor.class)
                 .calculate(doc, fromCard, options);
     }
+    /**
+     *
+     * @throws IllegalTransactionStateException 在无transaction状态下执行；如果当前已有transaction，则抛出异常
+     */
+    @Override
+    @Transactional(propagation = Propagation.NEVER)
+    public Object call(DocHV doc, String fromCard, String method, String options) {
+
+        validate(doc);
+
+        // 获取原始单据数据
+        DocHV original = detail(doc.getDocId());
+
+        // 获取单据配置
+        DocDefHV def = Optional.ofNullable(original).map(DocHV::getDef).orElseGet(()->
+                docDefService.getDocDefForRuntime(doc.getDocType())
+        );
+
+        // 获取单据处理器 并执行
+        return customObjectManager
+                .getCustomObject(def.getRefObjectType(), NkDocProcessor.class)
+                .call(doc, fromCard, method, options);
+    }
 
     @Override
     @Transactional

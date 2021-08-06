@@ -2,20 +2,20 @@ package cn.nkpro.ts5.engine.doc.impl;
 
 import cn.nkpro.ts5.config.id.GUID;
 import cn.nkpro.ts5.config.id.SequenceSupport;
-import cn.nkpro.ts5.engine.doc.interceptor.*;
-import cn.nkpro.ts5.engine.doc.service.NkDocHistoryService;
-import cn.nkpro.ts5.engine.task.NkBpmTaskService;
 import cn.nkpro.ts5.engine.co.NkCustomObjectManager;
 import cn.nkpro.ts5.engine.doc.NkCard;
 import cn.nkpro.ts5.engine.doc.NkDocCycle;
 import cn.nkpro.ts5.engine.doc.NkDocProcessor;
-import cn.nkpro.ts5.engine.doc.model.DocDefHV;
-import cn.nkpro.ts5.engine.doc.model.DocHPersistent;
-import cn.nkpro.ts5.engine.doc.model.DocHV;
-import cn.nkpro.ts5.engine.doc.model.DocIV;
+import cn.nkpro.ts5.engine.doc.interceptor.NkDocCommittedInterceptor;
+import cn.nkpro.ts5.engine.doc.interceptor.NkDocCreateInterceptor;
+import cn.nkpro.ts5.engine.doc.interceptor.NkDocExecuteInterceptor;
+import cn.nkpro.ts5.engine.doc.interceptor.NkDocUpdateInterceptor;
+import cn.nkpro.ts5.engine.doc.model.*;
 import cn.nkpro.ts5.engine.doc.service.NkDocDefService;
+import cn.nkpro.ts5.engine.doc.service.NkDocHistoryService;
 import cn.nkpro.ts5.engine.elasticearch.SearchEngine;
 import cn.nkpro.ts5.engine.elasticearch.model.DocHES;
+import cn.nkpro.ts5.engine.task.NkBpmTaskService;
 import cn.nkpro.ts5.orm.mb.gen.*;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
@@ -57,7 +57,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
     private NkBpmTaskService bpmTaskService;
     @Autowired@SuppressWarnings("all")
     private NkCustomObjectManager customObjectManager;
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private NkDocHistoryService docHistoryService;
 
     @Override
@@ -104,7 +104,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         docDefService.runLoopCards(def,false, (card, defIV)->
                 loopDoc.getData().put(
                 defIV.getCardKey(),
-                card.afterCreate(loopDoc,preDoc,card.deserialize(null),defIV.getConfig())
+                card.afterCreate(loopDoc,preDoc,card.deserialize(null), defIV, defIV.getConfig())
             )
         );
 
@@ -113,6 +113,36 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
                         .getCustomObject(beanName, NkDocCreateInterceptor.class)
                         .apply(doc,preDoc, NkDocCycle.afterCreated)
         );
+    }
+
+    @Override
+    public Object call(DocHV doc, String fromCard, String method, String options) {
+
+        docDefService.runLoopCards(doc.getDef(),false, (card, defIV)->
+                doc.getData().put(
+                        defIV.getCardKey(),
+                        card.deserialize(doc.getData().get(defIV.getCardKey()))
+                )
+        );
+
+        DocDefIV docDefI = doc.getDef().getCards()
+                .stream()
+                .filter(card -> StringUtils.equals(card.getCardKey(), fromCard))
+                .findFirst()
+                .orElse(null);
+
+        if(docDefI!=null){
+            return customObjectManager.getCustomObject(docDefI.getBeanName(), NkCard.class)
+                    .call(
+                            doc,
+                            doc.getData().get(docDefI.getCardKey()),
+                            docDefI,
+                            docDefI.getConfig(),
+                            options
+                    );
+        }
+
+        return null;
     }
 
     @Override
@@ -143,7 +173,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
 
             loopDoc.getData().put(
                     defIV.getCardKey(),
-                    card.calculate(loopDoc, cardData, defIV.getConfig(), isTrigger, itemOptions)
+                    card.calculate(loopDoc, cardData, defIV, defIV.getConfig(), isTrigger, itemOptions)
             );
         });
 
@@ -161,10 +191,10 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         doc.setDef(def);
 
         // 解析单据行项目数据
-        docDefService.runLoopCards(def,false, (nkCard, docDefIV)->{
+        docDefService.runLoopCards(def,false, (nkCard, defIV)->{
 
             // 获取行项目数据
-            DocI docI = doc.getItems().computeIfAbsent(docDefIV.getCardKey(),(key)->{
+            DocI docI = doc.getItems().computeIfAbsent(defIV.getCardKey(),(key)->{
                 DocIV n = new DocIV();
                 n.setCardKey(key);
                 // warning: docId 作为保存时 insert 或 update 的判断，所以这里不要赋值
@@ -173,8 +203,8 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
             });
 
             doc.getData().put(
-                docDefIV.getCardKey(),
-                nkCard.afterGetData(doc, nkCard.deserialize(docI.getCardContent()), docDefIV.getConfig())
+                defIV.getCardKey(),
+                nkCard.afterGetData(doc, nkCard.deserialize(docI.getCardContent()), defIV, defIV.getConfig())
             );
 
             // 清除JSON，避免无效数据网络传输
@@ -190,6 +220,12 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
                 );
 
         return doc;
+    }
+
+    private boolean existsOriginal(DocHV original, DocDefIV defIV){
+        return original !=null
+                && original.getItems().containsKey(defIV.getCardKey())
+                && StringUtils.isNotBlank(original.getItems().get(defIV.getCardKey()).getDocId());
     }
 
     @SuppressWarnings("unchecked")
@@ -223,17 +259,15 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
 
         docDefService.runLoopCards(loopDoc.getDef(),false, (card, defIV)->{
 
-            boolean existsOriginal = original !=null
-                    && original.getItems().containsKey(defIV.getCardKey())
-                    && StringUtils.isNotBlank(original.getItems().get(defIV.getCardKey()).getDocId());
-            Object cardDataOriginal = null;
-            Object cardData = loopDoc.getData().get(defIV.getCardKey());
+            boolean existsOriginal = existsOriginal(original, defIV);
 
-            if(existsOriginal){
-                cardDataOriginal = original.getData().get(defIV.getCardKey());
-            }
-
-            cardData = card.beforeUpdate(loopDoc, cardData, defIV.getConfig(), cardDataOriginal);
+            Object cardData  = card.beforeUpdate(
+                    loopDoc,
+                    loopDoc.getData().get(defIV.getCardKey()),
+                    existsOriginal ? original.getData().get(defIV.getCardKey()) : null,
+                    defIV,
+                    defIV.getConfig()
+            );
 
             // 如果原始单据数据存在则更新，否则插入数据
             if(existsOriginal){
@@ -263,19 +297,13 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
             }
 
             loopDoc.getData().put(defIV.getCardKey(),cardData);
-
-            // 调用 卡片 afterUpdated
-            if(isOverride(card)){
-                Object loopCardData = cardData;
-                LocalSyncUtilz.runAfterCommit(()-> card.updateCommitted(loopDoc, loopCardData, defIV.getConfig()));
-            }
         });
 
         if(original==null || !StringUtils.equals(loopDoc.getDocState(),original.getDocState())){
             // 单据状态发生变化
             docDefService.runLoopCards(loopDoc.getDef(),false, (card, defIV)->{
                 Object cardData = loopDoc.getData().get(defIV.getCardKey());
-                card.stateChanged(loopDoc, original, cardData, defIV.getConfig());
+                card.stateChanged(loopDoc, original, cardData, defIV, defIV.getConfig());
             });
 
             // 启动工作流
@@ -290,6 +318,34 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
                     });
             }
         }
+
+        // 卡片数据保存之后
+        docDefService.runLoopCards(loopDoc.getDef(),false, (card, defIV)->{
+
+            boolean existsOriginal = existsOriginal(original, defIV);
+
+            loopDoc.getData().put(
+                    defIV.getCardKey(),
+                    card.afterUpdated(
+                            loopDoc,
+                            loopDoc.getData().get(defIV.getCardKey()),
+                            existsOriginal ? original.getData().get(defIV.getCardKey()) : null,
+                            defIV,
+                            defIV.getConfig()
+                    ));
+
+            // 调用 卡片 updateCommitted
+            if(isOverride(card,"updateCommitted")){
+                LocalSyncUtilz.runAfterCommit(()->
+                        card.updateCommitted(
+                                loopDoc,
+                                loopDoc.getData().get(defIV.getCardKey()),
+                                defIV,
+                                defIV.getConfig()
+                        )
+                );
+            }
+        });
 
         processCycle(loopDoc, NkDocCycle.afterUpdated, (beanName)->{
             customObjectManager
@@ -356,14 +412,14 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         searchEngine.indexBeforeCommit(BeanUtilz.copyFromObject(doc, DocHES.class));
     }
 
-    private boolean isOverride(Object obj){
+    private boolean isOverride(Object obj, String methodName){
         try {
             if(AopUtils.isAopProxy(obj)){
                 obj = ((Advised)obj).getTargetSource().getTarget();
             }
 
             assert obj != null;
-            Method afterUpdated = obj.getClass().getDeclaredMethod("afterUpdated", DocHV.class, Object.class, Object.class);
+            Method afterUpdated = obj.getClass().getDeclaredMethod(methodName, DocHV.class, Object.class, DocDefIV.class, Object.class);
             return afterUpdated.getDeclaringClass() != NkCard.class;
         } catch (Exception e) {
 

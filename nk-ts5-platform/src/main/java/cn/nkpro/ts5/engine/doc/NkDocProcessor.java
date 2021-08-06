@@ -15,6 +15,8 @@ public interface NkDocProcessor extends NkCustomObject {
 
     DocHV calculate(DocHV doc, String fromCard, String options);
 
+    Object call(DocHV doc, String fromCard, String method, String options);
+
     DocHV detail  (DocDefHV def, DocHPersistent docHD);
 
     DocHV toCreate(DocDefHV def, DocHV preDoc);
