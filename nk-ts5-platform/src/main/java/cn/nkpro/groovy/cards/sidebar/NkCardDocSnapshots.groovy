@@ -46,7 +46,7 @@ class NkCardDocSnapshots extends NkAbstractCard<List<SysLogDocRecord>,Map> {
      */
     @Override
     List<SysLogDocRecord> beforeUpdate(DocHV doc, List<SysLogDocRecord> data, List<SysLogDocRecord> original, DocDefIV defIV, Map map) {
-        return null
+        return Collections.emptyList()
     }
 
     /**
