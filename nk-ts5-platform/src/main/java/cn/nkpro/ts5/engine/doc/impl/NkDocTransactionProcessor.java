@@ -347,16 +347,12 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
             }
         });
 
-        processCycle(loopDoc, NkDocCycle.afterUpdated, (beanName)->{
-            customObjectManager
-                    .getCustomObject(beanName, NkDocUpdateInterceptor.class)
-                    .apply(loopDoc, original, NkDocCycle.afterUpdated);
-            return loopDoc;
-        });
-
         // 数据更新前后对比
         List<String> changedCard = new ArrayList<>();
         docDefService.runLoopCards(loopDoc.getDef(),false, (card, defIV)->{
+            if(card.ignoreDataDiff())
+                return;
+
             if(optionalOriginal.isPresent()){
 
                 Object o1 =  loopDoc.getData().get(defIV.getCardKey());
@@ -368,6 +364,14 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
             }else{
                 changedCard.add(defIV.getCardKey());
             }
+        });
+
+        // 卡片更新完成
+        processCycle(loopDoc, NkDocCycle.afterUpdated, (beanName)->{
+            customObjectManager
+                    .getCustomObject(beanName, NkDocUpdateInterceptor.class)
+                    .apply(loopDoc, original, NkDocCycle.afterUpdated);
+            return loopDoc;
         });
 
         loopDoc.setIdentification(random());

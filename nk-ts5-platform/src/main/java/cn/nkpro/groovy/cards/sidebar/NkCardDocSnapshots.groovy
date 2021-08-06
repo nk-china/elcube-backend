@@ -24,7 +24,11 @@ class NkCardDocSnapshots extends NkAbstractCard<List<SysLogDocRecord>,Map> {
         return POSITION_SIDEBAR
     }
 
-    /**
+    @Override
+    boolean ignoreDataDiff() {
+        return true
+    }
+/**
      * 打开单据时，自定义获取数据
      * @param doc
      * @param data

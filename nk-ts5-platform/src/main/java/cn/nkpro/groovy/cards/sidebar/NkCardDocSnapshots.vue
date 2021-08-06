@@ -29,14 +29,16 @@ export default {
     computed:{
         joined(){
             const joined = [];
-            joined.push(...(this.data.slice(0,5)));
+            if(this.data){
+                joined.push(...(this.data.slice(0,5)));
+            }
             if(this.list.length>1){
                 joined.push(...(this.list));
             }
             return joined;
         },
         showMore(){
-            return this.hasMore !== undefined ? this.hasMore : this.data.length>5;
+            return this.hasMore !== undefined ? this.hasMore : (this.data && this.data.length>5);
         }
     },
     methods:{
