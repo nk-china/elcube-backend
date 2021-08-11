@@ -1,5 +1,5 @@
 <template>
-    <nk-card :card="card" class="nk-card-doc-snapshots">
+    <nk-card class="nk-card-doc-snapshots">
         <a-list size="small"  :data-source="joined" style="padding: 0 5px;">
             <a-list-item slot="renderItem" slot-scope="item">
                 <a @click="to(item)">V{{ item.version }} | {{item.userRealname}}</a>

@@ -1,5 +1,5 @@
 <template>
-    <nk-card title="单据信息">
+    <nk-card>
         <nk-form :col="1">
             <nk-form-item term="创建时间">{{doc.createdTime | nkDatetimeFriendly}}</nk-form-item>
             <nk-form-item term="更新时间">{{doc.updatedTime | nkDatetimeFriendly}}</nk-form-item>

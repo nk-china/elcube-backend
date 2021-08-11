@@ -39,7 +39,6 @@ export default {
         }
     },
     created() {
-
     }
 }
 </script>
@@ -47,3 +46,18 @@ export default {
 <style scoped>
 
 </style>
+
+<i18n>
+{
+    "en": {
+        "hello": "hello world!"
+    },
+    "zh_CN": {
+        "hello": "你好，世界！"
+    }
+}
+</i18n>
+
+<docs>
+    - 这是一段文档
+</docs>
