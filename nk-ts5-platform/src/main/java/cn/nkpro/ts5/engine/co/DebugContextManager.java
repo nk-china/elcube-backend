@@ -213,7 +213,9 @@ public class DebugContextManager implements ApplicationContextAware {
     @SuppressWarnings("all")
     public <T> List<T> getDebugResources(String keyPrefix){
         if(localDebugId.get()!=null){
-            return redisForResoure.getHashIfAbsent(String.format("DEBUG:%s", localDebugId.get()), () -> null)
+            Map<String, Object> hashIfAbsent = redisForResoure.getHashIfAbsent(String.format("DEBUG:%s", localDebugId.get()), () -> null);
+            if(hashIfAbsent!=null)
+                return hashIfAbsent
                     .entrySet()
                     .stream()
                     .filter(e -> e.getKey().startsWith(keyPrefix))
