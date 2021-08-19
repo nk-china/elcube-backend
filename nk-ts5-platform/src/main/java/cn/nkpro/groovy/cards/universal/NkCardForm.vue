@@ -93,7 +93,6 @@
                                     size            ="small"
                                     :style          ="item.options&&item.options.style"
                                     v-model         ="data[item.key]"
-
                                     @change         ="dateChanged($event,item)"></a-date-picker>
                     <a-date-picker  v-else-if       ="item.inputType==='datetime'"
                                     show-time
@@ -106,7 +105,7 @@
                                     slot            ="edit"
                                     v-model         ="data[item.key]"
                                     size            ="small"
-                                    @change         ="selectChanged($event,item)">
+                                    @change         ="itemChanged($event,item)">
                     </a-switch>
                     <a-select       v-else-if       ="item.inputType==='select'"
                                     slot            ="edit"
@@ -115,7 +114,7 @@
                                     size            ="small"
                                     style           ="max-width: 250px;"
                                     :style          ="item.options&&item.options.style"
-                                    @change         ="selectChanged($event,item)"
+                                    @change         ="itemChanged($event,item)"
                                     :options        ="JSON.parse(item.options)">
                     </a-select>
                     <a-cascader     v-else-if       ="item.inputType==='cascader'"
@@ -123,6 +122,7 @@
                                     size            ="small"
                                     v-model         ="data[item.key]"
                                     style           ="max-width: 250px;"
+                                    @change         ="itemChanged($event,item)"
                                     :options        ="JSON.parse(item.options)">
                     </a-cascader>
                     <a-tree-select  v-else-if       ="item.inputType==='tree'"
@@ -135,7 +135,7 @@
                                     tree-checkable
                                     :show-checked-strategy="SHOW_PARENT"
                                     search-placeholder="Please select"
-                                    @change="treeChanged($event,field)"
+                                    @change="itemChanged($event,field)"
                     />
                     <label          v-else-if       ="item.inputType==='ref'"
                                     slot            ="edit"
@@ -235,8 +235,10 @@ export default {
             return value && (value+'%');
         },
         itemChanged(value,item){
-            if(item.calcTrigger){
-                this.nk$calc();
+            if(!this.$refs.form.hasError()){
+                if(item.calcTrigger){
+                    this.nk$calc();
+                }
             }
         },
         dateChanged(value,item){
