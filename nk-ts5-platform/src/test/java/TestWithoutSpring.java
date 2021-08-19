@@ -1,9 +1,11 @@
+import cn.nkpro.ts5.utils.DateTimeUtilz;
 import org.junit.Test;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 
+import java.util.Date;
 import java.util.HashMap;
 
 /**
@@ -13,18 +15,9 @@ public class TestWithoutSpring {
 
     @Test
     public void test(){
-        ExpressionParser parser = new SpelExpressionParser();
-        Expression exp = parser.parseExpression("#a * #c");
 
-        StandardEvaluationContext ctx = new StandardEvaluationContext(new HashMap(){{
-            put("b",1);
-        }});
-        //ctx.setRootObject(doc);
-        ctx.setVariable("a",2);
-        ctx.setVariable("c",3);
-        //ctx.setVariable("list", list);
+        long a = DateTimeUtilz.fromISO("2021-08-18T16:00:00.000Z");
+        System.out.println(new Date(a*1000));
 
-        Object value = exp.getValue(ctx);
-        System.out.println(value);
     }
 }

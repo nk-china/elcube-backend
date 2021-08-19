@@ -2,7 +2,7 @@
     <nk-card>
         <nk-form :col="1" :edit="editMode">
             <nk-form-item title="字段">
-                {{data.field}}{{$t('hello')}}
+                {{data.field}}
                 <a-input v-model="data.field" slot="edit" @change="$nkCalc('123');" />
             </nk-form-item>
         </nk-form>

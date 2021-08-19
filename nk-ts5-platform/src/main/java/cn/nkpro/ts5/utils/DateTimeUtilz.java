@@ -3,6 +3,7 @@ package cn.nkpro.ts5.utils;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -89,5 +90,7 @@ public class DateTimeUtilz {
         return null;
     }
 
-
+    public static Long fromISO(String isoDate){
+        return Instant.parse( isoDate ).getEpochSecond();
+    }
 }

@@ -1,6 +1,6 @@
 <template>
     <nk-card>
-        <nk-form ref="form" :col="def.col" :edit="editMode" style="width: 80%">
+        <nk-form ref="form" :col="def.col" :edit="editMode" >
             <template v-for="(item,index) in def.items" >
                 <nk-form-divider
                         v-if="item.inputType==='divider'"
@@ -12,15 +12,39 @@
                         :key="item.key"
                         :term="item.name"
                         :col="item.col"
-                        :validateFor="item.fieldValue"
+                        :validateFor="data[item.key]"
                         :required="!!item.required"
-                        :len="item.options&&item.options.len"
-                        :min="item.options&&item.options.min"
-                        :max="item.options&&item.options.max"
-                        :pattern="item.options&&item.options.pattern"
-                        :message="item.options&&item.options.message"
+                        :len="(!!item.maxLength)||(!!item.minLength)"
+                        :min="item.min || item.minLength"
+                        :max="item.max || item.maxLength"
+                        :pattern="item.pattern"
+                        :message="item.message || ('\''+item.name+'\'校验不通过')"
                 >
-                    {{data[item.key]}}
+                    <template v-if     ="item.inputType==='integer' || item.inputType==='decimal'">
+                        {{data[item.key] | nkNumber(item.format)}}
+                    </template>
+                    <template v-else-if     ="item.inputType==='percent'">
+                        {{data[item.key]/100 | nkPercent(item.format)}}
+                    </template>
+                    <template v-else-if     ="item.inputType==='date' || item.inputType==='datetime'">
+                        {{data[item.key] | nkDatetime(item.format)}}
+                    </template>
+                    <template v-else-if     ="item.inputType==='switch'">
+                        {{data[item.key] | formatSwitch(item)}}
+                    </template>
+                    <template v-else-if     ="item.inputType==='select'">
+                        {{data[item.key] | formatSelect(item.options)}}
+                    </template>
+                    <template v-else-if     ="item.inputType==='cascader'">
+                        {{data[item.key] | formatCascader(item.options)}}
+                    </template>
+                    <template v-else-if     ="item.inputType==='tree'">
+                        {{data[item.key] | formatTree(item.options)}}
+                    </template>
+                    <template v-else>
+                        {{data[item.key]}}
+                    </template>
+
                     <a-input        v-if            ="item.inputType==='text'"
                                     slot            ="edit"
                                     size            ="small"
@@ -61,14 +85,15 @@
                                     :precision      ="item.digits||2"
                                     :step           ="item.step||0.01"
                                     @blur           ="itemChanged($event,item)"
-                                    :formatter      ="percentFormat($event,item)"
-                                    :parser         ="percentParse($event,item)"
+                                    :formatter      ="percentFormat"
+                                    :parser         ="percentParse"
                     />
                     <a-date-picker  v-else-if       ="item.inputType==='date'"
                                     slot            ="edit"
                                     size            ="small"
                                     :style          ="item.options&&item.options.style"
                                     v-model         ="data[item.key]"
+
                                     @change         ="dateChanged($event,item)"></a-date-picker>
                     <a-date-picker  v-else-if       ="item.inputType==='datetime'"
                                     show-time
@@ -77,23 +102,20 @@
                                     :style          ="item.options&&item.options.style"
                                     v-model         ="data[item.key]"
                                     @change         ="datetimeChanged($event,item)"></a-date-picker>
+                    <a-switch       v-else-if       ="item.inputType==='switch'"
+                                    slot            ="edit"
+                                    v-model         ="data[item.key]"
+                                    size            ="small"
+                                    @change         ="selectChanged($event,item)">
+                    </a-switch>
                     <a-select       v-else-if       ="item.inputType==='select'"
                                     slot            ="edit"
+                                    :mode            ="item.selectMode||'default'"
                                     v-model         ="data[item.key]"
                                     size            ="small"
                                     style           ="max-width: 250px;"
                                     :style          ="item.options&&item.options.style"
                                     @change         ="selectChanged($event,item)"
-                                    :options        ="JSON.parse(item.options)">
-                    </a-select>
-                    <a-select       v-else-if       ="item.inputType==='multiple'"
-                                    slot            ="edit"
-                                    v-model         ="data[item.key]"
-                                    mode            ="multiple"
-                                    size            ="small"
-                                    style           ="max-width: 250px;"
-                                    :style          ="item.options&&item.options.style"
-                                    @change         ="multipleChanged($event,item)"
                                     :options        ="JSON.parse(item.options)">
                     </a-select>
                     <a-cascader     v-else-if       ="item.inputType==='cascader'"
@@ -137,19 +159,66 @@
 <script>
 import { Mixin } from "nk-ts5-platform";
 import numeral from "numeral";
-import moment from "moment";
 import { Interpreter } from "eval5";
 import { TreeSelect } from 'ant-design-vue';
+
+const findInTree = (tree,value)=>{
+    for(let i in tree){
+        const item = tree[i];
+        if(item.key === value || item.value === value){
+            return item;
+        }
+        if(item.children){
+            let ret = findInTree(item.children, value);
+            if(ret){
+                return ret;
+            }
+        }
+    }
+    return undefined;
+};
 
 export default {
     mixins:[new Mixin()],
     filters:{
-        dataValueFilter(value){
-            return value?moment(value*1000):null;
+        formatSwitch(value, options) {
+            return value === true ? (options.checked || 'YES') : (options.unChecked || 'NO');
+        },
+        formatSelect(value, options) {
+            options = typeof options === 'string' ? JSON.parse(options) : options;
+            return (Array.isArray(value) ? value : [value]).map(item => {
+                let find = options && options.find(o => o.key === item || o.value === item);
+                if(find){
+                    return find.label || find.name || find.title;
+                }
+                return item;
+            }).join(' , ');
+        },
+        formatCascader(value, options){
+            options = typeof options === 'string' ? JSON.parse(options) : options;
+            let find = options;
+            return value.map(item => {
+                find = find && find.find(o => o.key === item || o.value === item);
+                if(find){
+                    const label = find.label || find.name || find.title;
+                    find = find.children;
+                    return label;
+                }
+                return item;
+            }).join(' / ');
+        },
+        formatTree(value, options){
+            options = typeof options === 'string' ? JSON.parse(options) : options;
+            return (Array.isArray(value) ? value : [value]).map(item => {
+                let find = options && findInTree(options, item);
+                if(find){
+                    return find.label || find.name || find.title;
+                }
+                return item;
+            }).join(' , ');
         }
     },
     created() {
-        console.log(this.def.items)
     },
     data(){
         return {
@@ -157,16 +226,13 @@ export default {
         }
     },
     computed:{
-        list(){
-            return this.data;
-        }
     },
     methods:{
         percentParse(value){
-            return value && numeral(value).format(item.format||'#.00%');
+            return value && value.replace(/[,%]/, '');
         },
-        percentFormat(value,item){
-            return value && value.replace(/[,%]/, '')/100;
+        percentFormat(value){
+            return value && (value+'%');
         },
         itemChanged(value,item){
             if(item.calcTrigger){
@@ -174,30 +240,20 @@ export default {
             }
         },
         dateChanged(value,item){
-            this.itemChanged((value && (value.hour(0).minute(0).second(0).millisecond(0).valueOf()/1000))||'',item);
+            value = value && value.startOf('day').toISOString();
+            this.data[item.key]=value;
+            this.itemChanged(value,item);
         },
         datetimeChanged(value,item){
-            this.itemChanged((value && (value                                           .valueOf()/1000))||'',item);
-        },
-        selectChanged(value,item){
-            // field.fieldValue=value;
-            // if(field.options.options){
-            //     field.fieldDisplay=field.options.options.find(e=>e.value===value).label;
-            // }else{
-            //     field.fieldDisplay=field.fieldValue;
-            // }
-            // if(field.inputCalc===1){
-            //     this.$nkCalc("options");
-            // }
-        },
-        multipleChanged(){
-
-        },
-        treeChanged(){
-
+            value = value && value.toISOString();
+            this.data[item.key]=value;
+            this.itemChanged(value,item);
         },
         refClick(){
 
+        },
+        hasError(){
+            return this.$refs.form.hasError()
         }
     }
 }

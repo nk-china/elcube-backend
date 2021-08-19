@@ -3,13 +3,15 @@
         <nk-form :col="1" :edit="editMode" style="width:300px;">
             <nk-form-item title="列">
                 {{def.col}}
-                <a-input v-model="def.col" slot="edit" />
+                <a-input v-model="def.col" slot="edit" size="small" />
             </nk-form-item>
         </nk-form>
 
         <vxe-toolbar v-if="editMode">
             <template v-slot:buttons>
-                <vxe-button icon="fa fa-plus" status="perfect" size="mini" @click="add()">新增</vxe-button>
+                <vxe-button status="perfect" size="mini" @click="add()">新增</vxe-button>
+                <vxe-button status="perfect" size="mini" @click="rowExpandAll(true)">全部展开</vxe-button>
+                <vxe-button status="perfect" size="mini" @click="rowExpandAll()">全部收起</vxe-button>
             </template>
         </vxe-toolbar>
         <vxe-table
@@ -54,7 +56,7 @@
                               field=""
                               width="10%">
                 <template v-slot="{seq,items}">
-                    <span v-if="editMode" class="drag-btn" style="margin-left: 10px;">
+                    <span v-if="editMode && sortable" class="drag-btn" style="margin-left: 10px;">
                         <i class="vxe-icon--menu"></i>
                     </span>
                     <span v-if="editMode" style="margin-left: 10px;" @click="$nkSortableRemove(def.items,seq)">
@@ -67,9 +69,17 @@
                             {{row.required?'是':'否'}}
                             <a-switch slot="edit" size="small" v-model="row.required" />
                         </nk-form-item>
+                        <nk-form-item title="校验提示">
+                            {{row.message}}
+                            <a-input slot="edit" size="small" v-model="row.message"></a-input>
+                        </nk-form-item>
                         <nk-form-item title="是否只读">
                             {{row.readonly?'是':'否'}}
                             <a-switch slot="edit" size="small" v-model="row.readonly" />
+                        </nk-form-item>
+                        <nk-form-item title="是否只读JS Eval">
+                            {{row.eval}}
+                            <a-input slot="edit" size="small" v-model="row.eval"></a-input>
                         </nk-form-item>
                         <nk-form-item title="SpEL 表达式">
                             {{row.spELContent}}
@@ -78,14 +88,10 @@
                         <nk-form-item title="SpEL 计算时点">
                             {{row.spELTriggers}}
                             <a-select slot="edit" size="small" v-model="row.spELTriggers" mode="multiple" >
-                                <a-select-option key="ALWAYS">ALWAYS</a-select-option>
+                                <a-select-option key="ALWAYS">ALL</a-select-option>
                                 <a-select-option key="INIT">INIT</a-select-option>
                                 <a-select-option key="BLANK">BLANK</a-select-option>
                             </a-select>
-                        </nk-form-item>
-                        <nk-form-item title="JS Eval">
-                            {{row.eval}}
-                            <a-input slot="edit" size="small" v-model="row.eval"></a-input>
                         </nk-form-item>
 
                         <nk-form-item title="显示格式" v-if="row.$options.format">
@@ -96,21 +102,53 @@
                             {{row.options}}
                             <a-input slot="edit" size="small" v-model="row.options"></a-input>
                         </nk-form-item>
+                        <nk-form-item title="选择模式" v-if="row.$options.selectMode">
+                            {{row.selectMode}}
+                            <a-select slot="edit" size="small" v-model="row.selectMode" mode="default" >
+                                <a-select-option key="default">default</a-select-option>
+                                <a-select-option key="multiple">multiple</a-select-option>
+                                <a-select-option key="tags" disabled>tags</a-select-option>
+                            </a-select>
+                        </nk-form-item>
                         <nk-form-item title="条件" v-if="row.$options.conditions">
                             {{row.conditions}}
                             <a-input slot="edit" size="small" v-model="row.conditions"></a-input>
                         </nk-form-item>
                         <nk-form-item title="Min" v-if="row.$options.min!==undefined">
                             {{row.min}}
-                            <a-input slot="edit" size="small" v-model="row.min"></a-input>
+                            <a-input-number slot="edit" size="small" v-model="row.min"></a-input-number>
                         </nk-form-item>
                         <nk-form-item title="Max" v-if="row.$options.max">
                             {{row.max}}
-                            <a-input slot="edit" size="small" v-model="row.max"></a-input>
+                            <a-input-number slot="edit" size="small" v-model="row.max"></a-input-number>
+                        </nk-form-item>
+                        <nk-form-item title="MinLength" v-if="row.$options.minLength">
+                            {{row.minLength}}
+                            <a-input-number slot="edit" size="small" :min="0" :max="200" :precision="0" v-model="row.minLength"></a-input-number>
                         </nk-form-item>
                         <nk-form-item title="MaxLength" v-if="row.$options.maxLength">
                             {{row.maxLength}}
-                            <a-input slot="edit" size="small" v-model="row.maxLength"></a-input>
+                            <a-input-number slot="edit" size="small" :min="1" :max="200" :precision="0" v-model="row.maxLength"></a-input-number>
+                        </nk-form-item>
+                        <nk-form-item title="Digits" v-if="row.$options.digits">
+                            {{row.digits}}
+                            <a-input-number slot="edit" size="small" :min="0" :max="6" :precision="0" v-model="row.digits"></a-input-number>
+                        </nk-form-item>
+                        <nk-form-item title="Step" v-if="row.$options.step">
+                            {{row.step}}
+                            <a-input-number slot="edit" size="small" :min="0.0001" :max="10000" :precision="2" v-model="row.step"></a-input-number>
+                        </nk-form-item>
+                        <nk-form-item title="选中后显示" v-if="row.$options.checked">
+                            {{row.checked}}
+                            <a-input slot="edit" size="small" :maxLength="20" v-model="row.checked"></a-input>
+                        </nk-form-item>
+                        <nk-form-item title="未选中显示" v-if="row.$options.unChecked">
+                            {{row.unChecked}}
+                            <a-input slot="edit" size="small" :maxLength="20" v-model="row.unChecked"></a-input>
+                        </nk-form-item>
+                        <nk-form-item title="正则表达式" v-if="row.$options.pattern !== undefined">
+                            {{row.pattern}}
+                            <a-input slot="edit" size="small" :maxLength="20" v-model="row.pattern"></a-input>
                         </nk-form-item>
                     </nk-form>
                 </template>
@@ -123,25 +161,26 @@
 import { MixinDef, MixinSortable } from "nk-ts5-platform";
 
 const inputTypeDefs = [
-    {label:'文本 | text',    value:'text',     options:{                            maxLength:200                          }},
-    {label:'整数 | integer', value:'integer',  options:{format:'#',                 min:0, max:2147483647                  }},
-    {label:'小数 | decimal', value:'decimal',  options:{format:'#.00',              min:0, max:2147483647                  }},
-    {label:'比例 | percent', value:'percent',  options:{format:'#.00',              min:0, max:100                         }},
-    {label:'日期 | date',    value:'date',     options:{format:'yyyy/M/d',          min:0, max:4105094400                  }},
-    {label:'时间 | datetime',value:'datetime', options:{format:'yyyy/M/d HH:mm:ss', min:0, max:4105094400                  }},
-    {label:'单选 | select',  value:'select',   options:{                                                   options:'[]'    }},
-    {label:'多选 | multiple',value:'multiple', options:{                                                   options:'[]'    }},
-    {label:'级联 | cascader',value:'cascader', options:{                                                   options:'[]'    }},
-    {label:'树形 | tree',    value:'tree',     options:{                                                   options:'[]'    }},
-    {label:'引用 | ref',     value:'ref',      options:{                                                   conditions:'{}' }},
-    {label:'分隔 | divider', value:'divider',  options:{                                                                   }},
+    {label:'文本 | text',    value:'text',     options:{                            minLength:0, maxLength:200,pattern:''                     }},
+    {label:'整数 | integer', value:'integer',  options:{format:'#',                 min:0, max:2147483647                                     }},
+    {label:'小数 | decimal', value:'decimal',  options:{format:'#.00',              min:0, max:2147483647, digits:2, step:0.02                }},
+    {label:'比例 | percent', value:'percent',  options:{format:'#.00',              min:0, max:100,        digits:2, step:0.02                }},
+    {label:'日期 | date',    value:'date',     options:{format:'yyyy/M/d',          min:0, max:4105094400                                     }},
+    {label:'时间 | datetime',value:'datetime', options:{format:'yyyy/M/d HH:mm:ss', min:0, max:4105094400                                     }},
+    {label:'开关 | switch',  value:'switch',   options:{                            checked:'YES',unChecked:'NO'                              }},
+    {label:'选择 | select',  value:'select',   options:{                                                   options:'[]',selectMode:'default'  }},
+    {label:'级联 | cascader',value:'cascader', options:{                                                   options:'[]'                       }},
+    {label:'树形 | tree',    value:'tree',     options:{                                                   options:'[]'                       }},
+    {label:'引用 | ref',     value:'ref',      options:{                                                   conditions:'{}'                    }},
+    {label:'分隔 | divider', value:'divider',  options:{                                                                                      }},
 ];
 
 export default {
     mixins:[new MixinDef({col:1,items:[]}),MixinSortable()],
     data(){
         return {
-            inputTypeDefs
+            inputTypeDefs,
+            sortable:true
         }
     },
     created() {
@@ -159,33 +198,43 @@ export default {
                     }
                 }
             }
+            this.sortable = this.$refs.xTable.getRowExpandRecords().length === 0;
+            this.$nkSortableVxeTable(this.sortable);
+        },
+        rowExpandAll(bool){
+            if(bool){
+                this.$refs.xTable.setAllRowExpand(bool);
+            }else{
+                this.$refs.xTable.clearRowExpand();
+            }
+            this.sortable = this.$refs.xTable.getRowExpandRecords().length === 0;
+            this.$nkSortableVxeTable(this.sortable);
         },
         keyChanged({column,row},{value}){
             row[column.property]=value && value.toUpperCase()
         },
         inputTypeChanged({row}){
             row.$options = inputTypeDefs.find(e=>e.value===row.inputType).options;
-            Object.assign(row,row.$options)
+            for(let key in row.$options){
+                this.$set(row,key,row.$options[key]);
+            }
         },
         add(){
             let newItem = {
                 key:'KEY',
                 name:'新字段',
+                col:1,
                 inputType:'text',
                 calcTrigger:'',
                 calcOrder:1,
                 required:true,
                 readonly:false,
-                eval:'',
                 spELContent:'',
                 spELTriggers:['ALWAYS','INIT','BLANK'],
-                col:1
+                eval:''
             };
             this.def.items.push(newItem);
             this.$refs.xTable.loadData(this.def.items).then(() => this.$refs.xTable.setActiveRow(newItem));
-        },
-        switchChanged(row,key,e){
-            row[key]=e
         }
     }
 }

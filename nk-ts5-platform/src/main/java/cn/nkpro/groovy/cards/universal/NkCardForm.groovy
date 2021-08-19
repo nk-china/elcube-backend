@@ -50,6 +50,12 @@ class NkCardForm extends NkAbstractCard<JSONObject,NkCardFormDef> {
         private Float min
         private Float max
         private Integer maxLength
+        private Integer digits
+        private Float step
+        private String selectMode
+        private String pattern
+        private String message
+
 
         String getKey() {
             return key
@@ -185,6 +191,46 @@ class NkCardForm extends NkAbstractCard<JSONObject,NkCardFormDef> {
 
         void setMaxLength(Integer maxLength) {
             this.maxLength = maxLength
+        }
+
+        Integer getDigits() {
+            return digits
+        }
+
+        void setDigits(Integer digits) {
+            this.digits = digits
+        }
+
+        Float getStep() {
+            return step
+        }
+
+        void setStep(Float step) {
+            this.step = step
+        }
+
+        String getSelectMode() {
+            return selectMode
+        }
+
+        void setSelectMode(String selectMode) {
+            this.selectMode = selectMode
+        }
+
+        String getPattern() {
+            return pattern
+        }
+
+        void setPattern(String pattern) {
+            this.pattern = pattern
+        }
+
+        String getMessage() {
+            return message
+        }
+
+        void setMessage(String message) {
+            this.message = message
         }
     }
 }
