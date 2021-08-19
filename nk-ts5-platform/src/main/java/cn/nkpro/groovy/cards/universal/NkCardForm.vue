@@ -41,6 +41,9 @@
                     <template v-else-if     ="item.inputType==='tree'">
                         {{data[item.key] | formatTree(item.options)}}
                     </template>
+                    <template v-else-if     ="item.inputType==='ref'">
+                        <nk-doc-link :doc="data[item.key+'$doc']">{{data | formatRef(item)}}</nk-doc-link>
+                    </template>
                     <template v-else>
                         {{data[item.key]}}
                     </template>
@@ -92,14 +95,14 @@
                                     slot            ="edit"
                                     size            ="small"
                                     :style          ="item.options&&item.options.style"
-                                    v-model         ="data[item.key]"
+                                    :defaultValue   ="moment(data[item.key])"
                                     @change         ="dateChanged($event,item)"></a-date-picker>
                     <a-date-picker  v-else-if       ="item.inputType==='datetime'"
                                     show-time
                                     slot            ="edit"
                                     size            ="small"
                                     :style          ="item.options&&item.options.style"
-                                    v-model         ="data[item.key]"
+                                    :defaultValue   ="moment(data[item.key])"
                                     @change         ="datetimeChanged($event,item)"></a-date-picker>
                     <a-switch       v-else-if       ="item.inputType==='switch'"
                                     slot            ="edit"
@@ -140,12 +143,14 @@
                     <label          v-else-if       ="item.inputType==='ref'"
                                     slot            ="edit"
                                     class           ="ref-input ant-input-affix-wrapper"
+                                    style           ="max-width: 250px;"
                                     :style          ="item.options&&item.options.style"
                     >
                         <input      class="ant-input ant-input-sm"
-                                    v-model="item.fieldDisplay"
+                                    :value="data | formatRef(item)"
+                                    style="cursor: pointer;"
                                     readonly
-                                    @click="refClick(field)" />
+                                    @click="refClick(item)" />
                         <span       class="ant-input-suffix">
                             <a-icon type="select" style="color: rgba(0,0,0,.45)" />
                         </span>
@@ -153,12 +158,13 @@
                 </nk-form-item>
             </template>
         </nk-form>
+        <nk-doc-select-modal v-model="docSelectModalVisable" :modal="docSelectModal" @select="docSelected"></nk-doc-select-modal>
     </nk-card>
 </template>
 
 <script>
 import { Mixin } from "nk-ts5-platform";
-import numeral from "numeral";
+import moment from "moment";
 import { Interpreter } from "eval5";
 import { TreeSelect } from 'ant-design-vue';
 
@@ -181,6 +187,10 @@ const findInTree = (tree,value)=>{
 export default {
     mixins:[new Mixin()],
     filters:{
+        formatRef(value, options){
+            const info = value[options.key+'$doc'];
+            return (info && info.docName) || value[options.key];
+        },
         formatSwitch(value, options) {
             return value === true ? (options.checked || 'YES') : (options.unChecked || 'NO');
         },
@@ -222,12 +232,16 @@ export default {
     },
     data(){
         return {
-            SHOW_PARENT:TreeSelect.SHOW_PARENT
+            SHOW_PARENT:TreeSelect.SHOW_PARENT,
+            docSelectModalVisable: false,
+            docSelectModal:undefined,
+            docSelectItem: undefined
         }
     },
     computed:{
     },
     methods:{
+        moment,
         percentParse(value){
             return value && value.replace(/[,%]/, '');
         },
@@ -251,8 +265,14 @@ export default {
             this.data[item.key]=value;
             this.itemChanged(value,item);
         },
-        refClick(){
-
+        refClick(item){
+            this.docSelectItem = item;
+            this.docSelectModal = item.modal && JSON.parse(item.modal);
+            this.docSelectModalVisable = true;
+        },
+        docSelected(selected){
+            this.data[this.docSelectItem.key]=selected.docId;
+            this.data[this.docSelectItem.key+'$doc']=selected;
         },
         hasError(){
             return this.$refs.form.hasError()

@@ -46,13 +46,13 @@ class NkCardForm extends NkAbstractCard<JSONObject,NkCardFormDef> {
         private String eval
         private String format
         private String options
-        private String conditions
         private Float min
         private Float max
         private Integer maxLength
         private Integer digits
         private Float step
         private String selectMode
+        private String modal
         private String pattern
         private String message
 
@@ -161,12 +161,12 @@ class NkCardForm extends NkAbstractCard<JSONObject,NkCardFormDef> {
             this.options = options
         }
 
-        String getConditions() {
-            return conditions
+        String getModal() {
+            return modal
         }
 
-        void setConditions(String conditions) {
-            this.conditions = conditions
+        void setModal(String modal) {
+            this.modal = modal
         }
 
         Float getMin() {

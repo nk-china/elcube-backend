@@ -110,10 +110,6 @@
                                 <a-select-option key="tags" disabled>tags</a-select-option>
                             </a-select>
                         </nk-form-item>
-                        <nk-form-item title="条件" v-if="row.$options.conditions">
-                            {{row.conditions}}
-                            <a-input slot="edit" size="small" v-model="row.conditions"></a-input>
-                        </nk-form-item>
                         <nk-form-item title="Min" v-if="row.$options.min!==undefined">
                             {{row.min}}
                             <a-input-number slot="edit" size="small" v-model="row.min"></a-input-number>
@@ -150,10 +146,15 @@
                             {{row.pattern}}
                             <a-input slot="edit" size="small" :maxLength="20" v-model="row.pattern"></a-input>
                         </nk-form-item>
+                        <nk-form-item title="对话框" v-if="row.$options.modal !== undefined">
+                            {{row.modal}}
+                            <a-input slot="edit" size="small" v-model="row.modal" @click="refClick(row)" readOnly style="cursor: pointer"></a-input>
+                        </nk-form-item>
                     </nk-form>
                 </template>
             </vxe-table-column>
         </vxe-table>
+        <nk-doc-select-def v-model="modalVisible" :def="modalRow.modal" @submit="refSubmit"></nk-doc-select-def>
     </a-card>
 </template>
 
@@ -165,13 +166,13 @@ const inputTypeDefs = [
     {label:'整数 | integer', value:'integer',  options:{format:'#',                 min:0, max:2147483647                                     }},
     {label:'小数 | decimal', value:'decimal',  options:{format:'#.00',              min:0, max:2147483647, digits:2, step:0.02                }},
     {label:'比例 | percent', value:'percent',  options:{format:'#.00',              min:0, max:100,        digits:2, step:0.02                }},
-    {label:'日期 | date',    value:'date',     options:{format:'yyyy/M/d',          min:0, max:4105094400                                     }},
-    {label:'时间 | datetime',value:'datetime', options:{format:'yyyy/M/d HH:mm:ss', min:0, max:4105094400                                     }},
+    {label:'日期 | date',    value:'date',     options:{format:'YYYY/M/D',          min:0, max:4105094400                                     }},
+    {label:'时间 | datetime',value:'datetime', options:{format:'YYYY/M/D HH:mm:ss', min:0, max:4105094400                                     }},
     {label:'开关 | switch',  value:'switch',   options:{                            checked:'YES',unChecked:'NO'                              }},
     {label:'选择 | select',  value:'select',   options:{                                                   options:'[]',selectMode:'default'  }},
     {label:'级联 | cascader',value:'cascader', options:{                                                   options:'[]'                       }},
     {label:'树形 | tree',    value:'tree',     options:{                                                   options:'[]'                       }},
-    {label:'引用 | ref',     value:'ref',      options:{                                                   conditions:'{}'                    }},
+    {label:'引用 | ref',     value:'ref',      options:{                                                   modal:''                           }},
     {label:'分隔 | divider', value:'divider',  options:{                                                                                      }},
 ];
 
@@ -180,7 +181,9 @@ export default {
     data(){
         return {
             inputTypeDefs,
-            sortable:true
+            sortable:true,
+            modalRow:{},
+            modalVisible:false
         }
     },
     created() {
@@ -235,6 +238,13 @@ export default {
             };
             this.def.items.push(newItem);
             this.$refs.xTable.loadData(this.def.items).then(() => this.$refs.xTable.setActiveRow(newItem));
+        },
+        refClick(row){
+            this.modalRow = row;
+            this.modalVisible = true;
+        },
+        refSubmit(value){
+            this.modalRow.modal = value;
         }
     }
 }
