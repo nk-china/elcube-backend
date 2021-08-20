@@ -16,11 +16,13 @@ import eu.bitwalker.useragentutils.Browser;
 import eu.bitwalker.useragentutils.UserAgent;
 import eu.bitwalker.useragentutils.Version;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -41,11 +43,6 @@ public class DocController {
     private NkIndexService docService;
     @Autowired
     private NkDocHistoryService docHistoryService;
-//    @Autowired
-//    private TfmsDocEngineWithPerm docEngineWithPerm;
-//    @Autowired
-//    private TfmsDocHistoryService historyService;
-
     
     @WsDocNote("1.拉取交易列表数据")
     @RequestMapping(value = "/list",method = RequestMethod.POST)
@@ -79,21 +76,6 @@ public class DocController {
     public DocHHistory getHistory(@PathVariable("historyId") String historyId) {
         return docHistoryService.getDetail(historyId);
     }
-//
-//    @ResponseCompress
-//    @WsDocNote("1、拉取交易列表数据")
-//    @RequestMapping(value = "/items/list",method = RequestMethod.POST)
-//    public ESPageList<IndexDocItem> itemList(@RequestBody JSONObject params) {
-//        return docService.query(IndexDocItem.class, params,null);
-//    }
-//
-//    @ResponseCompress
-//    @WsDocNote("3、拉取交易历史版本")
-//    @RequestMapping(value = "/detail/history/{id}",method = RequestMethod.GET)
-//    public SysLogDocRecord getHistory(@PathVariable("id") String id) {
-//        return historyService.getDetail(id);
-//    }
-//
     
     @WsDocNote("4、创建新单据")
     @RequestMapping(value = "/pre/create",method = RequestMethod.POST)
@@ -117,6 +99,25 @@ public class DocController {
             @WsDocNote(value="单据JSON") @RequestBody CallModel calcModel) {
         return docEngine.call(calcModel.getDoc(),calcModel.getFromCard(),calcModel.getMethod(), calcModel.getOptions());
     }
+    
+    @WsDocNote("A、修改单据")
+    @RequestMapping(value = "/update",method = RequestMethod.POST)
+    public DocHV update(
+            HttpServletRequest request,
+            @WsDocNote(value="单据JSON") @RequestBody DocHV doc) {
+
+        String userAgent = request.getHeader("User-Agent");
+        String info = userAgent != null ? Arrays.stream(userAgent.split(" "))
+            .filter(s->s.contains("MicroMessenger"))
+            .findFirst()
+            .orElseGet(()->{
+                Browser browser = UserAgent.parseUserAgentString(userAgent).getBrowser();
+                Version version = browser.getVersion(userAgent);
+                return browser.getName() + "/" + version.getVersion();
+            }) : "Unknown Browser";
+
+        return docEngine.doUpdateView(doc, info);
+    }
 
     @Data
     static class CalcModel extends DocHV{
@@ -132,77 +133,4 @@ public class DocController {
         String options;
         DocHV doc;
     }
-//
-//    
-//    @ResponseCompress
-//    @WsDocNote("8、调用")
-//    @RequestMapping(value = "/call/{docType}",method = RequestMethod.POST)
-//    public Object call(
-//            @WsDocNote(value="单据类型") @PathVariable(value="docType") String docType,
-//            @WsDocNote(value="卡片名称") @RequestParam(value="component",required = false) String componentName,
-//            @WsDocNote(value="计算类型") @RequestParam(value="event",required = false) String event,
-//            @WsDocNote(value="单据JSON") @RequestBody String json) {
-//        return docEngineWithPerm.callForController(docType,componentName,event,json);
-//    }
-//
-//    @ResponseCompress
-//    @WsDocNote("9、检查修改单据权限")
-//    @RequestMapping(value = "/pre/update/{docType}/{docId}",method = RequestMethod.POST)
-//    public boolean preUpdate(
-//            @WsDocNote(value="单据类型") @PathVariable(value="docType") String docType,
-//            @WsDocNote(value="单据JSON") @PathVariable(value="docId") String docId) {
-//        return docEngineWithPerm.preUpdateForController(docType,docId);
-//    }
-//
-    
-    @WsDocNote("A、修改单据")
-    @RequestMapping(value = "/update",method = RequestMethod.POST)
-    public DocHV update(
-            HttpServletRequest request,
-            @WsDocNote(value="单据JSON") @RequestBody DocHV doc) throws Exception {
-
-        Browser browser = UserAgent.parseUserAgentString(request.getHeader("User-Agent")).getBrowser();
-        Version version = browser.getVersion(request.getHeader("User-Agent"));
-        String info = null;//browser.getName() + "/" + version.getVersion();
-        //微信小程序请求
-        if(request.getHeader("User-Agent").contains("MicroMessenger"))
-        {
-            String str = request.getHeader("User-Agent");
-            String cut = " ";
-            String[] newStr = str.split(cut);
-            for(String s:newStr){
-                if(s.contains("MicroMessenger"))
-                {
-                    info= s;
-                    break;
-                }
-            }
-        }else {
-            info = browser.getName() + "/" + version.getVersion();
-        }
-        return docEngine.doUpdateView(doc);
-    }
-//
-//    
-//    @ResponseCompress
-//    @WsDocNote("B、执行单据函数")
-//    @RequestMapping(value = "/exec/processor/{docType}",method = RequestMethod.POST)
-//    public Object execDocFunc(
-//            @WsDocNote(value="单据类型") @PathVariable(value="docType") String docType,
-//            @WsDocNote(value="单据JSON") @RequestBody String json) {
-//        return docService.execDocProcessorFunc(docType,json);
-//    }
-//
-//    
-//    @ResponseCompress
-//    @WsDocNote("C、执行组件函数")
-//    @RequestMapping(value = {
-//            "/exec/card/{card}/{func}",
-//            "/exec/component/{card}/{func}"},method = RequestMethod.POST)
-//    public Object execComponentFunc(
-//            @PathVariable("card")       String card,
-//            @PathVariable("func")       String func,
-//            @RequestBody                String body) throws Throwable {
-//        return docService.execCardFunc(card,func,body);
-//    }
 }

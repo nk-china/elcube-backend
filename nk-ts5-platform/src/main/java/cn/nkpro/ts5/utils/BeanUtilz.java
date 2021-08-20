@@ -1,7 +1,9 @@
 package cn.nkpro.ts5.utils;
 
+import com.alibaba.fastjson.JSON;
 import org.springframework.beans.BeanUtils;
 
+import java.lang.reflect.Type;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -9,6 +11,12 @@ import java.util.stream.Collectors;
  * Created by bean on 2020/1/3.
  */
 public class BeanUtilz {
+
+    public static <T> T cloneWithFastjson(Object source){
+        if(source==null)return null;
+        return JSON.parseObject(JSON.toJSONString(source), (Type) source.getClass());
+    }
+
     /**
      * 将source复制到target对象，并返回
      * @param source

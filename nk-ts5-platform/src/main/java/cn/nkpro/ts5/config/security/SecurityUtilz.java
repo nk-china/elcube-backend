@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.config.security;
 
-import cn.nkpro.ts5.config.security.TfmsUserDetails;
+import cn.nkpro.ts5.exception.TfmsAccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,7 +19,7 @@ public class SecurityUtilz {
     public static TfmsUserDetails getUser(){
         return (TfmsUserDetails) Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
                 .map(Authentication::getDetails)
-                .orElse(null);
+                .orElseThrow(()->new TfmsAccessDeniedException("未登陆"));
     }
 
     public static Collection<? extends GrantedAuthority> getAuthorities(){

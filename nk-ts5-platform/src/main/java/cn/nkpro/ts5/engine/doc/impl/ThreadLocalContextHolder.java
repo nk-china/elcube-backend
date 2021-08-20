@@ -53,7 +53,15 @@ public class ThreadLocalContextHolder {
             }
         }
 
-        return docHV;
+        if(docHV!=null){
+            try {
+                return (DocHV) docHV.clone();
+            } catch (CloneNotSupportedException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return null;
     }
 
     public static synchronized void setDoc(DocHV doc){

@@ -10,7 +10,7 @@ import java.util.Map;
  * Created by bean on 2020/7/22.
  */
 @Data
-public class BpmTask {
+public class BpmTask implements Cloneable{
     private String id;
     private String name;
     private String priority;
@@ -43,4 +43,9 @@ public class BpmTask {
     private List<BpmTaskTransition> transitions;
     // variables
     private Map<String, Object> bpmVariables;
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
+    }
 }

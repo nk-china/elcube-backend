@@ -1,22 +1,19 @@
 package cn.nkpro.ts5.engine.web.impl;
 
 import cn.nkpro.ts5.basic.Constants;
-import cn.nkpro.ts5.engine.spel.TfmsSpELManager;
-import cn.nkpro.ts5.config.security.TfmsGrantedAuthority;
-import cn.nkpro.ts5.config.security.TfmsUserDetails;
-import cn.nkpro.ts5.engine.doc.model.DocHV;
-import cn.nkpro.ts5.engine.web.model.UserGroupBO;
-import cn.nkpro.ts5.engine.web.UserAuthorizationService;
 import cn.nkpro.ts5.config.id.GUID;
 import cn.nkpro.ts5.config.redis.RedisSupport;
+import cn.nkpro.ts5.config.security.NkGrantedAuthority;
+import cn.nkpro.ts5.engine.doc.model.DocHV;
+import cn.nkpro.ts5.engine.spel.TfmsSpELManager;
+import cn.nkpro.ts5.engine.web.UserAuthorizationService;
+import cn.nkpro.ts5.engine.web.model.UserGroupBO;
 import cn.nkpro.ts5.orm.mb.gen.*;
 import cn.nkpro.ts5.utils.BeanUtilz;
-import cn.nkpro.ts5.config.security.SecurityUtilz;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
-import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,40 +26,40 @@ import java.util.stream.Collectors;
 @Service
 public class UserAuthorizationServiceImpl implements UserAuthorizationService {
 
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private GUID guid;
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private SysAuthGroupMapper authGroupMapper;
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private SysAuthGroupRefMapper authGroupRefMapper;
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private SysAuthPermissionMapper authPermissionMapper;
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private SysAuthLimitMapper authLimitMapper;
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private SysAccountMapper accountMapper;
 
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private RedisSupport<UserGroupBO> redisSupport;
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private RedisSupport<SysAuthLimit> redisSupportLimit;
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private TfmsSpELManager spELManager;
 
 
     /**
      * 创建指定账号的权限集合
      * @param accountId 账号ID
-     * @return
+     * @return List<NkGrantedAuthority>
      */
     @Override
-    public List<TfmsGrantedAuthority> buildGrantedPerms(String accountId,String partnerId){
+    public List<NkGrantedAuthority> buildGrantedPerms(String accountId, String partnerId){
 
         //DocHV partner = StringUtils.isNotBlank(partnerId)?docEngine.getDocDetail(partnerId):new DocHV();
         DocHV partner = new DocHV();
 
         // 构造权限列表
-        List<TfmsGrantedAuthority> permList = new ArrayList<>();
+        List<NkGrantedAuthority> permList = new ArrayList<>();
 
         SysAuthGroupRefExample authGroupRefExample = new SysAuthGroupRefExample();
         authGroupRefExample.createCriteria()
@@ -115,177 +112,6 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
                     .collect(Collectors.toList());
     }
 
-//    /**
-//     * 当前账号下 根据授权过滤单据卡片
-//     * @param mode 操作
-//     * @param runtimeDefined 单据类型运行时对象
-//     * @return
-//     */
-//    @Override
-//    public DefDocTypeBO filterDocCards(String mode, DefDocTypeBO runtimeDefined){
-//
-//        // 移除没有权限的卡片
-//        getDocAuthorities(mode,runtimeDefined.getDocType())
-//                .stream()
-//                .findFirst()
-//                .map(authority -> StringUtils.split(authority.getSubResource(),'|'))
-//                .ifPresent(authority->{
-//                    runtimeDefined.getCustomComponents()
-//                            .removeIf(component ->!ArrayUtils.contains(authority,component.getComponent()));
-//                });
-//
-//        // 设置卡片的writeable值
-////        runtimeDefined.getCustomComponents()
-////                .forEach(component -> component.setWriteable(true));
-//        getDocAuthorities(TfmsPermService.MODE_WRITE, runtimeDefined.getDocType())
-//                .stream()
-//                .findFirst()
-//                .map(writeAuthority -> StringUtils.split(writeAuthority.getSubResource(),'|'))
-//                .ifPresent(writeAuthority -> {
-//                    runtimeDefined.getCustomComponents()
-//                            .stream()
-//                            .filter(DefDocComponentBO::getWriteable)
-//                            .forEach(component -> component.setWriteable(
-//                                    ArrayUtils.contains(writeAuthority,component.getComponent())
-//                            ));
-//                });
-//
-//        return runtimeDefined;
-//    }
-
-    /**
-     * 当前账号下 创建一个doc权限过滤器
-     * @param mode
-     * @param docType 允许为空，查询所有
-     * @return
-     */
-    @Override
-    public BoolQueryBuilder buildDocFilter(String mode,String docType,String typeKey, boolean ignoreLimit){
-        // 处理权限
-        List<TfmsGrantedAuthority> authorities = getDocAuthorities(mode, docType);
-
-        BoolQueryBuilder filter = QueryBuilders.boolQuery();
-
-        if(authorities.isEmpty()){
-            filter.must(QueryBuilders.idsQuery().addIds("NONE"));
-            return filter;
-        }
-
-        // 这里优化了下，把相同limit的单据类型条件合并
-        Map<String,TfmsGrantedAuthority> distinct = new HashMap<>();
-        authorities.forEach(authority -> {
-            distinct.putIfAbsent(authority.getDocType(),authority);
-        });
-
-        Map<String,List<String>> collectByLimit = new HashMap<>();
-
-        distinct.forEach((type,authority)-> {
-            String limit = ignoreLimit?null:authority.getLimitQuery();
-            collectByLimit.putIfAbsent(limit,new ArrayList<>());
-            collectByLimit.get(limit).add(authority.getDocType());
-        });
-
-        collectByLimit.forEach((limit,docTypes)->{
-            BoolQueryBuilder builder = QueryBuilders.boolQuery();
-
-            if(!docTypes.contains("*"))
-                builder.must(QueryBuilders.termsQuery(StringUtils.defaultIfBlank(typeKey,"docType"), docTypes));
-            if(StringUtils.isNotBlank(limit))
-                builder.must(QueryBuilders.wrapperQuery(limit));
-            filter.should(builder);
-        });
-
-        log.debug("单据查询权限过滤:\n"+filter);
-
-        return filter;
-    }
-
-//    /**
-//     * 当前账号下 检查是否具有对指定单据的权限
-//     * @param mode 操作
-//     * @param docType 单据类型
-//     */
-//    @Override
-//    public void assertHasDocPerm(String mode, String docType){
-//        if(!hasDocPerm(mode,docType)){
-//            throw new TfmsAccessDeniedException(String.format("没有单据类型[%s]-[%s]访问权限",docType, mode));
-//        }
-//    }
-//
-//    /**
-//     * 当前账号下 检查是否具有对指定单据类型的权限
-//     * @param mode 操作
-//     * @param docType 单据类型
-//     * @return
-//     */
-//    @Override
-//    public boolean hasDocPerm(String mode, String docType){
-//        return !getDocAuthorities(mode,docType).isEmpty();
-//    }
-//
-//    /**
-//     * 当前账号下 检查是否具有对指定单据的权限
-//     * @param mode 操作
-//     * @param docId 单据ID
-//     * @param docType 允许为空，查询所有
-//     * @throws TfmsAccessDeniedException
-//     */
-//    @Override
-//    public void assertHasDocPerm(String mode, String docId, String docType){
-//        if(!hasDocPerm(mode,docId,docType)){
-//            if(docType!=null)
-//                throw new TfmsAccessDeniedException(String.format("没有单据[%s:%s]-[%s]的访问权限", docType, docId, mode));
-//            else
-//                throw new TfmsAccessDeniedException(String.format("没有单据[%s]-[%s]的访问权限", docId, mode));
-//        }
-//    }
-//    /**
-//     * 当前账号下 检查是否具有对指定单据ID的权限
-//     * @param mode 操作
-//     * @param docId 单据ID
-//     * @param docType 单据类型
-//     * @return
-//     */
-//    @Override
-//    public boolean hasDocPerm(String mode, String docId, String docType) {
-//        if(SecurityUtilz.getAuthorities().stream()
-//                .anyMatch(g-> g.getAuthority().equals("*:*"))){
-//            return true;
-//        }
-//        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder()
-//                .postFilter(buildDocFilter(mode, docType,null,false))
-//                .query(QueryBuilders.termQuery("docId",docId));
-//        try {
-//            return searchEngine.exists(IndexDoc.class,sourceBuilder);
-//        } catch (IOException e) {
-//            throw new TfmsSearchException(e);
-//        }
-//    }
-
-
-    /**
-     * 当前账号下 获取指定单据类型的授权模型对象
-     * @param mode 操作
-     * @param docType 单据类型
-     * @return 授权模型对象集合
-     */
-    private List<TfmsGrantedAuthority> getDocAuthorities(String mode, String docType){
-        TfmsUserDetails user = SecurityUtilz.getUser();
-        if(user!=null){
-            return user.getAuthorities()
-                    .stream()
-                    .filter(authority->
-                            authority.getPermResource().equals("*")||
-                                    authority.getPermResource().equals("@*")||
-                                    authority.getPermResource().equalsIgnoreCase(String.format("@%s", docType))||
-                                    (docType==null && authority.getPermResource().startsWith("@"))
-                    )
-                    .filter(authority->StringUtils.equalsAnyIgnoreCase(authority.getPermOperate(),"*",mode))
-                    .collect(Collectors.toList());
-        }
-        return Collections.emptyList();
-    }
-
     /**
      * 创建一个用户组模型
      * @param groupId 用户组Id
@@ -322,7 +148,7 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
                     g.setPermissions(authPermissionMapper.selectByExampleWithBLOBs(authPermissionExample));
 
                     // 创建Group下的授权模型
-                    List<TfmsGrantedAuthority> authoritys = new ArrayList<>();
+                    List<NkGrantedAuthority> authoritys = new ArrayList<>();
                     g.getPermissions()
                         .forEach(permission -> {
                             if(StringUtils.startsWith(permission.getPermResource(),Constants.BIZ_DEFAULT_EMPTY)
@@ -355,13 +181,13 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
 
     /**
      * 创建一个授权对象
-     * @param resource
-     * @param perm
-     * @param group
-     * @return
+     * @param resource resource
+     * @param perm perm
+     * @param group group
+     * @return NkGrantedAuthority
      */
-    private TfmsGrantedAuthority buildAuthority(String resource, SysAuthPermission perm, SysAuthGroup group){
-        TfmsGrantedAuthority authority = new TfmsGrantedAuthority();
+    private NkGrantedAuthority buildAuthority(String resource, SysAuthPermission perm, SysAuthGroup group){
+        NkGrantedAuthority authority = new NkGrantedAuthority();
         authority.setPermResource(resource);
         authority.setPermOperate(perm.getPermOperate());
         authority.setSubResource(perm.getSubResource());

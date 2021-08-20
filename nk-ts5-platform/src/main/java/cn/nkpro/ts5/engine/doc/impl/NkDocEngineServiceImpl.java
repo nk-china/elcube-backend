@@ -9,6 +9,7 @@ import cn.nkpro.ts5.engine.doc.interceptor.NkDocFlowInterceptor;
 import cn.nkpro.ts5.engine.doc.model.*;
 import cn.nkpro.ts5.engine.doc.service.NkDocDefService;
 import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService;
+import cn.nkpro.ts5.engine.doc.service.NkDocPermService;
 import cn.nkpro.ts5.engine.task.NkBpmTaskService;
 import cn.nkpro.ts5.exception.TfmsDefineException;
 import cn.nkpro.ts5.orm.mb.gen.DocHMapper;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import javax.print.Doc;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -46,10 +48,16 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
     private NkDocDefService docDefService;
     @Autowired@SuppressWarnings("all")
     private NkBpmTaskService bpmTaskService;
+    @Autowired@SuppressWarnings("all")
+    private NkDocPermService docPermService;
 
 
     @Override
     public DocHV create(String docType, String preDocId) {
+
+        if(log.isInfoEnabled())log.info("创建单据 docType = {} 检查权限", docType);
+        docPermService.assertHasDocPerm(NkDocPermService.MODE_WRITE, docType);
+
         if(log.isInfoEnabled())log.info("创建单据 docType = {} preDocId = {}",docType, preDocId);
 
         // 获取前序单据
@@ -71,8 +79,17 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
 
     @Override
     public DocHV detailView(String docId) {
-        if(log.isInfoEnabled())log.info("获取单据视图 docId = {}: ",docId);
-        DocHV docHV = detail(docId);
+        final long start = System.currentTimeMillis();
+
+        if(log.isInfoEnabled())log.info("获取单据视图 docId = {}",docId);
+        DocHPersistent docHPersistent = fetchDoc(docId);
+
+        if(log.isInfoEnabled())log.info("获取单据视图 docId = {} 检查权限", docId);
+        docPermService.assertHasDocPerm(NkDocPermService.MODE_READ, docId, docHPersistent.getDocType());
+
+        DocHV docHV = ThreadLocalContextHolder.getDoc(docId, (id)-> fetchDocProcess(docHPersistent));
+
+        if(docHV==null)return null;
 
         if(StringUtils.isNotBlank(docHV.getProcessInstanceId())){
             docHV.setBpmTask(
@@ -81,16 +98,23 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
             if(log.isInfoEnabled())log.info("获取单据任务 docId = {}",docId);
         }
 
-        return processViewDef(docHV);
+        processView(docHV);
+        if(log.isInfoEnabled())log.info("获取单据 docId = {}: 完成 总耗时{}ms",docId,System.currentTimeMillis() - start);
+
+        return docHV;
     }
 
     @Override
     public DocHV detail(String docId) {
-        return ThreadLocalContextHolder.getDoc(docId, this::detailFromDB);
+        final long start = System.currentTimeMillis();
+        if(log.isInfoEnabled())log.info("获取单据 docId = {}",docId);
+        DocHV ret = ThreadLocalContextHolder.getDoc(docId, (id)-> fetchDocProcess(fetchDoc(id)));
+        if(log.isInfoEnabled())log.info("获取单据 docId = {}: 完成 总耗时{}ms",docId,System.currentTimeMillis() - start);
+        return ret;
     }
 
-    private DocHV detailFromDB(String docId){
-        if(log.isInfoEnabled())log.info("获取单据 docId = {}: 开始",docId);
+    private DocHPersistent fetchDoc(String docId){
+        if(log.isInfoEnabled())log.info("获取单据 docId = {}: 获取原始数据开始",docId);
 
         // 获取单据抬头和行项目数据
         final long start = System.currentTimeMillis();
@@ -112,6 +136,11 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
         });
         if(log.isInfoEnabled())log.info("获取单据 docId = {}: 获取原始数据 耗时{}ms", docId, System.currentTimeMillis()-start);
 
+        return  docHPersistent;
+    }
+
+    private DocHV fetchDocProcess(DocHPersistent docHPersistent){
+
         // 处理数据
         if(docHPersistent != null){
 
@@ -124,17 +153,15 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
             NkDocProcessor docProcessor = customObjectManager
                     .getCustomObject(def.getRefObjectType(), NkDocProcessor.class);
 
-            if(log.isInfoEnabled())log.info("获取单据 docId = {}: 获取配置 耗时{}ms", docId, System.currentTimeMillis()-now);
-            if(log.isInfoEnabled())log.info("获取单据 docId = {}: 确定单据处理器 = {}", docId, docProcessor.getBeanName());
+            if(log.isInfoEnabled())log.info("获取单据 docId = {}: 获取配置 耗时{}ms", docHPersistent.getDocId(), System.currentTimeMillis()-now);
+            if(log.isInfoEnabled())log.info("获取单据 docId = {}: 确定单据处理器 = {}", docHPersistent.getDocId(), docProcessor.getBeanName());
 
             now = System.currentTimeMillis();
             DocHV detail = docProcessor.detail(def, docHPersistent);
-            if(log.isInfoEnabled())log.info("获取单据 docId = {}: 处理单据内容 耗时{}ms", docId, System.currentTimeMillis()-now);
-            if(log.isInfoEnabled())log.info("获取单据 docId = {}: 完成 总耗时{}ms", docId, System.currentTimeMillis()-start);
+            if(log.isInfoEnabled())log.info("获取单据 docId = {}: 处理单据内容 耗时{}ms", docHPersistent.getDocId(), System.currentTimeMillis()-now);
 
             return detail;
         }
-        if(log.isInfoEnabled())log.info("获取单据 docId = {}: 未找到单据 总耗时{}ms", docId, System.currentTimeMillis()-start);
 
         return null;
     }
@@ -188,21 +215,30 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
 
     @Override
     @Transactional
-    public DocHV doUpdateView(DocHV docHV){
-        docHV = doUpdate(docHV);
+    public DocHV doUpdateView(DocHV docHV, String optSource){
 
-        if(StringUtils.isNotBlank(docHV.getProcessInstanceId())){
-            docHV.setBpmTask(
-                    bpmTaskService.taskByBusinessAndAssignee(docHV.getDocId(), SecurityUtilz.getUser().getId())
-            );
+        if(log.isInfoEnabled())log.info("保存单据视图 docId = {} 检查权限", docHV.getDocId());
+        docPermService.assertHasDocPerm(NkDocPermService.MODE_WRITE, docHV.getDocId(), docHV.getDocType());
+
+        DocHV original = detail(docHV.getDocId());
+        if(original!=null){
+            original.getData().forEach((k,v)-> docHV.getData().putIfAbsent(k,v));
         }
 
-        return processViewDef(docHV);
+        DocHV doc = doUpdate(docHV, optSource);
+
+        if(StringUtils.isNotBlank(doc.getProcessInstanceId())){
+            doc.setBpmTask(
+                    bpmTaskService.taskByBusinessAndAssignee(doc.getDocId(), SecurityUtilz.getUser().getId())
+            );
+        }
+        processView(doc);
+        return doc;
     }
 
     @Override
     @Transactional
-    public DocHV doUpdate(DocHV doc) {
+    public DocHV doUpdate(DocHV doc, String optSource) {
         final long start = System.currentTimeMillis();
         if(log.isInfoEnabled())log.info("保存单据 docId = {}: 开始",doc.getDocId());
 
@@ -242,15 +278,20 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
             // 获取单据处理器 并执行
             return customObjectManager
                             .getCustomObject(def.getRefObjectType(), NkDocProcessor.class)
-                            .doUpdate(doc, optionalOriginal.orElse(null),"用户操作");
+                            .doUpdate(doc, optionalOriginal.orElse(null),optSource);
         }finally {
             if(lock){
                 redisSupport.unLock(doc.getDocId(), lockId);
                 if(log.isInfoEnabled())log.info("保存单据 docId = {}: 解锁单据 redis",doc.getDocId());
             }
             if(log.isInfoEnabled())log.info("保存单据 docId = {}: 保存单据内容 耗时{}ms",doc.getDocId(),System.currentTimeMillis() - now);
-            // 事务提交后清空缓存
+
+            // 事务提交后清空缓存 | 事务提交后重新写入缓存 todo 检查是否有问题
             LocalSyncUtilz.runAfterCommit(()-> {
+
+                //DocHPersistent docHPersistent = BeanUtilz.copyFromObject(doc,DocHPersistent.class);
+                //redisSupport.putHash(Constants.CACHE_DOC, doc.getDocId(), docHPersistent);
+
                 redisSupport.delete(Constants.CACHE_DOC, doc.getDocId());
                 if(log.isInfoEnabled())log.info("保存单据 docId = {}: 完成 总耗时{}ms",doc.getDocId(),System.currentTimeMillis() - start);
             });
@@ -311,8 +352,9 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
     /**
      * 处理可创建的后续单据类型
      */
-    private DocHV processViewDef(DocHV docHV){
+    private void processView(DocHV docHV){
 
+        docPermService.filterDocCards(null, docHV);
 
         Map<String, DocDefStateV> cache = new LinkedHashMap<>();
         docHV.getDef()
@@ -346,7 +388,5 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
                 flow.setVisible(visibleState);
             });
         if(log.isInfoEnabled())log.info("设置单据后续操作 docId = {}: 操作数量 = {}",docHV.getDocId(), docHV.getDef().getNextFlows().size());
-
-        return docHV;
     }
 }

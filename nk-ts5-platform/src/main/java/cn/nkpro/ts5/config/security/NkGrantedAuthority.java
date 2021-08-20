@@ -6,7 +6,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.core.GrantedAuthority;
 
 @Data
-public class TfmsGrantedAuthority implements GrantedAuthority,Comparable<TfmsGrantedAuthority> {
+public class NkGrantedAuthority implements GrantedAuthority,Comparable<NkGrantedAuthority> {
 
     private static final long serialVersionUID  = 521L;
 
@@ -47,7 +47,7 @@ public class TfmsGrantedAuthority implements GrantedAuthority,Comparable<TfmsGra
 
 
     @Override
-    public int compareTo(TfmsGrantedAuthority o) {
+    public int compareTo(NkGrantedAuthority o) {
         return this.level.compareTo(o.level);
     }
 

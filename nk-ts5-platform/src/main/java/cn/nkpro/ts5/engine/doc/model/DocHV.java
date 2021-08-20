@@ -4,15 +4,12 @@ import cn.nkpro.ts5.engine.task.model.BpmTask;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * 单据数据对象，与前端交互的数据格式
  */
 @EqualsAndHashCode(callSuper = false)
 @Data
-public class DocHV extends DocHBasis {
+public class DocHV extends DocHBasis implements Cloneable {
 
     private BpmTask bpmTask;
 
@@ -21,5 +18,15 @@ public class DocHV extends DocHBasis {
 
     public DocHV() {
         super();
+    }
+
+    @Override
+    public Object clone() throws CloneNotSupportedException {
+        DocHV clone = (DocHV) super.clone();
+        clone.setWriteable(writeable);
+        if(bpmTask!=null)
+            clone.setBpmTask((BpmTask) bpmTask.clone());
+
+        return clone;
     }
 }

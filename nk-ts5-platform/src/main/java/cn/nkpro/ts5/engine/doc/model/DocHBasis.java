@@ -1,5 +1,6 @@
 package cn.nkpro.ts5.engine.doc.model;
 
+import cn.nkpro.ts5.utils.BeanUtilz;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -11,7 +12,7 @@ import java.util.Map;
  */
 @EqualsAndHashCode(callSuper = false)
 @Data
-class DocHBasis extends DocHPersistent {
+class DocHBasis extends DocHPersistent implements Cloneable {
 
     private String docTypeDesc;
 
@@ -27,5 +28,18 @@ class DocHBasis extends DocHPersistent {
         super();
         this.data       = new HashMap<>();
         this.dynamics   = new HashMap<>();
+    }
+
+    @Override
+    protected Object clone() throws CloneNotSupportedException {
+        DocHBasis clone = (DocHBasis) super.clone();
+        clone.setDocTypeDesc(docTypeDesc);
+        clone.setDocStateDesc(docStateDesc);
+        clone.setDef(def);
+        clone.dynamics = new HashMap<>(dynamics);
+        clone.data     = new HashMap<>();
+        data.forEach((k,v)-> clone.data.put(k,BeanUtilz.cloneWithFastjson(v)));
+
+        return clone;
     }
 }

@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.engine.web;
 
-import cn.nkpro.ts5.config.security.TfmsGrantedAuthority;
+import cn.nkpro.ts5.config.security.NkGrantedAuthority;
 import cn.nkpro.ts5.engine.web.model.UserGroupBO;
 import cn.nkpro.ts5.orm.mb.gen.SysAccount;
 import cn.nkpro.ts5.orm.mb.gen.SysAuthGroup;
@@ -17,25 +17,8 @@ public interface UserAuthorizationService {
     Integer GROUP_TO_ACCOUNT = 0;
     Integer GROUP_TO_PERM = 1;
 
-    //String MODE_ADD =     "NEW";
-    String MODE_READ =    "READ";
-    String MODE_WRITE =   "WRITE";
-    //String MODE_REMOVE =  "REMOVE";
 
-
-    List<TfmsGrantedAuthority> buildGrantedPerms(String accountId, String partnerId);
-
-    BoolQueryBuilder buildDocFilter(String mode, String docType, String typeKey, boolean ignoreLimit);
-//
-//    //DefDocTypeBO filterDocCards(String mode, DefDocTypeBO runtimeDefined);
-
-//    void assertHasDocPerm(String mode, String docType);
-//
-//    void assertHasDocPerm(String mode, String docId, String docType);
-//
-//    boolean hasDocPerm(String mode, String docType);
-//
-//    boolean hasDocPerm(String mode, String docId, String docType);
+    List<NkGrantedAuthority> buildGrantedPerms(String accountId, String partnerId);
 
     List<SysAuthLimit> getLimits(String[] limitIds);
 

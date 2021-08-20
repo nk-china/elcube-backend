@@ -13,7 +13,7 @@ public interface NkDocEngineFrontService extends NkDocEngine {
     Object call(DocHV doc, String fromCard, String method, String options);
 
     @Transactional
-    DocHV doUpdateView(DocHV docHV);
+    DocHV doUpdateView(DocHV docHV, String optSource);
 
     void onBpmKilled(String docId, String processKey, String optSource);
 }

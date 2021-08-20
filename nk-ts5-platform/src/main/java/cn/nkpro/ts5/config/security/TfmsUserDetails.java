@@ -12,7 +12,7 @@ import java.util.List;
 public class TfmsUserDetails extends UserAccountBO implements UserDetails {
 
     @Override
-    public List<TfmsGrantedAuthority> getAuthorities() {
+    public List<NkGrantedAuthority> getAuthorities() {
         return super.getAuthorities();
     }
     @Override

@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.engine.elasticearch;
 
+import cn.nkpro.ts5.engine.doc.service.NkDocPermService;
 import cn.nkpro.ts5.engine.elasticearch.model.ESDoc;
-import cn.nkpro.ts5.engine.web.UserAuthorizationService;
 import cn.nkpro.ts5.exception.TfmsSystemException;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
@@ -23,10 +23,10 @@ import java.io.IOException;
 @Component
 public class NkIndexService {
 
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private SearchEngine searchEngine;
-    @Autowired
-    protected UserAuthorizationService permService;
+    @Autowired@SuppressWarnings("all")
+    protected NkDocPermService docPermService;
 
     public <T extends ESDoc> ESPageList<T> queryList(
             Class<T> docType,
@@ -45,7 +45,7 @@ public class NkIndexService {
             );
         }
         postQueryBuilder.must(
-            permService.buildDocFilter(UserAuthorizationService.MODE_READ, null,null,false)
+                docPermService.buildDocFilter(NkDocPermService.MODE_READ, null,null,false)
         );
 
         // 处理查询条件
@@ -84,6 +84,7 @@ public class NkIndexService {
                 .size(params.getInteger("rows"));
 
         if(params.containsKey("_source")){
+            @SuppressWarnings("all")
             String[] fields = params.getJSONArray("_source").toArray(new String[0]);
             sourceBuilder.fetchSource(fields,null);
         }
