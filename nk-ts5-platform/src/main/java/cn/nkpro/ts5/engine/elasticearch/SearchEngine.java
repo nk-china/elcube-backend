@@ -51,7 +51,7 @@ public class SearchEngine {
     @Scheduled(cron = "0 * * * * ?")
     public void heartbeat(){
         try {
-            log.debug("indices heartbeat : " + client.ping(RequestOptions.DEFAULT));
+            client.ping(RequestOptions.DEFAULT);
         } catch (IOException e) {
             log.error("indices heartbeat error",e);
         }
@@ -73,6 +73,10 @@ public class SearchEngine {
     public void indexBeforeCommit(Collection<ESDoc> docs){
 
         LocalSyncUtilz.runBeforeCommit(()-> {
+
+            if(log.isInfoEnabled()){
+                log.info("重建索引开始 数量 = {}", docs.size());
+            }
 
             for(ESDoc doc : docs){
 
@@ -105,6 +109,14 @@ public class SearchEngine {
                                 .id(id)
                                 .source(json),
                         RequestOptions.DEFAULT);
+
+                if(log.isInfoEnabled()) {
+                    log.info("重建索引 DOC = {}", doc);
+                }
+            }
+
+            if(log.isInfoEnabled()){
+                log.info("重建索引完成 数量 = {}", docs.size());
             }
         });
     }

@@ -53,8 +53,6 @@ public class LocalSyncUtilz {
 		// 启动异步线程，在事务提交后，将需要更新solr索引的数据写入同步队列
 		if(TransactionSynchronizationManager.isSynchronizationActive()){
 			
-			log.info("当前线程有事务管理，加入本地任务");
-			
 			Handler handler = new Handler(function, priority);
 			
 			List<Handler> handlers = targetTaskList.get();
@@ -66,8 +64,17 @@ public class LocalSyncUtilz {
 			handlers.add(handler);
 			
 			TransactionSynchronizationManager.registerSynchronization(transactionSync);
+
+			if(log.isInfoEnabled()){
+				if(targetTaskList==tasksRunBeforeCommit){
+					log.info("创建事务同步任务, 任务将在事务提交前执行, 当前任务数量 = {}",handlers.size());
+				}else{
+					log.info("创建事务同步任务, 任务将在事务提交后执行, 当前任务数量 = {}",handlers.size());
+				}
+			}
+
 		}else{
-			log.info("当前线程无事务管理，直接执行任务");
+			log.warn("当前线程无事务管理，任务将立即执行");
             try {
                 function.apply();
             } catch (Exception e) {
@@ -87,14 +94,14 @@ public class LocalSyncUtilz {
 
 			List<Handler> handlers = tasksRunBeforeCommit.get();
 			if(handlers!=null){
-				log.info("开始执行事务提交前任务");
+				log.info("准备执行事务提交前的同步任务，任务数量 = {}", handlers.size());
 
 				tasksRunBeforeCommit.remove();
 
 				for(Handler handler : handlers.stream().sorted().collect(Collectors.toList())){
 					handler.getTask().apply();
 				}
-				log.info("事务提交前任务处理完成");
+				log.info("事务提交前的同步任务执行完成");
 			}
 
 			unlock();
@@ -107,7 +114,8 @@ public class LocalSyncUtilz {
 	    	
 	    	List<Handler> handlers = tasksRunAfterCommit.get();
 			if(handlers!=null) {
-				log.info("开始处理本地任务");
+				log.info("准备执行事务提交后的同步任务，任务数量 = {}", handlers.size());
+
 				tasksRunAfterCommit.remove();
 
 				for (Handler handler : handlers.stream().sorted().collect(Collectors.toList())) {
@@ -117,7 +125,7 @@ public class LocalSyncUtilz {
 						log.error(e.getMessage(), e);
 					}
 				}
-				log.info("本地任务处理完成");
+				log.info("事务提交后的同步任务执行完成");
 			}
 
 			unlock();

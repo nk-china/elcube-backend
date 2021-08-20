@@ -34,7 +34,7 @@ public class DefaultRedisSupportImpl<T> implements RedisSupport<T>,ApplicationCo
 
     @Scheduled(cron = "0 * * * * ?")
     public void heartbeat(){
-        log.debug("redis heartbeat : " + redisTemplate.opsForValue().get("__.heartbeat"));
+        redisTemplate.opsForValue().get("__.heartbeat");
     }
 
 

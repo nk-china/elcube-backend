@@ -50,6 +50,7 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
 
     @Override
     public DocHV create(String docType, String preDocId) {
+        if(log.isInfoEnabled())log.info("创建单据 docType = {} preDocId = {}",docType, preDocId);
 
         // 获取前序单据
         DocHV preDoc = StringUtils.isBlank(preDocId) || StringUtils.equalsIgnoreCase(preDocId,"@") ? null : detail(preDocId);
@@ -70,19 +71,29 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
 
     @Override
     public DocHV detailView(String docId) {
+        if(log.isInfoEnabled())log.info("获取单据视图 docId = {}: ",docId);
         DocHV docHV = detail(docId);
 
         if(StringUtils.isNotBlank(docHV.getProcessInstanceId())){
             docHV.setBpmTask(
                     bpmTaskService.taskByBusinessAndAssignee(docId, SecurityUtilz.getUser().getId())
             );
+            if(log.isInfoEnabled())log.info("获取单据任务 docId = {}",docId);
         }
 
         return processViewDef(docHV);
     }
 
+    @Override
+    public DocHV detail(String docId) {
+        return ThreadLocalContextHolder.getDoc(docId, this::detailFromDB);
+    }
+
     private DocHV detailFromDB(String docId){
+        if(log.isInfoEnabled())log.info("获取单据 docId = {}: 开始",docId);
+
         // 获取单据抬头和行项目数据
+        final long start = System.currentTimeMillis();
         DocHPersistent docHPersistent = redisSupport.getIfAbsent(Constants.CACHE_DOC, docId,()->{
 
             DocHPersistent doc = BeanUtilz.copyFromObject(docHMapper.selectByPrimaryKey(docId), DocHV.class);
@@ -99,25 +110,33 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
 
             return doc;
         });
+        if(log.isInfoEnabled())log.info("获取单据 docId = {}: 获取原始数据 耗时{}ms", docId, System.currentTimeMillis()-start);
 
         // 处理数据
         if(docHPersistent != null){
+
+            long now = System.currentTimeMillis();
 
             // 获取单据DEF
             DocDefHV def = docDefService.getDocDefForRuntime(docHPersistent.getDocType());
 
             // 获取单据处理器 并执行
-            return customObjectManager
-                    .getCustomObject(def.getRefObjectType(), NkDocProcessor.class)
-                    .detail(def, docHPersistent);
+            NkDocProcessor docProcessor = customObjectManager
+                    .getCustomObject(def.getRefObjectType(), NkDocProcessor.class);
+
+            if(log.isInfoEnabled())log.info("获取单据 docId = {}: 获取配置 耗时{}ms", docId, System.currentTimeMillis()-now);
+            if(log.isInfoEnabled())log.info("获取单据 docId = {}: 确定单据处理器 = {}", docId, docProcessor.getBeanName());
+
+            now = System.currentTimeMillis();
+            DocHV detail = docProcessor.detail(def, docHPersistent);
+            if(log.isInfoEnabled())log.info("获取单据 docId = {}: 处理单据内容 耗时{}ms", docId, System.currentTimeMillis()-now);
+            if(log.isInfoEnabled())log.info("获取单据 docId = {}: 完成 总耗时{}ms", docId, System.currentTimeMillis()-start);
+
+            return detail;
         }
+        if(log.isInfoEnabled())log.info("获取单据 docId = {}: 未找到单据 总耗时{}ms", docId, System.currentTimeMillis()-start);
 
         return null;
-    }
-
-    @Override
-    public DocHV detail(String docId) {
-        return ThreadLocalContextHolder.getDoc(docId, this::detailFromDB);
     }
 
     /**
@@ -184,10 +203,13 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
     @Override
     @Transactional
     public DocHV doUpdate(DocHV doc) {
+        final long start = System.currentTimeMillis();
+        if(log.isInfoEnabled())log.info("保存单据 docId = {}: 开始",doc.getDocId());
 
         validate(doc);
 
         // 获取原始单据数据
+        if(log.isInfoEnabled())log.info("保存单据 docId = {}: 准备获取原始单据",doc.getDocId());
         Optional<DocHV> optionalOriginal = Optional.ofNullable(detail(doc.getDocId()));
 
 
@@ -203,14 +225,18 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
                     "单据被其他用户修改，请刷新后重试");
         }else{
             // 新建
-            validateFlow(def,detail(doc.getPreDocId()));
+            validateFlow(def, detail(doc.getPreDocId()));
         }
 
+        long now = System.currentTimeMillis();
         boolean lock = false;
         String  lockId = UUID.randomUUID().toString();
+
         try{
             lock = redisSupport.lock(doc.getDocId(), lockId, 10);
             Assert.isTrue(lock,"单据被其他用户锁定，请稍后再试");
+
+            if(log.isInfoEnabled())log.info("保存单据 docId = {}: 锁定单据成功 redis",doc.getDocId());
 
             doc.setDef(def);
             // 获取单据处理器 并执行
@@ -218,9 +244,16 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
                             .getCustomObject(def.getRefObjectType(), NkDocProcessor.class)
                             .doUpdate(doc, optionalOriginal.orElse(null),"用户操作");
         }finally {
-            if(lock) redisSupport.unLock(doc.getDocId(), lockId);
+            if(lock){
+                redisSupport.unLock(doc.getDocId(), lockId);
+                if(log.isInfoEnabled())log.info("保存单据 docId = {}: 解锁单据 redis",doc.getDocId());
+            }
+            if(log.isInfoEnabled())log.info("保存单据 docId = {}: 保存单据内容 耗时{}ms",doc.getDocId(),System.currentTimeMillis() - now);
             // 事务提交后清空缓存
-            LocalSyncUtilz.runAfterCommit(()-> redisSupport.delete(Constants.CACHE_DOC, doc.getDocId()));
+            LocalSyncUtilz.runAfterCommit(()-> {
+                redisSupport.delete(Constants.CACHE_DOC, doc.getDocId());
+                if(log.isInfoEnabled())log.info("保存单据 docId = {}: 完成 总耗时{}ms",doc.getDocId(),System.currentTimeMillis() - start);
+            });
         }
     }
 
@@ -250,8 +283,12 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
      */
     private void validateFlow(DocDefHV def, DocHV preDoc){
 
+        long now = System.currentTimeMillis();
+
         String preDocType = Optional.ofNullable(preDoc).map(DocHV::getDocType).orElse("@");
         String preDocState = Optional.ofNullable(preDoc).map(DocHV::getDocState).orElse("@");
+
+        if(log.isInfoEnabled())log.info("验证单据业务流 docType = {}: 验证单据业务流 前序docType = {}",def.getDocType(), preDocType);
 
         DocDefFlowV flowV = def.getFlows()
                 .stream()
@@ -259,7 +296,7 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
                 .findFirst()
                 .orElseThrow(()->new TfmsDefineException("没有找到业务流配置"));
 
-        if(!StringUtils.equals(flowV.getPreDocState(),preDocState)){
+        if(!StringUtils.equalsAny(flowV.getPreDocState(),preDocState, "@")){
             throw new TfmsDefineException("状态不满足条件");
         }
         if(StringUtils.isNotBlank(flowV.getRefObjectType())){
@@ -268,12 +305,14 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
                 throw new TfmsDefineException(flowDescribe.getVisibleDesc());
             }
         }
+        if(log.isInfoEnabled())log.info("验证单据业务流 docType = {}: 完成 耗时{}ms", def.getDocType(), System.currentTimeMillis() - now);
     }
 
     /**
      * 处理可创建的后续单据类型
      */
     private DocHV processViewDef(DocHV docHV){
+
 
         Map<String, DocDefStateV> cache = new LinkedHashMap<>();
         docHV.getDef()
@@ -284,6 +323,7 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
                     }
                 });
         docHV.getDef().setStatus(new ArrayList<>(cache.values()));
+        if(log.isInfoEnabled())log.info("设置单据可用状态 docId = {}: 状态 = {}",docHV.getDocId(), docHV.getDef().getStatus());
 
         docHV.getDef()
             .getNextFlows()
@@ -305,6 +345,7 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
 
                 flow.setVisible(visibleState);
             });
+        if(log.isInfoEnabled())log.info("设置单据后续操作 docId = {}: 操作数量 = {}",docHV.getDocId(), docHV.getDef().getNextFlows().size());
 
         return docHV;
     }

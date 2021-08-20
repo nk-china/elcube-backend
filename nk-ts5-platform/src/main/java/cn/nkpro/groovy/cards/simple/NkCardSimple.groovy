@@ -19,25 +19,25 @@ class NkCardSimple extends NkAbstractCard<NkCardSimpleData,NkCardSimpleDef> {
 
     @Override
     NkCardSimpleDef afterGetDef(DocDefHV defHV, DocDefIV defIV, NkCardSimpleDef cardDef) {
-        log.info("DEF:"+JSON.toJSONString(cardDef))
+        log.debug("DEF:"+JSON.toJSONString(cardDef))
         return cardDef
     }
 
     @Override
     NkCardSimpleData afterCreate(DocHV doc, DocHV preDoc, NkCardSimpleData data, DocDefIV defIV, NkCardSimpleDef cardDef) {
-        log.info("DATA:"+JSON.toJSONString(data))
+        log.debug("DATA:"+JSON.toJSONString(data))
         return data
     }
 
     @Override
     NkCardSimpleData afterGetData(DocHV doc, NkCardSimpleData data, DocDefIV defIV, NkCardSimpleDef cardDef) {
-        log.info("DATA:"+JSON.toJSONString(data))
+        log.debug("DATA:"+JSON.toJSONString(data))
         return data
     }
 
     @Override
     NkCardSimpleData beforeUpdate(DocHV doc, NkCardSimpleData data, NkCardSimpleData original, DocDefIV defIV, NkCardSimpleDef cardDef) {
-        log.info("DATA:"+JSON.toJSONString(data))
+        log.debug("DATA:"+JSON.toJSONString(data))
         return data
     }
 

@@ -9,7 +9,7 @@ import lombok.EqualsAndHashCode;
 /**
  * Created by bean on 2020/7/6.
  */
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class DocHES extends DocBaseES {
 

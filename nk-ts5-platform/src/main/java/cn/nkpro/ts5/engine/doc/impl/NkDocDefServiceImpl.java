@@ -480,6 +480,8 @@ public class NkDocDefServiceImpl implements NkDocDefService {
     @SuppressWarnings("unchecked")
     public DocDefHV getDocDefForRuntime(String docType){
 
+        if(log.isInfoEnabled())log.info("获取单据配置 docType = {}: 开始", docType);
+
         // 判断当前请求是否debug，如果是，先尝试从debug环境中获取配置
         DocDefHV defHV = Optional.ofNullable(
             (DocDefHV)(debugContextManager.getDebugResource(String.format("@%s", docType)))
@@ -489,6 +491,7 @@ public class NkDocDefServiceImpl implements NkDocDefService {
         Assert.notNull(defHV,String.format("单据类型[%s]版本的配置没有找到或尚未激活",docType));
 
         deserializeDef(defHV);
+        if(log.isInfoEnabled())log.info("获取单据配置 docType = {}: 反序列化配置完成", docType);
 
         runLoopCards(defHV,false, (nkCard,item)->{
                 item.setDebug(nkCard.isDebug());
@@ -496,6 +499,7 @@ public class NkDocDefServiceImpl implements NkDocDefService {
         });
 
         defHV.setNextFlows(getDocTypeFlows(docType));
+        if(log.isInfoEnabled())log.info("获取单据配置 docType = {}: 完成", docType);
 
         return defHV;
     }
@@ -573,6 +577,7 @@ public class NkDocDefServiceImpl implements NkDocDefService {
 
     private DocDefHV deserializeDef(DocDefHV docDefHV) {
 
+        log.info("配置反序列化 docType = {}: 开始",docDefHV.getDocType());
         runLoopCards(docDefHV,true, (nkCard,item)->{
             item.setConfig(nkCard.deserializeDef(item));
             item.setPosition(nkCard.getPosition());
@@ -580,6 +585,7 @@ public class NkDocDefServiceImpl implements NkDocDefService {
             item.setDefComponentNames(nkCard.getAutoDefComponentNames());
             item.setCardContent(null);
         });
+        log.info("配置反序列化 docType = {}: 完成",docDefHV.getDocType());
 
         return docDefHV;
     }

@@ -55,10 +55,10 @@ public class PaginationInterceptor implements Interceptor {
 
 		Object parameterObject = boundSql.getParameterObject();
 
-		if (log.isDebugEnabled()) {
-			log.debug("Parameter = " + parameter);
-			log.debug("RowBounds = " + rowBounds);
-			log.debug("Default RowBounds = " + (rowBounds == RowBounds.DEFAULT));
+		if (log.isTraceEnabled()) {
+			log.trace("Parameter = " + parameter);
+			log.trace("RowBounds = " + rowBounds);
+			log.trace("Default RowBounds = " + (rowBounds == RowBounds.DEFAULT));
 		}
 
 		// 如果没有分页参数，则直接退出
@@ -78,9 +78,9 @@ public class PaginationInterceptor implements Interceptor {
 			// 暂时mybatis没有复杂sql
 			String countSql = originalSql.replaceAll("(?<=select)[\\s\\S]*?(?=from)", " count(*) ").replaceAll("order by.*", "");
 
-			if (log.isDebugEnabled()) {
-				log.debug("生成查询数量SQL : " + originalSql);
-				log.debug("生成查询数量SQL : " + countSql);
+			if (log.isTraceEnabled()) {
+				log.trace("生成查询数量SQL : " + originalSql);
+				log.trace("生成查询数量SQL : " + countSql);
 			}
 			Connection connection = null;
 			ResultSet rs = null;
@@ -126,8 +126,10 @@ public class PaginationInterceptor implements Interceptor {
 				new BoundSqlSqlSource(newBoundSql));
 		queryArgs[MAPPED_STATEMENT_INDEX] = newMs;
 
-		if (log.isDebugEnabled()) {
-			log.debug("生成分页SQL : " + newBoundSql.getSql());
+		if (log.isTraceEnabled()) {
+			log.trace("生成分页SQL : " + newBoundSql.getSql()
+					.replaceAll("\n"," ")
+					.replaceAll("\\s{2,}"," "));
 		}
 		return;
 	}

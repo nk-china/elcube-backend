@@ -195,37 +195,43 @@ export default {
             return value === true ? (options.checked || 'YES') : (options.unChecked || 'NO');
         },
         formatSelect(value, options) {
-            options = typeof options === 'string' ? JSON.parse(options) : options;
-            return (Array.isArray(value) ? value : [value]).map(item => {
-                let find = options && options.find(o => o.key === item || o.value === item);
-                if(find){
-                    return find.label || find.name || find.title;
-                }
-                return item;
-            }).join(' , ');
+            if(value){
+                options = typeof options === 'string' ? JSON.parse(options) : options;
+                return (Array.isArray(value) ? value : [value]).map(item => {
+                    let find = options && options.find(o => o.key === item || o.value === item);
+                    if(find){
+                        return find.label || find.name || find.title;
+                    }
+                    return item;
+                }).join(' , ');
+            }
         },
         formatCascader(value, options){
-            options = typeof options === 'string' ? JSON.parse(options) : options;
-            let find = options;
-            return value.map(item => {
-                find = find && find.find(o => o.key === item || o.value === item);
-                if(find){
-                    const label = find.label || find.name || find.title;
-                    find = find.children;
-                    return label;
-                }
-                return item;
-            }).join(' / ');
+            if(value) {
+                options = typeof options === 'string' ? JSON.parse(options) : options;
+                let find = options;
+                return value.map(item => {
+                    find = find && find.find(o => o.key === item || o.value === item);
+                    if (find) {
+                        const label = find.label || find.name || find.title;
+                        find = find.children;
+                        return label;
+                    }
+                    return item;
+                }).join(' / ');
+            }
         },
         formatTree(value, options){
-            options = typeof options === 'string' ? JSON.parse(options) : options;
-            return (Array.isArray(value) ? value : [value]).map(item => {
-                let find = options && findInTree(options, item);
-                if(find){
-                    return find.label || find.name || find.title;
-                }
-                return item;
-            }).join(' , ');
+            if(value) {
+                options = typeof options === 'string' ? JSON.parse(options) : options;
+                return (Array.isArray(value) ? value : [value]).map(item => {
+                    let find = options && findInTree(options, item);
+                    if (find) {
+                        return find.label || find.name || find.title;
+                    }
+                    return item;
+                }).join(' , ');
+            }
         }
     },
     created() {
