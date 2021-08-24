@@ -454,9 +454,8 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
                 });
         docHV.getDef().setStatus(new ArrayList<>(cache.values()));
         if(log.isInfoEnabled())
-            log.info("{}设置单据可用状态 docId = {}: 状态 = {}",
+            log.info("{}设置单据可用状态 状态 = {}",
                     NkDocEngineContext.currLog(),
-                    docHV.getDocId(),
                     docHV.getDef().getStatus()
             );
 
@@ -481,9 +480,8 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
                 flow.setVisible(visibleState);
             });
         if(log.isInfoEnabled())
-            log.info("{}设置单据后续操作 docId = {}: 操作数量 = {}",
+            log.info("{}设置单据后续操作 操作数量 = {}",
                     NkDocEngineContext.currLog(),
-                    docHV.getDocId(),
                     docHV.getDef().getNextFlows().size()
             );
     }
