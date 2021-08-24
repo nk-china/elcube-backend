@@ -18,14 +18,19 @@ public class DocHPersistent extends DocH implements Cloneable {
 
     private Map<String, DocI> items;
 
+    private Map<String,Object> data;
+
     DocHPersistent() {
         this.items = new HashMap<>();
+        this.data  = new HashMap<>();
     }
 
     @Override
     protected Object clone() throws CloneNotSupportedException {
         DocHPersistent clone = (DocHPersistent) super.clone();
-        clone.setItems(items);
+        clone.items    = items;
+        clone.data     = new HashMap<>();
+        data.forEach((k,v)-> clone.data.put(k,BeanUtilz.cloneWithFastjson(v)));
         return clone;
     }
 }

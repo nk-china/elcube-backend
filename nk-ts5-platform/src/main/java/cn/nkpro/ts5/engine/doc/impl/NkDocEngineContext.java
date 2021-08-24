@@ -1,21 +1,54 @@
 package cn.nkpro.ts5.engine.doc.impl;
 
 import cn.nkpro.ts5.engine.doc.model.DocHV;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationAdapter;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Vector;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
-public class ThreadLocalContextHolder {
+@Slf4j
+public class NkDocEngineContext {
+    private final static ThreadLocal<Stack<String>>       threadLocalLog = new ThreadLocal<>();
     private final static ThreadLocal<List<String>>       threadLocalLock = new ThreadLocal<>();
     private final static ThreadLocal<Map<String, DocHV>> threadLocalDocs = new ThreadLocal<>();
     private final static ThreadLocal<DocHV>              threadLocalRuntimeDoc = new ThreadLocal<>();
 
+    private final static String c = "\t";
+    private final static String d = "%s %s : ";
+    private final static String e = "%s%s";
+
+    static synchronized void startLog(String opt, String docId){
+        Stack<String> logs = threadLocalLog.get();
+        if(logs==null){
+            logs = new Stack<>();
+            threadLocalLog.set(logs);
+        }
+        logs.push(String.format(d, opt, docId));
+    }
+    static synchronized String endLog(){
+        Stack<String> logs = threadLocalLog.get();
+        if(CollectionUtils.isNotEmpty(logs)){
+            return logs.pop();
+        }
+        return null;
+    }
+    static synchronized String currLog(){
+        Stack<String> logs = threadLocalLog.get();
+        if(CollectionUtils.isNotEmpty(logs)){
+            String collect = logs.stream()
+                    .map(i -> StringUtils.EMPTY)
+                    .collect(Collectors.joining(c));
+            return String.format(e,collect,logs.peek());
+        }
+        return StringUtils.EMPTY;
+    }
 
    /*
     *
@@ -50,6 +83,10 @@ public class ThreadLocalContextHolder {
             docHV = function.apply(docId);
             if(docHV!=null){
                 docMap.put(docId,docHV);
+            }
+        }else{
+            if(log.isInfoEnabled()){
+                log.info("{}从本地线程中获取到单据",currLog());
             }
         }
 
@@ -117,12 +154,13 @@ public class ThreadLocalContextHolder {
         threadLocalLock.remove();
         threadLocalDocs.remove();
         threadLocalRuntimeDoc.remove();
+        threadLocalLog.remove();
     }
 
 
     private static TransactionSynchronization transactionSync = new TransactionSynchronizationAdapter() {
         @Override
-        public void afterCommit() {
+        public void afterCompletion(int status) {
             clear();
         }
     };

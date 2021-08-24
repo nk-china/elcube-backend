@@ -123,15 +123,22 @@ public class NkDocPermServiceImpl implements NkDocPermService {
      */
     @Override
     public boolean hasDocPerm(String mode, String docId, String docType) {
+
+        if(log.isInfoEnabled())log.info("* 检测单据权限 docType = {}, docId = {}, mode = {}", docType, docId, mode);
         if(SecurityUtilz.getAuthorities().stream()
                 .anyMatch(g-> g.getAuthority().equals("*:*"))){
+            if(log.isInfoEnabled())log.info("检测到 超级权限 pass");
             return true;
         }
+        BoolQueryBuilder filter = buildDocFilter(mode, docType, null, false);
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder()
-                .postFilter(buildDocFilter(mode, docType,null,false))
+                .postFilter(filter)
                 .query(QueryBuilders.termQuery("docId",docId));
         try {
-            return searchEngine.exists(DocHES.class,sourceBuilder);
+            boolean has = searchEngine.exists(DocHES.class,sourceBuilder);
+
+            if(log.isInfoEnabled())log.info("* 检测到 权限 = {}, filter = {}",has, filter);
+            return has;
         } catch (IOException e) {
             throw new TfmsSystemException(e);
         }

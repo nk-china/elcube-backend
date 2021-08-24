@@ -3,7 +3,7 @@ package cn.nkpro.ts5.engine.elasticearch;
 import cn.nkpro.ts5.config.NkProperties;
 import cn.nkpro.ts5.engine.elasticearch.annotation.*;
 import cn.nkpro.ts5.engine.elasticearch.model.ESDoc;
-import cn.nkpro.ts5.utils.LocalSyncUtilz;
+import cn.nkpro.ts5.engine.LocalSyncUtilz;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
