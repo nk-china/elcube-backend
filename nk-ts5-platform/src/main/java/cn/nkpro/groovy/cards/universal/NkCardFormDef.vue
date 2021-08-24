@@ -1,5 +1,5 @@
 <template>
-    <a-card :title="`${card.cardName}配置`">
+    <nk-def-card :card="card">
         <nk-form :col="1" :edit="editMode" style="width:300px;">
             <nk-form-item title="列">
                 {{def.col}}
@@ -155,7 +155,7 @@
             </vxe-table-column>
         </vxe-table>
         <nk-doc-select-def v-model="modalVisible" :def="modalRow.modal" @submit="refSubmit"></nk-doc-select-def>
-    </a-card>
+    </nk-def-card>
 </template>
 
 <script>
@@ -253,3 +253,7 @@ export default {
 <style scoped>
 
 </style>
+
+<docs>
+    -- doc
+</docs>
