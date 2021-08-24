@@ -1,5 +1,6 @@
 <template>
-    <nk-def-card :card="card">
+    <nk-def-card>
+
         <nk-form :col="1" :edit="editMode" style="width:300px;">
             <nk-form-item title="列">
                 {{def.col}}
