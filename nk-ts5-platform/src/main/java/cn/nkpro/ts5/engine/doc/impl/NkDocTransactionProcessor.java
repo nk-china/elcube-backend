@@ -187,13 +187,13 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
     }
 
     @Override
-    public DocHPersistent deserialize(DocDefHV def, DocHPersistent docHD){
+    public final DocHBasis deserialize(DocDefHV def, DocHPersistent docHD){
 
         long start = System.currentTimeMillis();
         if(log.isInfoEnabled())
             log.info("{}反序列化卡片数据", NkDocEngineContext.currLog());
 
-        DocHPersistent doc = BeanUtilz.copyFromObject(docHD, DocHPersistent.class);
+        DocHBasis doc = BeanUtilz.copyFromObject(docHD, DocHBasis.class);
 
         // 解析单据行项目数据
         docDefService.runLoopCards(def,false, (nkCard, defIV)->{
@@ -212,8 +212,6 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
                     nkCard.deserialize(docI.getCardContent())
             );
 
-            // 清除JSON，避免无效数据网络传输
-            docI.setCardContent(null);
             if(log.isInfoEnabled())
                 log.info("{}\tdeserialize cardKey = {} | {}, card = {}",
                         NkDocEngineContext.currLog(),
@@ -234,7 +232,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
     }
 
     @Override
-    public DocHV detail(DocDefHV def, DocHPersistent docHD) {
+    public DocHV detail(DocDefHV def, DocHBasis docHD) {
 
         long start = System.currentTimeMillis();
         if(log.isInfoEnabled())log.info("{}获取单据内容", NkDocEngineContext.currLog());
@@ -336,7 +334,6 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
 
                 // 将更新后的数据放回到doc
                 loopDoc.getItems().put(defIV.getCardKey(),docI);
-                docI.setCardContent(null);
             }else{
 
                 DocI docI = new DocI();
@@ -350,7 +347,6 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
 
                 // 将更新后的数据放回到doc
                 loopDoc.getItems().put(defIV.getCardKey(),docI);
-                docI.setCardContent(null);
             }
 
             loopDoc.getData().put(defIV.getCardKey(),cardData);

@@ -20,10 +20,13 @@ public class DocHBasis extends DocHPersistent implements Cloneable {
 
     private DocDefHV def;
 
+    private Map<String,Object> data;
+
     private Map<String,Object> dynamics;
 
     DocHBasis() {
         super();
+        this.data       = new HashMap<>();
         this.dynamics   = new HashMap<>();
     }
 
@@ -34,6 +37,8 @@ public class DocHBasis extends DocHPersistent implements Cloneable {
         clone.setDocStateDesc(docStateDesc);
         clone.setDef(def);
         clone.dynamics = new HashMap<>(dynamics);
+        clone.data     = new HashMap<>();
+        data.forEach((k,v)-> clone.data.put(k,BeanUtilz.cloneWithFastjson(v)));
 
         return clone;
     }

@@ -18,9 +18,9 @@ public interface NkDocProcessor extends NkCustomObject {
 
     Object call(DocHV doc, String fromCard, String method, String options);
 
-    DocHPersistent deserialize(DocDefHV def, DocHPersistent docHD);
+    DocHBasis deserialize(DocDefHV def, DocHPersistent docHD);
 
-    DocHV detail  (DocDefHV def, DocHPersistent docHD);
+    DocHV detail  (DocDefHV def, DocHBasis docHD);
 
     DocHV toCreate(DocDefHV def, DocHV preDoc);
 

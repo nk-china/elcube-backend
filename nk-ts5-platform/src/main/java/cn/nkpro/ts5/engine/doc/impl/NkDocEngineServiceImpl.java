@@ -139,7 +139,7 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
         final long start = System.currentTimeMillis();
         DocHPersistent docHPersistent = redisSupport.getIfAbsent(Constants.CACHE_DOC, docId,()->{
 
-            DocHPersistent doc = BeanUtilz.copyFromObject(docHMapper.selectByPrimaryKey(docId), DocHV.class);
+            DocHPersistent doc = BeanUtilz.copyFromObject(docHMapper.selectByPrimaryKey(docId), DocHPersistent.class);
 
             if(doc!=null){
 
@@ -149,15 +149,6 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
 
                 doc.setItems(docIMapper.selectByExampleWithBLOBs(example).stream()
                         .collect(Collectors.toMap(DocIKey::getCardKey, e -> e)));
-
-                // 获取单据DEF
-                DocDefHV def = docDefService.getDocDefForRuntime(doc.getDocType());
-
-                // 获取单据处理器 并执行
-                NkDocProcessor docProcessor = customObjectManager
-                        .getCustomObject(def.getRefObjectType(), NkDocProcessor.class);
-
-                doc = docProcessor.deserialize(def, doc);
             }
 
             return doc;
@@ -180,11 +171,7 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
                     .getCustomObject(def.getRefObjectType(), NkDocProcessor.class);
             if(log.isInfoEnabled())log.info("{}确定单据处理器 = {}", NkDocEngineContext.currLog(),docProcessor.getBeanName());
 
-            long now = System.currentTimeMillis();
-            DocHV detail = docProcessor.detail(def, docHPersistent);
-            if(log.isInfoEnabled())log.info("{}获取单据 处理单据内容 耗时{}ms", NkDocEngineContext.currLog(), System.currentTimeMillis()-now);
-
-            return detail;
+            return docProcessor.detail(def, docProcessor.deserialize(def, docHPersistent));
         }
 
         return null;
@@ -349,7 +336,8 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
                     .doUpdate(doc, optionalOriginal.orElse(null),optSource);
 
             // 预创建一个持久化对象，在事务提交后使用
-            docHPersistent = BeanUtilz.copyFromObject(doc,DocHPersistent.class);
+            docHPersistent = doc.toPersistent();
+            doc.clearItemContent();
 
             return doc;
         }finally {
@@ -479,6 +467,9 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
 
                 flow.setVisible(visibleState);
             });
+
+        docHV.clearItemContent();
+
         if(log.isInfoEnabled())
             log.info("{}设置单据后续操作 操作数量 = {}",
                     NkDocEngineContext.currLog(),

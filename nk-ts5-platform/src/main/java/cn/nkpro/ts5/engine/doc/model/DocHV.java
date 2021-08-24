@@ -1,8 +1,13 @@
 package cn.nkpro.ts5.engine.doc.model;
 
 import cn.nkpro.ts5.engine.task.model.BpmTask;
+import cn.nkpro.ts5.orm.mb.gen.DocI;
+import cn.nkpro.ts5.utils.BeanUtilz;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 单据数据对象，与前端交互的数据格式
@@ -28,5 +33,20 @@ public class DocHV extends DocHBasis implements Cloneable {
             clone.setBpmTask((BpmTask) bpmTask.clone());
 
         return clone;
+    }
+
+    public DocHPersistent toPersistent(){
+        DocHPersistent docHPersistent = BeanUtilz.copyFromObject(this, DocHPersistent.class);
+        docHPersistent.setItems(getItems().entrySet()
+                .stream()
+                .collect(Collectors.toMap(
+                        Map.Entry::getKey,
+                        e->BeanUtilz.copyFromObject(e.getValue(), DocI.class)
+                )));
+        return docHPersistent;
+    }
+
+    public void clearItemContent(){
+        getItems().forEach((k,v)->v.setCardContent(null));
     }
 }
