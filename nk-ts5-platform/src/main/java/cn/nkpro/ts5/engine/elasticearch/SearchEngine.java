@@ -350,6 +350,13 @@ public class SearchEngine {
                             if (template.copyToKeyword()) {
                                 builder.field("copy_to", "$keyword");
                             }
+                            if (template.original()) {
+                                builder.startObject("fields");
+                                builder.startObject("original");
+                                builder.field("type", "keyword");
+                                builder.endObject();
+                                builder.endObject();
+                            }
                             for(@SuppressWarnings("unused") ESField field : template.fields()){
                                 throw new RuntimeException("暂不支持");
                             }

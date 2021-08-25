@@ -158,7 +158,7 @@
                 </nk-form-item>
             </template>
         </nk-form>
-        <nk-doc-select-modal v-model="docSelectModalVisable" :modal="docSelectModal" @select="docSelected"></nk-doc-select-modal>
+        <nk-doc-select-modal v-model="docSelectModalVisible" :modal="docSelectModal" @select="docSelected"></nk-doc-select-modal>
     </nk-card>
 </template>
 
@@ -239,7 +239,7 @@ export default {
     data(){
         return {
             SHOW_PARENT:TreeSelect.SHOW_PARENT,
-            docSelectModalVisable: false,
+            docSelectModalVisible: false,
             docSelectModal:undefined,
             docSelectItem: undefined
         }
@@ -273,8 +273,8 @@ export default {
         },
         refClick(item){
             this.docSelectItem = item;
-            this.docSelectModal = item.modal && JSON.parse(item.modal);
-            this.docSelectModalVisable = true;
+            this.docSelectModal = (item.modal && JSON.parse(item.modal))||undefined;
+            this.docSelectModalVisible = true;
         },
         docSelected(selected){
             this.data[this.docSelectItem.key]=selected.docId;

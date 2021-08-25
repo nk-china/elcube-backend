@@ -255,12 +255,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
                 );
         });
 
-        doc.setDocTypeDesc(String.format("%s | %s",doc.getDocType(),doc.getDef().getDocName()));
-        doc.getDef().getStatus().stream()
-                .filter(defDocStatus -> StringUtils.equals(defDocStatus.getDocState(),doc.getDocState()))
-                .findAny().ifPresent(state ->
-                        doc.setDocStateDesc(String.format("%s | %s",state.getDocState(),state.getDocStateDesc()))
-                );
+        humanize(doc);
 
         if(log.isInfoEnabled())
             log.info("{}获取单据内容 耗时{}ms",
@@ -269,12 +264,6 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
             );
 
         return doc;
-    }
-
-    private boolean existsOriginal(DocHV original, DocDefIV defIV){
-        return original !=null
-                && original.getItems().containsKey(defIV.getCardKey())
-                && StringUtils.isNotBlank(original.getItems().get(defIV.getCardKey()).getDocId());
     }
 
     @SuppressWarnings("unchecked")
@@ -443,6 +432,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         docHistoryService.doAddVersion(loopDoc,original,changedCard,optSource);
         if(log.isInfoEnabled())log.info("{}保存单据内容 增加单据修改历史记录", NkDocEngineContext.currLog());
 
+        humanize(doc);
         index(loopDoc);
         if(log.isInfoEnabled())log.info("{}保存单据内容 创建重建index任务", NkDocEngineContext.currLog());
 
@@ -474,6 +464,21 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
                 this.doUpdate(docHV,docHV,optSource);
             }
         }
+    }
+
+    private boolean existsOriginal(DocHV original, DocDefIV defIV){
+        return original !=null
+                && original.getItems().containsKey(defIV.getCardKey())
+                && StringUtils.isNotBlank(original.getItems().get(defIV.getCardKey()).getDocId());
+    }
+
+    private void humanize(DocHV doc){
+        doc.setDocTypeDesc(String.format("%s | %s",doc.getDocType(),doc.getDef().getDocName()));
+        doc.getDef().getStatus().stream()
+                .filter(defDocStatus -> StringUtils.equals(defDocStatus.getDocState(),doc.getDocState()))
+                .findAny().ifPresent(state ->
+                doc.setDocStateDesc(String.format("%s | %s",state.getDocState(),state.getDocStateDesc()))
+        );
     }
 
     private void index(DocHV doc){

@@ -39,4 +39,9 @@ public @interface ESDynamicTemplate {
     ESField[] fields() default {};
 
     boolean copyToKeyword() default false;
+    /**
+     * 分词后，是否保留原始值用于聚合计算或排序
+     * <p>对于分词字段，如果需要排序或者聚合计算的话，需要设置original为true，排序时指定排序字段为 字段名.original
+     */
+    boolean original() default false;
 }
