@@ -14,6 +14,7 @@
                 auto-resize
                 size="mini"
                 border=inner
+                show-header-overflow="tooltip"
                 show-overflow="tooltip"
                 resizable
                 highlight-hover-row
@@ -88,10 +89,6 @@
                             </a-select>
                         </nk-form-item>
 
-                        <nk-form-item title="显示格式" v-if="row.$options.format">
-                            {{row.format}}
-                            <a-input slot="edit" size="small" v-model="row.format"></a-input>
-                        </nk-form-item>
                         <nk-form-item title="选项表达式" v-if="row.$options.options">
                             {{row.options}}
                             <a-input slot="edit" size="small" v-model="row.options"></a-input>
@@ -143,6 +140,10 @@
                         <nk-form-item title="对话框" v-if="row.$options.modal !== undefined">
                             {{row.modal}}
                             <a-input slot="edit" size="small" v-model="row.modal" @click="refClick(row)" readOnly style="cursor: pointer"></a-input>
+                        </nk-form-item>
+                        <nk-form-item title="显示格式" v-if="row.$options.format">
+                            {{row.format}}
+                            <a-input slot="edit" size="small" v-model="row.format"></a-input>
                         </nk-form-item>
                     </nk-form>
                 </template>

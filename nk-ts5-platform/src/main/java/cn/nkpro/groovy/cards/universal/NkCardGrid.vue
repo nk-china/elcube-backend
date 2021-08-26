@@ -295,13 +295,13 @@ export default {
                     columns.splice(0,0,{
                         type:'seq',
                         title:'#',
-                        width:'40px'
+                        width:'2%'
                     });
                 }
                 if(this.editMode){
                     columns.push({
                         title:"Action",
-                        width:"60px",
+                        width:"10%",
                         "slots": {
                             default: ({row},h) => {
                                 return [

@@ -39,7 +39,7 @@ public class NkDocEngineContext {
         }
         return null;
     }
-    static synchronized String currLog(){
+    public static synchronized String currLog(){
         Stack<String> logs = threadLocalLog.get();
         if(CollectionUtils.isNotEmpty(logs)){
             String collect = logs.stream()

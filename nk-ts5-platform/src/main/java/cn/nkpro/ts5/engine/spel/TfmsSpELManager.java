@@ -4,6 +4,8 @@ import cn.nkpro.ts5.engine.co.NkCustomObjectManager;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.exception.TfmsDefineException;
 import cn.nkpro.ts5.utils.BeanUtilz;
+import com.alibaba.fastjson.JSON;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.expression.MapAccessor;
@@ -20,66 +22,56 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Component
 public class TfmsSpELManager {
 
     private static final ExpressionParser parser = new SpelExpressionParser();
-    private static final Pattern pattern = Pattern.compile("\\$\\{(?:[^\"'}]|\"[^\"]*\"|'[^']*'|\\{\\{|}})*}");
+    private static final Pattern pattern = Pattern.compile("\"?\\$\\{(?:[^\"'}]|\"[^\"]*\"|'[^']*'|\\{\\{|}})*}\"?");
 
 
     @Autowired@SuppressWarnings("all")
     private NkCustomObjectManager customObjectManager;
 
     public EvaluationContext createContext(DocHV doc){
-        StandardEvaluationContext ctx = new StandardEvaluationContext(make(doc));
+        StandardEvaluationContext ctx = new StandardEvaluationContext(doc);
         ctx.addPropertyAccessor(new MapAccessor());
-        getSpELMap(doc).forEach(ctx::setVariable);
-
-//        customObjectManager.getCustomObjects(TfmsSpELInjection.class)
-//                .forEach((k,v)->{
-//                    if(doc!=null && v instanceof TfmsSpELInjectionDocAwared){
-//                        ((TfmsSpELInjectionDocAwared) v).setDoc(doc);
-//                    }
-//                    ctx.setVariable(v.getSpELName(),v);
-//                });
+        getSpELMap().forEach(ctx::setVariable);
 
         return ctx;
     }
 
-    public Map<String, Object> getSpELMap(DocHV doc){
+    private Map<String, Object> getSpELMap(){
         return customObjectManager.getCustomObjects(TfmsSpELInjection.class)
                 .values()
                 .stream()
-                .peek(tfmsSpELInjection -> {
-                    if (doc != null && tfmsSpELInjection instanceof TfmsSpELInjectionDocAwared) {
-                        ((TfmsSpELInjectionDocAwared) tfmsSpELInjection).setDoc(doc);
-                    }
-                }).collect(Collectors.toMap(TfmsSpELInjection::getSpELName,t->t));
+                .collect(Collectors.toMap(TfmsSpELInjection::getSpELName,t->t));
     }
 
     public ExpressionParser parser(){
         return parser;
     }
 
+    public Object invoke(String el, EvaluationContext context){
+        try{
+            return parser.parseExpression(el).getValue(context);
+        }catch (ParseException | EvaluationException e){
+            throw new TfmsDefineException(String.format("表达式 %s 错误",el),e);
+        }
+    }
+
     public String convert(String input){
         StandardEvaluationContext ctx = new StandardEvaluationContext();
         ctx.addPropertyAccessor(new MapAccessor());
-        customObjectManager.getCustomObjects(TfmsSpELInjection.class)
-                .forEach((k,v)-> ctx.setVariable(v.getSpELName(),v));
+        getSpELMap().forEach(ctx::setVariable);
+
         return convert(ctx,input);
     }
     public String convert(DocHV doc,String input){
 
-        StandardEvaluationContext ctx = new StandardEvaluationContext(make(doc));
+        StandardEvaluationContext ctx = new StandardEvaluationContext(doc);
         ctx.addPropertyAccessor(new MapAccessor());
-
-        customObjectManager.getCustomObjects(TfmsSpELInjection.class)
-                .forEach((k,v)->{
-                    if(doc!=null && v instanceof TfmsSpELInjectionDocAwared){
-                        ((TfmsSpELInjectionDocAwared) v).setDoc(doc);
-                    }
-                    ctx.setVariable(v.getSpELName(),v);
-                });
+        getSpELMap().forEach(ctx::setVariable);
 
         return convert(ctx,input);
     }
@@ -90,26 +82,47 @@ public class TfmsSpELManager {
         }
 
         Matcher matcher = pattern.matcher(input);
+        boolean bool  = true;
+        boolean bool2 = false;
 
         while(matcher.find()){
 
-            String expression = matcher.group(0);
-            String SpEL = expression
-                    .substring(2,expression.length()-1)
-                    .replaceAll("\\{\\{","{")
-                    .replaceAll("}}","}");
-            try{
-                String value = parser.parseExpression(SpEL).getValue(context,String.class);
-                input = input.replace(expression, StringUtils.defaultString(value));
-            }catch (ParseException | EvaluationException e){
-                throw new TfmsDefineException(String.format("表达式%s错误",SpEL),e);
+            bool2 = true;
+            if(bool && log.isDebugEnabled()){
+                bool = false;
+                log.debug("解析SpEL模版 {}",input);
             }
+
+            String expression = matcher.group(0);
+            String el = expression
+                    .replaceAll("\\{\\{","{")
+                    .replaceAll("}}","}")
+                    .replaceAll("^\"?\\$\\{",StringUtils.EMPTY)
+                    .replaceAll("}\"?$",StringUtils.EMPTY);
+
+            try{
+                Object value = parser.parseExpression(el).getValue(context);
+
+                String strValue;
+                if(value == null){
+                    strValue = "null";
+                }else if(value instanceof Boolean || value instanceof Number){
+                    strValue = value.toString();
+                }else{
+                    strValue = JSON.toJSONString(value);
+                }
+                input = input.replace(expression, strValue);
+
+                if(log.isDebugEnabled())log.debug("\t {} => {} >> {}",expression, el, strValue);
+
+            }catch (ParseException | EvaluationException e){
+                throw new TfmsDefineException(String.format("表达式模版 %s 错误 : %s",input, el),e);
+            }
+        }
+        if(bool2 && log.isDebugEnabled()){
+            log.debug("解析SpEL模版 完成 {}",input);
         }
 
         return input;
-    }
-
-    private TfmsSpELDoc make(DocHV doc){
-        return BeanUtilz.copyFromObject(doc,TfmsSpELDoc.class);
     }
 }

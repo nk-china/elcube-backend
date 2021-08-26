@@ -161,7 +161,7 @@ public abstract class NkAbstractCard<DT,DDT> extends NkAbstractCustomScriptObjec
      */
     @Override
     @SuppressWarnings("all")
-    public final DT calculate(DocHV doc, DT data, DocDefIV defIV, DDT def, boolean isTrigger, String options){
+    public DT calculate(DocHV doc, DT data, DocDefIV defIV, DDT def, boolean isTrigger, String options){
         return data;
     }
 

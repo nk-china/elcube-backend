@@ -36,6 +36,9 @@ class NkCardGrid extends NkAbstractCard<JSONArray,NkCardGridDef> {
     }
 
     static class NkCardGridDef {
+
+        private String preSpEL;
+
         private List<NkCardGridDefI> items
 
         List<NkCardGridDefI> getItems() {

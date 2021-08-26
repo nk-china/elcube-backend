@@ -78,6 +78,8 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
 
         DocHV doc = new DocHV();
 
+        doc.setNewCreate(true);
+
         // 核心字段
         doc.setDocId(guid.nextId(DocH.class));
         doc.setClassify(def.getDocClassify());
@@ -381,7 +383,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
                     ));
 
             // 调用 卡片 updateCommitted
-            if(isOverride(card,"updateCommitted")){
+            if(isOverride(card)){
                 LocalSyncUtilz.runAfterCommit(()->
                         card.updateCommitted(
                                 loopDoc,
@@ -447,6 +449,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
                 if(log.isInfoEnabled())log.info("{}保存单据内容 触发单据 afterUpdateCommitted 接口", currLog);
         });
 
+        loopDoc.setNewCreate(false);
         return loopDoc;
     }
 
@@ -485,15 +488,14 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         searchEngine.indexBeforeCommit(BeanUtilz.copyFromObject(doc, DocHES.class));
     }
 
-    @SuppressWarnings("all")
-    private boolean isOverride(Object obj, String methodName){
+    private boolean isOverride(Object obj){
         try {
             if(AopUtils.isAopProxy(obj)){
                 obj = ((Advised)obj).getTargetSource().getTarget();
             }
 
             assert obj != null;
-            Method afterUpdated = obj.getClass().getDeclaredMethod(methodName, DocHV.class, Object.class, DocDefIV.class, Object.class);
+            Method afterUpdated = obj.getClass().getDeclaredMethod("updateCommitted", DocHV.class, Object.class, DocDefIV.class, Object.class);
             return afterUpdated.getDeclaringClass() != NkCard.class;
         } catch (Exception e) {
 

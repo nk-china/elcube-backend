@@ -3,12 +3,12 @@
         <nk-form ref="form" :col="def.col" :edit="editMode" >
             <template v-for="(item,index) in def.items" >
                 <nk-form-divider
-                        v-if="item.inputType==='divider'"
+                        v-if="item.control >= 0 && item.inputType==='divider'"
                         :key="index"
                         :term="item.name"></nk-form-divider>
                 <nk-form-item
-                        v-else
-                        :edit="!item.readonly"
+                        v-else-if="item.control >= 0"
+                        :edit="item.control === 1"
                         :key="item.key"
                         :term="item.name"
                         :col="item.col"
@@ -33,13 +33,13 @@
                         {{data[item.key] | formatSwitch(item)}}
                     </template>
                     <template v-else-if     ="item.inputType==='select'">
-                        {{data[item.key] | formatSelect(item.options)}}
+                        {{data[item.key] | formatSelect(item.optionsObject)}}
                     </template>
                     <template v-else-if     ="item.inputType==='cascader'">
-                        {{data[item.key] | formatCascader(item.options)}}
+                        {{data[item.key] | formatCascader(item.optionsObject)}}
                     </template>
                     <template v-else-if     ="item.inputType==='tree'">
-                        {{data[item.key] | formatTree(item.options)}}
+                        {{data[item.key] | formatTree(item.optionsObject)}}
                     </template>
                     <template v-else-if     ="item.inputType==='ref'">
                         <nk-doc-link :doc="data[item.key+'$doc']">{{data | formatRef(item)}}</nk-doc-link>
@@ -54,12 +54,12 @@
                                     style           ="max-width: 300px;"
                                     v-model         ="data[item.key]"
                                     :maxLength      ="item.maxLength"
-                                    @blur           ="itemChanged($event,item)"/>
+                                    @blur           ="itemChanged($event,item)"></a-input>
                     <a-input-number v-else-if       ="item.inputType==='integer'"
                                     slot            ="edit"
                                     size            ="small"
                                     style           ="max-width: 300px;"
-                                    :style          ="item.options&&item.options.style"
+                                    :style          ="item.style"
                                     v-model         ="data[item.key]"
                                     :min            ="item.min"
                                     :max            ="item.max"
@@ -70,7 +70,7 @@
                                     slot            ="edit"
                                     size            ="small"
                                     style           ="max-width: 300px;"
-                                    :style          ="item.options&&item.options.style"
+                                    :style          ="item.style"
                                     v-model         ="data[item.key]"
                                     :min            ="item.min"
                                     :max            ="item.max"
@@ -81,7 +81,7 @@
                                     slot            ="edit"
                                     size            ="small"
                                     style           ="max-width: 300px;"
-                                    :style          ="item.options&&item.options.style"
+                                    :style          ="item.style"
                                     v-model         ="data[item.key]"
                                     :min            ="item.min"
                                     :max            ="item.max"
@@ -94,14 +94,14 @@
                     <a-date-picker  v-else-if       ="item.inputType==='date'"
                                     slot            ="edit"
                                     size            ="small"
-                                    :style          ="item.options&&item.options.style"
+                                    :style          ="item.style"
                                     :defaultValue   ="moment(data[item.key])"
                                     @change         ="dateChanged($event,item)"></a-date-picker>
                     <a-date-picker  v-else-if       ="item.inputType==='datetime'"
                                     show-time
                                     slot            ="edit"
                                     size            ="small"
-                                    :style          ="item.options&&item.options.style"
+                                    :style          ="item.style"
                                     :defaultValue   ="moment(data[item.key])"
                                     @change         ="datetimeChanged($event,item)"></a-date-picker>
                     <a-switch       v-else-if       ="item.inputType==='switch'"
@@ -116,25 +116,26 @@
                                     v-model         ="data[item.key]"
                                     size            ="small"
                                     style           ="max-width: 250px;"
-                                    :style          ="item.options&&item.options.style"
+                                    :style          ="item.style"
                                     @change         ="itemChanged($event,item)"
-                                    :options        ="JSON.parse(item.options)">
+                                    :options        ="item.optionsObject">
                     </a-select>
                     <a-cascader     v-else-if       ="item.inputType==='cascader'"
                                     slot            ="edit"
                                     size            ="small"
                                     v-model         ="data[item.key]"
                                     style           ="max-width: 250px;"
+                                    :style          ="item.style"
                                     @change         ="itemChanged($event,item)"
-                                    :options        ="JSON.parse(item.options)">
+                                    :options        ="item.optionsObject">
                     </a-cascader>
                     <a-tree-select  v-else-if       ="item.inputType==='tree'"
                                     slot            ="edit"
                                     v-model         ="data[item.key]"
                                     style           ="max-width: 350px;"
-                                    :style          ="item.options&&item.options.style"
+                                    :style          ="item.style"
                                     size            ="small"
-                                    :tree-data      ="JSON.parse(item.options)"
+                                    :tree-data      ="item.optionsObject"
                                     tree-checkable
                                     :show-checked-strategy="SHOW_PARENT"
                                     search-placeholder="Please select"
@@ -144,7 +145,7 @@
                                     slot            ="edit"
                                     class           ="ref-input ant-input-affix-wrapper"
                                     style           ="max-width: 250px;"
-                                    :style          ="item.options&&item.options.style"
+                                    :style          ="item.style"
                     >
                         <input      class="ant-input ant-input-sm"
                                     :value="data | formatRef(item)"
@@ -187,12 +188,12 @@ const findInTree = (tree,value)=>{
 export default {
     mixins:[new Mixin()],
     filters:{
-        formatRef(value, options){
-            const info = value[options.key+'$doc'];
-            return (info && info.docName) || value[options.key];
+        formatRef(value, field){
+            const info = value[field.key+'$doc'];
+            return (info && info.docName) || value[field.key];
         },
-        formatSwitch(value, options) {
-            return value === true ? (options.checked || 'YES') : (options.unChecked || 'NO');
+        formatSwitch(value, field) {
+            return value === true ? (field.checked || 'YES') : (field.unChecked || 'NO');
         },
         formatSelect(value, options) {
             if(value){
@@ -255,10 +256,8 @@ export default {
             return value && (value+'%');
         },
         itemChanged(value,item){
-            if(!this.$refs.form.hasError()){
-                if(item.calcTrigger){
-                    this.nk$calc();
-                }
+            if(item.calcTrigger){
+                this.nk$calc();
             }
         },
         dateChanged(value,item){

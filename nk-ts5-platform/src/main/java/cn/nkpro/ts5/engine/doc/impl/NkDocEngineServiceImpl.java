@@ -185,23 +185,22 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
     @Transactional(propagation = Propagation.NEVER)
     public DocHV calculate(DocHV doc, String fromCard, String options) {
         NkDocEngineContext.startLog("CALCULATE", doc.getDocId());
+        if(log.isInfoEnabled())log.info("{}开始单据计算", NkDocEngineContext.currLog());
         try{
 
             validate(doc);
+            DocDefHV def = docDefService.deserializeDef(doc.getDef());
 
-            // 获取原始单据数据
-            DocHV original = detail(doc.getDocId());
-
-            // 获取单据配置
-            DocDefHV def = Optional.ofNullable(original).map(DocHV::getDef).orElseGet(()->
-                    docDefService.getDocDefForRuntime(doc.getDocType())
-            );
+            // 获取单据配置 todo 之前为什么要替换def？ 需要思考下
+            //DocDefHV def = docDefService.getDocDefForRuntime(doc.getDocType());
+            //doc.setDef(def);
 
             // 获取单据处理器 并执行
             return customObjectManager
                     .getCustomObject(def.getRefObjectType(), NkDocProcessor.class)
                     .calculate(doc, fromCard, options);
         }finally {
+            if(log.isInfoEnabled())log.info("{}单据计算 完成", NkDocEngineContext.currLog());
             NkDocEngineContext.endLog();
         }
     }
@@ -213,22 +212,19 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
     @Transactional(propagation = Propagation.NEVER)
     public Object call(DocHV doc, String fromCard, String method, String options) {
         NkDocEngineContext.startLog("CALL", doc.getDocId());
+        if(log.isInfoEnabled())log.info("{}开始调用单据程序", NkDocEngineContext.currLog());
         try{
             validate(doc);
 
-            // 获取原始单据数据
-            DocHV original = detail(doc.getDocId());
-
             // 获取单据配置
-            DocDefHV def = Optional.ofNullable(original).map(DocHV::getDef).orElseGet(()->
-                    docDefService.getDocDefForRuntime(doc.getDocType())
-            );
+            DocDefHV def = docDefService.deserializeDef(doc.getDef());
 
             // 获取单据处理器 并执行
             return customObjectManager
                     .getCustomObject(def.getRefObjectType(), NkDocProcessor.class)
                     .call(doc, fromCard, method, options);
         }finally {
+            if(log.isInfoEnabled())log.info("{}调用单据程序 完成", NkDocEngineContext.currLog());
             NkDocEngineContext.endLog();
         }
     }
@@ -311,10 +307,11 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
 
 
             // 获取单据配置
-            String docType = doc.getDocType();
-            DocDefHV def = optionalOriginal.map(DocHV::getDef).orElseGet(()->
-                    docDefService.getDocDefForRuntime(docType)
-            );
+            DocDefHV def = docDefService.deserializeDef(doc.getDef());
+//            String docType = doc.getDocType();
+//            DocDefHV def = optionalOriginal.map(DocHV::getDef).orElseGet(()->
+//                    docDefService.getDocDefForRuntime(docType)
+//            );
 
 
             if(optionalOriginal.isPresent()){
@@ -330,7 +327,7 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
 
 
             // 获取单据处理器 并执行
-            doc.setDef(def);
+            // doc.setDef(def);todo 之前为什么要替换def？ 需要思考下
             doc = customObjectManager
                     .getCustomObject(def.getRefObjectType(), NkDocProcessor.class)
                     .doUpdate(doc, optionalOriginal.orElse(null),optSource);

@@ -21,6 +21,8 @@ public class DocHV extends DocHBasis implements Cloneable {
     // 单据是否允许编辑，默认真
     private Boolean writeable = true;
 
+    private boolean newCreate = false;
+
     public DocHV() {
         super();
     }

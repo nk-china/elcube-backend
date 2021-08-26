@@ -191,7 +191,7 @@ public class NkDocDefServiceImpl implements NkDocDefService {
             docDefHV.setVersion(UUID.randomUUID().toString());
         }
 
-        serializeDef(docDefHV);
+        deserializeDef(docDefHV);
 
         // status
         Assert.notEmpty(docDefHV.getStatus(),"状态不能为空");
@@ -499,7 +499,7 @@ public class NkDocDefServiceImpl implements NkDocDefService {
         );
         Assert.notNull(defHV,String.format("单据类型[%s]版本的配置没有找到或尚未激活",docType));
 
-        deserializeDef(defHV);
+        deserializeDefFromContent(defHV);
 
         runLoopCards(defHV,false, (nkCard,item)->{
                 item.setDebug(nkCard.isDebug());
@@ -530,7 +530,7 @@ public class NkDocDefServiceImpl implements NkDocDefService {
         if(docDefHV!=null && StringUtils.equals(docDefHV.getVersion(),version)){
             return docDefHV;
         }
-        return deserializeDef(fetchDocDefFromDB(docType, version));
+        return deserializeDefFromContent(fetchDocDefFromDB(docType, version));
     }
 
     private DocDefHV fetchDocDefFromDB(String docType, String version){
@@ -588,7 +588,8 @@ public class NkDocDefServiceImpl implements NkDocDefService {
         return def;
     }
 
-    private DocDefHV serializeDef(DocDefHV docDefHV) {
+    @Override
+    public DocDefHV deserializeDef(DocDefHV docDefHV) {
 
         runLoopCards(docDefHV,true, (nkCard,item)->{
             item.setConfig(nkCard.deserializeDef(item.getConfig()));
@@ -596,13 +597,13 @@ public class NkDocDefServiceImpl implements NkDocDefService {
             item.setDataComponentName(nkCard.getDataComponentName());
             item.setDefComponentNames(nkCard.getAutoDefComponentNames());
             item.setCardContent(null);
-            log.info("{}\t配置序列化 docType = {} cardKey = {}",NkDocEngineContext.currLog(), docDefHV.getDocType(), item.getCardKey());
+            log.info("{}\tdeserializeDef docType = {} cardKey = {}",NkDocEngineContext.currLog(), docDefHV.getDocType(), item.getCardKey());
         });
 
         return docDefHV;
     }
 
-    private DocDefHV deserializeDef(DocDefHV docDefHV) {
+    private DocDefHV deserializeDefFromContent(DocDefHV docDefHV) {
 
         runLoopCards(docDefHV,true, (nkCard,item)->{
             item.setConfig(nkCard.deserializeDef(item.getCardContent()));
@@ -610,7 +611,7 @@ public class NkDocDefServiceImpl implements NkDocDefService {
             item.setDataComponentName(nkCard.getDataComponentName());
             item.setDefComponentNames(nkCard.getAutoDefComponentNames());
             item.setCardContent(null);
-            log.info("{}\t配置反序列化 docType = {} cardKey = {}",NkDocEngineContext.currLog(), docDefHV.getDocType(), item.getCardKey());
+            log.info("{}\tdeserializeDef docType = {} cardKey = {}",NkDocEngineContext.currLog(), docDefHV.getDocType(), item.getCardKey());
         });
 
         return docDefHV;

@@ -1,5 +1,10 @@
 package cn.nkpro.ts5.config.redis;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
@@ -16,10 +21,16 @@ public class EnvRedisTemplate<V> extends RedisTemplate<String, V> implements Ini
 
         this.env = env;
 
+        ObjectMapper om = new ObjectMapper();
+        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        om.activateDefaultTyping(LaissezFaireSubTypeValidator.instance,ObjectMapper.DefaultTyping.NON_FINAL, JsonTypeInfo.As.EXISTING_PROPERTY);
+
+        GenericJackson2JsonRedisSerializer jsonRedisSerializer = new GenericJackson2JsonRedisSerializer();
+
         setKeySerializer(new EnvStringRedisSerializer());
-        setValueSerializer(new GenericJackson2JsonRedisSerializer());
+        setValueSerializer(jsonRedisSerializer);
         setHashKeySerializer(new StringRedisSerializer());
-        setHashValueSerializer(new GenericJackson2JsonRedisSerializer());
+        setHashValueSerializer(jsonRedisSerializer);
         setConnectionFactory(factory);
 
         afterPropertiesSet();
