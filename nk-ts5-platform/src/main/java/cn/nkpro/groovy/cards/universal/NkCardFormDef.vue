@@ -78,11 +78,11 @@
                             {{row.readonly?'是':'否'}}
                             <a-switch slot="edit" size="small" v-model="row.readonly" />
                         </nk-form-item>
-                        <nk-form-item title="是否只读JS Eval">
+                        <nk-form-item title="控制 SpEL 表达式">
                             {{row.eval}}
                             <a-input slot="edit" size="small" v-model="row.eval"></a-input>
                         </nk-form-item>
-                        <nk-form-item title="SpEL 表达式">
+                        <nk-form-item title="值 SpEL 表达式">
                             {{row.spELContent}}
                             <a-input slot="edit" size="small" v-model="row.spELContent"></a-input>
                         </nk-form-item>
@@ -193,8 +193,8 @@ export default {
     methods:{
         boolFormat : ({cellValue})=>{return cellValue?'是':''},
         activeMethod(){return this.editMode;},
-        rowExpand({expanded,row}){
-            if(expanded && row.inputType){
+        initRowOptions(row){
+            if(row.inputType){
                 row.$options = inputTypeDefs.find(e=>e.value===row.inputType).options
                 for(let key in row.$options){
                     if(!row[key]){
@@ -202,11 +202,19 @@ export default {
                     }
                 }
             }
+        },
+        rowExpand({expanded,row}){
+            if(expanded){
+                this.initRowOptions(row);
+            }
             this.sortable = this.$refs.xTable.getRowExpandRecords().length === 0;
             this.$nkSortableVxeTable(this.sortable);
         },
         rowExpandAll(bool){
             if(bool){
+                this.def.items.forEach((row)=>{
+                    this.initRowOptions(row);
+                });
                 this.$refs.xTable.setAllRowExpand(bool);
             }else{
                 this.$refs.xTable.clearRowExpand();

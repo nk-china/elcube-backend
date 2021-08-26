@@ -12,6 +12,8 @@
                 keep-source
                 resizable
                 highlight-hover-row
+                show-header-overflow="tooltip"
+                show-overflow="tooltip"
                 size="mini"
                 border=inner
                 :columns="tableColumns"
@@ -21,226 +23,274 @@
                 :edit-config="{trigger: 'click', mode: 'row', showIcon: editMode, activeMethod: xTableActiveMethod, showStatus: true}"
                 :sort-config="{trigger: 'cell', remote: false,showIcon: !editMode, defaultSort: {field: 'orderby', order: 'asc'}, orders: ['desc', 'asc', null]}">
         </vxe-grid>
-        <nk-doc-select-modal v-model="docSelectModalVisible" :modal="docSelectModal" @select="docSelected"></nk-doc-select-modal>
+        <nk-doc-select-modal v-model="docSelectModalVisible" :modal="docSelectModal" @select="xTableRefChanged"></nk-doc-select-modal>
     </nk-card>
 </template>
 
 <script>
-import { Mixin } from "nk-ts5-platform";
-import moment from "moment";
-import { Interpreter } from "eval5";
-import { TreeSelect } from 'ant-design-vue';
+import { Mixin,NkFormat } from "nk-ts5-platform";
 
-const editRenders = {
-    text(){
-        return{
-            name: '$input',
-            props: {
-                type: 'text',
-                maxlength:200
+const columnTypes = {
+    text(field){
+        return {
+            field: field.key,
+            title: field.name,
+            width: (field.col || '10') + '%',
+            editRender: field.readonly ? undefined : {
+                name: '$input',
+                props: {
+                    type:       'text',
+                    maxlength:  field.maxLength,
+                },
+                events : {
+                    input:      this.xTableInputChanged,
+                    prevNumber: this.xTableInputChanged,
+                    nextNumber: this.xTableInputChanged,
+                }
             }
         }
     },
-    integer(){
-        return{
-            name: '$input',
-            props: {
-                type: 'integer',
-            }
-        }
-    },
-    decimal(){
-        return{
-            name: '$input',
-            props: {
-                type: 'float',
-                digits: 2,
-            }
-        }
-    },
-    percent(){
-        return{
-            name: '$input',
-            props: {
-                type: 'float',
-                digits:2
+    integer(field){
+
+        return {
+            field: field.key,
+            title: field.name,
+            width: (field.col || '10') + '%',
+            formatter({cellValue}){
+                return cellValue && NkFormat.nkNumber(cellValue,field.format)
             },
-        }
-    },
-    date(){
-        return{
-            name: 'nkDate',
-            props: {
-                size: 'small',
-                type: 'date',
-                format: 'YYYY/MM/DD'
+            editRender: field.readonly ? undefined : {
+                name: '$input',
+                props: {
+                    type: 'integer',
+                    min:   field.min,
+                    max:   field.max,
+                },
+                events: {
+                    input: this.xTableInputChanged,
+                    prevNumber: this.xTableInputChanged,
+                    nextNumber: this.xTableInputChanged,
+                }
             }
         }
     },
-    datetime(){
-        return{
-            name: 'nkDateTime',
-            props: {
-                size: 'small',
-                type: 'datetime',
-                format: 'YYYY/MM/DD HH:mm:ss'
+    decimal(field){
+        return {
+            field: field.key,
+            title: field.name,
+            width: (field.col || '10') + '%',
+            formatter({cellValue}){
+                return cellValue && NkFormat.nkNumber(cellValue,field.format)
+            },
+            editRender: field.readonly ? undefined : {
+                name: '$input',
+                props: {
+                    type:   'float',
+                    min:    field.min,
+                    max:    field.max,
+                    step:   field.step | 0.01,
+                    digits: field.digits | 2,
+                },
+                events: {
+                    input: this.xTableInputChanged,
+                    prevNumber: this.xTableInputChanged,
+                    nextNumber: this.xTableInputChanged,
+                }
             }
         }
     },
-    switch(){
-        return{
-            name: '$switch',
-            props: {
+    percent(field){
+        return {
+            field: field.key,
+            title: field.name,
+            width: (field.col || '10') + '%',
+            formatter({cellValue}){
+                return cellValue && NkFormat.nkPercent(cellValue/100,field.format)
+            },
+            editRender: field.readonly ? undefined : {
+                name: '$input',
+                props: {
+                    type: 'float',
+                    min:    field.min,
+                    max:    field.max,
+                    step:   field.step | 0.01,
+                    digits: field.digits | 2,
+                },
+                events: {
+                    input: this.xTableInputChanged,
+                    prevNumber: this.xTableInputChanged,
+                    nextNumber: this.xTableInputChanged,
+                }
+            }
+        }
+    },
+    date(field){
+        return {
+            field: field.key,
+            title: field.name,
+            width: (field.col || '10') + '%',
+            formatter({cellValue}){
+                return NkFormat.nkDatetimeISO(cellValue,field.format)
+            },
+            editRender: field.readonly ? undefined : {
+                name: 'nkDate',
+                props: {
+                    type: 'date',
+                },
+                events: {
+                    change: this.xTableValueChanged,
+                }
+            }
+        }
+    },
+    datetime(field){
+        return {
+            field: field.key,
+            title: field.name,
+            width: (field.col || '10') + '%',
+            formatter({cellValue}){
+                return NkFormat.nkDatetimeISO(cellValue,field.format)
+            },
+            editRender: field.readonly ? undefined : {
+                name: 'nkDateTime',
+                props: {
+                    type: 'datetime',
+                },
+                events: {
+                    change: this.xTableValueChanged,
+                }
+            }
+        }
+    },
+    switch(field){
+        return {
+            field: field.key,
+            title: field.name,
+            width: (field.col || '10') + '%',
+            formatter({cellValue}){
+                return cellValue === true ? (field.checked || 'YES') : (field.unChecked || 'NO')
+            },
+            editRender: field.readonly ? undefined : {
+                name: '$switch',
+                props: {},
+                events: {
+                    change: this.xTableValueChanged,
+                }
             }
         }
     },
     select(field){
-        console.log(field)
+        let options = (field.options && JSON.parse(field.options))||[];
         return {
-            name: '$select',
-            props: {
-                multiple: field.selectMode === 'multiple',
-                options: JSON.parse(field.options)
+            field: field.key,
+            title: field.name,
+            width: (field.col || '10') + '%',
+            formatter({cellValue}){
+                if(cellValue){
+                    return (Array.isArray(cellValue) ? cellValue : [cellValue]).map(item => {
+                        let find = options && options.find(o => o.key === item || o.value === item);
+                        if(find){
+                            return find.label || find.name || find.title;
+                        }
+                        return item;
+                    }).join(' , ');
+                }
+            },
+            editRender: field.readonly ? undefined : {
+                name: '$select',
+                props: {
+                    multiple: field.selectMode === 'multiple',
+                    options
+                },
+                events: {
+                    change: this.xTableValueChanged,
+                }
             }
         }
     },
-    ref(){
+    ref(field){
+        const self = this;
+        const formatter = ({row, cellValue})=>{
+            const info = row[field.key+'$doc'];
+            return (info && info.docName) || cellValue;
+        };
+        const slots = {
+            default(e,h){
+                return [
+                    h("nk-doc-link",{props:{doc:e.row[field.key+'$doc']}},formatter(e))
+                ]
+            }
+        };
+
+        if(!field.readonly){
+            slots.edit = (e,h)=>{
+                return [
+                    h("span",formatter(e)),
+                    h("a",{on:{click:()=>{self.refClick(e,field)}}},"选择")
+                ]
+            };
+        }
+
         return {
-            name: '$input',
-            props: {
-                readonly:true
-            }
+            field: field.key,
+            title: field.name,
+            width: (field.col || '10') + '%',
+            editRender: field.readonly ? undefined : {},
+            slots
         }
     }
-};
-
-const formatters = {
-
-};
-
-const findInTree = (tree,value)=>{
-    for(let i in tree){
-        const item = tree[i];
-        if(item.key === value || item.value === value){
-            return item;
-        }
-        if(item.children){
-            let ret = findInTree(item.children, value);
-            if(ret){
-                return ret;
-            }
-        }
-    }
-    return undefined;
 };
 
 export default {
     mixins:[new Mixin()],
-    filters:{
-        formatRef(value, options){
-            const info = value[options.key+'$doc'];
-            return (info && info.docName) || value[options.key];
-        },
-        formatSwitch(value, options) {
-            return value === true ? (options.checked || 'YES') : (options.unChecked || 'NO');
-        },
-        formatSelect(value, options) {
-            if(value){
-                options = typeof options === 'string' ? JSON.parse(options) : options;
-                return (Array.isArray(value) ? value : [value]).map(item => {
-                    let find = options && options.find(o => o.key === item || o.value === item);
-                    if(find){
-                        return find.label || find.name || find.title;
-                    }
-                    return item;
-                }).join(' , ');
-            }
-        },
-        formatCascader(value, options){
-            if(value) {
-                options = typeof options === 'string' ? JSON.parse(options) : options;
-                let find = options;
-                return value.map(item => {
-                    find = find && find.find(o => o.key === item || o.value === item);
-                    if (find) {
-                        const label = find.label || find.name || find.title;
-                        find = find.children;
-                        return label;
-                    }
-                    return item;
-                }).join(' / ');
-            }
-        },
-        formatTree(value, options){
-            if(value) {
-                options = typeof options === 'string' ? JSON.parse(options) : options;
-                return (Array.isArray(value) ? value : [value]).map(item => {
-                    let find = options && findInTree(options, item);
-                    if (find) {
-                        return find.label || find.name || find.title;
-                    }
-                    return item;
-                }).join(' , ');
-            }
-        }
-    },
     created() {
     },
     data(){
         return {
             loading:false,
-            SHOW_PARENT:TreeSelect.SHOW_PARENT,
             docSelectModalVisible: false,
             docSelectModal:undefined,
-            docSelectRow:undefined,
+            docSelectParams:undefined,
             docSelectItem: undefined
         }
     },
     computed:{
+        tableValidRules(){
+            const rules = {};
+            if(this.editMode&&this.def&&this.def.items){
+                this.def.items.forEach(field=>{
+                    const list = [];
+                    if(field.required){
+                        list.push({ required: true,         message: field.message||'不能为空' });
+                    }
+                    if(field.min){
+                        list.push({ min: field.min,         type:'number',message: field.message||`不能小于${field.min}` });
+                    }
+                    if(field.max){
+                        list.push({ max: field.max,         type:'number',message: field.message||`不能大于${field.max}` });
+                    }
+                    if(field.minLength){
+                        list.push({ min: field.minLength,   message: field.message||`字符长度不能小于${field.minLength}` });
+                    }
+                    if(field.maxLength){
+                        list.push({ max: field.maxLength,   message: field.message||`字符长度不能小于${field.maxLength}` });
+                    }
+                    if(field.pattern){
+                        list.push({ pattern: field.pattern, message: field.message||'校验不通过' });
+                    }
+                    rules[field.key]=list;
+                });
+            }
+            return rules;
+        },
         tableColumns(){
             if(this.def && this.def.items){
 
-                let self = this;
+                const columns = this.def.items.map(
+                    field=>
+                        columnTypes[field.inputType].apply(this, [field])
+                );
 
-                const columns = this.def.items.map(field=>{
-
-                    let editRender = editRenders[field.inputType](field);
-
-                    if(editRender.name==='$input'){
-                        editRender.events = {
-                            input:      this.xTableInputChanged,
-                            prevNumber: this.xTableInputChanged,
-                            nextNumber: this.xTableInputChanged,
-                        };
-                    }
-                    if(editRender.name==='nkDate'||editRender.name==='nkDateTime'){
-                        editRender.events = {
-                            change:    this.xTableDateChanged,
-                        };
-                    }
-
-                    let slots = undefined;
-                    if(field.inputType==='ref'){
-                        field.readonly = true;
-                        slots = {
-                            edit(e,h){
-                                return [
-                                    h("a",{on:{click:()=>{self.refClick(e,field)}}},"选择")
-                                ]
-                            }
-                        };
-                    }
-
-
-                    return {
-                        field:field.key,
-                        title:field.name,
-                        width:field.width,
-                        //formatter:formatters[field.inputType](field.format,editRender.props),
-                        editRender:field.readonly!==1?editRender:undefined,
-                        slots
-                    }
-                });
                 if(!this.def.items.find(i=>i.key==='fieldKey')){
                     columns.splice(0,0,{
                         type:'seq',
@@ -251,6 +301,7 @@ export default {
                 if(this.editMode){
                     columns.push({
                         title:"Action",
+                        width:"60px",
                         "slots": {
                             default: ({row},h) => {
                                 return [
@@ -280,26 +331,38 @@ export default {
 
 
             return [];
-        },
-        tableValidRules(){
-            return {};
         }
     },
     methods:{
         xTableActiveMethod(){
             return this.editMode;
         },
-        xTableInputChanged({column},{value,$event}){
-            switch (column.editRender.name) {
+        xTableInputChanged(e,value){
+            switch (e.column.editRender.name) {
                 case "$input":
-                    if($event.type==='change' || $event.type==='mousedown')
-                        console.log(value);
+                    if(value.$event.type==='change' || value.$event.type==='mousedown')
+                        this.xTableValueChanged(e,value);
                     break;
                 case "$switch":
                     break;
             }
         },
-        xTableDateChanged(a,b){
+        xTableValueChanged({column,row},{value}){
+            if(!this.hasError()) {
+                let item = this.def.items.find(i => i.key === column.property);
+                if (item && item.calcTrigger) {
+                    row[column.property] = value;
+                    this.nk$calc();
+                }
+            }
+        },
+        xTableRefChanged(selected){
+            const {row} = this.docSelectParams;
+            if(row[this.docSelectItem.key]!==selected.docId){
+                row[this.docSelectItem.key]=selected.docId;
+                row[this.docSelectItem.key+'$doc']=selected;
+                this.xTableValueChanged(this.docSelectParams,{value: selected.docId, $event:{type:"change"}});
+            }
         },
         async xTableAdd(){
             let row = {};
@@ -314,27 +377,13 @@ export default {
         xTableRemoveRow(row){
             this.data.splice(this.data.indexOf(row),1);
         },
-        refClick({row},field){
-            this.docSelectRow = row;
+        refClick(e,field){
+            this.docSelectParams = e;
             this.docSelectItem = field;
             this.docSelectModal = (field.modal && JSON.parse(field.modal))||undefined;
             this.docSelectModalVisible = true;
         },
-        docSelected(selected){
-            this.docSelectRow[this.docSelectItem.key]=selected.docId;
-            this.docSelectRow[this.docSelectItem.key+'$doc']=selected;
-        },
 
-
-
-
-        moment,
-        percentParse(value){
-            return value && value.replace(/[,%]/, '');
-        },
-        percentFormat(value){
-            return value && (value+'%');
-        },
         itemChanged(value,item){
             if(!this.$refs.form.hasError()){
                 if(item.calcTrigger){
@@ -347,7 +396,7 @@ export default {
             if (fieldKey && NkUtil.isRepeat(this.data, ['fieldKey'])) {
                 return `${fieldKey.name}重复，请检查后再次提交`;
             }
-            const errMap = await this.$refs.xTable.fullValidate().catch(errMap => errMap)
+            const errMap = await this.$refs.xTable.fullValidate(true).catch(errMap => errMap)
             if (errMap) {
                 return `${this.card.cardName}校验不通过`;
             }

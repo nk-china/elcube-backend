@@ -124,8 +124,8 @@ public abstract class NkAbstractCard<DT,DDT> extends NkAbstractCustomScriptObjec
      */
     @Override
     @SuppressWarnings("unchecked")
-    public final DDT deserializeDef(DocDefIV docDefI){
-        return (DDT) parse(docDefI.getCardContent(),getType(1));
+    public final DDT deserializeDef(Object defContent){
+        return (DDT) parse(defContent,getType(1));
     }
 
     public DDT afterGetDef(DocDefHV defHV, DocDefIV defIV, DDT def){

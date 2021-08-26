@@ -45,7 +45,7 @@
             <vxe-table-column title="列宽"
                               field="col"
                               width="10%"
-                              :edit-render="{name:'$input', props: {type: 'number',min:1, max:4}}"></vxe-table-column>
+                              :edit-render="{name:'$input', props: {type: 'number',min:1, max:30}}"></vxe-table-column>
             <vxe-table-column type="expand"
                               field=""
                               width="10%">
@@ -71,11 +71,11 @@
                             {{row.readonly?'是':'否'}}
                             <a-switch slot="edit" size="small" v-model="row.readonly" />
                         </nk-form-item>
-                        <nk-form-item title="是否只读JS Eval">
+                        <nk-form-item title="控制 SpEL 表达式">
                             {{row.eval}}
                             <a-input slot="edit" size="small" v-model="row.eval"></a-input>
                         </nk-form-item>
-                        <nk-form-item title="SpEL 表达式">
+                        <nk-form-item title="值 SpEL 表达式">
                             {{row.spELContent}}
                             <a-input slot="edit" size="small" v-model="row.spELContent"></a-input>
                         </nk-form-item>
@@ -159,15 +159,14 @@ const inputTypeDefs = [
     {label:'文本 | text',    value:'text',     options:{                            minLength:0, maxLength:200,pattern:''                     }},
     {label:'整数 | integer', value:'integer',  options:{format:'#',                 min:0, max:2147483647                                     }},
     {label:'小数 | decimal', value:'decimal',  options:{format:'#.00',              min:0, max:2147483647, digits:2, step:0.02                }},
-    {label:'比例 | percent', value:'percent',  options:{format:'#.00',              min:0, max:100,        digits:2, step:0.02                }},
-    {label:'日期 | date',    value:'date',     options:{format:'YYYY/M/D',          min:0, max:4105094400                                     }},
-    {label:'时间 | datetime',value:'datetime', options:{format:'YYYY/M/D HH:mm:ss', min:0, max:4105094400                                     }},
-    {label:'开关 | switch',  value:'switch',   options:{                            checked:'YES',unChecked:'NO'                              }},
+    {label:'比例 | percent', value:'percent',  options:{format:'%#.00',             min:0, max:100,        digits:2, step:0.02                }},
+    {label:'日期 | date',    value:'date',     options:{format:'YYYY/M/D',          /*min:0, max:4105094400*/                                 }},
+    {label:'时间 | datetime',value:'datetime', options:{format:'YYYY/M/D HH:mm:ss', /*min:0, max:4105094400*/                                 }},
+    {label:'开关 | switch',  value:'switch',   options:{                            checked:'是',unChecked:'否'                               }},
     {label:'选择 | select',  value:'select',   options:{                                                   options:'[]',selectMode:'default'  }},
-    {label:'级联 | cascader',value:'cascader', options:{                                                   options:'[]'                       }},
-    {label:'树形 | tree',    value:'tree',     options:{                                                   options:'[]'                       }},
-    {label:'引用 | ref',     value:'ref',      options:{                                                   modal:''                           }},
-    {label:'分隔 | divider', value:'divider',  options:{                                                                                      }},
+ // {label:'级联 | cascader',value:'cascader', options:{                                                   options:'[]'                       }},
+ // {label:'树形 | tree',    value:'tree',     options:{                                                   options:'[]'                       }},
+    {label:'引用 | ref',     value:'ref',      options:{                                                   modal:''                           }}
 ];
 
 export default {
@@ -186,8 +185,8 @@ export default {
     methods:{
         boolFormat : ({cellValue})=>{return cellValue?'是':''},
         activeMethod(){return this.editMode;},
-        rowExpand({expanded,row}){
-            if(expanded && row.inputType){
+        initRowOptions(row){
+            if(row.inputType){
                 row.$options = inputTypeDefs.find(e=>e.value===row.inputType).options
                 for(let key in row.$options){
                     if(!row[key]){
@@ -195,11 +194,19 @@ export default {
                     }
                 }
             }
+        },
+        rowExpand({expanded,row}){
+            if(expanded){
+                this.initRowOptions(row);
+            }
             this.sortable = this.$refs.xTable.getRowExpandRecords().length === 0;
             this.$nkSortableVxeTable(this.sortable);
         },
         rowExpandAll(bool){
             if(bool){
+                this.def.items.forEach((row)=>{
+                    this.initRowOptions(row);
+                });
                 this.$refs.xTable.setAllRowExpand(bool);
             }else{
                 this.$refs.xTable.clearRowExpand();

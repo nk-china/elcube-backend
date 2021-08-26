@@ -30,7 +30,7 @@ public interface NkCard<DT,DDT> extends NkCustomObject {
     Map<String,String> getVueTemplate();
 
     // 配置方法
-    DDT deserializeDef(DocDefIV defI);
+    DDT deserializeDef(Object defContent);
 
     DDT afterGetDef(DocDefHV defHV, DocDefIV defIV, DDT def);
 

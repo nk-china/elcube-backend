@@ -2,16 +2,38 @@ package cn.nkpro.groovy.cards.universal
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote
 import cn.nkpro.ts5.engine.doc.abstracts.NkAbstractCard
+import cn.nkpro.ts5.engine.doc.model.DocDefIV
+import cn.nkpro.ts5.engine.doc.model.DocHV
 import com.alibaba.fastjson.JSONArray
+import com.alibaba.fastjson.JSONObject
+import org.apache.commons.lang3.StringUtils
 import org.springframework.stereotype.Component
 
 @WsDocNote("基础表格")
 @Component("NkCardGrid")
 class NkCardGrid extends NkAbstractCard<JSONArray,NkCardGridDef> {
 
-
-
-
+    @Override
+    JSONArray beforeUpdate(DocHV doc, JSONArray data, JSONArray original, DocDefIV defIV, NkCardGridDef nkCardGridDef) {
+        data.forEach({ item ->
+            JSONObject json = (JSONObject)item
+            json.remove("_XID")
+            nkCardGridDef.items
+                .forEach({ defItem ->
+                    if(StringUtils.equalsIgnoreCase(defItem.getInputType(),"integer")){
+                        if(json.containsKey(defItem.key)){
+                            json.put(defItem.key,json.getInteger(defItem.key))
+                        }
+                    }else
+                    if(StringUtils.equalsAnyIgnoreCase(defItem.getInputType(),"decimal","percent")){
+                        if(json.containsKey(defItem.key)){
+                            json.put(defItem.key,json.getFloat(defItem.key))
+                        }
+                    }
+                })
+        })
+        return data
+    }
 
     static class NkCardGridDef {
         private List<NkCardGridDefI> items
@@ -31,6 +53,7 @@ class NkCardGrid extends NkAbstractCard<JSONArray,NkCardGridDef> {
         private String inputType
         private String calcTrigger
         private Integer calcOrder
+        private Integer col
         private Boolean required
         private Boolean readonly
         private String spELContent
@@ -44,6 +67,8 @@ class NkCardGrid extends NkAbstractCard<JSONArray,NkCardGridDef> {
         private Integer digits
         private Float step
         private String selectMode
+        private String checked
+        private String unChecked
         private String modal
         private String pattern
         private String message
@@ -87,6 +112,14 @@ class NkCardGrid extends NkAbstractCard<JSONArray,NkCardGridDef> {
 
         void setCalcOrder(Integer calcOrder) {
             this.calcOrder = calcOrder
+        }
+
+        Integer getCol() {
+            return col
+        }
+
+        void setCol(Integer col) {
+            this.col = col
         }
 
         Boolean getRequired() {
@@ -199,6 +232,22 @@ class NkCardGrid extends NkAbstractCard<JSONArray,NkCardGridDef> {
 
         void setSelectMode(String selectMode) {
             this.selectMode = selectMode
+        }
+
+        String getChecked() {
+            return checked
+        }
+
+        void setChecked(String checked) {
+            this.checked = checked
+        }
+
+        String getUnChecked() {
+            return unChecked
+        }
+
+        void setUnChecked(String unChecked) {
+            this.unChecked = unChecked
         }
 
         String getPattern() {
