@@ -85,13 +85,9 @@
                         </nk-form-item>
                         <nk-form-item title="控制 SpEL 表达式">
                             {{row.spELControl}}
-                            <a-input slot="edit" size="small" v-model="row.spELControl"></a-input>
+                            <nk-sp-el-editor slot="edit" v-model="row.spELControl"></nk-sp-el-editor>
                         </nk-form-item>
-                        <nk-form-item title="值 SpEL 表达式">
-                            {{row.spELContent}}
-                            <a-input slot="edit" size="small" v-model="row.spELContent"></a-input>
-                        </nk-form-item>
-                        <nk-form-item title="SpEL 计算时点">
+                        <nk-form-item title="值 SpEL 计算时点">
                             {{row.spELTriggers}}
                             <a-select slot="edit" size="small" v-model="row.spELTriggers" mode="multiple" >
                                 <a-select-option key="ALWAYS">ALWAYS</a-select-option>
@@ -99,10 +95,14 @@
                                 <a-select-option key="BLANK">BLANK</a-select-option>
                             </a-select>
                         </nk-form-item>
+                        <nk-form-item title="值 SpEL 表达式">
+                            {{row.spELContent}}
+                            <nk-sp-el-editor slot="edit" v-model="row.spELContent"></nk-sp-el-editor>
+                        </nk-form-item>
 
                         <nk-form-item title="选项表达式" v-if="row.$options.options">
                             {{row.options}}
-                            <a-input slot="edit" size="small" v-model="row.options"></a-input>
+                            <nk-sp-el-template-editor slot="edit" v-model="row.options"></nk-sp-el-template-editor>
                         </nk-form-item>
                         <nk-form-item title="选择模式" v-if="row.$options.selectMode">
                             {{row.selectMode}}
@@ -150,7 +150,7 @@
                         </nk-form-item>
                         <nk-form-item title="对话框" v-if="row.$options.modal !== undefined">
                             {{row.modal}}
-                            <a-input slot="edit" size="small" v-model="row.modal" @click="refClick(row)" readOnly style="cursor: pointer"></a-input>
+                            <nk-doc-select-editor slot="edit" v-model="row.modal"></nk-doc-select-editor>
                         </nk-form-item>
                         <nk-form-item title="显示格式" v-if="row.$options.format">
                             {{row.format}}
@@ -160,7 +160,6 @@
                 </template>
             </vxe-table-column>
         </vxe-table>
-        <nk-doc-select-def v-model="modalVisible" :def="modalRow.modal" @submit="refSubmit"></nk-doc-select-def>
     </nk-def-card>
 </template>
 
@@ -174,7 +173,7 @@ const inputTypeDefs = [
     {label:'比例 | percent', value:'percent',  options:{format:'#.00',              min:0, max:100,        digits:2, step:0.02                }},
     {label:'日期 | date',    value:'date',     options:{format:'YYYY/M/D',          min:0, max:4105094400                                     }},
     {label:'时间 | datetime',value:'datetime', options:{format:'YYYY/M/D HH:mm:ss', min:0, max:4105094400                                     }},
-    {label:'开关 | switch',  value:'switch',   options:{                            checked:'YES',unChecked:'NO'                              }},
+    {label:'开关 | switch',  value:'switch',   options:{                            checked:'是',unChecked:'否'                               }},
     {label:'选择 | select',  value:'select',   options:{                                                   options:'[]',selectMode:'default'  }},
     {label:'级联 | cascader',value:'cascader', options:{                                                   options:'[]'                       }},
     {label:'树形 | tree',    value:'tree',     options:{                                                   options:'[]'                       }},
@@ -256,9 +255,6 @@ export default {
         refClick(row){
             this.modalRow = row;
             this.modalVisible = true;
-        },
-        refSubmit(value){
-            this.modalRow.modal = value;
         }
     }
 }

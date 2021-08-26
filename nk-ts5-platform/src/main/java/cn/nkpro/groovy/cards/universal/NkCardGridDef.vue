@@ -68,30 +68,33 @@
                             {{row.message}}
                             <a-input slot="edit" size="small" v-model="row.message"></a-input>
                         </nk-form-item>
-                        <nk-form-item title="是否只读">
-                            {{row.readonly?'是':'否'}}
-                            <a-switch slot="edit" size="small" v-model="row.readonly" />
+                        <nk-form-item title="控制">
+                            {{row.control===1 ?'读写':'只读'}}
+                            <a-select slot="edit" size="small" v-model="row.control" >
+                                <a-select-option :key="1" >读写</a-select-option>
+                                <a-select-option :key="0" >只读</a-select-option>
+                            </a-select>
                         </nk-form-item>
                         <nk-form-item title="控制 SpEL 表达式">
-                            {{row.eval}}
-                            <a-input slot="edit" size="small" v-model="row.eval"></a-input>
+                            {{row.spELControl}}
+                            <nk-sp-el-editor slot="edit" v-model="row.spELControl"></nk-sp-el-editor>
                         </nk-form-item>
-                        <nk-form-item title="值 SpEL 表达式">
-                            {{row.spELContent}}
-                            <a-input slot="edit" size="small" v-model="row.spELContent"></a-input>
-                        </nk-form-item>
-                        <nk-form-item title="SpEL 计算时点">
+                        <nk-form-item title="值 SpEL 计算时点">
                             {{row.spELTriggers}}
                             <a-select slot="edit" size="small" v-model="row.spELTriggers" mode="multiple" >
-                                <a-select-option key="ALWAYS">ALL</a-select-option>
+                                <a-select-option key="ALWAYS">ALWAYS</a-select-option>
                                 <a-select-option key="INIT">INIT</a-select-option>
                                 <a-select-option key="BLANK">BLANK</a-select-option>
                             </a-select>
                         </nk-form-item>
+                        <nk-form-item title="值 SpEL 表达式">
+                            {{row.spELContent}}
+                            <nk-sp-el-editor slot="edit" size="small" v-model="row.spELContent"></nk-sp-el-editor>
+                        </nk-form-item>
 
                         <nk-form-item title="选项表达式" v-if="row.$options.options">
                             {{row.options}}
-                            <a-input slot="edit" size="small" v-model="row.options"></a-input>
+                            <nk-sp-el-template-editor slot="edit" size="small" v-model="row.options"></nk-sp-el-template-editor>
                         </nk-form-item>
                         <nk-form-item title="选择模式" v-if="row.$options.selectMode">
                             {{row.selectMode}}
@@ -139,7 +142,7 @@
                         </nk-form-item>
                         <nk-form-item title="对话框" v-if="row.$options.modal !== undefined">
                             {{row.modal}}
-                            <a-input slot="edit" size="small" v-model="row.modal" @click="refClick(row)" readOnly style="cursor: pointer"></a-input>
+                            <nk-doc-select-editor slot="edit" v-model="row.modal"></nk-doc-select-editor>
                         </nk-form-item>
                         <nk-form-item title="显示格式" v-if="row.$options.format">
                             {{row.format}}
@@ -149,7 +152,6 @@
                 </template>
             </vxe-table-column>
         </vxe-table>
-        <nk-doc-select-def v-model="modalVisible" :def="modalRow.modal" @submit="refSubmit"></nk-doc-select-def>
     </nk-def-card>
 </template>
 
@@ -232,9 +234,9 @@ export default {
                 calcTrigger:'',
                 calcOrder:1,
                 required:true,
-                readonly:false,
+                control:1,
                 spELContent:'',
-                spELTriggers:['ALWAYS','INIT','BLANK'],
+                spELTriggers:[],
                 eval:''
             };
             this.def.items.push(newItem);
@@ -243,9 +245,6 @@ export default {
         refClick(row){
             this.modalRow = row;
             this.modalVisible = true;
-        },
-        refSubmit(value){
-            this.modalRow.modal = value;
         }
     }
 }

@@ -95,10 +95,10 @@ public class TfmsSpELManager {
 
             String expression = matcher.group(0);
             String el = expression
-                    .replaceAll("\\{\\{","{")
-                    .replaceAll("}}","}")
                     .replaceAll("^\"?\\$\\{",StringUtils.EMPTY)
-                    .replaceAll("}\"?$",StringUtils.EMPTY);
+                    .replaceAll("}\"?$",StringUtils.EMPTY)
+                    .replaceAll("\\{\\{","{")
+                    .replaceAll("}}","}");
 
             try{
                 Object value = parser.parseExpression(el).getValue(context);

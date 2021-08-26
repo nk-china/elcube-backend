@@ -36,7 +36,7 @@ const columnTypes = {
             field: field.key,
             title: field.name,
             width: (field.col || '10') + '%',
-            editRender: field.readonly ? undefined : {
+            editRender: field.control === 0 ? undefined : {
                 name: '$input',
                 props: {
                     type:       'text',
@@ -59,7 +59,7 @@ const columnTypes = {
             formatter({cellValue}){
                 return cellValue && NkFormat.nkNumber(cellValue,field.format)
             },
-            editRender: field.readonly ? undefined : {
+            editRender: field.control === 0 ? undefined : {
                 name: '$input',
                 props: {
                     type: 'integer',
@@ -82,7 +82,7 @@ const columnTypes = {
             formatter({cellValue}){
                 return cellValue && NkFormat.nkNumber(cellValue,field.format)
             },
-            editRender: field.readonly ? undefined : {
+            editRender: field.control === 0 ? undefined : {
                 name: '$input',
                 props: {
                     type:   'float',
@@ -107,7 +107,7 @@ const columnTypes = {
             formatter({cellValue}){
                 return cellValue && NkFormat.nkPercent(cellValue/100,field.format)
             },
-            editRender: field.readonly ? undefined : {
+            editRender: field.control === 0 ? undefined : {
                 name: '$input',
                 props: {
                     type: 'float',
@@ -132,7 +132,7 @@ const columnTypes = {
             formatter({cellValue}){
                 return NkFormat.nkDatetimeISO(cellValue,field.format)
             },
-            editRender: field.readonly ? undefined : {
+            editRender: field.control === 0 ? undefined : {
                 name: 'nkDate',
                 props: {
                     type: 'date',
@@ -151,7 +151,7 @@ const columnTypes = {
             formatter({cellValue}){
                 return NkFormat.nkDatetimeISO(cellValue,field.format)
             },
-            editRender: field.readonly ? undefined : {
+            editRender: field.control === 0 ? undefined : {
                 name: 'nkDateTime',
                 props: {
                     type: 'datetime',
@@ -170,7 +170,7 @@ const columnTypes = {
             formatter({cellValue}){
                 return cellValue === true ? (field.checked || 'YES') : (field.unChecked || 'NO')
             },
-            editRender: field.readonly ? undefined : {
+            editRender: field.control === 0 ? undefined : {
                 name: '$switch',
                 props: {},
                 events: {
@@ -196,7 +196,7 @@ const columnTypes = {
                     }).join(' , ');
                 }
             },
-            editRender: field.readonly ? undefined : {
+            editRender: field.control === 0 ? undefined : {
                 name: '$select',
                 props: {
                     multiple: field.selectMode === 'multiple',
@@ -222,7 +222,7 @@ const columnTypes = {
             }
         };
 
-        if(!field.readonly){
+        if(field.control !== 0){
             slots.edit = (e,h)=>{
                 return [
                     h("span",formatter(e)),
@@ -235,7 +235,7 @@ const columnTypes = {
             field: field.key,
             title: field.name,
             width: (field.col || '10') + '%',
-            editRender: field.readonly ? undefined : {},
+            editRender: field.control === 0 ? undefined : {},
             slots
         }
     }
@@ -348,12 +348,10 @@ export default {
             }
         },
         xTableValueChanged({column,row},{value}){
-            if(!this.hasError()) {
-                let item = this.def.items.find(i => i.key === column.property);
-                if (item && item.calcTrigger) {
-                    row[column.property] = value;
-                    this.nk$calc();
-                }
+            let item = this.def.items.find(i => i.key === column.property);
+            if (item && item.calcTrigger) {
+                row[column.property] = value;
+                this.nk$calc();
             }
         },
         xTableRefChanged(selected){
@@ -367,7 +365,7 @@ export default {
         async xTableAdd(){
             let row = {};
             this.def.items.forEach(field=>{
-                row[field.key]=undefined;
+                row[field.key]=(field.inputType==='switch'?1:undefined);
             });
             this.data.push(row);
             await this.$refs.xTable.loadData(this.data);

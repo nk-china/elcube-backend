@@ -17,16 +17,6 @@ class NkCardDate extends NkAbstractCard<Map,Map> {
     String date;
 
     NkCardDate(){
-
-        def a = 1
-        def b = new StringBuilder()
-
-        b = 1
-
-        println b
-
-        logger.debug(a as String);
-
     }
     //@Override
     String getComponentDesc() {

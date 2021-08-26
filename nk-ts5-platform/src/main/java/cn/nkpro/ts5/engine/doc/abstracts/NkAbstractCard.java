@@ -10,7 +10,6 @@ import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.engine.doc.model.ScriptDefHV;
 import cn.nkpro.ts5.exception.TfmsDefineException;
 import cn.nkpro.ts5.exception.TfmsSystemException;
-import cn.nkpro.ts5.orm.mb.gen.SysLogDocRecord;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -142,13 +141,13 @@ public abstract class NkAbstractCard<DT,DDT> extends NkAbstractCustomScriptObjec
     }
 
     @Override
-    public DT afterCreate(DocHV doc, DocHV preDoc, DT data, DocDefIV defIV, DDT def){
+    public DT afterCreate(DocHV doc, DocHV preDoc, DT data, DocDefIV defIV, DDT d){
         return data;
     }
 
 
     @Override
-    public DT afterGetData(DocHV doc, DT data, DocDefIV defIV, DDT def) {
+    public DT afterGetData(DocHV doc, DT data, DocDefIV defIV, DDT d) {
         return data;
     }
 
@@ -161,27 +160,27 @@ public abstract class NkAbstractCard<DT,DDT> extends NkAbstractCustomScriptObjec
      */
     @Override
     @SuppressWarnings("all")
-    public DT calculate(DocHV doc, DT data, DocDefIV defIV, DDT def, boolean isTrigger, String options){
+    public DT calculate(DocHV doc, DT data, DocDefIV defIV, DDT d, boolean isTrigger, String options){
         return data;
     }
 
     @Override
-    public DT call(DocHV doc, DT data, DocDefIV defIV, DDT def, String options) {
+    public DT call(DocHV doc, DT data, DocDefIV defIV, DDT d, String options) {
         return null;
     }
 
     @Override
-    public DT beforeUpdate(DocHV doc, DT data, DT original, DocDefIV defIV, DDT def) {
+    public DT beforeUpdate(DocHV doc, DT data, DT original, DocDefIV defIV, DDT d) {
         return data;
     }
 
     @Override
-    public DT afterUpdated(DocHV doc, DT data, DT original, DocDefIV defIV, DDT def) {
+    public DT afterUpdated(DocHV doc, DT data, DT original, DocDefIV defIV, DDT d) {
         return data;
     }
 
     @Override
-    public void stateChanged(DocHV doc, DocHV original, DT data, DocDefIV defIV, DDT def){
+    public void stateChanged(DocHV doc, DocHV original, DT data, DocDefIV defIV, DDT d){
 
     }
 

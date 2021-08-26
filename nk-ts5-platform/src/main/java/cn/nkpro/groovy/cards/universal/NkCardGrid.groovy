@@ -1,33 +1,63 @@
 package cn.nkpro.groovy.cards.universal
 
+
+import cn.nkpro.groovy.cards.universal.ref.NkCardFormDefI
+import cn.nkpro.groovy.cards.universal.ref.NkFormCardHelper
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote
 import cn.nkpro.ts5.engine.doc.abstracts.NkAbstractCard
 import cn.nkpro.ts5.engine.doc.model.DocDefIV
 import cn.nkpro.ts5.engine.doc.model.DocHV
-import com.alibaba.fastjson.JSONArray
-import com.alibaba.fastjson.JSONObject
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import org.apache.commons.lang3.StringUtils
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 @WsDocNote("基础表格")
 @Component("NkCardGrid")
-class NkCardGrid extends NkAbstractCard<JSONArray,NkCardGridDef> {
+class NkCardGrid extends NkAbstractCard<List<Map<String,Object>>,NkCardGridDef> {
+
+    @Autowired
+    private NkFormCardHelper nkFormCardHelper
+
+    private List<Map<String,Object>> execSpEL(DocHV doc, List<Map<String,Object>> data, DocDefIV defIV, NkCardGridDef d){
+        nkFormCardHelper.execSpEL(doc, null, defIV, d.getItems(), true, true)
+        data.forEach({ item ->
+            nkFormCardHelper.execSpEL(doc, item, defIV, d.getItems(), true, false)
+        })
+        return data
+    }
 
     @Override
-    JSONArray beforeUpdate(DocHV doc, JSONArray data, JSONArray original, DocDefIV defIV, NkCardGridDef nkCardGridDef) {
+    List<Map<String,Object>> afterCreate(DocHV doc, DocHV preDoc, List<Map<String,Object>> data, DocDefIV defIV, NkCardGridDef d) {
+        return execSpEL(doc, data, defIV, d)
+    }
+
+    @Override
+    List<Map<String,Object>> afterGetData(DocHV doc, List<Map<String,Object>> data, DocDefIV defIV, NkCardGridDef d) {
+        return execSpEL(doc, data, defIV, d)
+    }
+
+    @Override
+    List<Map<String,Object>> calculate(DocHV doc, List<Map<String,Object>> data, DocDefIV defIV, NkCardGridDef d, boolean isTrigger, String options) {
+        return execSpEL(doc, data, defIV, d)
+    }
+
+    @Override
+    List<Map<String,Object>> beforeUpdate(DocHV doc, List<Map<String,Object>> data, List<Map<String,Object>> original, DocDefIV defIV, NkCardGridDef nkCardGridDef) {
         data.forEach({ item ->
-            JSONObject json = (JSONObject)item
-            json.remove("_XID")
+            item.remove("_XID")
             nkCardGridDef.items
                 .forEach({ defItem ->
                     if(StringUtils.equalsIgnoreCase(defItem.getInputType(),"integer")){
-                        if(json.containsKey(defItem.key)){
-                            json.put(defItem.key,json.getInteger(defItem.key))
+                        if(item.containsKey(defItem.key)){
+                            Object value = item.get(defItem.key)
+                            item.put(defItem.key,value!=null?Integer.parseInt(value.toString()):null)
                         }
                     }else
                     if(StringUtils.equalsAnyIgnoreCase(defItem.getInputType(),"decimal","percent")){
-                        if(json.containsKey(defItem.key)){
-                            json.put(defItem.key,json.getFloat(defItem.key))
+                        if(item.containsKey(defItem.key)){
+                            Object value = item.get(defItem.key)
+                            item.put(defItem.key,value!=null?Float.parseFloat(value.toString()):null)
                         }
                     }
                 })
@@ -35,238 +65,20 @@ class NkCardGrid extends NkAbstractCard<JSONArray,NkCardGridDef> {
         return data
     }
 
+    @SuppressWarnings("unused")
+    @JsonIgnoreProperties(ignoreUnknown=true)
     static class NkCardGridDef {
 
-        private String preSpEL;
+        private String preSpEL
 
-        private List<NkCardGridDefI> items
+        private List<NkCardFormDefI> items
 
-        List<NkCardGridDefI> getItems() {
+        List<NkCardFormDefI> getItems() {
             return items
         }
 
-        void setItems(List<NkCardGridDefI> items) {
+        void setItems(List<NkCardFormDefI> items) {
             this.items = items
-        }
-    }
-
-    static class NkCardGridDefI {
-        private String key
-        private String name
-        private String inputType
-        private String calcTrigger
-        private Integer calcOrder
-        private Integer col
-        private Boolean required
-        private Boolean readonly
-        private String spELContent
-        private String[] spELTriggers
-        private String eval
-        private String format
-        private String options
-        private Float min
-        private Float max
-        private Integer maxLength
-        private Integer digits
-        private Float step
-        private String selectMode
-        private String checked
-        private String unChecked
-        private String modal
-        private String pattern
-        private String message
-
-
-        String getKey() {
-            return key
-        }
-
-        void setKey(String key) {
-            this.key = key
-        }
-
-        String getName() {
-            return name
-        }
-
-        void setName(String name) {
-            this.name = name
-        }
-
-        String getInputType() {
-            return inputType
-        }
-
-        void setInputType(String inputType) {
-            this.inputType = inputType
-        }
-
-        String getCalcTrigger() {
-            return calcTrigger
-        }
-
-        void setCalcTrigger(String calcTrigger) {
-            this.calcTrigger = calcTrigger
-        }
-
-        Integer getCalcOrder() {
-            return calcOrder
-        }
-
-        void setCalcOrder(Integer calcOrder) {
-            this.calcOrder = calcOrder
-        }
-
-        Integer getCol() {
-            return col
-        }
-
-        void setCol(Integer col) {
-            this.col = col
-        }
-
-        Boolean getRequired() {
-            return required
-        }
-
-        void setRequired(Boolean required) {
-            this.required = required
-        }
-
-        Boolean getReadonly() {
-            return readonly
-        }
-
-        void setReadonly(Boolean readonly) {
-            this.readonly = readonly
-        }
-
-        String getSpELContent() {
-            return spELContent
-        }
-
-        void setSpELContent(String spELContent) {
-            this.spELContent = spELContent
-        }
-
-        String[] getSpELTriggers() {
-            return spELTriggers
-        }
-
-        void setSpELTriggers(String[] spELTriggers) {
-            this.spELTriggers = spELTriggers
-        }
-
-        String getEval() {
-            return eval
-        }
-
-        void setEval(String eval) {
-            this.eval = eval
-        }
-
-        String getFormat() {
-            return format
-        }
-
-        void setFormat(String format) {
-            this.format = format
-        }
-
-        String getOptions() {
-            return options
-        }
-
-        void setOptions(String options) {
-            this.options = options
-        }
-
-        String getModal() {
-            return modal
-        }
-
-        void setModal(String modal) {
-            this.modal = modal
-        }
-
-        Float getMin() {
-            return min
-        }
-
-        void setMin(Float min) {
-            this.min = min
-        }
-
-        Float getMax() {
-            return max
-        }
-
-        void setMax(Float max) {
-            this.max = max
-        }
-
-        Integer getMaxLength() {
-            return maxLength
-        }
-
-        void setMaxLength(Integer maxLength) {
-            this.maxLength = maxLength
-        }
-
-        Integer getDigits() {
-            return digits
-        }
-
-        void setDigits(Integer digits) {
-            this.digits = digits
-        }
-
-        Float getStep() {
-            return step
-        }
-
-        void setStep(Float step) {
-            this.step = step
-        }
-
-        String getSelectMode() {
-            return selectMode
-        }
-
-        void setSelectMode(String selectMode) {
-            this.selectMode = selectMode
-        }
-
-        String getChecked() {
-            return checked
-        }
-
-        void setChecked(String checked) {
-            this.checked = checked
-        }
-
-        String getUnChecked() {
-            return unChecked
-        }
-
-        void setUnChecked(String unChecked) {
-            this.unChecked = unChecked
-        }
-
-        String getPattern() {
-            return pattern
-        }
-
-        void setPattern(String pattern) {
-            this.pattern = pattern
-        }
-
-        String getMessage() {
-            return message
-        }
-
-        void setMessage(String message) {
-            this.message = message
         }
     }
 }
