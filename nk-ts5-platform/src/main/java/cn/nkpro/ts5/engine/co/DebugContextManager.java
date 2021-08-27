@@ -168,6 +168,11 @@ public class DebugContextManager implements ApplicationContextAware {
         registerScriptObject(scriptDef, rootApplicationContext);
     }
 
+    public void removeDebugResource(String key, DocDefHV resource){
+        resource.setDebug(false);
+        redisForResoure.delete(String.format("DEBUG:%s", localDebugId.get()), key);
+    }
+
     private void registerScriptObject(ScriptDefHV scriptDef,ApplicationContext context){
 
         Class<?> clazz = GroovyUtils.compileGroovy(scriptDef.getScriptName(), scriptDef.getGroovyMain());
@@ -198,6 +203,18 @@ public class DebugContextManager implements ApplicationContextAware {
         beanDefinitionBuilder.addPropertyValue("scriptDef", scriptDef);
         ((BeanDefinitionRegistry) context.getAutowireCapableBeanFactory())
                 .registerBeanDefinition(beanName,beanDefinitionBuilder.getBeanDefinition());
+
+        /*
+         * 如果激活的上下文是跟上下文，尝试查找debug上下文，并将对象从debug上下文中移除
+         */
+        if(context == rootApplicationContext){
+            Optional.ofNullable(localDebugId.get())
+                .map(debugApplications::get)
+                .ifPresent(debugApplicationContext->{
+                    ((BeanDefinitionRegistry) debugApplicationContext.getAutowireCapableBeanFactory())
+                            .removeBeanDefinition(beanName);
+                });
+        }
     }
 
     public boolean isDebug(){
