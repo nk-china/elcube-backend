@@ -200,6 +200,10 @@ public class DebugContextManager implements ApplicationContextAware {
                 .registerBeanDefinition(beanName,beanDefinitionBuilder.getBeanDefinition());
     }
 
+    public boolean isDebug(){
+        return localDebugId.get()!=null;
+    }
+
     /**
      * 获取当前debug的缓存中获取单个资源
      */

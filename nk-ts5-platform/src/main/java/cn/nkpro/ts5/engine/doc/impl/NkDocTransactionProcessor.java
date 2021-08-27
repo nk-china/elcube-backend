@@ -529,6 +529,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if(log.isInfoEnabled())log.info("{}保存单据内容 保存单据抬头数据到数据库", NkDocEngineContext.currLog());
+
         loopDoc.setIdentification(random());
         if(optionalOriginal.isPresent()){
             docHMapper.updateByPrimaryKeySelective(loopDoc);

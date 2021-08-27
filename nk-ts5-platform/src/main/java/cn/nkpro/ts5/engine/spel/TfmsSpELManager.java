@@ -5,6 +5,7 @@ import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.exception.TfmsDefineException;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,10 +49,6 @@ public class TfmsSpELManager {
                 .collect(Collectors.toMap(TfmsSpELInjection::getSpELName,t->t));
     }
 
-    public ExpressionParser parser(){
-        return parser;
-    }
-
     public Object invoke(String el, EvaluationContext context){
         try{
             return parser.parseExpression(el).getValue(context);
@@ -60,21 +57,10 @@ public class TfmsSpELManager {
         }
     }
 
-    public String convert(String input){
-        StandardEvaluationContext ctx = new StandardEvaluationContext();
-        ctx.addPropertyAccessor(new MapAccessor());
-        getSpELMap().forEach(ctx::setVariable);
-
-        return convert(ctx,input);
-    }
     public String convert(DocHV doc,String input){
-
-        StandardEvaluationContext ctx = new StandardEvaluationContext(doc);
-        ctx.addPropertyAccessor(new MapAccessor());
-        getSpELMap().forEach(ctx::setVariable);
-
-        return convert(ctx,input);
+        return convert(createContext(doc),input);
     }
+
     public String convert(EvaluationContext context,String input){
 
         if(StringUtils.isBlank(input)){

@@ -4,6 +4,7 @@ import cn.nkpro.ts5.basic.Constants;
 import cn.nkpro.ts5.config.redis.RedisSupport;
 import cn.nkpro.ts5.config.security.SecurityUtilz;
 import cn.nkpro.ts5.engine.LocalSyncUtilz;
+import cn.nkpro.ts5.engine.co.DebugContextManager;
 import cn.nkpro.ts5.engine.co.NkCustomObjectManager;
 import cn.nkpro.ts5.engine.doc.NkDocProcessor;
 import cn.nkpro.ts5.engine.doc.interceptor.NkDocFlowInterceptor;
@@ -16,6 +17,7 @@ import cn.nkpro.ts5.exception.TfmsDefineException;
 import cn.nkpro.ts5.orm.mb.gen.*;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import com.alibaba.fastjson.JSON;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -24,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.IllegalTransactionStateException;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.util.Assert;
 
@@ -50,6 +53,8 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
     private NkBpmTaskService bpmTaskService;
     @Autowired@SuppressWarnings("all")
     private NkDocPermService docPermService;
+    @Autowired
+    private DebugContextManager debugContextManager;
 
 
     @Override
@@ -137,44 +142,49 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
 
         // 获取单据抬头和行项目数据
         final long start = System.currentTimeMillis();
-        DocHPersistent docHPersistent = redisSupport.getIfAbsent(Constants.CACHE_DOC, docId,()->{
-
-            DocHPersistent doc = BeanUtilz.copyFromObject(docHMapper.selectByPrimaryKey(docId), DocHPersistent.class);
-
-            if(doc!=null){
-
-                DocIExample example = new DocIExample();
-                example.createCriteria()
-                        .andDocIdEqualTo(docId);
-
-                doc.setItems(docIMapper.selectByExampleWithBLOBs(example).stream()
-                        .collect(Collectors.toMap(DocIKey::getCardKey, e -> e)));
-
-                DocIIndexExample iIndexExample = new DocIIndexExample();
-                iIndexExample.createCriteria()
-                        .andDocIdEqualTo(docId);
-                iIndexExample.setOrderByClause("ORDER_BY");
-                doc.setDynamics(
-                    docIIndexMapper.selectByExample(iIndexExample)
-                        .stream()
-                        .collect(Collectors.toMap(
-                                DocIIndexKey::getName,
-                                e->{
-                                    try {
-                                        return JSON.parseObject(e.getValue(),Class.forName(e.getDataType()));
-                                    } catch (ClassNotFoundException ex) {
-                                        return StringUtils.EMPTY;
-                                    }
-                                }
-                        ))
-                );
-            }
-
-            return doc;
-        });
+        DocHPersistent docHPersistent =
+                debugContextManager.isDebug()? // 如果是debug模式，不操作redis
+                        fetchDocFromDB(docId):
+                        redisSupport.getIfAbsent(Constants.CACHE_DOC, docId,()-> fetchDocFromDB(docId));
         if(log.isInfoEnabled())log.info("{}获取单据原始数据 耗时{}ms", NkDocEngineContext.currLog(), System.currentTimeMillis()-start);
 
         return  docHPersistent;
+    }
+
+    private DocHPersistent fetchDocFromDB(String docId){
+
+        DocHPersistent doc = BeanUtilz.copyFromObject(docHMapper.selectByPrimaryKey(docId), DocHPersistent.class);
+
+        if(doc!=null){
+
+            DocIExample example = new DocIExample();
+            example.createCriteria()
+                    .andDocIdEqualTo(docId);
+
+            doc.setItems(docIMapper.selectByExampleWithBLOBs(example).stream()
+                    .collect(Collectors.toMap(DocIKey::getCardKey, e -> e)));
+
+            DocIIndexExample iIndexExample = new DocIIndexExample();
+            iIndexExample.createCriteria()
+                    .andDocIdEqualTo(docId);
+            iIndexExample.setOrderByClause("ORDER_BY");
+            doc.setDynamics(
+                    docIIndexMapper.selectByExample(iIndexExample)
+                            .stream()
+                            .collect(Collectors.toMap(
+                                    DocIIndexKey::getName,
+                                    e->{
+                                        try {
+                                            return JSON.parseObject(e.getValue(),Class.forName(e.getDataType()));
+                                        } catch (ClassNotFoundException ex) {
+                                            return StringUtils.EMPTY;
+                                        }
+                                    }
+                            ))
+            );
+        }
+
+        return doc;
     }
 
     private DocHV fetchDocProcess(DocHPersistent docHPersistent){
@@ -251,6 +261,13 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
     @Override
     @Transactional
     public DocHV doUpdateView(DocHV docHV, String optSource){
+
+        if(debugContextManager.isDebug()){
+            TransactionAspectSupport.currentTransactionStatus().setRollbackOnly();
+            System.out.println("\n\n\n");
+            System.out.println("当前请求为Debug模式，所有操作的事务不会提交，但对于外部系统接口、redis、es等可能会有不可避免的数据更新，需要谨慎");
+            System.out.println("\n\n\n");
+        }
 
         NkDocEngineContext.startLog("UPDATE", docHV.getDocId());
 
@@ -336,7 +353,8 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
             if(optionalOriginal.isPresent()){
                 // 修改
                 // 检查单据数据是否已经发生变化
-                Assert.isTrue(StringUtils.equals(doc.getIdentification(),optionalOriginal.get().getIdentification()),
+                if(!debugContextManager.isDebug())
+                    Assert.isTrue(StringUtils.equals(doc.getIdentification(),optionalOriginal.get().getIdentification()),
                         "单据被其他用户修改，请刷新后重试");
             }else{
                 // 新建
