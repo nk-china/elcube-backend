@@ -2,6 +2,7 @@ package cn.nkpro.ts5.engine.doc.service;
 
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.engine.doc.NkCard;
+import cn.nkpro.ts5.engine.doc.model.DocDefFlowV;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocDefIV;
 import cn.nkpro.ts5.orm.mb.gen.DocDefH;
@@ -28,9 +29,9 @@ public interface NkDocDefService {
 
     DocDefIV getCardDescribe(String cardHandlerName);
 
-    List<DocDefH> getEntrance(String classify);
+    List<DocDefFlowV> getEntrance(String classify);
 
-    DocDefHV doRun(DocDefHV docDefHV);
+    DocDefHV doRun(DocDefHV docDefHV,boolean run);
 
     DocDefHV getDocDefForRuntime(String docType);
 

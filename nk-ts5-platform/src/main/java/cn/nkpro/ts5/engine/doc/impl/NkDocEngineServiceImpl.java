@@ -14,6 +14,8 @@ import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService;
 import cn.nkpro.ts5.engine.doc.service.NkDocPermService;
 import cn.nkpro.ts5.engine.task.NkBpmTaskService;
 import cn.nkpro.ts5.exception.TfmsDefineException;
+import cn.nkpro.ts5.exception.TfmsException;
+import cn.nkpro.ts5.exception.TfmsSystemException;
 import cn.nkpro.ts5.orm.mb.gen.*;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import com.alibaba.fastjson.JSON;
@@ -142,13 +144,21 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
 
         // 获取单据抬头和行项目数据
         final long start = System.currentTimeMillis();
-        DocHPersistent docHPersistent =
-                debugContextManager.isDebug()? // 如果是debug模式，不操作redis
-                        fetchDocFromDB(docId):
-                        redisSupport.getIfAbsent(Constants.CACHE_DOC, docId,()-> fetchDocFromDB(docId));
-        if(log.isInfoEnabled())log.info("{}获取单据原始数据 耗时{}ms", NkDocEngineContext.currLog(), System.currentTimeMillis()-start);
 
-        return  docHPersistent;
+        try{
+            if(debugContextManager.isDebug()){
+                DocHPersistent doc = debugContextManager.getDebugResource("$"+docId);
+                if(doc!=null)
+                    return doc;
+
+                return fetchDocFromDB(docId);
+            }
+            return redisSupport.getIfAbsent(Constants.CACHE_DOC, docId,()-> fetchDocFromDB(docId));
+
+        }finally {
+            if(log.isInfoEnabled())
+                log.info("{}获取单据原始数据 耗时{}ms", NkDocEngineContext.currLog(), System.currentTimeMillis()-start);
+        }
     }
 
     private DocHPersistent fetchDocFromDB(String docId){
@@ -182,6 +192,8 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
                                     }
                             ))
             );
+        }else{
+            throw new TfmsSystemException("单据不存在");
         }
 
         return doc;
@@ -299,6 +311,11 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
         }finally {
             if(log.isInfoEnabled())log.info("{}保存单据视图 完成",NkDocEngineContext.currLog());
             NkDocEngineContext.endLog();
+
+            if(debugContextManager.isDebug()){
+                debugContextManager.addDebugResource("$"+docHV.getDocId(), docHV.toPersistent());
+            }
+            docHV.clearItemContent();
         }
     }
 
@@ -318,6 +335,7 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
             return execUpdate(doc, optSource, lockId);
         }finally {
             NkDocEngineContext.endLog();
+            doc.clearItemContent();
         }
 
     }
@@ -344,18 +362,12 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
 
             // 获取单据配置
             DocDefHV def = docDefService.deserializeDef(doc.getDef());
-//            String docType = doc.getDocType();
-//            DocDefHV def = optionalOriginal.map(DocHV::getDef).orElseGet(()->
-//                    docDefService.getDocDefForRuntime(docType)
-//            );
-
 
             if(optionalOriginal.isPresent()){
                 // 修改
                 // 检查单据数据是否已经发生变化
-                if(!debugContextManager.isDebug())
-                    Assert.isTrue(StringUtils.equals(doc.getIdentification(),optionalOriginal.get().getIdentification()),
-                        "单据被其他用户修改，请刷新后重试");
+                Assert.isTrue(StringUtils.equals(doc.getIdentification(),optionalOriginal.get().getIdentification()),
+                    "单据被其他用户修改，请刷新后重试");
             }else{
                 // 新建
                 // 检查单据是否符合业务流控制
@@ -371,7 +383,6 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
 
             // 预创建一个持久化对象，在事务提交后使用
             docHPersistent = doc.toPersistent();
-            doc.clearItemContent();
 
             return doc;
         }finally {
@@ -501,8 +512,6 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
 
                 flow.setVisible(visibleState);
             });
-
-        docHV.clearItemContent();
 
         if(log.isInfoEnabled())
             log.info("{}设置单据后续操作 操作数量 = {}",

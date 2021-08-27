@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by bean on 2020/7/17.
@@ -50,7 +51,13 @@ public class SysDebugController {
         return debugSupport.createContext(desc);
     }
 
-    @WsDocNote("4.调试SpEL")
+    @WsDocNote("4.获取调试中的资源")
+    @RequestMapping("/resources")
+    public List<Object> resources(){
+        return debugSupport.getDebugResources("@","#");
+    }
+
+    @WsDocNote("5.调试SpEL")
     @RequestMapping("/spel/test")
     public R spELTest(
             @RequestParam String el,

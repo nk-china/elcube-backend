@@ -430,7 +430,9 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         DocIIndexExample example = new DocIIndexExample();
         example.createCriteria().andDocIdEqualTo(loopDoc.getDocId());
         docIIndexMapper.deleteByExample(example);
-        loopDoc.getDef()
+
+        if(loopDoc.getDef().getIndexRules()!=null)
+            loopDoc.getDef()
                 .getIndexRules()
                 .forEach(rule->{
                     String name = String.format("%s_%s",rule.getIndexName(),rule.getIndexType());
@@ -441,21 +443,17 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
                             spELManager.invoke(rule.getRuleSpEL(),context)
                     );
 
+                    DocIIndex index = new DocIIndex();
+                    index.setDocId(loopDoc.getDocId());
+                    index.setName(name);
+                    index.setValue(JSON.toJSONString(value));
+                    index.setDataType(type);
+                    index.setOrderBy(rule.getOrderBy());
+                    index.setUpdatedTime(DateTimeUtilz.nowSeconds());
+
                     if(optionalOriginal.isPresent()&&original.getDynamics().containsKey(name)){
-                        DocIIndex index = BeanUtilz.copyFromObject(original.getDynamics().get(name),DocIIndex.class);
-                        index.setValue(JSON.toJSONString(value));
-                        index.setDataType(type);
-                        index.setOrderBy(rule.getOrderBy());
-                        index.setUpdatedTime(DateTimeUtilz.nowSeconds());
                         docIIndexMapper.updateByPrimaryKey(index);
                     }else{
-                        DocIIndex index = new DocIIndex();
-                        index.setDocId(loopDoc.getDocId());
-                        index.setName(name);
-                        index.setValue(JSON.toJSONString(value));
-                        index.setDataType(type);
-                        index.setOrderBy(rule.getOrderBy());
-                        index.setUpdatedTime(DateTimeUtilz.nowSeconds());
                         docIIndexMapper.insert(index);
                     }
                 });
@@ -620,13 +618,15 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
 
     private DocHV processCycle(DocHV doc, NkDocCycle cycleName, Function<String, DocHV> function){
 
-        List<DocDefCycle> collect =  doc.getDef().getLifeCycles()
-                .stream()
-                .filter(cycle -> StringUtils.equals(cycle.getDocCycle(), cycleName.name()))
-                .collect(Collectors.toList());
+        if(doc.getDef().getLifeCycles()!=null){
+            List<DocDefCycle> collect =  doc.getDef().getLifeCycles()
+                    .stream()
+                    .filter(cycle -> StringUtils.equals(cycle.getDocCycle(), cycleName.name()))
+                    .collect(Collectors.toList());
 
-        for(DocDefCycle cycle : collect){
-            doc = function.apply(cycle.getRefObjectType());
+            for(DocDefCycle cycle : collect){
+                doc = function.apply(cycle.getRefObjectType());
+            }
         }
 
         return doc;

@@ -4,6 +4,7 @@ import cn.nkpro.ts5.basic.Constants;
 import cn.nkpro.ts5.config.redis.RedisSupport;
 import cn.nkpro.ts5.config.security.SecurityUtilz;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
+import cn.nkpro.ts5.engine.doc.model.DocHPersistent;
 import cn.nkpro.ts5.engine.doc.model.ScriptDefHV;
 import cn.nkpro.ts5.exception.TfmsSystemException;
 import cn.nkpro.ts5.utils.GroovyUtils;
@@ -12,6 +13,7 @@ import groovy.lang.GroovyObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
@@ -23,6 +25,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -123,7 +126,7 @@ public class DebugContextManager implements ApplicationContextAware {
                     .ifPresent((map)->
                         map.entrySet()
                                 .stream()
-                                .filter(e->e.getKey().startsWith("$"))
+                                .filter(e->e.getKey().startsWith("#"))
                                 .map(Map.Entry::getValue)
                                 .forEach(e->registerScriptObject((ScriptDefHV) e,debugApplicationContext))
                     );
@@ -156,20 +159,34 @@ public class DebugContextManager implements ApplicationContextAware {
             registerScriptObject((ScriptDefHV) resource,debugApplicationContext);
         }else if(resource instanceof DocDefHV){
             ((DocDefHV) resource).setDebug(true);
-        }else{
+        }else if(!(resource instanceof DocHPersistent)){
             throw new TfmsSystemException(resource.getClass().getName() + " 不支持调试");
         }
 
         redisForResoure.putHash(String.format("DEBUG:%s", localDebugId.get()), key, resource);
     }
 
-    public void addActiveResource(ScriptDefHV scriptDef){
+    public void addActiveResource(String key, ScriptDefHV scriptDef){
         scriptDef.setDebug(false);
         registerScriptObject(scriptDef, rootApplicationContext);
+        removeDebugResource(key, scriptDef);
     }
 
-    public void removeDebugResource(String key, DocDefHV resource){
-        resource.setDebug(false);
+    public void removeDebugResource(String key, Object resource){
+        if(resource instanceof ScriptDefHV){
+            ((ScriptDefHV) resource).setDebug(false);
+            Optional.ofNullable(localDebugId.get())
+                    .map(debugApplications::get)
+                    .ifPresent(debugApplicationContext->{
+                        String scriptName = ((ScriptDefHV) resource).getScriptName();
+                        BeanDefinitionRegistry definitionRegistry = (BeanDefinitionRegistry)
+                                debugApplicationContext.getAutowireCapableBeanFactory();
+                        if(definitionRegistry.containsBeanDefinition(scriptName))
+                            definitionRegistry.removeBeanDefinition(scriptName);
+                    });
+        }else if(resource instanceof DocDefHV){
+            ((DocDefHV) resource).setDebug(false);
+        }
         redisForResoure.delete(String.format("DEBUG:%s", localDebugId.get()), key);
     }
 
@@ -182,6 +199,8 @@ public class DebugContextManager implements ApplicationContextAware {
         }
 
         String beanName = cn.nkpro.ts5.utils.ClassUtils.decapitateBeanName(clazz);
+
+        Assert.isTrue(StringUtils.equals(beanName,scriptDef.getScriptName()),"对象名称与脚本名称必须保持一致");
 
         // 避免非法重写spring的类
         if(context.containsBean(beanName)){
@@ -203,18 +222,6 @@ public class DebugContextManager implements ApplicationContextAware {
         beanDefinitionBuilder.addPropertyValue("scriptDef", scriptDef);
         ((BeanDefinitionRegistry) context.getAutowireCapableBeanFactory())
                 .registerBeanDefinition(beanName,beanDefinitionBuilder.getBeanDefinition());
-
-        /*
-         * 如果激活的上下文是跟上下文，尝试查找debug上下文，并将对象从debug上下文中移除
-         */
-        if(context == rootApplicationContext){
-            Optional.ofNullable(localDebugId.get())
-                .map(debugApplications::get)
-                .ifPresent(debugApplicationContext->{
-                    ((BeanDefinitionRegistry) debugApplicationContext.getAutowireCapableBeanFactory())
-                            .removeBeanDefinition(beanName);
-                });
-        }
     }
 
     public boolean isDebug(){
@@ -232,14 +239,19 @@ public class DebugContextManager implements ApplicationContextAware {
         return null;
     }
     @SuppressWarnings("all")
-    public <T> List<T> getDebugResources(String keyPrefix){
+    public <T> List<T> getDebugResources(String... keyPrefix){
         if(localDebugId.get()!=null){
             Map<String, Object> hashIfAbsent = redisForResoure.getHashIfAbsent(String.format("DEBUG:%s", localDebugId.get()), () -> null);
             if(hashIfAbsent!=null)
                 return hashIfAbsent
                     .entrySet()
                     .stream()
-                    .filter(e -> e.getKey().startsWith(keyPrefix))
+                    .filter(e ->
+                         Arrays.stream(keyPrefix)
+                                .filter(p->e.getKey().startsWith(p))
+                                .findFirst()
+                                .isPresent()
+                    )
                     .map(e -> (T) e.getValue())
                     .collect(Collectors.toList());
         }

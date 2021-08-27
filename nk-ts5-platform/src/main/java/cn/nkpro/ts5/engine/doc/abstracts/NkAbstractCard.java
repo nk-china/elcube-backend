@@ -81,7 +81,7 @@ public abstract class NkAbstractCard<DT,DDT> extends NkAbstractCustomScriptObjec
     }
 
     private ScriptDefHV scriptDefHV(){
-        if(properties.isComponentReloadClassPath()){
+        if(!isDebug() && properties.isComponentReloadClassPath()){
             ScriptDefHV defHV = super.loadScriptFromClassPath();
             if(defHV!=null){
                 return defHV;

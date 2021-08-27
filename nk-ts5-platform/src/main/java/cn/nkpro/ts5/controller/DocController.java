@@ -1,6 +1,7 @@
 package cn.nkpro.ts5.controller;
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
+import cn.nkpro.ts5.engine.doc.model.DocDefFlowV;
 import cn.nkpro.ts5.engine.doc.model.DocHHistory;
 import cn.nkpro.ts5.engine.doc.service.NkDocHistoryService;
 import cn.nkpro.ts5.engine.elasticearch.NkIndexService;
@@ -9,14 +10,12 @@ import cn.nkpro.ts5.engine.doc.service.NkDocDefService;
 import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService;
 import cn.nkpro.ts5.engine.elasticearch.ESPageList;
 import cn.nkpro.ts5.engine.elasticearch.model.DocHES;
-import cn.nkpro.ts5.orm.mb.gen.DocDefH;
 import cn.nkpro.ts5.orm.mb.gen.SysLogDocRecord;
 import com.alibaba.fastjson.JSONObject;
 import eu.bitwalker.useragentutils.Browser;
 import eu.bitwalker.useragentutils.UserAgent;
 import eu.bitwalker.useragentutils.Version;
 import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -53,10 +52,9 @@ public class DocController {
     
     @WsDocNote("2.拉取入口单据列表")
     @RequestMapping(value = "/entrance",method = RequestMethod.GET)
-    public List<DocDefH> getEntrance(@RequestParam("classify") String classify){
+    public List<DocDefFlowV> getEntrance(@RequestParam("classify") String classify){
         return docDefService.getEntrance(classify);
     }
-
 
     @WsDocNote("3.拉取交易详情")
     @RequestMapping(value = "/detail/{docId}",method = RequestMethod.GET)

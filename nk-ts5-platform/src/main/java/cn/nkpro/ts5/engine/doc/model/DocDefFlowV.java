@@ -9,6 +9,8 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude()
 public class DocDefFlowV extends DocDefFlow {
+    private String classify;
+    private String docName;
     private boolean visible;
     private String visibleDesc;
 }

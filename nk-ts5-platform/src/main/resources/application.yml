@@ -12,7 +12,7 @@ nk:
     - cn.nkpro.ts5.cards
     - cn.nkpro.groovy
   component-disable-online-editing: false
-  component-reload-class-path: true
+  component-reload-class-path: false
 #  aliyun:
 #    access-key-id: LTAI4G6YUdTBx8b9C8uR3gTU
 #    access-key-secret: zeqaRsOAOkwwTLK8E2QyR1aEcj6RAL

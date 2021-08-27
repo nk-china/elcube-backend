@@ -16,8 +16,8 @@ public class NkProperties {
     private String passwordStrategy;
     private Boolean enableBreachStream;
 
-    private boolean  componentDisableOnlineEditing = true;
-    private boolean  componentReloadClassPath      = true;
+    private boolean  componentDisableOnlineEditing = false;
+    private boolean  componentReloadClassPath      = false;
     private String[] componentBasePackages         = new String[]{"cn.nkpro.ts5.cards"};
 }
 

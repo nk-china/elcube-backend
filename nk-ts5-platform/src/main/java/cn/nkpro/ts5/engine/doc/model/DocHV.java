@@ -41,6 +41,7 @@ public class DocHV extends DocHBasis implements Cloneable {
 
     public DocHPersistent toPersistent(){
         DocHPersistent docHPersistent = BeanUtilz.copyFromObject(this, DocHPersistent.class);
+        docHPersistent.setDynamics(getDynamics());
         docHPersistent.setItems(getItems().entrySet()
                 .stream()
                 .collect(Collectors.toMap(

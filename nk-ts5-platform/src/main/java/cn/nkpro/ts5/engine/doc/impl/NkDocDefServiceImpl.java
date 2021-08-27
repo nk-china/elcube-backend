@@ -4,6 +4,7 @@ import cn.nkpro.ts5.basic.Constants;
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.config.mybatis.pagination.PaginationContext;
 import cn.nkpro.ts5.config.redis.RedisSupport;
+import cn.nkpro.ts5.engine.LocalSyncUtilz;
 import cn.nkpro.ts5.engine.co.DebugContextManager;
 import cn.nkpro.ts5.engine.co.NkCustomObject;
 import cn.nkpro.ts5.engine.co.NkCustomObjectManager;
@@ -142,12 +143,20 @@ public class NkDocDefServiceImpl implements NkDocDefService {
     }
 
     @Override
-    public DocDefHV doRun(DocDefHV docDefHV){
-        Assert.isTrue(StringUtils.equals(docDefHV.getState(),"InActive"),"已激活的版本不能调试");
-        validateDef(docDefHV);
-        doUpdate(docDefHV, false);
-        debugContextManager.addDebugResource(String.format("@%s",docDefHV.getDocType()),docDefHV);
-        return docDefHV;
+    public DocDefHV doRun(DocDefHV docDefHV, boolean run){
+        if(run){
+            Assert.isTrue(StringUtils.equals(docDefHV.getState(),"InActive"),"已激活的版本不能调试");
+            validateDef(docDefHV);
+            doUpdate(docDefHV, false);
+
+            // 因为卡片的配置对象是动态脚本生成，json不能正确序列化，所以在存入debug资源前，清除卡片的配置对象
+            docDefHV.getCards().forEach(card->card.setConfig(null));
+
+            debugContextManager.addDebugResource(String.format("@%s",docDefHV.getDocType()),docDefHV);
+        }else {
+            debugContextManager.removeDebugResource(String.format("@%s",docDefHV.getDocType()),docDefHV);
+        }
+        return deserializeDefFromContent(docDefHV);
     }
 
     /**
@@ -202,7 +211,8 @@ public class NkDocDefServiceImpl implements NkDocDefService {
                 .andDocTypeEqualTo(docDefHV.getDocType())
                 .andVersionEqualTo(docDefHV.getVersion());
         docDefStateMapper.deleteByExample(stateExample);
-        docDefHV.getStatus()
+        if(docDefHV.getStatus()!=null)
+            docDefHV.getStatus()
                 .forEach(state->{
                     Assert.hasLength(state.getDocState(),"状态 不能为空");
                     Assert.hasLength(state.getDocStateDesc(),"状态描述 不能为空");
@@ -221,7 +231,8 @@ public class NkDocDefServiceImpl implements NkDocDefService {
                 .andDocTypeEqualTo(docDefHV.getDocType())
                 .andVersionEqualTo(docDefHV.getVersion());
         docDefCycleMapper.deleteByExample(cycleExample);
-        docDefHV.getLifeCycles()
+        if(docDefHV.getLifeCycles()!=null)
+            docDefHV.getLifeCycles()
                 .forEach(cycle->{
                     if(StringUtils.isNotBlank(cycle.getDocCycle())&&StringUtils.isNotBlank(cycle.getRefObjectType())){
 
@@ -241,7 +252,8 @@ public class NkDocDefServiceImpl implements NkDocDefService {
                 .andDocTypeEqualTo(docDefHV.getDocType())
                 .andVersionEqualTo(docDefHV.getVersion());
         docDefBpmMapper.deleteByExample(bpmExample);
-        docDefHV.getBpms()
+        if(docDefHV.getBpms()!=null)
+            docDefHV.getBpms()
                 .forEach(bpm->{
                     if(StringUtils.isNotBlank(bpm.getProcessKey())&&StringUtils.isNotBlank(bpm.getStartBy())){
 
@@ -255,29 +267,25 @@ public class NkDocDefServiceImpl implements NkDocDefService {
 
 
         // flow
-        docDefHV.setDocEntrance(0);
-
         Assert.notEmpty(docDefHV.getFlows(),"业务流不能为空");
         DocDefFlowExample flowExample = new DocDefFlowExample();
         flowExample.createCriteria()
                 .andDocTypeEqualTo(docDefHV.getDocType())
                 .andVersionEqualTo(docDefHV.getVersion());
         docDefFlowMapper.deleteByExample(flowExample);
-        docDefHV.getFlows()
+        if(docDefHV.getFlows()!=null)
+            docDefHV.getFlows()
                 .forEach(flow->{
                     Assert.hasLength(flow.getPreDocType(),"业务流 前置交易 不能为空");
                     flow.setPreDocState(StringUtils.defaultIfBlank(flow.getPreDocState(),"@"));
-                    flow.setDocType(docDefHV.getDocType());
+                    flow.setDocType(docDefHV.getDocType());// 视图字段，用于业务流缓存
+                    flow.setDocName(docDefHV.getDocName());// 视图字段，用于业务流缓存
+                    flow.setClassify(docDefHV.getDocClassify());
                     flow.setVersion(docDefHV.getVersion());
                     flow.setState(docDefHV.getState());
                     flow.setOrderBy(docDefHV.getFlows().indexOf(flow));
                     flow.setUpdatedTime(DateTimeUtilz.nowSeconds());
                     docDefFlowMapper.insert(flow);
-
-                    // 设置入口单据标识
-                    if(StringUtils.equals(flow.getPreDocType(),"@")){
-                        docDefHV.setDocEntrance(1);
-                    }
                 });
 
         // indexRule
@@ -286,7 +294,8 @@ public class NkDocDefServiceImpl implements NkDocDefService {
                 .andDocTypeEqualTo(docDefHV.getDocType())
                 .andVersionEqualTo(docDefHV.getVersion());
         docDefIndexRuleMapper.deleteByExample(indexRuleExample);
-        docDefHV.getIndexRules()
+        if(docDefHV.getIndexRules()!=null)
+            docDefHV.getIndexRules()
                 .forEach(indexRule -> {
                     Assert.hasLength(indexRule.getIndexName(),"索引 字段名 不能为空");
                     Assert.hasLength(indexRule.getIndexType(),"索引 字段名 不能为空");
@@ -382,8 +391,15 @@ public class NkDocDefServiceImpl implements NkDocDefService {
         docDefHV = doUpdate(docDefHV,false);
         // 一旦单据激活，则删除单据配置
         redisSupport.delete(Constants.CACHE_DEF_DOC_TYPES,docDefHV.getDocType());
+
         // 一旦单据激活，则删除所有的业务流缓存，避免数据不一致
-        redisSupport.delete(Constants.CACHE_DEF_DOC_FLOWS);
+        // redisSupport.delete(Constants.CACHE_DEF_DOC_FLOWS);
+
+        // 一旦单据激活，更新缓存中的业务流
+        DocDefHV def = docDefHV;
+        LocalSyncUtilz.runBeforeCommit(()->
+            redisSupportFlows.putHash(Constants.CACHE_DEF_DOC_FLOWS, def.getDocType(), def.getFlows())
+        );
 
         debugContextManager.removeDebugResource(String.format("@%s",docDefHV.getDocType()), docDefHV);
 
@@ -415,6 +431,8 @@ public class NkDocDefServiceImpl implements NkDocDefService {
         docDefIMapper.deleteByExample(defIExample);
 
         docDefHMapper.deleteByPrimaryKey(docDefHV);
+
+        debugContextManager.removeDebugResource(String.format("@%s",docDefHV.getDocType()), docDefHV);
     }
 
     @Override
@@ -434,50 +452,42 @@ public class NkDocDefServiceImpl implements NkDocDefService {
     }
 
     @Override
-    public List<DocDefH> getEntrance(String classify){
+    public List<DocDefFlowV> getEntrance(String classify){
 
-        String today = DateTimeUtilz.todayShortString();
-
-        DocDefHExample example = new DocDefHExample();
-        DocDefHExample.Criteria criteria = example.createCriteria()
-                .andValidFromLessThanOrEqualTo(today)
-                .andValidToGreaterThanOrEqualTo(today)
-                .andDocEntranceEqualTo(1)
-                .andStateEqualTo("Active");
-
-        if(StringUtils.isNotBlank(classify)){
-            criteria.andDocClassifyEqualTo(classify);
-        }
-
-        example.setOrderByClause("DOC_TYPE, VERSION DESC");
-
-        Map<String,DocDefH> cache = new HashMap<>();
-        docDefHMapper
-                .selectByExample(example)
-                .forEach(docDefH -> cache.computeIfAbsent(docDefH.getDocType(),(e)-> docDefH));
-
-        return cache.values().stream()
-                .sorted(Comparator.comparing(DocDefH::getDocName))
+        return getDocTypeFlows("@")
+                .stream()
+                .filter(flowV->StringUtils.isBlank(classify) || StringUtils.equals(flowV.getClassify(),classify))
                 .collect(Collectors.toList());
     }
 
     private List<DocDefFlowV> getDocTypeFlows(String docType){
         // 从缓存中获取已激活的单据业务流
         Map<String, List<DocDefFlowV>> docTypeFlows = redisSupportFlows.getHashIfAbsent(Constants.CACHE_DEF_DOC_FLOWS, () -> {
+
+            DocDefHExample docDefHExample = new DocDefHExample();
+            docDefHExample.createCriteria()
+                    .andStateEqualTo("Active");
+            Map<String,DocDefH> docDefs = docDefHMapper.selectByExample(docDefHExample)
+                    .stream()
+                    .collect(Collectors.toMap(DocDefHKey::getDocType,e->e));
+
             DocDefFlowExample flowExample = new DocDefFlowExample();
             flowExample.createCriteria()
                     .andStateEqualTo("Active");
-            flowExample.setOrderByClause("ORDER_BY");
+            flowExample.setOrderByClause("DOC_TYPE, ORDER_BY");
 
             Map<String, List<DocDefFlowV>> flows = new HashMap<>();
 
             docDefFlowMapper.selectByExample(flowExample)
-                    .forEach(item ->
-                            flows.computeIfAbsent(
-                                    item.getDocType(),
-                                    (key) -> new ArrayList<>()
-                            ).add(BeanUtilz.copyFromObject(item,DocDefFlowV.class))
-                    );
+                    .forEach(item ->{
+                            DocDefFlowV flowV = BeanUtilz.copyFromObject(item,DocDefFlowV.class);
+                            if(docDefs.containsKey(flowV.getDocType())){
+                                DocDefH defH = docDefs.get(flowV.getDocType());
+                                flowV.setClassify(defH.getDocClassify());   // 视图字段，用于业务流缓存
+                                flowV.setDocName(defH.getDocName());        // 视图字段，用于业务流缓存
+                                flows.computeIfAbsent(item.getDocType(),(key) -> new ArrayList<>()).add(flowV);
+                            }
+                    });
 
             return flows;
         });

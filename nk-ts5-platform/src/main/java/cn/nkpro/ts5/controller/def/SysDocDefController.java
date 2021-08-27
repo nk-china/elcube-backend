@@ -98,8 +98,8 @@ public class SysDocDefController {
     @WsDocNote("9.调试配置")
     @RequestMapping("/type/debug")
     public DocDefHV debug(
-            @WsDocNote("单据配置对象")@RequestBody DocDefHV def){
-        return defDocTypeService.doRun(def);
+            @WsDocNote("单据配置对象")@RequestBody DocDefHV def, @RequestParam(value="run")boolean run){
+        return defDocTypeService.doRun(def, run);
     }
 
     @WsDocNote("10.获取单据配置的Options")

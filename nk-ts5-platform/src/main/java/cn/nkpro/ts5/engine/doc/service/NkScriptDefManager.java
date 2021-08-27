@@ -31,7 +31,7 @@ public interface NkScriptDefManager extends ApplicationListener<ContextRefreshed
     ScriptDefH getScript(String scriptName, String version);
 
     @Transactional
-    ScriptDefH doRun(ScriptDefHV scriptDefH);
+    ScriptDefH doRun(ScriptDefHV scriptDefH, boolean run);
 
     @Transactional
     void doDelete(ScriptDefHV scriptDefH);

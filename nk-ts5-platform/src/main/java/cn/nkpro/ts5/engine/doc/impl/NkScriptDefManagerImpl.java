@@ -126,13 +126,18 @@ public class NkScriptDefManagerImpl implements NkScriptDefManager {
 
     @Override
     @Transactional
-    public ScriptDefH doRun(ScriptDefHV scriptDefH){
+    public ScriptDefH doRun(ScriptDefHV scriptDefH, boolean run){
 
-        Assert.isTrue(!StringUtils.equals(scriptDefH.getVersion(),"@"),"IDE版本不能调试");
-        Assert.isTrue(StringUtils.equals(scriptDefH.getState(),"InActive"),"已激活的版本不能调试");
+        if(run){
+            Assert.isTrue(!StringUtils.equals(scriptDefH.getVersion(),"@"),"IDE版本不能调试");
+            Assert.isTrue(StringUtils.equals(scriptDefH.getState(),"InActive"),"已激活的版本不能调试");
 
-        doUpdate(scriptDefH,false);
-        debugContextManager.addDebugResource("$"+scriptDefH.getScriptName(),scriptDefH);
+            doUpdate(scriptDefH,false);
+            debugContextManager.addDebugResource("#"+scriptDefH.getScriptName(),scriptDefH);
+        }else{
+            debugContextManager.removeDebugResource("#"+scriptDefH.getScriptName(),scriptDefH);
+        }
+
         return scriptDefH;
     }
 
@@ -183,7 +188,7 @@ public class NkScriptDefManagerImpl implements NkScriptDefManager {
         // 激活版本
         scriptDefH.setState("Active");
         doUpdate(scriptDefH,false);
-        debugContextManager.addActiveResource(scriptDefH);
+        debugContextManager.addActiveResource("#"+scriptDefH.getScriptName(), scriptDefH);
 
         redisSupport.delete(Constants.CACHE_DEF_SCRIPT);
 
@@ -195,6 +200,7 @@ public class NkScriptDefManagerImpl implements NkScriptDefManager {
     public void doDelete(ScriptDefHV scriptDefH){
         Assert.isTrue(StringUtils.equals(scriptDefH.getState(),"InActive"),"非未激活的版本不能删除");
         scriptDefHMapper.deleteByPrimaryKey(scriptDefH);
+        debugContextManager.removeDebugResource("#"+scriptDefH.getScriptName(),scriptDefH);
     }
 
     /**
@@ -330,7 +336,7 @@ public class NkScriptDefManagerImpl implements NkScriptDefManager {
         if(contextRefreshedEvent.getApplicationContext()== debugContextManager.getApplicationContext()){
             getActiveResources().forEach((scriptDef)-> {
                 try {
-                    debugContextManager.addActiveResource(BeanUtilz.copyFromObject(scriptDef,ScriptDefHV.class));
+                    debugContextManager.addActiveResource("#"+scriptDef.getScriptName(), BeanUtilz.copyFromObject(scriptDef,ScriptDefHV.class));
                 }catch (RuntimeException e){
                     log.error(e.getMessage(),e);
                 }

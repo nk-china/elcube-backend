@@ -4,6 +4,7 @@ package cn.nkpro.ts5.exception;
 import cn.nkpro.ts5.exception.abstracts.TfmsCaution;
 import cn.nkpro.ts5.exception.abstracts.TfmsRuntimeException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
@@ -45,7 +46,17 @@ public class GlobalExceptionHandler {
     public ModelAndView errorHandler(HttpServletRequest request,
                                      HttpServletResponse response, Exception ex) {
 
-        log.error(ex.getMessage(),ex);
+        String message = ex.getMessage();
+
+        if(StringUtils.isBlank(message)){
+            if(ex instanceof NullPointerException){
+                message = "空指针";
+            }else{
+                message = "未知错误";
+            }
+        }
+
+        log.error(message,ex);
 
         response.setStatus(codes.getOrDefault(ex.getClass(),500));
 
@@ -53,7 +64,7 @@ public class GlobalExceptionHandler {
         Map<String, Object> attributes = new HashMap<>();
 
         attributes.put("code", response.getStatus());
-        attributes.put("msg", ex.getMessage());
+        attributes.put("msg", message);
         attributes.put("url", request.getRequestURI().substring(request.getContextPath().length()));
         attributes.put("causeStackTrace", ExceptionUtils.getRootCauseStackTrace(ex));
 

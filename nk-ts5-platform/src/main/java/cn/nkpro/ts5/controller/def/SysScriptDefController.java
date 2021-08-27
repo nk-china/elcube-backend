@@ -81,11 +81,11 @@ public class SysScriptDefController {
     @WsDocNote("8.调试")
     @RequestMapping("/debug")
     public ScriptDefH debug(
-            @WsDocNote("脚本对象")@RequestBody ScriptDefHV script){
-        return scriptService.doRun(script);
+            @WsDocNote("脚本对象")@RequestBody ScriptDefHV script, @RequestParam(value="run")boolean run){
+        return scriptService.doRun(script,run);
     }
 
-    @WsDocNote("9、是否禁用在线编辑")
+    @WsDocNote("10.是否禁用在线编辑")
     @RequestMapping("/online/editing")
     public boolean isComponentDisableOnlineEditing(){
         return properties.isComponentDisableOnlineEditing();
