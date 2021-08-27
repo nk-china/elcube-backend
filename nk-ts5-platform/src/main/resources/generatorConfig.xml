@@ -35,11 +35,13 @@
 		<table tableName="nk_script_def_h"					enableDeleteByExample="false" domainObjectName="ScriptDefH" />
 
 		<table tableName="nk_doc_h"		  					enableDeleteByExample="false" domainObjectName="DocH"/>
-		<table tableName="nk_doc_i"		 					enableDeleteByExample="false" domainObjectName="DocI"/>
+        <table tableName="nk_doc_i"		 					enableDeleteByExample="false" domainObjectName="DocI"/>
+        <table tableName="nk_doc_i_index"		 			enableDeleteByExample="true"  domainObjectName="DocIIndex"/>
 		<table tableName="nk_doc_def_h"		 				enableDeleteByExample="false" domainObjectName="DocDefH"/>
 		<table tableName="nk_doc_def_i"		 				enableDeleteByExample="true"  domainObjectName="DocDefI"/>
 		<table tableName="nk_doc_def_state"				 	enableDeleteByExample="true"  domainObjectName="DocDefState"/>
 		<table tableName="nk_doc_def_cycle"				 	enableDeleteByExample="true"  domainObjectName="DocDefCycle"/>
+		<table tableName="nk_doc_def_index_rule"			enableDeleteByExample="true"  domainObjectName="DocDefIndexRule"/>
 		<table tableName="nk_doc_def_flow"				 	enableDeleteByExample="true"  domainObjectName="DocDefFlow"/>
 		<table tableName="nk_doc_def_bpm"					enableDeleteByExample="true"  domainObjectName="DocDefBpm"/>
 

@@ -16,7 +16,9 @@ import cn.nkpro.ts5.engine.doc.service.NkDocDefService;
 import cn.nkpro.ts5.engine.doc.service.NkDocHistoryService;
 import cn.nkpro.ts5.engine.elasticearch.SearchEngine;
 import cn.nkpro.ts5.engine.elasticearch.model.DocHES;
+import cn.nkpro.ts5.engine.spel.TfmsSpELManager;
 import cn.nkpro.ts5.engine.task.NkBpmTaskService;
+import cn.nkpro.ts5.exception.TfmsDefineException;
 import cn.nkpro.ts5.orm.mb.gen.*;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
@@ -25,10 +27,12 @@ import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.session.RowBounds;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.expression.EvaluationContext;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
@@ -53,6 +57,8 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
     private DocHMapper docHMapper;
     @Autowired@SuppressWarnings("all")
     private DocIMapper docIMapper;
+    @Autowired
+    private DocIIndexMapper docIIndexMapper;
     @Autowired@SuppressWarnings("all")
     private SearchEngine searchEngine;
     @Autowired@SuppressWarnings("all")
@@ -61,6 +67,8 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
     private NkCustomObjectManager customObjectManager;
     @Autowired@SuppressWarnings("all")
     private NkDocHistoryService docHistoryService;
+    @Autowired
+    private TfmsSpELManager spELManager;
 
     @Override
     public EnumDocClassify classify() {
@@ -287,6 +295,9 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
             doc.setCreatedTime(doc.getUpdatedTime());
         }
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if(log.isInfoEnabled())log.info("{}保存单据内容 开始处理单据卡片数据", NkDocEngineContext.currLog());
         docDefService.runLoopCards(doc.getDef(),false, (card, defIV)->
                 doc.getData().put(
@@ -296,6 +307,9 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         );
         if(log.isInfoEnabled())log.info("{}保存单据内容 反序列化数据完成", NkDocEngineContext.currLog());
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if(log.isInfoEnabled())log.info("{}保存单据内容 触发单据 beforeUpdate 接口", NkDocEngineContext.currLog());
         DocHV loopDoc = processCycle(doc, NkDocCycle.beforeUpdate, (beanName)->
                 customObjectManager
@@ -303,6 +317,9 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
                         .apply(doc, original, NkDocCycle.beforeUpdate)
         );
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if(log.isInfoEnabled())log.info("{}保存单据内容 保存卡片数据到数据库", NkDocEngineContext.currLog());
         docDefService.runLoopCards(loopDoc.getDef(),false, (card, defIV)->{
 
@@ -344,8 +361,11 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
             loopDoc.getData().put(defIV.getCardKey(),cardData);
         });
 
+        // 单据状态发生变化
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if(original==null || !StringUtils.equals(loopDoc.getDocState(),original.getDocState())){
-            // 单据状态发生变化
             if(log.isInfoEnabled())log.info("{}保存单据内容 触发卡片的状态变更事件", NkDocEngineContext.currLog());
             docDefService.runLoopCards(loopDoc.getDef(),false, (card, defIV)->{
                 Object cardData = loopDoc.getData().get(defIV.getCardKey());
@@ -366,7 +386,10 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
             }
         }
 
-        // 卡片数据保存之后
+        // 卡片数据保存
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if(log.isInfoEnabled())log.info("{}保存单据内容 准备触发卡片 afterUpdated 、updateCommitted 接口", NkDocEngineContext.currLog());
         docDefService.runLoopCards(loopDoc.getDef(),false, (card, defIV)->{
 
@@ -396,7 +419,82 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         });
         if(log.isInfoEnabled())log.info("{}保存单据内容 触发卡片 afterUpdated 、updateCommitted 接口完成", NkDocEngineContext.currLog());
 
+
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        if(log.isInfoEnabled())log.info("{}保存单据内容 计算动态索引字段", NkDocEngineContext.currLog());
+        EvaluationContext context = spELManager.createContext(loopDoc);
+
+        DocIIndexExample example = new DocIIndexExample();
+        example.createCriteria().andDocIdEqualTo(loopDoc.getDocId());
+        docIIndexMapper.deleteByExample(example);
+        loopDoc.getDef()
+                .getIndexRules()
+                .forEach(rule->{
+                    String name = String.format("%s_%s",rule.getIndexName(),rule.getIndexType());
+                    Object value = spELManager.invoke(rule.getRuleSpEL(),context);
+                    String type = value==null?Void.class.getName():value.getClass().getName();
+                    loopDoc.getDynamics().put(
+                            name,
+                            spELManager.invoke(rule.getRuleSpEL(),context)
+                    );
+
+                    if(optionalOriginal.isPresent()&&original.getDynamics().containsKey(name)){
+                        DocIIndex index = BeanUtilz.copyFromObject(original.getDynamics().get(name),DocIIndex.class);
+                        index.setValue(JSON.toJSONString(value));
+                        index.setDataType(type);
+                        index.setOrderBy(rule.getOrderBy());
+                        index.setUpdatedTime(DateTimeUtilz.nowSeconds());
+                        docIIndexMapper.updateByPrimaryKey(index);
+                    }else{
+                        DocIIndex index = new DocIIndex();
+                        index.setDocId(loopDoc.getDocId());
+                        index.setName(name);
+                        index.setValue(JSON.toJSONString(value));
+                        index.setDataType(type);
+                        index.setOrderBy(rule.getOrderBy());
+                        index.setUpdatedTime(DateTimeUtilz.nowSeconds());
+                        docIIndexMapper.insert(index);
+                    }
+                });
+        // 删除已过时的索引
+        if(optionalOriginal.isPresent()){
+            original.getDynamics().forEach((k,v)->{
+                if(!loopDoc.getDynamics().containsKey(k)){
+                    DocIIndexKey key = new DocIIndexKey();
+                    key.setDocId(loopDoc.getDocId());
+                    key.setName(k);
+                    docIIndexMapper.deleteByPrimaryKey(key);
+                }
+            });
+        }
+
+        // 业务主键
+        loopDoc.setBusinessKey(StringUtils.EMPTY);
+        if(StringUtils.isNotBlank(loopDoc.getDef().getBusinessKeySpEL())){
+            Object businessKey = spELManager.invoke(loopDoc.getDef().getBusinessKeySpEL(), context);
+            loopDoc.setBusinessKey(businessKey!=null?businessKey.toString():StringUtils.EMPTY);
+            if(StringUtils.isNotBlank(loopDoc.getBusinessKey())&&
+                    !(optionalOriginal.isPresent() && StringUtils.equals(loopDoc.getBusinessKey(),original.getBusinessKey()))){
+
+                DocHExample docHExample = new DocHExample();
+                docHExample.createCriteria()
+                        .andBusinessKeyEqualTo(loopDoc.getBusinessKey());
+
+                docHMapper.selectByExample(docHExample,new RowBounds(0,1))
+                        .stream()
+                        .filter(e->!StringUtils.equals(e.getDocId(),loopDoc.getDocId()))
+                        .findFirst()
+                        .ifPresent((e)->{throw new TfmsDefineException("业务主键重复");});
+            }
+        }
+
         // 数据更新前后对比
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if(log.isInfoEnabled())log.info("{}保存单据内容 对比修改内容", NkDocEngineContext.currLog());
         List<String> changedCard = new ArrayList<>();
         docDefService.runLoopCards(loopDoc.getDef(),false, (card, defIV)->{
@@ -416,7 +514,9 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         });
         if(log.isInfoEnabled())log.info("{}保存单据内容 对比修改内容完成 changedCard = {}", NkDocEngineContext.currLog(), changedCard);
 
-        // 卡片更新完成
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if(log.isInfoEnabled())log.info("{}保存单据内容 触发单据 afterUpdated 接口", NkDocEngineContext.currLog());
         processCycle(loopDoc, NkDocCycle.afterUpdated, (beanName)->{
             customObjectManager
@@ -425,6 +525,9 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
             return loopDoc;
         });
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if(log.isInfoEnabled())log.info("{}保存单据内容 保存单据抬头数据到数据库", NkDocEngineContext.currLog());
         loopDoc.setIdentification(random());
         if(optionalOriginal.isPresent()){
@@ -433,13 +536,22 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
             docHMapper.insert(loopDoc);
         }
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if(log.isInfoEnabled())log.info("{}保存单据内容 增加单据修改历史记录", NkDocEngineContext.currLog());
         docHistoryService.doAddVersion(loopDoc,original,changedCard,optSource);
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         humanize(doc);
         if(log.isInfoEnabled())log.info("{}保存单据内容 创建重建index任务", NkDocEngineContext.currLog());
         index(loopDoc);
 
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         final String currLog = NkDocEngineContext.currLog();
         LocalSyncUtilz.runAfterCommit(()->{
             if(log.isInfoEnabled())log.info("{}保存单据内容 触发单据 afterUpdateCommitted 接口", currLog);

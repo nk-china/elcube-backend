@@ -60,6 +60,8 @@ public class NkDocDefServiceImpl implements NkDocDefService {
     private DocDefFlowMapper docDefFlowMapper;
     @Autowired@SuppressWarnings("all")
     private DocDefCycleMapper docDefCycleMapper;
+    @Autowired
+    private DocDefIndexRuleMapper docDefIndexRuleMapper;
     @Autowired@SuppressWarnings("all")
     private DocDefBpmMapper docDefBpmMapper;
 
@@ -277,6 +279,26 @@ public class NkDocDefServiceImpl implements NkDocDefService {
                         docDefHV.setDocEntrance(1);
                     }
                 });
+
+        // indexRule
+        DocDefIndexRuleExample indexRuleExample = new DocDefIndexRuleExample();
+        indexRuleExample.createCriteria()
+                .andDocTypeEqualTo(docDefHV.getDocType())
+                .andVersionEqualTo(docDefHV.getVersion());
+        docDefIndexRuleMapper.deleteByExample(indexRuleExample);
+        docDefHV.getIndexRules()
+                .forEach(indexRule -> {
+                    Assert.hasLength(indexRule.getIndexName(),"索引 字段名 不能为空");
+                    Assert.hasLength(indexRule.getIndexType(),"索引 字段名 不能为空");
+                    Assert.hasLength(indexRule.getRuleSpEL(),"索引 规则 不能为空");
+                    indexRule.setDocType(docDefHV.getDocType());
+                    indexRule.setVersion(docDefHV.getVersion());
+                    indexRule.setOrderBy(docDefHV.getIndexRules().indexOf(indexRule));
+                    indexRule.setUpdatedTime(DateTimeUtilz.nowSeconds());
+
+                    docDefIndexRuleMapper.insert(indexRule);
+                });
+
 
         // components
         DocDefIExample defIExample = new DocDefIExample();
@@ -568,6 +590,14 @@ public class NkDocDefServiceImpl implements NkDocDefService {
                 .andVersionEqualTo(version);
         cycleExample.setOrderByClause("ORDER_BY");
         def.setLifeCycles(docDefCycleMapper.selectByExample(cycleExample));
+
+        // indexRule
+        DocDefIndexRuleExample indexRuleExample = new DocDefIndexRuleExample();
+        indexRuleExample.createCriteria()
+                .andDocTypeEqualTo(docType)
+                .andVersionEqualTo(version);
+        indexRuleExample.setOrderByClause("ORDER_BY");
+        def.setIndexRules(docDefIndexRuleMapper.selectByExample(indexRuleExample));
 
         // bpm
         DocDefBpmExample bpmExample = new DocDefBpmExample();

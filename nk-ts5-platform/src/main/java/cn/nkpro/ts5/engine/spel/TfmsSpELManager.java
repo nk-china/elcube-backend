@@ -56,7 +56,7 @@ public class TfmsSpELManager {
         try{
             return parser.parseExpression(el).getValue(context);
         }catch (ParseException | EvaluationException e){
-            throw new TfmsDefineException(String.format("表达式 %s 错误",el),e);
+            throw new TfmsDefineException(String.format("表达式 %s 错误: %s",el, e.getMessage()),e);
         }
     }
 

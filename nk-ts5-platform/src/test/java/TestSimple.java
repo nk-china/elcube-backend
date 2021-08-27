@@ -1,3 +1,5 @@
+import camundajar.impl.scala.Int;
+import com.alibaba.fastjson.JSON;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
@@ -20,6 +22,15 @@ public class TestSimple {
         System.out.println(runC.getDeclaringClass()==A.class);
 
 
+        System.out.println(Class.forName("java.lang.Void").cast(null));
+        System.out.println(Class.forName("java.lang.Integer").cast(1));
+
+
+        System.out.println(JSON.parseObject("1", Integer.class));
+        System.out.println(JSON.parseObject("1", String.class));
+
+        System.out.println(JSON.toJSONString(null));
+        System.out.println(JSON.parseObject("null", Void.class)==null);
 
     }
 }

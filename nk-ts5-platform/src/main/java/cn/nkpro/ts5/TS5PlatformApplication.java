@@ -1,5 +1,7 @@
 package cn.nkpro.ts5;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.camunda.bpm.spring.boot.starter.annotation.EnableProcessApplication;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
@@ -17,6 +19,10 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @SpringBootApplication(scanBasePackages = {"cn.nkpro"})
 public class TS5PlatformApplication {
     public static void main(String[] args) {
+
+        JSON.DEFAULT_GENERATE_FEATURE |= SerializerFeature.WriteClassName.getMask();
+        JSON.DEFAULT_GENERATE_FEATURE |= SerializerFeature.WriteMapNullValue.getMask();
+        JSON.DEFAULT_GENERATE_FEATURE |= SerializerFeature.DisableCircularReferenceDetect.getMask();
         SpringApplication.run(TS5PlatformApplication.class, args);
     }
 }

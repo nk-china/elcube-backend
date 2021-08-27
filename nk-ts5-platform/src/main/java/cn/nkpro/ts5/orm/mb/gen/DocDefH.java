@@ -25,6 +25,8 @@ public class DocDefH extends DocDefHKey implements Serializable {
 
     private String refObjectType;
 
+    private String businessKeySpEL;
+
     private Integer docEntrance;
 
     /**
@@ -124,6 +126,15 @@ public class DocDefH extends DocDefHKey implements Serializable {
 
     public void setRefObjectType(String refObjectType) {
         this.refObjectType = refObjectType;
+    }
+
+    @cn.nkpro.ts5.basic.wsdoc.annotation.CodeFieldNotes("")
+    public String getBusinessKeySpEL() {
+        return businessKeySpEL;
+    }
+
+    public void setBusinessKeySpEL(String businessKeySpEL) {
+        this.businessKeySpEL = businessKeySpEL;
     }
 
     @cn.nkpro.ts5.basic.wsdoc.annotation.CodeFieldNotes("")

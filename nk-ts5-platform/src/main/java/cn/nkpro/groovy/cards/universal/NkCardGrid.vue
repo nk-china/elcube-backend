@@ -130,7 +130,7 @@ const columnTypes = {
             title: field.name,
             width: (field.col || '10') + '%',
             formatter({cellValue}){
-                return NkFormat.nkDatetimeISO(cellValue,field.format)
+                return NkFormat.nkDatetime(cellValue,field.format)
             },
             editRender: field.control === 0 ? undefined : {
                 name: 'nkDate',
@@ -149,7 +149,7 @@ const columnTypes = {
             title: field.name,
             width: (field.col || '10') + '%',
             formatter({cellValue}){
-                return NkFormat.nkDatetimeISO(cellValue,field.format)
+                return NkFormat.nkDatetime(cellValue,field.format)
             },
             editRender: field.control === 0 ? undefined : {
                 name: 'nkDateTime',
@@ -180,7 +180,7 @@ const columnTypes = {
         }
     },
     select(field){
-        let options = (field.options && JSON.parse(field.options))||[];
+        let options = field.optionsObject || [];
         return {
             field: field.key,
             title: field.name,
@@ -365,7 +365,7 @@ export default {
         async xTableAdd(){
             let row = {};
             this.def.items.forEach(field=>{
-                row[field.key]=(field.inputType==='switch'?1:undefined);
+                row[field.key]=(field.inputType==='switch'?1:null);
             });
             this.data.push(row);
             await this.$refs.xTable.loadData(this.data);

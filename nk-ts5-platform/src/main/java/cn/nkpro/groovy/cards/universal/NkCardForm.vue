@@ -95,14 +95,14 @@
                                     slot            ="edit"
                                     size            ="small"
                                     :style          ="item.style"
-                                    :defaultValue   ="moment(data[item.key])"
+                                    :defaultValue   ="data[item.key]?moment(data[item.key]*1000):null"
                                     @change         ="dateChanged($event,item)"></a-date-picker>
                     <a-date-picker  v-else-if       ="item.inputType==='datetime'"
                                     show-time
                                     slot            ="edit"
                                     size            ="small"
                                     :style          ="item.style"
-                                    :defaultValue   ="moment(data[item.key])"
+                                    :defaultValue   ="data[item.key]?moment(data[item.key]*1000):null"
                                     @change         ="datetimeChanged($event,item)"></a-date-picker>
                     <a-switch       v-else-if       ="item.inputType==='switch'"
                                     slot            ="edit"
@@ -139,7 +139,7 @@
                                     tree-checkable
                                     :show-checked-strategy="SHOW_PARENT"
                                     search-placeholder="Please select"
-                                    @change="itemChanged($event,field)"
+                                    @change="itemChanged($event,item)"
                     />
                     <label          v-else-if       ="item.inputType==='ref'"
                                     slot            ="edit"
@@ -236,6 +236,17 @@ export default {
         }
     },
     created() {
+        this.def.items.forEach(field=>{
+            if(this.data[field.key]===undefined){
+                if(field.inputType==='switch'){
+                    this.$set(this.data,field.key,true);
+                }else if(field.inputType==='select' && field.selectMode==='multiple'){
+                    this.$set(this.data,field.key,[]);
+                }else{
+                    this.$set(this.data,field.key,null);
+                }
+            }
+        })
     },
     data(){
         return {
@@ -261,12 +272,12 @@ export default {
             }
         },
         dateChanged(value,item){
-            value = value && value.startOf('day').toISOString();
+            value = value && value.startOf('day').unix();
             this.data[item.key]=value;
             this.itemChanged(value,item);
         },
         datetimeChanged(value,item){
-            value = value && value.toISOString();
+            value = value && value.unix();
             this.data[item.key]=value;
             this.itemChanged(value,item);
         },

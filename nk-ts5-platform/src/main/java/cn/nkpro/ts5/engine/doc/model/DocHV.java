@@ -3,6 +3,7 @@ package cn.nkpro.ts5.engine.doc.model;
 import cn.nkpro.ts5.engine.task.model.BpmTask;
 import cn.nkpro.ts5.orm.mb.gen.DocI;
 import cn.nkpro.ts5.utils.BeanUtilz;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -12,8 +13,9 @@ import java.util.stream.Collectors;
 /**
  * 单据数据对象，与前端交互的数据格式
  */
-@EqualsAndHashCode(callSuper = false)
 @Data
+@EqualsAndHashCode(callSuper = true)
+@JsonInclude()
 public class DocHV extends DocHBasis implements Cloneable {
 
     private BpmTask bpmTask;

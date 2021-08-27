@@ -4,6 +4,7 @@ package cn.nkpro.ts5.exception;
 import cn.nkpro.ts5.exception.abstracts.TfmsCaution;
 import cn.nkpro.ts5.exception.abstracts.TfmsRuntimeException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -54,6 +55,7 @@ public class GlobalExceptionHandler {
         attributes.put("code", response.getStatus());
         attributes.put("msg", ex.getMessage());
         attributes.put("url", request.getRequestURI().substring(request.getContextPath().length()));
+        attributes.put("causeStackTrace", ExceptionUtils.getRootCauseStackTrace(ex));
 
         view.setAttributesMap(attributes);
         ModelAndView mav = new ModelAndView("error");

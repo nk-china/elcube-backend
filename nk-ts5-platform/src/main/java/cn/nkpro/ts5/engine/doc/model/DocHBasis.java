@@ -1,6 +1,7 @@
 package cn.nkpro.ts5.engine.doc.model;
 
 import cn.nkpro.ts5.utils.BeanUtilz;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -10,8 +11,9 @@ import java.util.Map;
 /**
  * 单据数据对象，基础格式
  */
-@EqualsAndHashCode(callSuper = false)
 @Data
+@EqualsAndHashCode(callSuper = true)
+@JsonInclude()
 public class DocHBasis extends DocHPersistent implements Cloneable {
 
     private String docTypeDesc;
@@ -22,12 +24,9 @@ public class DocHBasis extends DocHPersistent implements Cloneable {
 
     private Map<String,Object> data;
 
-    private Map<String,Object> dynamics;
-
     DocHBasis() {
         super();
         this.data       = new HashMap<>();
-        this.dynamics   = new HashMap<>();
     }
 
     @Override
@@ -36,7 +35,6 @@ public class DocHBasis extends DocHPersistent implements Cloneable {
         clone.setDocTypeDesc(docTypeDesc);
         clone.setDocStateDesc(docStateDesc);
         clone.setDef(def);
-        clone.dynamics = new HashMap<>(dynamics);
         clone.data     = new HashMap<>();
         data.forEach((k,v)-> clone.data.put(k,BeanUtilz.cloneWithFastjson(v)));
 

@@ -2,7 +2,6 @@ package cn.nkpro.ts5.config.secret;
 
 import cn.nkpro.ts5.utils.TextUtils;
 import com.alibaba.fastjson.JSONObject;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.MethodParameter;
 import org.springframework.lang.Nullable;
@@ -33,7 +32,7 @@ public class CompressReturnHandler implements HandlerMethodReturnValueHandler {
                                   NativeWebRequest webRequest) throws Exception {
 
         returnValue = returnValue==null ? StringUtils.EMPTY :
-                TextUtils.compress(JSONObject.toJSONString(returnValue, SerializerFeature.DisableCircularReferenceDetect));
+                TextUtils.compress(JSONObject.toJSONString(returnValue));
 
         delegate.handleReturnValue(returnValue, returnType, mavContainer, webRequest);
     }

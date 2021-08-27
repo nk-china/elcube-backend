@@ -1,8 +1,10 @@
 package cn.nkpro.ts5.engine.doc.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 @Data
+@JsonInclude()
 public class CardDescribe {
     private String      cardHandler;
     private String      cardName;

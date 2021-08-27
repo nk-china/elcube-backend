@@ -14,7 +14,10 @@ public class BeanUtilz {
 
     public static <T> T cloneWithFastjson(Object source){
         if(source==null)return null;
-        return JSON.parseObject(JSON.toJSONString(source), (Type) source.getClass());
+        return JSON.parseObject(
+                JSON.toJSONString(source),
+                (Type) source.getClass()
+        );
     }
 
     /**

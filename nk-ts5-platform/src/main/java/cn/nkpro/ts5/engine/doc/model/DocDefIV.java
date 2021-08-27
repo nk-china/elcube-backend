@@ -1,11 +1,13 @@
 package cn.nkpro.ts5.engine.doc.model;
 
 import cn.nkpro.ts5.orm.mb.gen.DocDefIWithBLOBs;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = true)
+@JsonInclude()
 public class DocDefIV extends DocDefIWithBLOBs {
     private Object      config;
     private String      dataComponentName;

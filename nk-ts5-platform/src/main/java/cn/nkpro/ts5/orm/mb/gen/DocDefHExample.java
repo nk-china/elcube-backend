@@ -604,6 +604,76 @@ public class DocDefHExample {
             return (Criteria) this;
         }
 
+        public Criteria andBusinessKeySpELIsNull() {
+            addCriterion("BUSINESS_KEY_SP_E_L is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusinessKeySpELIsNotNull() {
+            addCriterion("BUSINESS_KEY_SP_E_L is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusinessKeySpELEqualTo(String value) {
+            addCriterion("BUSINESS_KEY_SP_E_L =", value, "businessKeySpEL");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusinessKeySpELNotEqualTo(String value) {
+            addCriterion("BUSINESS_KEY_SP_E_L <>", value, "businessKeySpEL");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusinessKeySpELGreaterThan(String value) {
+            addCriterion("BUSINESS_KEY_SP_E_L >", value, "businessKeySpEL");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusinessKeySpELGreaterThanOrEqualTo(String value) {
+            addCriterion("BUSINESS_KEY_SP_E_L >=", value, "businessKeySpEL");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusinessKeySpELLessThan(String value) {
+            addCriterion("BUSINESS_KEY_SP_E_L <", value, "businessKeySpEL");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusinessKeySpELLessThanOrEqualTo(String value) {
+            addCriterion("BUSINESS_KEY_SP_E_L <=", value, "businessKeySpEL");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusinessKeySpELLike(String value) {
+            addCriterion("BUSINESS_KEY_SP_E_L like", value, "businessKeySpEL");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusinessKeySpELNotLike(String value) {
+            addCriterion("BUSINESS_KEY_SP_E_L not like", value, "businessKeySpEL");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusinessKeySpELIn(List<String> values) {
+            addCriterion("BUSINESS_KEY_SP_E_L in", values, "businessKeySpEL");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusinessKeySpELNotIn(List<String> values) {
+            addCriterion("BUSINESS_KEY_SP_E_L not in", values, "businessKeySpEL");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusinessKeySpELBetween(String value1, String value2) {
+            addCriterion("BUSINESS_KEY_SP_E_L between", value1, value2, "businessKeySpEL");
+            return (Criteria) this;
+        }
+
+        public Criteria andBusinessKeySpELNotBetween(String value1, String value2) {
+            addCriterion("BUSINESS_KEY_SP_E_L not between", value1, value2, "businessKeySpEL");
+            return (Criteria) this;
+        }
+
         public Criteria andDocEntranceIsNull() {
             addCriterion("DOC_ENTRANCE is null");
             return (Criteria) this;

@@ -40,14 +40,14 @@ public class TextUtils {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
         ByteArrayInputStream in = null;
         GZIPInputStream ginzip = null;
-        byte[] compressed = null;
+        byte[] compressed;
         String decompressed = null;
         try {
             compressed = Base64.decodeBase64(compressedStr);
             in = new ByteArrayInputStream(compressed);
             ginzip = new GZIPInputStream(in);
             byte[] buffer = new byte[1024];
-            int offset = -1;
+            int offset;
             while ((offset = ginzip.read(buffer)) != -1) {
                 out.write(buffer, 0, offset);
             }
@@ -58,20 +58,18 @@ public class TextUtils {
             if (ginzip != null) {
                 try {
                     ginzip.close();
-                } catch (IOException e) {
+                } catch (IOException ignored) {
                 }
             }
             if (in != null) {
                 try {
                     in.close();
-                } catch (IOException e) {
+                } catch (IOException ignored) {
                 }
             }
-            if (out != null) {
-                try {
-                    out.close();
-                } catch (IOException e) {
-                }
+            try {
+                out.close();
+            } catch (IOException ignored) {
             }
         }
         return decompressed;

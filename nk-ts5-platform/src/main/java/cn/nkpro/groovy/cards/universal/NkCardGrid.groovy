@@ -42,22 +42,30 @@ class NkCardGrid extends NkAbstractCard<List<Map<String,Object>>,NkCardGridDef> 
         return execSpEL(doc, data, defIV, d)
     }
 
+
+
     @Override
     List<Map<String,Object>> beforeUpdate(DocHV doc, List<Map<String,Object>> data, List<Map<String,Object>> original, DocDefIV defIV, NkCardGridDef nkCardGridDef) {
         data.forEach({ item ->
             item.remove("_XID")
             nkCardGridDef.items
                 .forEach({ defItem ->
-                    if(StringUtils.equalsIgnoreCase(defItem.getInputType(),"integer")){
-                        if(item.containsKey(defItem.key)){
-                            Object value = item.get(defItem.key)
-                            item.put(defItem.key,value!=null?Integer.parseInt(value.toString()):null)
-                        }
-                    }else
-                    if(StringUtils.equalsAnyIgnoreCase(defItem.getInputType(),"decimal","percent")){
-                        if(item.containsKey(defItem.key)){
-                            Object value = item.get(defItem.key)
-                            item.put(defItem.key,value!=null?Float.parseFloat(value.toString()):null)
+
+                    if(!item.containsKey(defItem.key)){
+                        item.put(defItem.key, null)
+                    }else{
+                        Object value = item.get(defItem.key)
+                        if(value instanceof String){
+                            if(StringUtils.equalsIgnoreCase(defItem.getInputType(),"integer")){
+                                if(item.containsKey(defItem.key)){
+                                    item.put(defItem.key,StringUtils.isNotBlank(value as CharSequence)?Integer.parseInt(value.toString()):null)
+                                }
+                            }else
+                            if(StringUtils.equalsAnyIgnoreCase(defItem.getInputType(),"decimal","percent")){
+                                if(item.containsKey(defItem.key)){
+                                    item.put(defItem.key,StringUtils.isNotBlank(value as CharSequence)?Float.parseFloat(value.toString()):null)
+                                }
+                            }
                         }
                     }
                 })

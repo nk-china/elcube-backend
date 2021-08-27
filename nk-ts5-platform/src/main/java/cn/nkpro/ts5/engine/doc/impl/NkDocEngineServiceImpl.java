@@ -13,11 +13,9 @@ import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService;
 import cn.nkpro.ts5.engine.doc.service.NkDocPermService;
 import cn.nkpro.ts5.engine.task.NkBpmTaskService;
 import cn.nkpro.ts5.exception.TfmsDefineException;
-import cn.nkpro.ts5.orm.mb.gen.DocHMapper;
-import cn.nkpro.ts5.orm.mb.gen.DocIExample;
-import cn.nkpro.ts5.orm.mb.gen.DocIKey;
-import cn.nkpro.ts5.orm.mb.gen.DocIMapper;
+import cn.nkpro.ts5.orm.mb.gen.*;
 import cn.nkpro.ts5.utils.BeanUtilz;
+import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -40,6 +38,8 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
     private DocHMapper docHMapper;
     @Autowired@SuppressWarnings("all")
     private DocIMapper docIMapper;
+    @Autowired
+    private DocIIndexMapper docIIndexMapper;
     @Autowired@SuppressWarnings("all")
     private RedisSupport<DocHPersistent> redisSupport;
     @Autowired@SuppressWarnings("all")
@@ -149,6 +149,25 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
 
                 doc.setItems(docIMapper.selectByExampleWithBLOBs(example).stream()
                         .collect(Collectors.toMap(DocIKey::getCardKey, e -> e)));
+
+                DocIIndexExample iIndexExample = new DocIIndexExample();
+                iIndexExample.createCriteria()
+                        .andDocIdEqualTo(docId);
+                iIndexExample.setOrderByClause("ORDER_BY");
+                doc.setDynamics(
+                    docIIndexMapper.selectByExample(iIndexExample)
+                        .stream()
+                        .collect(Collectors.toMap(
+                                DocIIndexKey::getName,
+                                e->{
+                                    try {
+                                        return JSON.parseObject(e.getValue(),Class.forName(e.getDataType()));
+                                    } catch (ClassNotFoundException ex) {
+                                        return StringUtils.EMPTY;
+                                    }
+                                }
+                        ))
+                );
             }
 
             return doc;
