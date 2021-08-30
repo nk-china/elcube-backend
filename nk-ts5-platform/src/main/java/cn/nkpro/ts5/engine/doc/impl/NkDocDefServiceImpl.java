@@ -444,7 +444,7 @@ public class NkDocDefServiceImpl implements NkDocDefService {
         // 一旦单据激活，更新缓存中的业务流
         DocDefHV def = docDefHV;
         LocalSyncUtilz.runBeforeCommit(()->
-            redisSupportFlows.putHash(Constants.CACHE_DEF_DOC_FLOWS, def.getDocType(), def.getFlows())
+            redisSupportFlows.set(Constants.CACHE_DEF_DOC_FLOWS, def.getDocType(), def.getFlows())
         );
 
         debugContextManager.removeDebugResource(String.format("@%s",docDefHV.getDocType()), docDefHV);

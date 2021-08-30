@@ -13,7 +13,6 @@ import groovy.lang.GroovyObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
@@ -48,7 +47,7 @@ public class DebugContextManager implements ApplicationContextAware {
      * 返回上下文列表
      */
     public Collection<ContextDescribe> getDebugContextList(){
-        Map<String, ContextDescribe> absent = redisForContext.getHashIfAbsent(Constants.CACHE_DEBUG_CONTEXT, () -> null);
+        Map<String, ContextDescribe> absent = redisForContext.getHash(Constants.CACHE_DEBUG_CONTEXT);
         if(absent!=null){
             return absent.values().stream()
                     .peek(item-> item.setVisible(StringUtils.equals(item.getMac(),OsUtils.getMacAddress()))).collect(Collectors.toList());
@@ -70,7 +69,7 @@ public class DebugContextManager implements ApplicationContextAware {
         debugApplications.put(debugId,context);
 
         // 创建调试上下文
-        redisForContext.putHash(
+        redisForContext.set(
                 Constants.CACHE_DEBUG_CONTEXT,
                 debugId,
                 new ContextDescribe(debugId,OsUtils.getMacAddress(),SecurityUtilz.getUser().getUsername(),desc,true)
@@ -122,7 +121,7 @@ public class DebugContextManager implements ApplicationContextAware {
             debugApplications.put(debugId,debugApplicationContext);
 
             // 初始化debug对象
-            Optional.ofNullable(redisForResoure.getHashIfAbsent(String.format("DEBUG:%s", debugId), () -> null))
+            Optional.ofNullable(redisForResoure.getHash(String.format("DEBUG:%s", debugId)))
                     .ifPresent((map)->
                         map.entrySet()
                                 .stream()
@@ -163,7 +162,7 @@ public class DebugContextManager implements ApplicationContextAware {
             throw new TfmsSystemException(resource.getClass().getName() + " 不支持调试");
         }
 
-        redisForResoure.putHash(String.format("DEBUG:%s", localDebugId.get()), key, resource);
+        redisForResoure.set(String.format("DEBUG:%s", localDebugId.get()), key, resource);
     }
 
     public void addActiveResource(String key, ScriptDefHV scriptDef){
@@ -241,7 +240,7 @@ public class DebugContextManager implements ApplicationContextAware {
     @SuppressWarnings("all")
     public <T> List<T> getDebugResources(String... keyPrefix){
         if(localDebugId.get()!=null){
-            Map<String, Object> hashIfAbsent = redisForResoure.getHashIfAbsent(String.format("DEBUG:%s", localDebugId.get()), () -> null);
+            Map<String, Object> hashIfAbsent = redisForResoure.getHash(String.format("DEBUG:%s", localDebugId.get()));
             if(hashIfAbsent!=null)
                 return hashIfAbsent
                     .entrySet()

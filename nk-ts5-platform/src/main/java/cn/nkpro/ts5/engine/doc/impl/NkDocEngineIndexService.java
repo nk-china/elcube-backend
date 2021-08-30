@@ -85,7 +85,7 @@ public class NkDocEngineIndexService {
     }
 
     public ReindexInfo getReindexInfo(String asyncTaskId){
-        return redisReindexInfo.getIfAbsent(asyncTaskId,()->null);
+        return redisReindexInfo.get(asyncTaskId);
     }
 
     @Data

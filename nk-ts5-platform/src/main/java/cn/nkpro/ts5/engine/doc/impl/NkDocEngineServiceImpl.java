@@ -15,9 +15,7 @@ import cn.nkpro.ts5.engine.doc.service.NkDocDefService;
 import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService;
 import cn.nkpro.ts5.engine.doc.service.NkDocPermService;
 import cn.nkpro.ts5.engine.elasticearch.SearchEngine;
-import cn.nkpro.ts5.engine.elasticearch.model.CustomES;
 import cn.nkpro.ts5.engine.elasticearch.model.DocHES;
-import cn.nkpro.ts5.engine.spel.TfmsSpELManager;
 import cn.nkpro.ts5.engine.task.NkBpmTaskService;
 import cn.nkpro.ts5.exception.TfmsDefineException;
 import cn.nkpro.ts5.exception.TfmsSystemException;
@@ -25,13 +23,10 @@ import cn.nkpro.ts5.orm.mb.gen.*;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
-import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.expression.EvaluationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.IllegalTransactionStateException;
 import org.springframework.transaction.annotation.Propagation;
@@ -429,7 +424,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
                 try{
                     if(status == TransactionSynchronization.STATUS_COMMITTED){
                         // 如果事务更新成功，将更新后的单据更新到缓存
-                        redisSupport.putHash(Constants.CACHE_DOC, docId, docHPersistentFinal);
+                        redisSupport.set(Constants.CACHE_DOC, docId, docHPersistentFinal);
                         if(log.isInfoEnabled())log.info("{}更新缓存", currLog);
                     }
                 }finally {

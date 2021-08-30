@@ -2,16 +2,12 @@ package cn.nkpro.ts5.config.redis.defaults;
 
 import cn.nkpro.ts5.config.redis.EnvRedisTemplate;
 import cn.nkpro.ts5.config.redis.RedisSupport;
-import cn.nkpro.ts5.exception.TfmsException;
 import cn.nkpro.ts5.exception.TfmsSystemException;
 import cn.nkpro.ts5.exception.abstracts.TfmsRuntimeException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -25,11 +21,11 @@ import java.util.stream.Collectors;
  * Created by bean on 2020/7/24.
  */
 @Slf4j
-public class DefaultRedisSupportImpl<T> implements RedisSupport<T>,ApplicationContextAware{
+public class DefaultRedisSupportImpl<T> implements RedisSupport<T>{
 
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private EnvRedisTemplate<T> redisTemplate;
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private EnvRedisTemplate<String> stringRedisTemplate;
 
     @Scheduled(cron = "0 * * * * ?")
@@ -37,10 +33,95 @@ public class DefaultRedisSupportImpl<T> implements RedisSupport<T>,ApplicationCo
         redisTemplate.opsForValue().get("__.heartbeat");
     }
 
+    @Override
+    public void clear() {
+        Optional.ofNullable(redisTemplate.keys("*"))
+            .ifPresent(list->{
+                List<String> collect = list.stream()
+                        .filter(key -> !(key.startsWith("stream.") || key.startsWith("stream:")))
+                        .collect(Collectors.toList());
+                if(collect.size()>0)
+                    redisTemplate.delete(collect);
+            });
+    }
+    @Override
+    public boolean exists(String key){
+        Boolean B = redisTemplate.hasKey(key);
+        return B == null ? false : B;
+    }
+    @Override
+    public void expire(String key, long timeout) {
+        redisTemplate.expire(key,timeout, TimeUnit.SECONDS);
+    }
+    @Override
+    public long increment(String key, long l) {
+        Long L = redisTemplate.opsForValue().increment(key,l);
+        return L == null ? 0 : L;
+    }
 
+
+
+    @Override
+    public void set(String key, T value) {
+        redisTemplate.opsForValue().set(key, value);
+    }
+    @Override
+    public T get(String key){
+        return redisTemplate.opsForValue().get(key);
+    }
+    @Override
+    public T getIfAbsent(String key, Function<T> mapper) throws TfmsRuntimeException {
+        return getIfAbsent(key, false, mapper);
+    }
+    @Override
+    public T getIfAbsent(String key,boolean cacheNullValue,Function<T> mapper) throws TfmsRuntimeException {
+        Assert.notNull(key,"key不能为空");
+
+        ValueOperations<String, T> valueOperations = redisTemplate.opsForValue();
+        T value = valueOperations.get(key);
+        if(value == null){
+            value = mapper.apply();
+            if(cacheNullValue || value != null){
+                valueOperations.set(key,value);
+            }
+        }
+        return value;
+    }
+    @Override
+    public void delete(String... key){
+        Assert.notNull(key,"key不能为空");
+        redisTemplate.delete(Arrays.asList(key));
+    }
+    @Override
+    public void delete(Collection<String> key){
+        Assert.notNull(key,"key不能为空");
+        redisTemplate.delete(key);
+    }
+    @Override
+    public void deletes(String keysLike) {
+        Assert.notNull(keysLike,"key不能为空");
+        Set<String> keys = redisTemplate.keys(keysLike);
+        if(keys!=null)
+            redisTemplate.delete(keys);
+    }
+
+
+
+
+    @Override
+    public void set(String hash, String key, T value) {
+        redisTemplate.opsForHash().put(hash,key,value);
+    }
+    @Override
+    public T get(String hash, String key) {
+        HashOperations<String,String,T> hashOperations = redisTemplate.opsForHash();
+        return hashOperations.get(hash,key);
+    }
+    @Override
     public T getIfAbsent(String hash,String hashKey,Function<T> mapper) throws TfmsRuntimeException {
         return getIfAbsent(hash, hashKey, false, mapper);
     }
+    @Override
     public T getIfAbsent(String hash,String hashKey,boolean cacheNullValue,Function<T> mapper) throws TfmsRuntimeException {
         Assert.notNull(hash,"hash不能为空");
         Assert.notNull(hashKey,"hashKey不能为空");
@@ -55,9 +136,36 @@ public class DefaultRedisSupportImpl<T> implements RedisSupport<T>,ApplicationCo
         }
         return value;
     }
-
     @Override
-    public Map<String,T> getHashIfAbsent(String hash, Function<Map<String,T>> mapper){
+    public Map<String,T> getHash(String hash){
+        Assert.notNull(hash,"hash不能为空");
+
+        HashOperations<String,String,T> hashOperations = redisTemplate.opsForHash();
+        return hashOperations.entries(hash);
+    }
+    @Override
+    public Map<String, T> getHash(String hash, String... keys) {
+        return getHash(hash, Arrays.asList(keys));
+    }
+    @Override
+    public Map<String,T> getHash(String hash, Collection<String> keys){
+        Assert.notNull(hash,"hash不能为空");
+        Assert.notNull(keys,"keys不能为空");
+        Assert.notEmpty(keys,"keys不能为空");
+
+        HashOperations<String,String,T> hashOperations = redisTemplate.opsForHash();
+
+        List<T> list = hashOperations.multiGet(hash, keys);
+        List<String> listKey = new ArrayList<>(keys);
+
+        return keys.stream()
+            .collect(Collectors.toMap(
+                    key->key,
+                    key-> list.get(listKey.indexOf(key))
+            ));
+    }
+    @Override
+    public Map<String, T> getHashIfAbsent(String hash, Function<Map<String, T>> mapper) {
         Assert.notNull(hash,"hash不能为空");
 
         HashOperations<String,String,T> hashOperations = redisTemplate.opsForHash();
@@ -70,69 +178,16 @@ public class DefaultRedisSupportImpl<T> implements RedisSupport<T>,ApplicationCo
         }
         return value;
     }
-
     @Override
-    public Map<String,T> getHash(String hash, Collection<String> keys){
+    public void delete(String hash, Object... keys){
         Assert.notNull(hash,"hash不能为空");
-
-        HashOperations<String,String,T> hashOperations = redisTemplate.opsForHash();
-        List<T> list = hashOperations.multiGet(hash, keys);
-
-        Map<String,T> data = new HashMap<>();
-        List<String> listKey = new ArrayList<>(keys);
-        listKey.forEach(key-> data.put(key,list.get(listKey.indexOf(key))));
-
-        return data;
+        Assert.notNull(keys,"hashKey不能为空");
+        Assert.notEmpty(keys,"keys不能为空");
+        redisTemplate.opsForHash().delete(hash,keys);
     }
-
     @Override
-    public void putHash(String hash, String key, T value) {
-        redisTemplate.opsForHash().put(hash,key,value);
-    }
-
-    public T getIfAbsent(String key, Function<T> mapper) throws TfmsRuntimeException {
-        return getIfAbsent(key, false, mapper);
-    }
-
-    public T getIfAbsent(String key,boolean cacheNullValue,Function<T> mapper) throws TfmsRuntimeException {
-        Assert.notNull(key,"key不能为空");
-
-        ValueOperations<String, T> valueOperations = redisTemplate.opsForValue();
-        T value = valueOperations.get(key);
-        if(value == null){
-            value = mapper.apply();
-            if(cacheNullValue || value != null){
-                valueOperations.set(key,value);
-            }
-        }
-        return value;
-    }
-
-    public void deletes(String keysLike) {
-        Set<String> keys = redisTemplate.keys(keysLike);
-        if(keys!=null)
-            redisTemplate.delete(keys);
-    }
-
-    public void delete(String key){
-        Assert.notNull(key,"key不能为空");
-        redisTemplate.delete(key);
-    }
-
-    public void delete(String hash, Object... hashKey){
-        Assert.notNull(hash,"hash不能为空");
-        Assert.notNull(hashKey,"hashKey不能为空");
-        Assert.isTrue(hashKey.length>0,"hashKey不能为空");
-        redisTemplate.opsForHash().delete(hash,hashKey);
-    }
-
-    @Override
-    public void unLock(String key, String value){
-        ValueOperations<String, String> ops = stringRedisTemplate.opsForValue();
-        String s = ops.get("LOCK:" + key);
-        if(s!=null && StringUtils.equals(s,value)){
-            stringRedisTemplate.delete("LOCK:" + key);
-        }
+    public void delete(String hash, Collection<String> keys) {
+        delete(hash, keys.toArray());
     }
 
     @Override
@@ -155,46 +210,12 @@ public class DefaultRedisSupportImpl<T> implements RedisSupport<T>,ApplicationCo
 
         return false;
     }
-
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    public void unLock(String key, String value){
+        ValueOperations<String, String> ops = stringRedisTemplate.opsForValue();
+        String s = ops.get("LOCK:" + key);
+        if(s!=null && StringUtils.equals(s,value)){
+            stringRedisTemplate.delete("LOCK:" + key);
+        }
     }
-
-    public Long increment(String key, long l) {
-        return redisTemplate.opsForValue().increment(key,l);
-    }
-
-    public void set(String key, T value) {
-        redisTemplate.opsForValue().set(key, value);
-    }
-
-    @Override
-    public T get(String key){
-        return redisTemplate.opsForValue().get(key);
-    }
-
-    @Override
-    public void expire(String key, long timeout) {
-        redisTemplate.expire(key,timeout, TimeUnit.SECONDS);
-    }
-
-    @Override
-    public void clear() {
-        Optional.ofNullable(redisTemplate.keys("*"))
-                .ifPresent(list->{
-                    List<String> collect = list.stream()
-                            .filter(key -> !(key.startsWith("stream.") || key.startsWith("stream:")))
-                            .collect(Collectors.toList());
-                    if(collect.size()>0)
-                        redisTemplate.delete(collect);
-                });
-    }
-
-
-    @Override
-    public Boolean hasKey(String key){
-        return redisTemplate.hasKey(key);
-    }
-
-
 }
