@@ -20,6 +20,7 @@ public class DocDefHV extends DocDefH {
     private List<DocDefCycle> lifeCycles;
     private List<DocDefIndexRule> indexRules;
     private List<DocDefIndexCustom> indexCustoms;
+    private List<DocDefDataSync> dataSyncs;
     private boolean debug;
 
     public DocDefHV(){
@@ -30,5 +31,6 @@ public class DocDefHV extends DocDefH {
         this.lifeCycles   = new ArrayList<>();
         this.indexRules   = new ArrayList<>();
         this.indexCustoms = new ArrayList<>();
+        this.dataSyncs    = new ArrayList<>();
     }
 }

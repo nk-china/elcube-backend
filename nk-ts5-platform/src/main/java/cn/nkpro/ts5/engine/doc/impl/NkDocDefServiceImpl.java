@@ -65,6 +65,8 @@ public class NkDocDefServiceImpl implements NkDocDefService {
     private DocDefIndexRuleMapper docDefIndexRuleMapper;
     @Autowired
     private DocDefIndexCustomMapper docDefIndexCustomMapper;
+    @Autowired
+    private DocDefDataSyncMapper docDefDataSyncMapper;
     @Autowired@SuppressWarnings("all")
     private DocDefBpmMapper docDefBpmMapper;
 
@@ -329,6 +331,27 @@ public class NkDocDefServiceImpl implements NkDocDefService {
                         indexCustom.setUpdatedTime(DateTimeUtilz.nowSeconds());
 
                         docDefIndexCustomMapper.insert(indexCustom);
+                    });
+
+        // dataSync
+        DocDefDataSyncExample dataSyncExample = new DocDefDataSyncExample();
+        dataSyncExample.createCriteria()
+                .andDocTypeEqualTo(docDefHV.getDocType())
+                .andVersionEqualTo(docDefHV.getVersion());
+        docDefDataSyncMapper.deleteByExample(dataSyncExample);
+        if(docDefHV.getDataSyncs()!=null)
+            docDefHV.getDataSyncs()
+                    .forEach(dataSync -> {
+                        Assert.hasLength(dataSync.getTargetSvr(),    "数据同步 目标服务 不能为空");
+                        Assert.hasLength(dataSync.getDataSpEL(),     "数据同步 源数据SpEL 不能为空");
+                        Assert.hasLength(dataSync.getKeySpEL(),      "数据同步 主键SpEL 不能为空");
+                        Assert.hasLength(dataSync.getMappingSpEL(),  "数据同步 映射规则模版 不能为空");
+                        dataSync.setDocType(docDefHV.getDocType());
+                        dataSync.setVersion(docDefHV.getVersion());
+                        dataSync.setOrderBy(docDefHV.getDataSyncs().indexOf(dataSync));
+                        dataSync.setUpdatedTime(DateTimeUtilz.nowSeconds());
+
+                        docDefDataSyncMapper.insert(dataSync);
                     });
 
 
@@ -641,6 +664,14 @@ public class NkDocDefServiceImpl implements NkDocDefService {
                 .andVersionEqualTo(version);
         indexCustomExample.setOrderByClause("ORDER_BY");
         def.setIndexCustoms(docDefIndexCustomMapper.selectByExample(indexCustomExample));
+
+        // dataSync
+        DocDefDataSyncExample dataSyncExample = new DocDefDataSyncExample();
+        dataSyncExample.createCriteria()
+                .andDocTypeEqualTo(docType)
+                .andVersionEqualTo(version);
+        dataSyncExample.setOrderByClause("ORDER_BY");
+        def.setDataSyncs(docDefDataSyncMapper.selectByExample(dataSyncExample));
 
         // bpm
         DocDefBpmExample bpmExample = new DocDefBpmExample();
