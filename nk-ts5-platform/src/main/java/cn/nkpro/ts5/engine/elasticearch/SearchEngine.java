@@ -2,6 +2,8 @@ package cn.nkpro.ts5.engine.elasticearch;
 
 import cn.nkpro.ts5.config.NkProperties;
 import cn.nkpro.ts5.engine.elasticearch.annotation.*;
+import cn.nkpro.ts5.engine.elasticearch.model.BpmTaskES;
+import cn.nkpro.ts5.engine.elasticearch.model.DocHES;
 import cn.nkpro.ts5.engine.elasticearch.model.ESDoc;
 import cn.nkpro.ts5.engine.LocalSyncUtilz;
 import com.alibaba.fastjson.JSON;
@@ -137,7 +139,7 @@ public class SearchEngine {
         return client.search(searchRequest, RequestOptions.DEFAULT).getHits().getTotalHits().value > 0;
     }
 
-    public <T extends ESDoc> ESPageList<T> searchPage(Class<T> docType, SearchSourceBuilder builder) throws IOException {
+    <T extends ESDoc> ESPageList<T> searchPage(Class<T> docType, SearchSourceBuilder builder) throws IOException {
 
         ESDocument document = docType.getAnnotation(ESDocument.class);
         if(document==null) {
@@ -257,15 +259,14 @@ public class SearchEngine {
         );
     }
 
-    @SuppressWarnings("all")
-    public boolean existsIndices(Class<? extends ESDoc> docType) throws IOException {
+    private boolean existsIndices(Class<? extends ESDoc> docType) throws IOException {
         ESDocument document = parseESDocument(docType);
         return client.indices()
                 .exists(new GetIndexRequest(documentIndex(document)), RequestOptions.DEFAULT);
     }
 
 
-    public void deleteIndices(Class<? extends ESDoc> docType) throws IOException {
+    void deleteIndices(Class<? extends ESDoc> docType) throws IOException {
         if(existsIndices(docType)){
             ESDocument document = parseESDocument(docType);
             client.indices()
