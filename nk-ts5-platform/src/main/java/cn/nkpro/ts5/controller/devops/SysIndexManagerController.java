@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
 import java.util.UUID;
-import java.util.Map;
 
 /**
  * Created by bean on 2020/7/17.
@@ -47,7 +46,7 @@ public class SysIndexManagerController {
 
     @WsDocNote("3.获取重建单据索引信息")
     @RequestMapping(value = "/docs/reindex/{asyncTaskId}")
-    public Map<String,String> reIndex(@PathVariable String asyncTaskId) {
+    public Object reIndex(@PathVariable String asyncTaskId) {
         return docEngineIndexService.getReindexInfo(asyncTaskId);
     }
 }

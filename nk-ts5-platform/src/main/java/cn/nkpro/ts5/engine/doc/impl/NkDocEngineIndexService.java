@@ -8,15 +8,15 @@ import cn.nkpro.ts5.engine.elasticearch.SearchEngine;
 import cn.nkpro.ts5.engine.elasticearch.model.DocHES;
 import cn.nkpro.ts5.engine.task.NkBpmTaskManager;
 import cn.nkpro.ts5.orm.mb.gen.DocH;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 @Component
 public class NkDocEngineIndexService {
@@ -29,7 +29,7 @@ public class NkDocEngineIndexService {
     @Autowired@SuppressWarnings("all")
     private NkBpmTaskManager bpmTaskManager;
     @Autowired
-    private RedisSupport<Map<String,String>> redisMapStringString;
+    private RedisSupport<ReindexInfo> redisReindexInfo;
 
     @Async
     public void reindex(String asyncTaskId, Boolean dropFirst, String docType) throws IOException {
@@ -55,23 +55,34 @@ public class NkDocEngineIndexService {
                     bpmTaskManager.indexDocTask(docHV);
 
                     // 记录日志
-                    redisMapStringString.set(asyncTaskId, Collections.singletonMap(
-                            "message",
-                            String.format("重建索引 docId = %s docDesc = %s",doc.getDocId(), doc.getDocDesc())
-                    ));
+                    redisReindexInfo.set(asyncTaskId,
+                        new ReindexInfo(false,0,String.format("重建索引 docId = %s docDesc = %s",doc.getDocId(), doc.getDocDesc()),null)
+                    );
                 });
                 offset += rows;
                 total  += list.size();
             }
-            redisMapStringString.set(asyncTaskId, Collections.singletonMap("success",String.format("重建索引完成，共 %d 条记录",total)));
+            redisReindexInfo.set(asyncTaskId,
+                new ReindexInfo(false,0,String.format("重建索引完成，共 %d 条记录",total),null)
+            );
         }catch (Exception e){
-            //ExceptionUtils.getRootCauseStackTrace(e)
             e.printStackTrace();
-            redisMapStringString.set(asyncTaskId, Collections.singletonMap("error",String.format("重建索引发生错误: %s",e.getMessage())));
+            redisReindexInfo.set(asyncTaskId,
+                new ReindexInfo(false,0,String.format("重建索引发生错误: %s",e.getMessage()),ExceptionUtils.getRootCauseStackTrace(e))
+            );
         }
     }
 
-    public Map<String,String> getReindexInfo(String asyncTaskId){
-        return redisMapStringString.getIfAbsent(asyncTaskId,()->null);
+    public ReindexInfo getReindexInfo(String asyncTaskId){
+        return redisReindexInfo.getIfAbsent(asyncTaskId,()->null);
+    }
+
+    @Data
+    @AllArgsConstructor
+    static class ReindexInfo{
+        boolean finished;
+        int total;
+        String message;
+        String[] exceptions;
     }
 }
