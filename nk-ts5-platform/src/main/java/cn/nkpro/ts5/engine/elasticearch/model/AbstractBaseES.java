@@ -2,10 +2,8 @@ package cn.nkpro.ts5.engine.elasticearch.model;
 
 import cn.nkpro.ts5.engine.elasticearch.ESAnalyzerType;
 import cn.nkpro.ts5.engine.elasticearch.ESFieldType;
-import cn.nkpro.ts5.engine.elasticearch.annotation.ESDocument;
 import cn.nkpro.ts5.engine.elasticearch.annotation.ESDynamicTemplate;
 import cn.nkpro.ts5.engine.elasticearch.annotation.ESField;
-import cn.nkpro.ts5.engine.elasticearch.annotation.ESId;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -14,7 +12,6 @@ import lombok.EqualsAndHashCode;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-@ESDocument("document")
 // 不需要分词的文本：状态、枚举、常量等，不能模糊查询，只能全文匹配
 @ESDynamicTemplate(value = "keyword",   match = "*_keyword",mappingType = ESFieldType.Keyword)
 // 分词文本：需要进行分词的 中文或中英文混合 的文本
@@ -46,7 +43,7 @@ import lombok.EqualsAndHashCode;
 @ESDynamicTemplate(value = "double",    match = "*_double", mappingType = ESFieldType.Double)
 @ESDynamicTemplate(value = "date",      match = "*_date",   mappingType = ESFieldType.Date, format = "epoch_second||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd")
 @ESDynamicTemplate(value = "obj",       match = "*_obj*",   mappingType = ESFieldType.Object)
-public class DocBaseES extends ESDoc {
+abstract class AbstractBaseES extends AbstractESDoc {
 
     @ESField(type= ESFieldType.Keyword)
     private String classify;
@@ -77,9 +74,6 @@ public class DocBaseES extends ESDoc {
 
     @ESField(type= ESFieldType.Text,analyzer = ESAnalyzerType.ik_max_word, copyToKeyword = true, original = true)
     private String docName;
-
-    @ESField(type= ESFieldType.Text,analyzer = ESAnalyzerType.ik_max_word, copyToKeyword = true)
-    private String docDesc;
 
     @ESField(type= ESFieldType.Keyword)
     private String preDocId;

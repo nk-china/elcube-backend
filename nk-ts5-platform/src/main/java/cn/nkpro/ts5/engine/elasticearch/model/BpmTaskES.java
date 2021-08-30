@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = false)
 @Data
 @ESDocument("document-bpm-task")
-public class BpmTaskES extends DocBaseES {
+public class BpmTaskES extends AbstractBaseES {
 
     @ESId
     @ESField(type= ESFieldType.Keyword)

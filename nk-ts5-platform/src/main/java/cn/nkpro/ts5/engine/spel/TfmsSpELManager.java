@@ -49,6 +49,16 @@ public class TfmsSpELManager {
                 .collect(Collectors.toMap(TfmsSpELInjection::getSpELName,t->t));
     }
 
+    public Object invoke(String el, Object root){
+        StandardEvaluationContext ctx = new StandardEvaluationContext(root);
+        ctx.addPropertyAccessor(new MapAccessor());
+        try{
+            return parser.parseExpression(el).getValue(ctx);
+        }catch (ParseException | EvaluationException e){
+            throw new TfmsDefineException(String.format("表达式 %s 错误: %s",el, e.getMessage()),e);
+        }
+    }
+
     public Object invoke(String el, EvaluationContext context){
         try{
             return parser.parseExpression(el).getValue(context);

@@ -16,6 +16,7 @@ import eu.bitwalker.useragentutils.Browser;
 import eu.bitwalker.useragentutils.UserAgent;
 import eu.bitwalker.useragentutils.Version;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -117,6 +118,7 @@ public class DocController {
         return docEngine.doUpdateView(doc, info);
     }
 
+    @EqualsAndHashCode(callSuper = true)
     @Data
     static class CalcModel extends DocHV{
         String fromCard;
@@ -124,6 +126,7 @@ public class DocController {
         DocHV doc;
     }
 
+    @EqualsAndHashCode(callSuper = true)
     @Data
     static class CallModel extends DocHV{
         String fromCard;

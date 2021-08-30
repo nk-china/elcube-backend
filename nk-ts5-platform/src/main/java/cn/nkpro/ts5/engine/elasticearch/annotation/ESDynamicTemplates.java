@@ -14,5 +14,5 @@ import java.lang.annotation.*;
 public @interface ESDynamicTemplates {
 
     //模版名称
-    ESDynamicTemplate[] value();
+    ESDynamicTemplate[] value() default {};
 }
