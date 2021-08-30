@@ -154,18 +154,12 @@ public class NkBpmTaskManagerImpl extends AbstractNkBpmSupport implements NkBpmT
     @Override
     public void indexDocTask(DocHV doc){
 
-        List<HistoricTaskInstance> list = processEngine.getHistoryService()
+        processEngine.getHistoryService()
                 .createHistoricTaskInstanceQuery()
                 .processInstanceBusinessKey(doc.getDocId())
-                .list();
-
-        System.out.println(list.size());
-        list
+                .list()
                 .forEach(historicTaskInstance ->
-                        {
-                            System.out.println(list.indexOf(historicTaskInstance));
-                            super.indexDocTask(historicTaskInstance, doc);
-                        }
+                        super.indexDocTask(historicTaskInstance, doc)
                 );
     }
 

@@ -1,5 +1,6 @@
 package cn.nkpro.ts5.engine.doc.impl;
 
+import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.config.redis.RedisSupport;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService;
@@ -34,18 +35,32 @@ public class NkDocEngineIndexService {
 
     @Async
     public void reindex(String asyncTaskId, Boolean dropFirst, String docType) throws IOException {
+        redisReindexInfo.set(asyncTaskId,
+            new ReindexInfo(false,0L, 0L, "加载索引任务", null)
+        );
+
         if(dropFirst){
             searchService.dropAndInit();
         }
 
+
         int offset = 0;
         int rows   = 1000;
-        int total  = 0;
-        List<DocH> list;
+        long totalS = 0;
+        long total  = 0;
+        PageList<DocH> list;
         try{
-            while((list = docEngineFrontService.list(docType, offset, rows, null)).size()>0){
+            while((list = docEngineFrontService.list(docType, offset, rows, null)).getList().size()>0){
 
-                list.forEach(doc->{
+                total = list.getTotal();
+
+                final long t1 = total;
+                final long t2 = totalS;
+                list.getList().forEach(doc->{
+                    // 记录日志
+                    redisReindexInfo.set(asyncTaskId,
+                            new ReindexInfo(false,t1, t2, String.format("重建索引 docId = %s docDesc = %s",doc.getDocId(), doc.getDocDesc()),null)
+                    );
                     // 获取详情
                     DocHV docHV = docEngineFrontService.detail(doc.getDocId());
 
@@ -54,23 +69,20 @@ public class NkDocEngineIndexService {
 
                     // 创建任务索引
                     bpmTaskManager.indexDocTask(docHV);
-
-                    // 记录日志
-                    redisReindexInfo.set(asyncTaskId,
-                        new ReindexInfo(false,0,String.format("重建索引 docId = %s docDesc = %s",doc.getDocId(), doc.getDocDesc()),null)
-                    );
                 });
                 offset += rows;
-                total  += list.size();
+                totalS  += list.getList().size();
             }
             redisReindexInfo.set(asyncTaskId,
-                new ReindexInfo(false,0,String.format("重建索引完成，共 %d 条记录",total),null)
+                new ReindexInfo(true,total, totalS,"重建索引完成",null)
             );
         }catch (Exception e){
             e.printStackTrace();
             redisReindexInfo.set(asyncTaskId,
-                new ReindexInfo(false,0,String.format("重建索引发生错误: %s",e.getMessage()),ExceptionUtils.getRootCauseStackTrace(e))
+                new ReindexInfo(true,total, totalS,String.format("重建索引发生错误: %s",e.getMessage()),ExceptionUtils.getRootCauseStackTrace(e))
             );
+        }finally {
+            redisReindexInfo.expire(asyncTaskId, 10);
         }
     }
 
@@ -83,7 +95,8 @@ public class NkDocEngineIndexService {
     @AllArgsConstructor
     static class ReindexInfo{
         boolean finished;
-        int total;
+        long total;
+        long totalS;
         String message;
         String[] exceptions;
     }

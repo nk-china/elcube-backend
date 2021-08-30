@@ -1,6 +1,8 @@
 package cn.nkpro.ts5.engine.doc.impl;
 
 import cn.nkpro.ts5.basic.Constants;
+import cn.nkpro.ts5.basic.PageList;
+import cn.nkpro.ts5.config.mybatis.pagination.PaginationContext;
 import cn.nkpro.ts5.config.redis.RedisSupport;
 import cn.nkpro.ts5.config.security.SecurityUtilz;
 import cn.nkpro.ts5.engine.LocalSyncUtilz;
@@ -25,6 +27,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.support.PagedListHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.IllegalTransactionStateException;
 import org.springframework.transaction.annotation.Propagation;
@@ -64,7 +67,7 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
 
 
     @Override
-    public List<DocH> list(String docType, int offset, int rows, String orderBy){
+    public PageList<DocH> list(String docType, int offset, int rows, String orderBy){
         DocHExample example = new DocHExample();
         DocHExample.Criteria criteria = example.createCriteria();
 
@@ -73,7 +76,9 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
 
         example.setOrderByClause(StringUtils.defaultIfBlank(orderBy,"CREATED_TIME asc"));
 
-        return docHMapper.selectByExample(example,new RowBounds(offset,rows));
+        PaginationContext context = PaginationContext.init();
+
+        return new PageList<>(docHMapper.selectByExample(example,new RowBounds(offset,rows)),offset,rows,context.getTotal());
     }
 
     @Override

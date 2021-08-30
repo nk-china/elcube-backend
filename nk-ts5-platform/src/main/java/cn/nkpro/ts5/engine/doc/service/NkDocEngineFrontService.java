@@ -1,5 +1,6 @@
 package cn.nkpro.ts5.engine.doc.service;
 
+import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.engine.doc.NkDocEngine;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.orm.mb.gen.DocH;
@@ -10,7 +11,7 @@ import java.util.List;
 
 public interface NkDocEngineFrontService extends NkDocEngine {
 
-    List<DocH> list(String docType, int offset, int rows, String orderBy);
+    PageList<DocH> list(String docType, int offset, int rows, String orderBy);
 
     DocHV detailView(String docId);
 
