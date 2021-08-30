@@ -1,9 +1,6 @@
 package cn.nkpro.ts5.engine.doc.model;
 
-import cn.nkpro.ts5.orm.mb.gen.DocDefBpm;
-import cn.nkpro.ts5.orm.mb.gen.DocDefCycle;
-import cn.nkpro.ts5.orm.mb.gen.DocDefH;
-import cn.nkpro.ts5.orm.mb.gen.DocDefIndexRule;
+import cn.nkpro.ts5.orm.mb.gen.*;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -22,14 +19,16 @@ public class DocDefHV extends DocDefH {
     private List<DocDefIV> cards;
     private List<DocDefCycle> lifeCycles;
     private List<DocDefIndexRule> indexRules;
+    private List<DocDefIndexCustom> indexCustoms;
     private boolean debug;
 
     public DocDefHV(){
-        this.status     = new ArrayList<>();
-        this.flows      = new ArrayList<>();
-        this.nextFlows  = new ArrayList<>();
-        this.bpms       = new ArrayList<>();
-        this.lifeCycles = new ArrayList<>();
-        this.indexRules = new ArrayList<>();
+        this.status       = new ArrayList<>();
+        this.flows        = new ArrayList<>();
+        this.nextFlows    = new ArrayList<>();
+        this.bpms         = new ArrayList<>();
+        this.lifeCycles   = new ArrayList<>();
+        this.indexRules   = new ArrayList<>();
+        this.indexCustoms = new ArrayList<>();
     }
 }

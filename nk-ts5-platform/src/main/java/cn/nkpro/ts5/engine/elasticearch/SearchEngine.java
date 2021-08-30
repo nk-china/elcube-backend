@@ -70,10 +70,10 @@ public class SearchEngine extends ESContentBuilder{
         return client.search(searchRequest, RequestOptions.DEFAULT).getHits().getTotalHits().value > 0;
     }
 
-    public void deleteBeforeCommit(Class<? extends AbstractESDoc> docType, QueryBuilder query){
+    public void deleteBeforeCommit(Class<? extends AbstractESDoc> esType, QueryBuilder query){
         LocalSyncUtilz.runBeforeCommit(()-> client.deleteByQuery(
                 new DeleteByQueryRequest(
-                        documentIndex(parseDocument(docType))
+                        documentIndex(parseDocument(esType))
                 ).setQuery(query),
                 RequestOptions.DEFAULT
         ));

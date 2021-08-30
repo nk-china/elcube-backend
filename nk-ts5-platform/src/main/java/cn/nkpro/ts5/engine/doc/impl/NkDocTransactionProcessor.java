@@ -15,8 +15,6 @@ import cn.nkpro.ts5.engine.doc.model.*;
 import cn.nkpro.ts5.engine.doc.service.NkDocDefService;
 import cn.nkpro.ts5.engine.doc.service.NkDocHistoryService;
 import cn.nkpro.ts5.engine.elasticearch.SearchEngine;
-import cn.nkpro.ts5.engine.elasticearch.model.CustomES;
-import cn.nkpro.ts5.engine.elasticearch.model.DocHES;
 import cn.nkpro.ts5.engine.spel.TfmsSpELManager;
 import cn.nkpro.ts5.engine.task.NkBpmTaskService;
 import cn.nkpro.ts5.exception.TfmsDefineException;
@@ -27,7 +25,6 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -564,58 +561,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
 
         loopDoc.setNewCreate(false);
 
-
-
-
-//        assert original != null;
-//        List<Map<String,Object>> nkCardGrid1 = (List<Map<String,Object>>) loopDoc.getData().get("NkCardGrid");
-//        List<Map<String,Object>> nkCardGrid2 = (List<Map<String,Object>>) original.getData().get("NkCardGrid");
-//
-//        diff(nkCardGrid1,nkCardGrid2,"KEY1",(key,e)->{
-//            // add
-//            CustomES customES = new CustomES();
-//            customES.setItemId(key);
-//            customES.setDocId(loopDoc.getDocId());
-//            customES.getDynamics().putAll(e);
-//
-//            searchEngine.indexBeforeCommit(customES);
-//        },(key,e)->{
-//            // update
-//            CustomES customES = new CustomES();
-//            customES.setItemId(key);
-//            customES.setDocId(loopDoc.getDocId());
-//            customES.getDynamics().putAll(e);
-//            searchEngine.updateBeforeCommit(customES);
-//        },(key,e)->{
-//            // delete
-//            searchEngine.deleteBeforeCommit(CustomES.class, key);
-//        });
-
-
         return loopDoc;
-    }
-
-    private <D> void diff(List<D> list1,List<D> list2,String keySpEL,DiffFunction<D> added,DiffFunction<D> updated,DiffFunction<D> removed){
-
-        Map<String,D> map1 = list1.stream().collect(Collectors.toMap(e->(String)(spELManager.invoke(keySpEL,e)),e->e));
-        Map<String,D> map2 = list2.stream().collect(Collectors.toMap(e->(String)(spELManager.invoke(keySpEL,e)),e->e));
-
-        map1.forEach((k,v)->{
-            if(map2.containsKey(k)){
-                updated.apply(k,v);
-            }else{
-                added.apply(k,v);
-            }
-        });
-        map2.forEach((k,v)->{
-            if(!map1.containsKey(k)){
-                removed.apply(k,v);
-            }
-        });
-    }
-
-    public interface DiffFunction<D>{
-        public void apply(String key,D data);
     }
 
 

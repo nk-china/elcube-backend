@@ -22,4 +22,6 @@ public interface NkDocEngineFrontService extends NkDocEngine {
     DocHV doUpdateView(DocHV docHV, String optSource);
 
     void onBpmKilled(String docId, String processKey, String optSource);
+
+    void index(DocHV doc);
 }

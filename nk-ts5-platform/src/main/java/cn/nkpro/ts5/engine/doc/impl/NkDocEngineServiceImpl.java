@@ -15,7 +15,9 @@ import cn.nkpro.ts5.engine.doc.service.NkDocDefService;
 import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService;
 import cn.nkpro.ts5.engine.doc.service.NkDocPermService;
 import cn.nkpro.ts5.engine.elasticearch.SearchEngine;
+import cn.nkpro.ts5.engine.elasticearch.model.CustomES;
 import cn.nkpro.ts5.engine.elasticearch.model.DocHES;
+import cn.nkpro.ts5.engine.spel.TfmsSpELManager;
 import cn.nkpro.ts5.engine.task.NkBpmTaskService;
 import cn.nkpro.ts5.exception.TfmsDefineException;
 import cn.nkpro.ts5.exception.TfmsSystemException;
@@ -23,11 +25,13 @@ import cn.nkpro.ts5.orm.mb.gen.*;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.support.PagedListHolder;
+import org.springframework.expression.EvaluationContext;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.IllegalTransactionStateException;
 import org.springframework.transaction.annotation.Propagation;
@@ -41,7 +45,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
+public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDocEngineFrontService {
 
     @Autowired@SuppressWarnings("all")
     private DocHMapper docHMapper;
@@ -329,14 +333,15 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
                 );
             }
             processView(doc);
+
+            if(debugContextManager.isDebug()){
+                debugContextManager.addDebugResource("$"+doc.getDocId(), doc.toPersistent());
+            }
+
             return doc;
         }finally {
             if(log.isInfoEnabled())log.info("{}保存单据视图 完成",NkDocEngineContext.currLog());
             NkDocEngineContext.endLog();
-
-            if(debugContextManager.isDebug()){
-                debugContextManager.addDebugResource("$"+docHV.getDocId(), docHV.toPersistent());
-            }
             docHV.clearItemContent();
         }
     }
@@ -404,7 +409,8 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
 
             if(log.isInfoEnabled())
                 log.info("{}保存单据内容 创建重建index任务", NkDocEngineContext.currLog());
-            index(doc);
+
+            index(doc, optionalOriginal.orElse(null));
 
             // 预创建一个持久化对象，在事务提交后使用
             docHPersistent = doc.toPersistent();
@@ -454,7 +460,16 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
         Assert.hasText(doc.getDocType(),"单据类型不能为空");
     }
 
-    private void index(DocHV doc){
+    /**
+     * 重建索引，单据没有修改，所以两个doc是一样的
+     */
+    @Override
+    public void index(DocHV doc){
+        this.index(doc, doc);
+    }
+
+    private void index(DocHV doc, DocHV original){
+        indexCustom(doc, original);
         searchEngine.indexBeforeCommit(DocHES.from(doc));
     }
 

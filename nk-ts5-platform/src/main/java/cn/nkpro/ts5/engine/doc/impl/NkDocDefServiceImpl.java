@@ -63,6 +63,8 @@ public class NkDocDefServiceImpl implements NkDocDefService {
     private DocDefCycleMapper docDefCycleMapper;
     @Autowired
     private DocDefIndexRuleMapper docDefIndexRuleMapper;
+    @Autowired
+    private DocDefIndexCustomMapper docDefIndexCustomMapper;
     @Autowired@SuppressWarnings("all")
     private DocDefBpmMapper docDefBpmMapper;
 
@@ -296,17 +298,38 @@ public class NkDocDefServiceImpl implements NkDocDefService {
         docDefIndexRuleMapper.deleteByExample(indexRuleExample);
         if(docDefHV.getIndexRules()!=null)
             docDefHV.getIndexRules()
-                .forEach(indexRule -> {
-                    Assert.hasLength(indexRule.getIndexName(),"索引 字段名 不能为空");
-                    Assert.hasLength(indexRule.getIndexType(),"索引 字段名 不能为空");
-                    Assert.hasLength(indexRule.getRuleSpEL(),"索引 规则 不能为空");
-                    indexRule.setDocType(docDefHV.getDocType());
-                    indexRule.setVersion(docDefHV.getVersion());
-                    indexRule.setOrderBy(docDefHV.getIndexRules().indexOf(indexRule));
-                    indexRule.setUpdatedTime(DateTimeUtilz.nowSeconds());
+                    .forEach(indexRule -> {
+                        Assert.hasLength(indexRule.getIndexName(),"索引 字段名 不能为空");
+                        Assert.hasLength(indexRule.getIndexType(),"索引 字段名 不能为空");
+                        Assert.hasLength(indexRule.getRuleSpEL(),"索引 规则 不能为空");
+                        indexRule.setDocType(docDefHV.getDocType());
+                        indexRule.setVersion(docDefHV.getVersion());
+                        indexRule.setOrderBy(docDefHV.getIndexRules().indexOf(indexRule));
+                        indexRule.setUpdatedTime(DateTimeUtilz.nowSeconds());
 
-                    docDefIndexRuleMapper.insert(indexRule);
-                });
+                        docDefIndexRuleMapper.insert(indexRule);
+                    });
+
+        // indexCustom
+        DocDefIndexCustomExample indexCustomExample = new DocDefIndexCustomExample();
+        indexCustomExample.createCriteria()
+                .andDocTypeEqualTo(docDefHV.getDocType())
+                .andVersionEqualTo(docDefHV.getVersion());
+        docDefIndexCustomMapper.deleteByExample(indexCustomExample);
+        if(docDefHV.getIndexCustoms()!=null)
+            docDefHV.getIndexCustoms()
+                    .forEach(indexCustom -> {
+                        Assert.hasLength(indexCustom.getCustomType(),   "自定义索引 唯一标示 不能为空");
+                        Assert.hasLength(indexCustom.getDataSpEL(),     "自定义索引 源数据SpEL 不能为空");
+                        Assert.hasLength(indexCustom.getKeySpEL(),      "自定义索引 主键SpEL 不能为空");
+                        Assert.hasLength(indexCustom.getMappingSpEL(),  "自定义索引 映射规则模版 不能为空");
+                        indexCustom.setDocType(docDefHV.getDocType());
+                        indexCustom.setVersion(docDefHV.getVersion());
+                        indexCustom.setOrderBy(docDefHV.getIndexCustoms().indexOf(indexCustom));
+                        indexCustom.setUpdatedTime(DateTimeUtilz.nowSeconds());
+
+                        docDefIndexCustomMapper.insert(indexCustom);
+                    });
 
 
         // components
@@ -562,7 +585,7 @@ public class NkDocDefServiceImpl implements NkDocDefService {
     public DocDefHV getDocDefForEdit(String docType, String version){
         DocDefHV docDefHV = debugContextManager.getDebugResource(String.format("@%s", docType));
         if(docDefHV!=null && StringUtils.equals(docDefHV.getVersion(),version)){
-            return docDefHV;
+            return deserializeDefFromContent(docDefHV);
         }
         return deserializeDefFromContent(fetchDocDefFromDB(docType, version));
     }
@@ -610,6 +633,14 @@ public class NkDocDefServiceImpl implements NkDocDefService {
                 .andVersionEqualTo(version);
         indexRuleExample.setOrderByClause("ORDER_BY");
         def.setIndexRules(docDefIndexRuleMapper.selectByExample(indexRuleExample));
+
+        // indexCustom
+        DocDefIndexCustomExample indexCustomExample = new DocDefIndexCustomExample();
+        indexCustomExample.createCriteria()
+                .andDocTypeEqualTo(docType)
+                .andVersionEqualTo(version);
+        indexCustomExample.setOrderByClause("ORDER_BY");
+        def.setIndexCustoms(docDefIndexCustomMapper.selectByExample(indexCustomExample));
 
         // bpm
         DocDefBpmExample bpmExample = new DocDefBpmExample();

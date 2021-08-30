@@ -4,9 +4,8 @@ import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.config.redis.RedisSupport;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService;
-import cn.nkpro.ts5.engine.elasticearch.SearchService;
 import cn.nkpro.ts5.engine.elasticearch.SearchEngine;
-import cn.nkpro.ts5.engine.elasticearch.model.DocHES;
+import cn.nkpro.ts5.engine.elasticearch.SearchService;
 import cn.nkpro.ts5.engine.task.NkBpmTaskManager;
 import cn.nkpro.ts5.orm.mb.gen.DocH;
 import lombok.AllArgsConstructor;
@@ -18,7 +17,6 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.List;
 
 @Component
 public class NkDocEngineIndexService {
@@ -65,7 +63,7 @@ public class NkDocEngineIndexService {
                     DocHV docHV = docEngineFrontService.detail(doc.getDocId());
 
                     // 创建单据索引
-                    searchEngine.indexBeforeCommit(DocHES.from(docHV));
+                    docEngineFrontService.index(docHV);
 
                     // 创建任务索引
                     bpmTaskManager.indexDocTask(docHV);

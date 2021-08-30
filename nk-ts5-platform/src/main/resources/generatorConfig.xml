@@ -42,6 +42,7 @@
 		<table tableName="nk_doc_def_state"				 	enableDeleteByExample="true"  domainObjectName="DocDefState"/>
 		<table tableName="nk_doc_def_cycle"				 	enableDeleteByExample="true"  domainObjectName="DocDefCycle"/>
 		<table tableName="nk_doc_def_index_rule"			enableDeleteByExample="true"  domainObjectName="DocDefIndexRule"/>
+		<table tableName="nk_doc_def_index_custom"			enableDeleteByExample="true"  domainObjectName="DocDefIndexCustom"/>
 		<table tableName="nk_doc_def_flow"				 	enableDeleteByExample="true"  domainObjectName="DocDefFlow"/>
 		<table tableName="nk_doc_def_bpm"					enableDeleteByExample="true"  domainObjectName="DocDefBpm"/>
 
