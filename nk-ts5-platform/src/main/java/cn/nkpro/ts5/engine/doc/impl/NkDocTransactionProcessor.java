@@ -545,8 +545,6 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         humanize(doc);
-        if(log.isInfoEnabled())log.info("{}保存单据内容 创建重建index任务", NkDocEngineContext.currLog());
-        index(loopDoc);
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -595,10 +593,6 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
                 .findAny().ifPresent(state ->
                 doc.setDocStateDesc(String.format("%s | %s",state.getDocState(),state.getDocStateDesc()))
         );
-    }
-
-    private void index(DocHV doc){
-        searchEngine.indexBeforeCommit(DocHES.from(doc));
     }
 
     private boolean isOverride(Object obj){

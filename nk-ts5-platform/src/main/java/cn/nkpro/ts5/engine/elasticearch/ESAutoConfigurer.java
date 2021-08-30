@@ -9,10 +9,10 @@ import org.springframework.context.annotation.Configuration;
 public class ESAutoConfigurer implements ApplicationRunner {
 
     @Autowired@SuppressWarnings("all")
-    private NkIndexService indexService;
+    private SearchService searchService;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        indexService.init();
+        searchService.init();
     }
 }

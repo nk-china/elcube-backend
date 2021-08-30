@@ -1,13 +1,10 @@
 package cn.nkpro.ts5.engine.elasticearch;
 
-import cn.nkpro.ts5.config.redis.RedisSupport;
-import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService;
 import cn.nkpro.ts5.engine.doc.service.NkDocPermService;
 import cn.nkpro.ts5.engine.elasticearch.model.BpmTaskES;
 import cn.nkpro.ts5.engine.elasticearch.model.DocHES;
 import cn.nkpro.ts5.engine.elasticearch.model.ESDoc;
 import cn.nkpro.ts5.exception.TfmsSystemException;
-import cn.nkpro.ts5.orm.mb.gen.DocH;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
@@ -21,67 +18,23 @@ import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Component
-public class NkIndexService {
+public class SearchService {
 
     @Autowired@SuppressWarnings("all")
     private SearchEngine searchEngine;
     @Autowired@SuppressWarnings("all")
     protected NkDocPermService docPermService;
-    @Autowired
-    private NkDocEngineFrontService docEngineFrontService;
-    @Autowired
-    private RedisSupport<Map<String,String>> redisMapStringString;
 
 
     public void init() throws IOException {
 
         searchEngine.createIndices(DocHES.class);
         searchEngine.createIndices(BpmTaskES.class);
-    }
-
-    @Async
-    public void reindex(String asyncTaskId, Boolean dropFirst, String docType) throws IOException {
-        if(dropFirst){
-            this.dropAndInit();
-        }
-
-        int offset = 0;
-        int rows   = 1000;
-        int total  = 0;
-        List<DocH> list;
-        try{
-            while((list = docEngineFrontService.list(docType, offset, rows, null)).size()>0){
-                redisMapStringString.set(asyncTaskId, Collections.singletonMap(
-                        "message",
-                        String.format("%s 等 %d 条记录",list.get(0).getDocDesc(),list.size())
-                ));
-                searchEngine.indexBeforeCommit(list.stream()
-                        .map(doc->DocHES.from(docEngineFrontService.detail(doc.getDocId())))
-                        .filter(Objects::nonNull)
-                        .collect(Collectors.toList()));
-                offset += rows;
-                total  += list.size();
-            }
-        }catch (Exception e){
-            redisMapStringString.set(asyncTaskId, Collections.singletonMap("error",String.format("重建索引发生错误: %s",e.getMessage())));
-        }finally {
-            redisMapStringString.set(asyncTaskId, Collections.singletonMap("success",String.format("重建索引完成，共 %d 条记录",total)));
-        }
-    }
-
-    public Map<String,String> getReindexInfo(String asyncTaskId){
-        return redisMapStringString.getIfAbsent(asyncTaskId,()->null);
     }
 
     public void dropAndInit() throws IOException {

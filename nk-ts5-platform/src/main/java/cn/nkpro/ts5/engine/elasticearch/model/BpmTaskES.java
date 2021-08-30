@@ -1,9 +1,11 @@
 package cn.nkpro.ts5.engine.elasticearch.model;
 
+import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.engine.elasticearch.ESFieldType;
 import cn.nkpro.ts5.engine.elasticearch.annotation.ESDocument;
 import cn.nkpro.ts5.engine.elasticearch.annotation.ESField;
 import cn.nkpro.ts5.engine.elasticearch.annotation.ESId;
+import cn.nkpro.ts5.utils.BeanUtilz;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -36,4 +38,17 @@ public class BpmTaskES extends DocBaseES {
 
     @ESField(type= ESFieldType.Keyword)
     private String docId;
+
+    public static BpmTaskES from(DocHV doc,String taskId,String taskName,String taskAssignee,String taskState,Long taskStartTime,Long taskEndTime){
+        BpmTaskES bpmTaskES = BeanUtilz.copyFromObject(doc, BpmTaskES.class);
+
+        bpmTaskES.setTaskId(taskId);
+        bpmTaskES.setTaskName(taskName);
+        bpmTaskES.setTaskAssignee(taskAssignee);
+        bpmTaskES.setTaskState(taskState);
+        bpmTaskES.setTaskStartTime(taskStartTime);
+        bpmTaskES.setTaskEndTime(taskEndTime);
+
+        return bpmTaskES;
+    }
 }

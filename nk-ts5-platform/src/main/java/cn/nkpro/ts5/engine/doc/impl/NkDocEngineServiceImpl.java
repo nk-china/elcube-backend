@@ -12,14 +12,14 @@ import cn.nkpro.ts5.engine.doc.model.*;
 import cn.nkpro.ts5.engine.doc.service.NkDocDefService;
 import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService;
 import cn.nkpro.ts5.engine.doc.service.NkDocPermService;
+import cn.nkpro.ts5.engine.elasticearch.SearchEngine;
+import cn.nkpro.ts5.engine.elasticearch.model.DocHES;
 import cn.nkpro.ts5.engine.task.NkBpmTaskService;
 import cn.nkpro.ts5.exception.TfmsDefineException;
-import cn.nkpro.ts5.exception.TfmsException;
 import cn.nkpro.ts5.exception.TfmsSystemException;
 import cn.nkpro.ts5.orm.mb.gen.*;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import com.alibaba.fastjson.JSON;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -58,6 +58,9 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
     private NkDocPermService docPermService;
     @Autowired
     private DebugContextManager debugContextManager;
+    @Autowired@SuppressWarnings("all")
+    private SearchEngine searchEngine;
+
 
 
     @Override
@@ -388,12 +391,15 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
                 validateFlow(def, detail(doc.getPreDocId()));
             }
 
-
             // 获取单据处理器 并执行
             // doc.setDef(def);todo 之前为什么要替换def？ 需要思考下
             doc = customObjectManager
                     .getCustomObject(def.getRefObjectType(), NkDocProcessor.class)
                     .doUpdate(doc, optionalOriginal.orElse(null),optSource);
+
+            if(log.isInfoEnabled())
+                log.info("{}保存单据内容 创建重建index任务", NkDocEngineContext.currLog());
+            index(doc);
 
             // 预创建一个持久化对象，在事务提交后使用
             docHPersistent = doc.toPersistent();
@@ -441,6 +447,10 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
     private void validate(DocHV doc){
         Assert.hasText(doc.getDocId(),"单据ID不能为空");
         Assert.hasText(doc.getDocType(),"单据类型不能为空");
+    }
+
+    private void index(DocHV doc){
+        searchEngine.indexBeforeCommit(DocHES.from(doc));
     }
 
 

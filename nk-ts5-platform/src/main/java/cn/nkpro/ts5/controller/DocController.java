@@ -4,7 +4,7 @@ import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
 import cn.nkpro.ts5.engine.doc.model.DocDefFlowV;
 import cn.nkpro.ts5.engine.doc.model.DocHHistory;
 import cn.nkpro.ts5.engine.doc.service.NkDocHistoryService;
-import cn.nkpro.ts5.engine.elasticearch.NkIndexService;
+import cn.nkpro.ts5.engine.elasticearch.SearchService;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.engine.doc.service.NkDocDefService;
 import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService;
@@ -39,14 +39,14 @@ public class DocController {
     @Autowired@SuppressWarnings("all")
     private NkDocEngineFrontService docEngine;
     @Autowired@SuppressWarnings("all")
-    private NkIndexService docService;
+    private SearchService searchService;
     @Autowired
     private NkDocHistoryService docHistoryService;
     
     @WsDocNote("1.拉取交易列表数据")
     @RequestMapping(value = "/list",method = RequestMethod.POST)
     public ESPageList<DocHES> list(@RequestBody JSONObject params) {
-        return docService.queryList(DocHES.class, null, params);
+        return searchService.queryList(DocHES.class, null, params);
     }
 
     

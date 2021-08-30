@@ -2,6 +2,7 @@ package cn.nkpro.ts5.controller.devops;
 
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
+import cn.nkpro.ts5.engine.task.NkBpmTaskManager;
 import cn.nkpro.ts5.engine.task.NkBpmTaskService;
 import cn.nkpro.ts5.engine.task.model.BpmInstance;
 import cn.nkpro.ts5.engine.task.model.BpmTaskComplete;
@@ -16,8 +17,10 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/ops/bpm")
 @PreAuthorize("hasAnyAuthority('*:*','DEVOPS:*','DEVOPS:BPM')")
-public class SysBPMTaskManagerController {
+public class SysTaskManagerController {
 
+    @Autowired@SuppressWarnings("all")
+    private NkBpmTaskManager bpmTaskManager;
     @Autowired@SuppressWarnings("all")
     private NkBpmTaskService bpmTaskService;
 
@@ -26,7 +29,7 @@ public class SysBPMTaskManagerController {
     public PageList<BpmInstance> processInstances(
             @WsDocNote("起始条目")@RequestParam("from") Integer from,
             @WsDocNote("查询条目")@RequestParam("rows") Integer rows){
-        return bpmTaskService.processInstancePage(from, rows);
+        return bpmTaskManager.processInstancePage(from, rows);
     }
 
     @WsDocNote("2.拉取流程详情")
@@ -34,7 +37,7 @@ public class SysBPMTaskManagerController {
     @ResponseBody
     public BpmInstance processInstanceDetail(
             @WsDocNote("任务Id")@RequestParam("instanceId") String instanceId) {
-        return bpmTaskService.processInstanceDetail(instanceId);
+        return bpmTaskManager.processInstanceDetail(instanceId);
     }
 
     @WsDocNote("3.强制执行任务")
@@ -51,6 +54,6 @@ public class SysBPMTaskManagerController {
     public void processInstanceKill(
             @WsDocNote("任务Id")@RequestParam("instanceId") String instanceId,
             @WsDocNote("删除原因")@RequestParam("deleteReason") String deleteReason) {
-        bpmTaskService.deleteProcessInstance(instanceId,deleteReason);
+        bpmTaskManager.deleteProcessInstance(instanceId,deleteReason);
     }
 }

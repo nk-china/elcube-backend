@@ -1,19 +1,13 @@
 package cn.nkpro.ts5.engine.task.impl;
 
 import cn.nkpro.ts5.engine.doc.model.DocHV;
-import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService;
-import cn.nkpro.ts5.engine.elasticearch.SearchEngine;
 import cn.nkpro.ts5.engine.elasticearch.model.BpmTaskES;
-import cn.nkpro.ts5.utils.BeanUtilz;
-import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.task.Task;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -21,14 +15,7 @@ import java.util.Map;
 
 @SuppressWarnings("all")
 @Component
-public class NkGlobalEventHandler implements HistoryEventHandler {
-
-    @Autowired@Lazy
-    private NkDocEngineFrontService docEngine;
-    @Autowired@Lazy
-    private SearchEngine searchEngine;
-    @Autowired@Lazy
-    private ProcessEngine processEngine;
+public class NkGlobalEventHandler extends AbstractNkBpmSupport implements HistoryEventHandler {
 
     @Override
     public void handleEvents(List<HistoryEvent> list) {
@@ -54,13 +41,14 @@ public class NkGlobalEventHandler implements HistoryEventHandler {
 
         DocHV doc = docEngine.detail(Context.getBpmnExecutionContext().getProcessInstance().getBusinessKey());
 
-        BpmTaskES bpmTaskES = BeanUtilz.copyFromObject(doc, BpmTaskES.class);
-
-        bpmTaskES.setTaskId(event.getTaskId());
-        bpmTaskES.setTaskAssignee(event.getAssignee());
-        bpmTaskES.setTaskName(event.getName());
-        bpmTaskES.setTaskState("create");
-        bpmTaskES.setTaskStartTime(event.getStartTime().getTime()/1000);
+        BpmTaskES bpmTaskES = BpmTaskES.from(doc,
+                event.getId(),
+                event.getName(),
+                event.getAssignee(),
+                "create",
+                event.getStartTime().getTime()/1000,
+                null
+        );
 
         searchEngine.indexBeforeCommit(bpmTaskES);
     }
@@ -72,14 +60,14 @@ public class NkGlobalEventHandler implements HistoryEventHandler {
         Task task = processEngine.getTaskService().createTaskQuery().taskId(event.getTaskId()).singleResult();
         DocHV doc = docEngine.detail((String) variables.get("NK$BUSINESS_KEY"));
 
-        BpmTaskES bpmTaskES = BeanUtilz.copyFromObject(doc, BpmTaskES.class);
-
-        bpmTaskES.setTaskId(event.getTaskId());
-        bpmTaskES.setTaskAssignee(event.getAssignee());
-        bpmTaskES.setTaskName(event.getName());
-        bpmTaskES.setTaskState(variables.containsKey("NK$DELETE")?"delete":"complete"); // 任务被强制删除
-        bpmTaskES.setTaskStartTime(task.getCreateTime().getTime()/1000);
-        bpmTaskES.setTaskEndTime(event.getEndTime().getTime()/1000);
+        BpmTaskES bpmTaskES = BpmTaskES.from(doc,
+                event.getId(),
+                event.getName(),
+                event.getAssignee(),
+                variables.containsKey("NK$DELETE")?"delete":"complete",// 任务被强制删除
+                event.getStartTime().getTime()/1000,
+                event.getEndTime().getTime()/1000
+        );
 
         searchEngine.indexBeforeCommit(bpmTaskES);
     }

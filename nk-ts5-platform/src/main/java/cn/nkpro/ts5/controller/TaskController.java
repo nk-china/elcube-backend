@@ -3,7 +3,7 @@ package cn.nkpro.ts5.controller;
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
 import cn.nkpro.ts5.engine.task.NkBpmTaskService;
 import cn.nkpro.ts5.engine.elasticearch.ESPageList;
-import cn.nkpro.ts5.engine.elasticearch.NkIndexService;
+import cn.nkpro.ts5.engine.elasticearch.SearchService;
 import cn.nkpro.ts5.engine.elasticearch.model.BpmTaskES;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
@@ -25,14 +25,14 @@ public class TaskController {
     @Autowired
     private NkBpmTaskService bpmTaskService;
     @Autowired
-    private NkIndexService indexService;
+    private SearchService searchService;
 
     @WsDocNote("1、拉取交易列表数据")
     @RequestMapping(value = "/tasks",method = RequestMethod.POST)
     public ESPageList<BpmTaskES> list(@RequestBody JSONObject params) {
 
         params.put("orderField",StringUtils.defaultIfBlank(params.getString("orderField"),"updatedTime"));
-        return indexService.queryList(
+        return searchService.queryList(
                 BpmTaskES.class,
                 null,//QueryBuilders.termQuery("assignee",SecurityUtilz.getUser().getId())
                 params
