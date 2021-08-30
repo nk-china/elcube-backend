@@ -10,6 +10,7 @@ import cn.nkpro.ts5.engine.task.NkBpmTaskManager;
 import cn.nkpro.ts5.orm.mb.gen.DocH;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
@@ -78,6 +79,7 @@ public class NkDocEngineIndexService {
     }
 
     @Data
+    @NoArgsConstructor
     @AllArgsConstructor
     static class ReindexInfo{
         boolean finished;
