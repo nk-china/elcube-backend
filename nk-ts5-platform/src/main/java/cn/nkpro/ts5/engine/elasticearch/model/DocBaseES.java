@@ -44,7 +44,7 @@ import lombok.EqualsAndHashCode;
 @ESDynamicTemplate(value = "long",      match = "*_long",   mappingType = ESFieldType.Long)
 @ESDynamicTemplate(value = "float",     match = "*_float",  mappingType = ESFieldType.Float)
 @ESDynamicTemplate(value = "double",    match = "*_double", mappingType = ESFieldType.Double)
-@ESDynamicTemplate(value = "date",      match = "*_date",   mappingType = ESFieldType.Date)
+@ESDynamicTemplate(value = "date",      match = "*_date",   mappingType = ESFieldType.Date, format = "epoch_second||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd")
 @ESDynamicTemplate(value = "obj",       match = "*_obj*",   mappingType = ESFieldType.Object)
 public class DocBaseES extends ESDoc {
 
@@ -69,10 +69,10 @@ public class DocBaseES extends ESDoc {
     @ESField(type= ESFieldType.Integer)
     private Integer docDefVersion;
 
-    @ESField(type= ESFieldType.Long)
+    @ESField(type= ESFieldType.Date, format = "epoch_second||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd")
     private Long createdTime;
 
-    @ESField(type= ESFieldType.Long)
+    @ESField(type= ESFieldType.Date, format = "epoch_second||yyyy-MM-dd HH:mm:ss||yyyy-MM-dd")
     private Long updatedTime;
 
     @ESField(type= ESFieldType.Text,analyzer = ESAnalyzerType.ik_max_word, copyToKeyword = true, original = true)

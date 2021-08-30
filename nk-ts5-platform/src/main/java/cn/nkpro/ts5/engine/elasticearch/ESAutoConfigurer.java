@@ -11,12 +11,10 @@ import org.springframework.context.annotation.Configuration;
 public class ESAutoConfigurer implements ApplicationRunner {
 
     @Autowired@SuppressWarnings("all")
-    private SearchEngine searchEngine;
+    private ESManager esManager;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
-        searchEngine.createIndices(DocHES.class);
-        //searchEngine.deleteIndices(BpmTaskES.class);
-        searchEngine.createIndices(BpmTaskES.class);
+        esManager.init();
     }
 }

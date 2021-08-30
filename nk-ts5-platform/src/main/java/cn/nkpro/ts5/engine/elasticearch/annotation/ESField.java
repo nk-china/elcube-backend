@@ -58,6 +58,8 @@ public @interface ESField {
      */
     ESAnalyzerType searchAnalyzer() default ESAnalyzerType.none;
 
+    String format() default "";
+
     /**
      * 暂不可用，如果某个字段需要被忽略
      */

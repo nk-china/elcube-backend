@@ -101,8 +101,6 @@ public class SearchEngine {
                         }).collect(Collectors.joining("$"));
 
                 JSONObject json = (JSONObject) JSON.toJSON(doc);
-//                if(doc.dynamics()!=null)
-//                    json.putAll(doc.dynamics());
 
                 client.index(
                         new IndexRequest(documentIndex(document))
@@ -357,6 +355,9 @@ public class SearchEngine {
                                 builder.endObject();
                                 builder.endObject();
                             }
+                            if(StringUtils.isNotBlank(template.format())){
+                                builder.field("format",template.format());
+                            }
                             for(@SuppressWarnings("unused") ESField field : template.fields()){
                                 throw new RuntimeException("暂不支持");
                             }
@@ -398,6 +399,9 @@ public class SearchEngine {
                                 }
                                 if (esField.copyToKeyword()) {
                                     builder.field("copy_to", "$keyword");
+                                }
+                                if(StringUtils.isNotBlank(esField.format())){
+                                    builder.field("format",esField.format());
                                 }
                             }
                             builder.endObject();

@@ -36,6 +36,8 @@ public @interface ESDynamicTemplate {
      */
     ESAnalyzerType searchAnalyzer() default ESAnalyzerType.none;
 
+    String format() default "";
+
     ESField[] fields() default {};
 
     boolean copyToKeyword() default false;

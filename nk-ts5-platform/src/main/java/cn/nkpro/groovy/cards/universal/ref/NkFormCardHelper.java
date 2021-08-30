@@ -31,7 +31,8 @@ public class NkFormCardHelper {
 
         EvaluationContext context = spELManager.createContext(doc);
 
-        items
+        if(items!=null){
+            items
             .stream()
             .sorted(Comparator.comparing(NkCardFormDefI::getCalcOrder))
             .peek(item -> {
@@ -119,8 +120,8 @@ public class NkFormCardHelper {
                         }
                     }
                 }
-
             });
+        }
         return data;
     }
 

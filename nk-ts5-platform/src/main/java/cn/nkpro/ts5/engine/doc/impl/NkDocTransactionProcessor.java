@@ -598,7 +598,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
     }
 
     private void index(DocHV doc){
-        searchEngine.indexBeforeCommit(BeanUtilz.copyFromObject(doc, DocHES.class));
+        searchEngine.indexBeforeCommit(DocHES.from(doc));
     }
 
     private boolean isOverride(Object obj){

@@ -23,6 +23,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.IllegalTransactionStateException;
@@ -58,6 +59,19 @@ public class NkDocEngineServiceImpl implements NkDocEngineFrontService {
     @Autowired
     private DebugContextManager debugContextManager;
 
+
+    @Override
+    public List<DocH> list(String docType, int offset, int rows, String orderBy){
+        DocHExample example = new DocHExample();
+        DocHExample.Criteria criteria = example.createCriteria();
+
+        if(StringUtils.isNotBlank(docType))
+            criteria.andDocTypeEqualTo(docType);
+
+        example.setOrderByClause(StringUtils.defaultIfBlank(orderBy,"CREATED_TIME asc"));
+
+        return docHMapper.selectByExample(example,new RowBounds(offset,rows));
+    }
 
     @Override
     public DocHV create(String docType, String preDocId) {
