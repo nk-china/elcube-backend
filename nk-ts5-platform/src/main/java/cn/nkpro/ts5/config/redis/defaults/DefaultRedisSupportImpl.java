@@ -118,20 +118,20 @@ public class DefaultRedisSupportImpl<T> implements RedisSupport<T>{
         return hashOperations.get(hash,key);
     }
     @Override
-    public T getIfAbsent(String hash,String hashKey,Function<T> mapper) throws TfmsRuntimeException {
-        return getIfAbsent(hash, hashKey, false, mapper);
+    public T getIfAbsent(String hash,String keys,Function<T> mapper) throws TfmsRuntimeException {
+        return getIfAbsent(hash, keys, false, mapper);
     }
     @Override
-    public T getIfAbsent(String hash,String hashKey,boolean cacheNullValue,Function<T> mapper) throws TfmsRuntimeException {
+    public T getIfAbsent(String hash,String keys,boolean cacheNullValue,Function<T> mapper) throws TfmsRuntimeException {
         Assert.notNull(hash,"hash不能为空");
-        Assert.notNull(hashKey,"hashKey不能为空");
+        Assert.notNull(keys,"keys不能为空");
 
         HashOperations<String,String,T> hashOperations = redisTemplate.opsForHash();
-        T value = hashOperations.get(hash, hashKey);
+        T value = hashOperations.get(hash, keys);
         if(value == null){
             value = mapper.apply();
             if(cacheNullValue || value != null){
-                hashOperations.put(hash,hashKey,value);
+                hashOperations.put(hash,keys,value);
             }
         }
         return value;
@@ -181,7 +181,7 @@ public class DefaultRedisSupportImpl<T> implements RedisSupport<T>{
     @Override
     public void delete(String hash, Object... keys){
         Assert.notNull(hash,"hash不能为空");
-        Assert.notNull(keys,"hashKey不能为空");
+        Assert.notNull(keys,"keys不能为空");
         Assert.notEmpty(keys,"keys不能为空");
         redisTemplate.opsForHash().delete(hash,keys);
     }
