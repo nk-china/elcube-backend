@@ -18,7 +18,7 @@ public class ThreadConfig {
         taskExecutor.setMaxPoolSize(20);
         taskExecutor.setKeepAliveSeconds(60);
         taskExecutor.setQueueCapacity(2147483647);
-        taskExecutor.setThreadNamePrefix("nk-async-executor");
+        taskExecutor.setThreadNamePrefix("nk-async-executor-");
         taskExecutor.setWaitForTasksToCompleteOnShutdown(true);
         taskExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
         return taskExecutor;
