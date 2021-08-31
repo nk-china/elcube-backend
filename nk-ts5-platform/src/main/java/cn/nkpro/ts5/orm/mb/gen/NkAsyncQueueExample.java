@@ -594,6 +594,76 @@ public class NkAsyncQueueExample {
             return (Criteria) this;
         }
 
+        public Criteria andAsyncNextIsNull() {
+            addCriterion("ASYNC_NEXT is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAsyncNextIsNotNull() {
+            addCriterion("ASYNC_NEXT is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andAsyncNextEqualTo(String value) {
+            addCriterion("ASYNC_NEXT =", value, "asyncNext");
+            return (Criteria) this;
+        }
+
+        public Criteria andAsyncNextNotEqualTo(String value) {
+            addCriterion("ASYNC_NEXT <>", value, "asyncNext");
+            return (Criteria) this;
+        }
+
+        public Criteria andAsyncNextGreaterThan(String value) {
+            addCriterion("ASYNC_NEXT >", value, "asyncNext");
+            return (Criteria) this;
+        }
+
+        public Criteria andAsyncNextGreaterThanOrEqualTo(String value) {
+            addCriterion("ASYNC_NEXT >=", value, "asyncNext");
+            return (Criteria) this;
+        }
+
+        public Criteria andAsyncNextLessThan(String value) {
+            addCriterion("ASYNC_NEXT <", value, "asyncNext");
+            return (Criteria) this;
+        }
+
+        public Criteria andAsyncNextLessThanOrEqualTo(String value) {
+            addCriterion("ASYNC_NEXT <=", value, "asyncNext");
+            return (Criteria) this;
+        }
+
+        public Criteria andAsyncNextLike(String value) {
+            addCriterion("ASYNC_NEXT like", value, "asyncNext");
+            return (Criteria) this;
+        }
+
+        public Criteria andAsyncNextNotLike(String value) {
+            addCriterion("ASYNC_NEXT not like", value, "asyncNext");
+            return (Criteria) this;
+        }
+
+        public Criteria andAsyncNextIn(List<String> values) {
+            addCriterion("ASYNC_NEXT in", values, "asyncNext");
+            return (Criteria) this;
+        }
+
+        public Criteria andAsyncNextNotIn(List<String> values) {
+            addCriterion("ASYNC_NEXT not in", values, "asyncNext");
+            return (Criteria) this;
+        }
+
+        public Criteria andAsyncNextBetween(String value1, String value2) {
+            addCriterion("ASYNC_NEXT between", value1, value2, "asyncNext");
+            return (Criteria) this;
+        }
+
+        public Criteria andAsyncNextNotBetween(String value1, String value2) {
+            addCriterion("ASYNC_NEXT not between", value1, value2, "asyncNext");
+            return (Criteria) this;
+        }
+
         public Criteria andCreatedTimeIsNull() {
             addCriterion("CREATED_TIME is null");
             return (Criteria) this;

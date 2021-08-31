@@ -19,6 +19,8 @@ public class NkAsyncQueue implements Serializable {
 
     private String asyncState;
 
+    private String asyncNext;
+
     private Long createdTime;
 
     private Long updatedTime;
@@ -83,6 +85,15 @@ public class NkAsyncQueue implements Serializable {
 
     public void setAsyncState(String asyncState) {
         this.asyncState = asyncState;
+    }
+
+    @cn.nkpro.ts5.basic.wsdoc.annotation.CodeFieldNotes("")
+    public String getAsyncNext() {
+        return asyncNext;
+    }
+
+    public void setAsyncNext(String asyncNext) {
+        this.asyncNext = asyncNext;
     }
 
     @cn.nkpro.ts5.basic.wsdoc.annotation.CodeFieldNotes("")

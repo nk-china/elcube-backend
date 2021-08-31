@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.engine.doc.service.impl;
 
 import cn.nkpro.ts5.engine.co.NkCustomObjectManager;
-import cn.nkpro.ts5.engine.doc.datasync.NkDocDataSyncAdapter;
+import cn.nkpro.ts5.engine.doc.datasync.NkDocDataAdapter;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.engine.spel.TfmsSpELManager;
 import org.apache.commons.lang3.StringUtils;
@@ -31,7 +31,7 @@ class AbstractNkDocEngine {
                     if(StringUtils.isBlank(config.getConditionSpEL())||
                             (Boolean) spELManager.invoke(config.getConditionSpEL(),context1)){
 
-                        customObjectManager.getCustomObject(config.getTargetSvr(), NkDocDataSyncAdapter.class)
+                        customObjectManager.getCustomObject(config.getTargetSvr(), NkDocDataAdapter.class)
                                 .sync(doc, original, context1, context2, config);
                     }
                 }

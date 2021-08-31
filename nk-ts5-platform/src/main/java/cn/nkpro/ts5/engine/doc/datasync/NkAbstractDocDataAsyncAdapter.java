@@ -48,9 +48,10 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
                         return (Map<String, Object>) (spELManager.invoke(def.getMappingSpEL(), context2));
                     }).collect(Collectors.toList());
         }else{
-            context1.setVariable("row", dataUnmapping);
             asyncData.single = true;
+            context1.setVariable("row", dataUnmapping);
             asyncData.data = (Map<String,Object>)(spELManager.invoke(def.getMappingSpEL(), context1));
+            context2.setVariable("row", dataOriginalUnmapping);
             asyncData.original = (Map<String,Object>)(spELManager.invoke(def.getMappingSpEL(), context2));
         }
 
@@ -61,6 +62,7 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
         queue.setAsyncRetry(0);
         queue.setAsyncLimit(limit());
         queue.setAsyncRule(rule());
+        queue.setAsyncState("WAITING");
         queue.setCreatedTime(DateTimeUtilz.nowSeconds());
         queue.setUpdatedTime(queue.getCreatedTime());
         asyncQueueMapper.insert(queue);
@@ -74,13 +76,13 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
 
         private NkAsyncQueue asyncQueue;
 
-        private RunInner(NkAsyncQueue asyncId){
+        private RunInner(NkAsyncQueue asyncQueue){
             this.asyncQueue = asyncQueue;
         }
 
         @Override
         public void run() {
-            NkAbstractDocDataAsyncAdapter.this.schedule(this.asyncQueue);
+            NkAbstractDocDataAsyncAdapter.this.lockRun(this.asyncQueue, DateTimeUtilz.nowSeconds());
         }
     }
 
@@ -93,6 +95,9 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
         // 如果超出重试次数
         if(asyncQueue.getAsyncRetry() >= asyncQueue.getAsyncLimit()){
             markError(asyncQueue, now);
+            if(log.isDebugEnabled())
+            log.debug("任务{} 重试次数 {} 超出限制 {}, 标记为 失败",
+                    asyncQueue.getAsyncId(),asyncQueue.getAsyncRetry(),asyncQueue.getAsyncLimit());
             return;
         }
 
@@ -100,6 +105,9 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
         String[] split = asyncQueue.getAsyncRule().split("[,;|\\s]");
         if(split.length<=asyncQueue.getAsyncRetry()){
             markError(asyncQueue, now);
+            if(log.isDebugEnabled())
+            log.debug("任务{} 重试次数 {} 超出间隔设定 {}, 标记为 失败",
+                    asyncQueue.getAsyncId(),asyncQueue.getAsyncRetry(),asyncQueue.getAsyncRule());
             return;
         }
 
@@ -107,11 +115,21 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
         long next = asyncQueue.getUpdatedTime() + Integer.parseInt(split[asyncQueue.getAsyncRetry()])*60;
         if(next>now) {
             // 等待
+            if(log.isDebugEnabled())
+            log.debug("任务{} 未到达下一次重试时间 {} 等待下一次重试",
+                    asyncQueue.getAsyncId(),DateTimeUtilz.format(next,"MM-dd HH:mm:ss"));
             return;
         }
 
+        lockRun(asyncQueue, now);
+
+    }
+
+    private void lockRun(NkAsyncQueue asyncQueue, long time){
         // 锁定任务
         if(redisSupport.lock(asyncQueue.getAsyncId(),Thread.currentThread().getName(),60)){
+            if(log.isDebugEnabled())
+                log.debug("锁定任务 {}",asyncQueue.getAsyncId());
             NkAsyncQueueWithBLOBs asyncQueueWithBLOBs = asyncQueueMapper.selectByPrimaryKey(asyncQueue.getAsyncId());
             try{
                 this.schedule(asyncQueueWithBLOBs);
@@ -120,15 +138,37 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
                 int retry = asyncQueueWithBLOBs.getAsyncRetry()+1;
 
                 if(retry>=asyncQueueWithBLOBs.getAsyncLimit()){
-                    markError(asyncQueueWithBLOBs, now, ExceptionUtils.getRootCauseStackTrace(e));
+                    markError(asyncQueueWithBLOBs, time, ExceptionUtils.getRootCauseStackTrace(e));
+                    if(log.isWarnEnabled())
+                        log.warn("执行任务 {} 失败，重试次数 {} 超出限制 {}, 标记为 失败：{}",
+                                asyncQueueWithBLOBs.getAsyncId(),
+                                retry,
+                                asyncQueueWithBLOBs.getAsyncLimit(),
+                                e.getMessage());
                 }else{
-                    asyncQueueWithBLOBs.setAsyncRetry(asyncQueueWithBLOBs.getAsyncRetry()+1);
-                    asyncQueueWithBLOBs.setUpdatedTime(now);
-                    asyncQueueWithBLOBs.setAsyncCauseStackTrace(JSON.toJSONString(ExceptionUtils.getRootCauseStackTrace(e)));
-                    asyncQueueMapper.updateByPrimaryKeyWithBLOBs(asyncQueueWithBLOBs);
+                    String[] split = asyncQueueWithBLOBs.getAsyncRule().split("[,;|\\s]");
+                    if(split.length<=retry){
+                        if(log.isDebugEnabled())
+                            log.debug("执行任务{} 重试次数 {} 超出间隔设定 {}, 标记为 失败：{}",
+                                    asyncQueueWithBLOBs.getAsyncId(),
+                                    retry,
+                                    asyncQueueWithBLOBs.getAsyncRule(),
+                                    e.getMessage());
+                    }else{
+                        long next = time + Integer.parseInt(split[asyncQueueWithBLOBs.getAsyncRetry()])*60;
+                        asyncQueueWithBLOBs.setAsyncRetry(retry);
+                        asyncQueueWithBLOBs.setAsyncNext(DateTimeUtilz.format(next,"MM-dd HH:mm:ss"));
+                        asyncQueueWithBLOBs.setUpdatedTime(time);
+                        asyncQueueWithBLOBs.setAsyncCauseStackTrace(JSON.toJSONString(ExceptionUtils.getRootCauseStackTrace(e)));
+                        asyncQueueMapper.updateByPrimaryKeyWithBLOBs(asyncQueueWithBLOBs);
+                        if(log.isWarnEnabled())
+                            log.warn("执行任务 {} 失败，等待{}重试: {}",asyncQueueWithBLOBs.getAsyncId(), asyncQueueWithBLOBs.getAsyncNext(), e.getMessage());
+                    }
                 }
             }finally {
-                redisSupport.unLock(asyncQueue.getAsyncId(),Thread.currentThread().getName());
+                redisSupport.unLock(asyncQueueWithBLOBs.getAsyncId(),Thread.currentThread().getName());
+                if(log.isDebugEnabled())
+                    log.debug("解锁任务 {}",asyncQueueWithBLOBs.getAsyncId());
             }
         }
     }

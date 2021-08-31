@@ -20,20 +20,20 @@ public class ScheduledConfig implements SchedulingConfigurer {
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
 
-        System.out.println(123);
-
-        Runnable task = new Runnable() {
-            @Override
-            public void run() {
-                System.out.println("run");
-            }
-        };
-
-        taskRegistrar.addTriggerTask(task,
-                triggerContext -> {
-                    System.out.println("retime");
-                    return new CronTrigger("0/10 * * * * ?").nextExecutionTime(triggerContext);
-                });
+//        System.out.println(123);
+//
+//        Runnable task = new Runnable() {
+//            @Override
+//            public void run() {
+//                System.out.println("run");
+//            }
+//        };
+//
+//        taskRegistrar.addTriggerTask(task,
+//                triggerContext -> {
+//                    System.out.println("retime");
+//                    return new CronTrigger("0/10 * * * * ?").nextExecutionTime(triggerContext);
+//                });
 //        for (SpringScheduledCron springScheduledCron : cronRepository.findAll()) {
 //            Class<?> clazz;
 //            Object task;
