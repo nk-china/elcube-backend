@@ -34,7 +34,8 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
     protected TfmsSpELManager spELManager;
     @Autowired
     private NkAsyncQueueMapper asyncQueueMapper;
-    @Autowired@Qualifier("nkTaskExecutor")
+    @Autowired
+    @Qualifier("nkTaskExecutor")
     private TaskExecutor taskExecutor;
 
     protected void doSync(Object dataUnmapping, Object dataOriginalUnmapping, EvaluationContext context1, EvaluationContext context2, DocDefDataSync def){
@@ -90,7 +91,7 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
         }
     }
 
-    @Async("NkTaskExecutor")
+    @Async("nkTaskExecutor")
     @Override
     public void run(NkAsyncQueue asyncQueue) {
 
@@ -98,7 +99,7 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
 
         // 如果超出重试次数
         if(asyncQueue.getAsyncRetry() >= asyncQueue.getAsyncLimit()){
-            markError(asyncQueue, now);
+            markFaild(asyncQueue, now);
             if(log.isDebugEnabled())
             log.debug("任务{} 重试次数 {} 超出限制 {}, 标记为 失败",
                     asyncQueue.getAsyncId(),asyncQueue.getAsyncRetry(),asyncQueue.getAsyncLimit());
@@ -108,7 +109,7 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
         // 如果超出重试间隔设定
         String[] split = asyncQueue.getAsyncRule().split("[,;|\\s]");
         if(split.length<=asyncQueue.getAsyncRetry()){
-            markError(asyncQueue, now);
+            markFaild(asyncQueue, now);
             if(log.isDebugEnabled())
             log.debug("任务{} 重试次数 {} 超出间隔设定 {}, 标记为 失败",
                     asyncQueue.getAsyncId(),asyncQueue.getAsyncRetry(),asyncQueue.getAsyncRule());
@@ -142,7 +143,7 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
                 int retry = asyncQueueWithBLOBs.getAsyncRetry()+1;
 
                 if(retry>=asyncQueueWithBLOBs.getAsyncLimit()){
-                    markError(asyncQueueWithBLOBs, time, ExceptionUtils.getRootCauseStackTrace(e));
+                    markFaild(asyncQueueWithBLOBs, time, ExceptionUtils.getRootCauseStackTrace(e));
                     if(log.isWarnEnabled())
                         log.warn("执行任务 {} 失败，重试次数 {} 超出限制 {}, 标记为 失败：{}",
                                 asyncQueueWithBLOBs.getAsyncId(),
@@ -152,6 +153,7 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
                 }else{
                     String[] split = asyncQueueWithBLOBs.getAsyncRule().split("[,;|\\s]");
                     if(split.length<=retry){
+                        markFaild(asyncQueueWithBLOBs, time, ExceptionUtils.getRootCauseStackTrace(e));
                         if(log.isDebugEnabled())
                             log.debug("执行任务{} 重试次数 {} 超出间隔设定 {}, 标记为 失败：{}",
                                     asyncQueueWithBLOBs.getAsyncId(),
@@ -178,14 +180,14 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
     }
 
 
-    private void markError(NkAsyncQueue asyncQueue,long time){
+    private void markFaild(NkAsyncQueue asyncQueue, long time){
         asyncQueue.setUpdatedTime(time);
-        asyncQueue.setAsyncState("ERROR");
+        asyncQueue.setAsyncState("FAILD");
         asyncQueueMapper.updateByPrimaryKey(asyncQueue);
     }
-    private void markError(NkAsyncQueueWithBLOBs asyncQueue,long time,String[] causeStackTrace){
+    private void markFaild(NkAsyncQueueWithBLOBs asyncQueue, long time, String[] causeStackTrace){
         asyncQueue.setUpdatedTime(time);
-        asyncQueue.setAsyncState("ERROR");
+        asyncQueue.setAsyncState("FAILD");
         asyncQueue.setAsyncCauseStackTrace(causeStackTrace!=null?JSON.toJSONString(causeStackTrace):null);
         asyncQueueMapper.updateByPrimaryKeySelective(asyncQueue);
     }
