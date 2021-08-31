@@ -231,13 +231,13 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
             authLimitMapper.insert(limit);
         }else{
             authLimitMapper.updateByPrimaryKeyWithBLOBs(limit);
-            redisSupportLimit.delete(Constants.CACHE_AUTH_LIMIT,limit.getLimitId());
+            redisSupportLimit.deleteHash(Constants.CACHE_AUTH_LIMIT,limit.getLimitId());
         }
     }
     @Override
     public void removeLimit(String limitId){
         authLimitMapper.deleteByPrimaryKey(limitId);
-        redisSupportLimit.delete(Constants.CACHE_AUTH_LIMIT,limitId);
+        redisSupportLimit.deleteHash(Constants.CACHE_AUTH_LIMIT,limitId);
     }
 
 
@@ -297,7 +297,7 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
                 .toArray(String[]::new);
 
         if(groupIds.length>0){
-            redisSupport.delete(Constants.CACHE_AUTH_GROUP,groupIds);
+            redisSupport.deleteHash(Constants.CACHE_AUTH_GROUP,groupIds);
         }
 
     }
@@ -375,7 +375,7 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
                     });
         }
 
-        redisSupport.delete(Constants.CACHE_AUTH_GROUP,group.getGroupId());
+        redisSupport.deleteHash(Constants.CACHE_AUTH_GROUP,group.getGroupId());
     }
     @Override
     public void removeGroup(String groupId){
@@ -388,7 +388,7 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
 
         authGroupMapper.deleteByPrimaryKey(groupId);
 
-        redisSupport.delete(Constants.CACHE_AUTH_GROUP,groupId);
+        redisSupport.deleteHash(Constants.CACHE_AUTH_GROUP,groupId);
     }
 
     @Override

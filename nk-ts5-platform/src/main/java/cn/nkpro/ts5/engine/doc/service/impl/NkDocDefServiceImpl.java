@@ -440,7 +440,7 @@ public class NkDocDefServiceImpl implements NkDocDefService {
 
         docDefHV = doUpdate(docDefHV,false);
         // 一旦单据激活，则删除单据配置
-        redisSupport.delete(Constants.CACHE_DEF_DOC_TYPES,docDefHV.getDocType());
+        redisSupport.deleteHash(Constants.CACHE_DEF_DOC_TYPES,docDefHV.getDocType());
 
         // 一旦单据激活，则删除所有的业务流缓存，避免数据不一致
         // redisSupport.delete(Constants.CACHE_DEF_DOC_FLOWS);

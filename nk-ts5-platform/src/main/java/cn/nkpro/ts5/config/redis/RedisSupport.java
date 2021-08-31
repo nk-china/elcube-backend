@@ -37,8 +37,8 @@ public interface RedisSupport<T> {
     Map<String, T>  getHash(String hash, String... keys);
     Map<String, T>  getHash(String hash, Collection<String> keys);
     Map<String, T>  getHashIfAbsent(String hash, Function<Map<String,T>> mapper);
-    void            delete(String hash, Object... keys);
-    void            delete(String hash, Collection<String> keys);
+    void            deleteHash(String hash, Object... keys);
+    void            deleteHash(String hash, Collection<String> keys);
 
     boolean lock(String key, String value, int retry, int expire);
     boolean lock(String key, String value, int expire);

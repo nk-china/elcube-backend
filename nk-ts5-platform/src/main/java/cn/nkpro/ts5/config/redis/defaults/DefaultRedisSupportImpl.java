@@ -179,15 +179,15 @@ public class DefaultRedisSupportImpl<T> implements RedisSupport<T>{
         return value;
     }
     @Override
-    public void delete(String hash, Object... keys){
+    public void deleteHash(String hash, Object... keys){
         Assert.notNull(hash,"hash不能为空");
         Assert.notNull(keys,"keys不能为空");
         Assert.notEmpty(keys,"keys不能为空");
         redisTemplate.opsForHash().delete(hash,keys);
     }
     @Override
-    public void delete(String hash, Collection<String> keys) {
-        delete(hash, keys.toArray());
+    public void deleteHash(String hash, Collection<String> keys) {
+        deleteHash(hash, keys.toArray());
     }
 
     @Override

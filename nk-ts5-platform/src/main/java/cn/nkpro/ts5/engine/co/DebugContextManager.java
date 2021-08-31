@@ -86,8 +86,8 @@ public class DebugContextManager implements ApplicationContextAware {
         if(context!=null){
             ((GenericApplicationContext)context).stop();
         }
-        redisForResoure.delete(String.format("DEBUG:%s", debugId));
-        redisForResoure.delete(Constants.CACHE_DEBUG_CONTEXT,debugId);
+        redisForResoure.deleteHash(String.format("DEBUG:%s", debugId));
+        redisForResoure.deleteHash(Constants.CACHE_DEBUG_CONTEXT,debugId);
     }
 
     /**
@@ -186,7 +186,7 @@ public class DebugContextManager implements ApplicationContextAware {
         }else if(resource instanceof DocDefHV){
             ((DocDefHV) resource).setDebug(false);
         }
-        redisForResoure.delete(String.format("DEBUG:%s", localDebugId.get()), key);
+        redisForResoure.deleteHash(String.format("DEBUG:%s", localDebugId.get()), key);
     }
 
     private void registerScriptObject(ScriptDefHV scriptDef,ApplicationContext context){

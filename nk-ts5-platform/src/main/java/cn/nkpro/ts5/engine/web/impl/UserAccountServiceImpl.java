@@ -71,7 +71,7 @@ public class UserAccountServiceImpl implements UserAccountService {
     @Override
     public UserAccountBO getAccount(String username, boolean preClear) {
         if(preClear){
-            redisTemplate.delete(Constants.CACHE_USERS,username);
+            redisTemplate.deleteHash(Constants.CACHE_USERS,username);
         }
         return redisTemplate.getIfAbsent(Constants.CACHE_USERS,username,()-> getAccount(username));
     }
@@ -96,7 +96,7 @@ public class UserAccountServiceImpl implements UserAccountService {
 
     @Override
     public void clear(){
-        redisTemplate.delete(Constants.CACHE_USERS, SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+        redisTemplate.deleteHash(Constants.CACHE_USERS, SecurityContextHolder.getContext().getAuthentication().getPrincipal());
     }
 
     @Override
@@ -130,7 +130,7 @@ public class UserAccountServiceImpl implements UserAccountService {
 
         account.setUpdatedTime(DateTimeUtilz.nowSeconds());
         sysAccountMapper.updateByPrimaryKeySelective(account);
-        redisTemplate.delete(Constants.CACHE_USERS, exists.getUsername());
+        redisTemplate.deleteHash(Constants.CACHE_USERS, exists.getUsername());
     }
 
     /**

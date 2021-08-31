@@ -22,7 +22,7 @@ public class NkDocDataAsyncScheduled {
     @Autowired
     private NkAsyncQueueMapper asyncQueueMapper;
 
-    @Scheduled(cron = "0/10 * * * * ?")
+    @Scheduled(cron = "0 * * * * ?")
     public void cron(){
 
         NkAsyncQueueExample example = new NkAsyncQueueExample();

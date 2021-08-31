@@ -419,7 +419,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
             AtomicReference<DocHPersistent> atomicDocHP = new AtomicReference<>(docHPersistent);
 
             // tips: 先删除缓存，避免事务提交成功后，缓存更新失败
-            redisSupport.delete(Constants.CACHE_DOC, docId);
+            redisSupport.deleteHash(Constants.CACHE_DOC, docId);
 
             LocalSyncUtilz.runAfterCompletion((status)-> {
 
@@ -447,7 +447,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
         customObjectManager.getCustomObject(docHV.getDef().getRefObjectType(), NkDocProcessor.class)
                 .doOnBpmKilled(docHV, processKey, optSource);
         // 事务提交后清空缓存
-        LocalSyncUtilz.runAfterCommit(()-> redisSupport.delete(Constants.CACHE_DOC, docId));
+        LocalSyncUtilz.runAfterCommit(()-> redisSupport.deleteHash(Constants.CACHE_DOC, docId));
         NkDocEngineContext.endLog();
     }
 
