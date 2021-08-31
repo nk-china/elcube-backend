@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.controller.devops;
 
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
-import cn.nkpro.ts5.engine.doc.impl.NkDocEngineIndexService;
+import cn.nkpro.ts5.engine.doc.service.impl.NkDocEngineIndexService;
 import cn.nkpro.ts5.engine.elasticearch.SearchService;
 import cn.nkpro.ts5.engine.elasticearch.SearchEngine;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.engine.doc.impl;
+package cn.nkpro.ts5.engine.doc.service;
 
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import lombok.extern.slf4j.Slf4j;
@@ -18,13 +18,12 @@ public class NkDocEngineContext {
     private final static ThreadLocal<Stack<String>>       threadLocalLog = new ThreadLocal<>();
     private final static ThreadLocal<List<String>>       threadLocalLock = new ThreadLocal<>();
     private final static ThreadLocal<Map<String, DocHV>> threadLocalDocs = new ThreadLocal<>();
-    private final static ThreadLocal<DocHV>              threadLocalRuntimeDoc = new ThreadLocal<>();
 
     private final static String c = "\t";
     private final static String d = "%s %s : ";
     private final static String e = "%s%s";
 
-    static synchronized void startLog(String opt, String docId){
+    public static synchronized void startLog(String opt, String docId){
         Stack<String> logs = threadLocalLog.get();
         if(logs==null){
             logs = new Stack<>();
@@ -32,12 +31,11 @@ public class NkDocEngineContext {
         }
         logs.push(String.format(d, opt, docId));
     }
-    static synchronized String endLog(){
+    public static synchronized void endLog(){
         Stack<String> logs = threadLocalLog.get();
         if(CollectionUtils.isNotEmpty(logs)){
-            return logs.pop();
+            logs.pop();
         }
-        return null;
     }
     public static synchronized String currLog(){
         Stack<String> logs = threadLocalLog.get();
@@ -66,7 +64,7 @@ public class NkDocEngineContext {
     }
     */
 
-    static synchronized DocHV getDoc(String docId, Function<String, DocHV> function){
+    public static synchronized DocHV getDoc(String docId, Function<String, DocHV> function){
 
         if(TransactionSynchronizationManager.isSynchronizationActive()){
             TransactionSynchronizationManager.registerSynchronization(transactionSync);
@@ -138,22 +136,9 @@ public class NkDocEngineContext {
             locks.remove(docId);
     }
 
-    public static synchronized void setRuntimeDoc(DocHV doc){
-        threadLocalRuntimeDoc.set(doc);
-    }
-
-    public static synchronized void clearRuntimeDoc(){
-        threadLocalRuntimeDoc.remove();
-    }
-
-    public static synchronized DocHV getRuntimeDoc(){
-        return threadLocalRuntimeDoc.get();
-    }
-
     public static void clear(){
         threadLocalLock.remove();
         threadLocalDocs.remove();
-        threadLocalRuntimeDoc.remove();
         threadLocalLog.remove();
     }
 

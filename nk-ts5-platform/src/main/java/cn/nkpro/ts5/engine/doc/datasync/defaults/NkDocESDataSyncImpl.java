@@ -1,6 +1,6 @@
-package cn.nkpro.ts5.engine.doc.impl.datasync;
+package cn.nkpro.ts5.engine.doc.datasync.defaults;
 
-import cn.nkpro.ts5.engine.doc.abstracts.NkAbstractDocDataDiffedSync;
+import cn.nkpro.ts5.engine.doc.datasync.NkAbstractDocDataDiffedSync;
 import cn.nkpro.ts5.engine.elasticearch.SearchEngine;
 import cn.nkpro.ts5.engine.elasticearch.model.CustomES;
 import cn.nkpro.ts5.orm.mb.gen.DocDefDataSync;

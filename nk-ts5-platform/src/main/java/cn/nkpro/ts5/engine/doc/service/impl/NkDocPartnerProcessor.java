@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.engine.doc.impl;
+package cn.nkpro.ts5.engine.doc.service.impl;
 
 import org.springframework.stereotype.Component;
 

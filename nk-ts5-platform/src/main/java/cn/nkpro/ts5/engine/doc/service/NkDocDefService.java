@@ -47,7 +47,7 @@ public interface NkDocDefService {
 
     DocDefHV deserializeDef(DocDefHV docDefHV);
 
-    void runLoopCards(DocDefHV docDefHV, boolean ignoreError, Function function);
+    void runLoopCards(String docId, DocDefHV docDefHV, boolean ignoreError, Function function);
 
     @FunctionalInterface
     interface Function {

@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.engine.doc.abstracts;
+package cn.nkpro.ts5.engine.doc.datasync;
 
 import cn.nkpro.ts5.engine.spel.TfmsSpELManager;
 import cn.nkpro.ts5.orm.mb.gen.DocDefDataSync;

@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.engine.doc;
 
-import cn.nkpro.ts5.engine.doc.impl.NkDocEngineContext;
+import cn.nkpro.ts5.engine.doc.service.NkDocEngineContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Configuration;
@@ -28,13 +28,13 @@ public class ThreadLocalContextConfigurer implements WebMvcConfigurer {
     public static class ThreadLocalClearInterceptor implements HandlerInterceptor {
 
         @Override
-        public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
             NkDocEngineContext.clear();
             return true;
         }
 
         @Override
-        public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws Exception {
+        public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
             NkDocEngineContext.clear();
         }
     }

@@ -1,6 +1,6 @@
 package cn.nkpro.groovy.cards.universal.ref;
 
-import cn.nkpro.ts5.engine.doc.impl.NkDocEngineContext;
+import cn.nkpro.ts5.engine.doc.service.NkDocEngineContext;
 import cn.nkpro.ts5.engine.doc.model.DocDefIV;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.engine.spel.TfmsSpELManager;

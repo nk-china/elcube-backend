@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.engine.doc.impl;
+package cn.nkpro.ts5.engine.doc.service.impl;
 
 import cn.nkpro.ts5.basic.Constants;
 import cn.nkpro.ts5.basic.PageList;
@@ -9,7 +9,7 @@ import cn.nkpro.ts5.engine.co.DebugContextManager;
 import cn.nkpro.ts5.engine.co.NkCustomObject;
 import cn.nkpro.ts5.engine.co.NkCustomObjectManager;
 import cn.nkpro.ts5.engine.doc.NkCard;
-import cn.nkpro.ts5.engine.doc.NkDocDataSync;
+import cn.nkpro.ts5.engine.doc.datasync.NkDocDataSync;
 import cn.nkpro.ts5.engine.doc.NkDocProcessor;
 import cn.nkpro.ts5.engine.doc.interceptor.*;
 import cn.nkpro.ts5.engine.doc.model.DocDefFlowV;
@@ -17,6 +17,7 @@ import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocDefIV;
 import cn.nkpro.ts5.engine.doc.model.DocDefStateV;
 import cn.nkpro.ts5.engine.doc.service.NkDocDefService;
+import cn.nkpro.ts5.engine.doc.service.NkDocEngineContext;
 import cn.nkpro.ts5.exception.TfmsComponentException;
 import cn.nkpro.ts5.exception.TfmsDefineException;
 import cn.nkpro.ts5.orm.mb.gen.*;
@@ -736,8 +737,7 @@ public class NkDocDefServiceImpl implements NkDocDefService {
         });
     }
 
-    @Override
-    public void runLoopCards(DocDefHV docDefHV, boolean ignoreError, Function function){
+    private void runLoopCards(DocDefHV docDefHV, boolean ignoreError, Function function){
         for(DocDefIV docDefI : docDefHV.getCards()){
             // 找到对应的组件实现类
             NkCard nkCard = customObjectManager.getCustomObjectIfExists(docDefI.getBeanName(), NkCard.class);
@@ -752,6 +752,12 @@ public class NkDocDefServiceImpl implements NkDocDefService {
                 }
             }
         }
+    }
+    @Override
+    public void runLoopCards(String docId, DocDefHV docDefHV, boolean ignoreError, Function function){
+        NkDocEngineContext.lockDoc(docId);
+        this.runLoopCards(docDefHV,ignoreError,function);
+        NkDocEngineContext.unlockDoc(docId);
     }
     /**
      * 获取最后一次更新

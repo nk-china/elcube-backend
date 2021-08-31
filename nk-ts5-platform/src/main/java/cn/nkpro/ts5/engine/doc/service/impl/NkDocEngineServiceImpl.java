@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.engine.doc.impl;
+package cn.nkpro.ts5.engine.doc.service.impl;
 
 import cn.nkpro.ts5.basic.Constants;
 import cn.nkpro.ts5.basic.PageList;
@@ -12,6 +12,7 @@ import cn.nkpro.ts5.engine.doc.NkDocProcessor;
 import cn.nkpro.ts5.engine.doc.interceptor.NkDocFlowInterceptor;
 import cn.nkpro.ts5.engine.doc.model.*;
 import cn.nkpro.ts5.engine.doc.service.NkDocDefService;
+import cn.nkpro.ts5.engine.doc.service.NkDocEngineContext;
 import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService;
 import cn.nkpro.ts5.engine.doc.service.NkDocPermService;
 import cn.nkpro.ts5.engine.elasticearch.SearchEngine;
@@ -36,6 +37,7 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.util.Assert;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -46,7 +48,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
     private DocHMapper docHMapper;
     @Autowired@SuppressWarnings("all")
     private DocIMapper docIMapper;
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private DocIIndexMapper docIIndexMapper;
     @Autowired@SuppressWarnings("all")
     private RedisSupport<DocHPersistent> redisSupport;
@@ -58,7 +60,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
     private NkBpmTaskService bpmTaskService;
     @Autowired@SuppressWarnings("all")
     private NkDocPermService docPermService;
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private DebugContextManager debugContextManager;
     @Autowired@SuppressWarnings("all")
     private SearchEngine searchEngine;
@@ -413,8 +415,8 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
             return doc;
         }finally {
             // 事务提交后清空缓存 | 事务提交后重新写入缓存
-            final String currLog = NkDocEngineContext.currLog();
-            final DocHPersistent docHPersistentFinal = docHPersistent;
+            AtomicReference<String>         atomicLog   = new AtomicReference<>(NkDocEngineContext.currLog());
+            AtomicReference<DocHPersistent> atomicDocHP = new AtomicReference<>(docHPersistent);
 
             // tips: 先删除缓存，避免事务提交成功后，缓存更新失败
             redisSupport.delete(Constants.CACHE_DOC, docId);
@@ -424,16 +426,16 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
                 try{
                     if(status == TransactionSynchronization.STATUS_COMMITTED){
                         // 如果事务更新成功，将更新后的单据更新到缓存
-                        redisSupport.set(Constants.CACHE_DOC, docId, docHPersistentFinal);
-                        if(log.isInfoEnabled())log.info("{}更新缓存", currLog);
+                        redisSupport.set(Constants.CACHE_DOC, docId, atomicDocHP.get());
+                        if(log.isInfoEnabled())log.info("{}更新缓存", atomicLog.get());
                     }
                 }finally {
                     // 解锁单据
                     redisSupport.unLock(docId, lockId);
-                    if(log.isInfoEnabled())log.info("{}解锁单据 redis分布式锁", currLog);
+                    if(log.isInfoEnabled())log.info("{}解锁单据 redis分布式锁", atomicLog.get());
                 }
 
-                if(log.isInfoEnabled())log.info("{}保存单据 完成 总耗时{}ms", currLog, System.currentTimeMillis() - start);
+                if(log.isInfoEnabled())log.info("{}保存单据 完成 总耗时{}ms", atomicLog.get(), System.currentTimeMillis() - start);
             });
         }
     }

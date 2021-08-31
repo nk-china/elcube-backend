@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.engine.doc.impl;
+package cn.nkpro.ts5.engine.doc.service.impl;
 
 import cn.nkpro.ts5.basic.Constants;
 import cn.nkpro.ts5.engine.doc.service.NkConstantService;

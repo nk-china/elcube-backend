@@ -3,7 +3,7 @@ package cn.nkpro.ts5.engine.doc.interceptor;
 
 import cn.nkpro.ts5.engine.co.NkCustomObject;
 import cn.nkpro.ts5.engine.doc.NkDocCycle;
-import cn.nkpro.ts5.engine.doc.impl.NkDocTransactionProcessor;
+import cn.nkpro.ts5.engine.doc.service.impl.NkDocTransactionProcessor;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 
 /**

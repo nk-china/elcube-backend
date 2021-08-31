@@ -1,7 +1,7 @@
-package cn.nkpro.ts5.engine.doc.abstracts;
+package cn.nkpro.ts5.engine.doc.datasync;
 
 import cn.nkpro.ts5.engine.co.NkAbstractCustomScriptObject;
-import cn.nkpro.ts5.engine.doc.NkDocDataSync;
+import cn.nkpro.ts5.engine.doc.datasync.NkDocDataSync;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.engine.spel.TfmsSpELManager;
 import cn.nkpro.ts5.orm.mb.gen.DocDefDataSync;
@@ -10,9 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.expression.EvaluationContext;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @SuppressWarnings({"all"})
 @Slf4j
