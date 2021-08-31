@@ -13,6 +13,8 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.scheduling.annotation.Async;
 
@@ -32,6 +34,8 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
     protected TfmsSpELManager spELManager;
     @Autowired
     private NkAsyncQueueMapper asyncQueueMapper;
+    @Autowired@Qualifier("nkTaskExecutor")
+    private TaskExecutor taskExecutor;
 
     protected void doSync(Object dataUnmapping, Object dataOriginalUnmapping, EvaluationContext context1, EvaluationContext context2, DocDefDataSync def){
 
@@ -68,7 +72,7 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
         asyncQueueMapper.insert(queue);
 
         LocalSyncUtilz.runAfterCommitLast(()->{
-            new RunInner(queue).start();
+            taskExecutor.execute(new RunInner(queue));
         });
     }
 
@@ -86,7 +90,7 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
         }
     }
 
-    @Async
+    @Async("NkTaskExecutor")
     @Override
     public void run(NkAsyncQueue asyncQueue) {
 
