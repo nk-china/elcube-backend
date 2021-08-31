@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.engine.doc.datasync.defaults;
 
-import cn.nkpro.ts5.engine.doc.datasync.NkAbstractDocDataSimpleSync;
+import cn.nkpro.ts5.engine.doc.datasync.NkAbstractDocDataGeneralSyncAdapter;
 import cn.nkpro.ts5.orm.mb.gen.DocDefDataSync;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +18,13 @@ import java.util.Map;
 @Slf4j
 @SuppressWarnings("all")
 @Component("NkDocRestDataSync")
-public class NkDocRestDataSyncImpl extends NkAbstractDocDataSimpleSync<Map<String,Object>> {
+public class NkDocRestDataSyncImpl extends NkAbstractDocDataGeneralSyncAdapter<Map<String,Object>> {
 
     @Autowired
     private RestTemplate restTemplate;
 
     @Override
-    protected void executeSingle(Map<String,Object> singleData, DocDefDataSync def) {
+    protected void doSyncSingle(Map<String,Object> singleData, DocDefDataSync def) {
         ResponseEntity<String> responseEntity = postJSON(def.getTargetArgs(), singleData, String.class);
         log.info(String.valueOf(responseEntity.getStatusCodeValue()));
         log.info(responseEntity.getStatusCode().toString());
@@ -32,7 +32,7 @@ public class NkDocRestDataSyncImpl extends NkAbstractDocDataSimpleSync<Map<Strin
     }
 
     @Override
-    protected void executeMultiple(List multipleData, DocDefDataSync def) {
+    protected void doSyncMultiple(List multipleData, DocDefDataSync def) {
         ResponseEntity<String> responseEntity = postJSON(def.getTargetArgs(), multipleData, String.class);
         log.info(String.valueOf(responseEntity.getStatusCodeValue()));
         log.info(responseEntity.getStatusCode().toString());

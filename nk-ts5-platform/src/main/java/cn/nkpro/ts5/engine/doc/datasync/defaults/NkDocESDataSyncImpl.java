@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.engine.doc.datasync.defaults;
 
-import cn.nkpro.ts5.engine.doc.datasync.NkAbstractDocDataDiffedSync;
+import cn.nkpro.ts5.engine.doc.datasync.NkAbstractDocDataDiffedSyncAdapter;
 import cn.nkpro.ts5.engine.elasticearch.SearchEngine;
 import cn.nkpro.ts5.engine.elasticearch.model.CustomES;
 import cn.nkpro.ts5.orm.mb.gen.DocDefDataSync;
@@ -15,7 +15,7 @@ import java.util.Map;
 
 @Slf4j
 @Component("NkDocESDataSync")
-public class NkDocESDataSyncImpl extends NkAbstractDocDataDiffedSync<String> {
+public class NkDocESDataSyncImpl extends NkAbstractDocDataDiffedSyncAdapter<String> {
 
     @Autowired@SuppressWarnings("all")
     private SearchEngine searchEngine;

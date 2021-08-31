@@ -47,6 +47,8 @@
 		<table tableName="nk_doc_def_flow"				 	enableDeleteByExample="true"  domainObjectName="DocDefFlow"/>
 		<table tableName="nk_doc_def_bpm"					enableDeleteByExample="true"  domainObjectName="DocDefBpm"/>
 
+		<table tableName="nk_async_queue"					enableDeleteByExample="false"/>
+
 		<!-- 基础组件 -->
 
 		<table tableName="sys_account"		 			 	enableDeleteByExample="false"/>

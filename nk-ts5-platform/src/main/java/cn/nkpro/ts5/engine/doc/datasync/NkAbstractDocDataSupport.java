@@ -1,7 +1,6 @@
 package cn.nkpro.ts5.engine.doc.datasync;
 
 import cn.nkpro.ts5.engine.co.NkAbstractCustomScriptObject;
-import cn.nkpro.ts5.engine.doc.datasync.NkDocDataSync;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.engine.spel.TfmsSpELManager;
 import cn.nkpro.ts5.orm.mb.gen.DocDefDataSync;
@@ -11,15 +10,13 @@ import org.springframework.expression.EvaluationContext;
 
 import java.util.Arrays;
 
-@SuppressWarnings({"all"})
 @Slf4j
-public abstract class NkAbstractDocDataSync<K> extends NkAbstractCustomScriptObject implements NkDocDataSync<K> {
+public abstract class NkAbstractDocDataSupport extends NkAbstractCustomScriptObject {
 
     @Autowired
     protected TfmsSpELManager spELManager;
 
-    @Override
-    public final void run(DocHV doc, DocHV original, EvaluationContext context, EvaluationContext contextOriginal, DocDefDataSync config) {
+    public final void sync(DocHV doc, DocHV original, EvaluationContext context, EvaluationContext contextOriginal, DocDefDataSync config) {
 
         // data1 新数据
         Object dataUnmapping = spELManager.invoke(config.getDataSpEL(), context);
@@ -34,8 +31,8 @@ public abstract class NkAbstractDocDataSync<K> extends NkAbstractCustomScriptObj
             dataOriginalUnmapping = Arrays.asList((Object[])dataOriginalUnmapping);
         }
 
-        this.execute(dataUnmapping, dataOriginalUnmapping, context, contextOriginal, config);
+        this.doSync(dataUnmapping, dataOriginalUnmapping, context, contextOriginal, config);
     }
 
-    protected abstract void execute(Object dataUnmapping, Object dataOriginalUnmapping, EvaluationContext context1, EvaluationContext context2, DocDefDataSync def);
+    protected abstract void doSync(Object dataUnmapping, Object dataOriginalUnmapping, EvaluationContext context1, EvaluationContext context2, DocDefDataSync def);
 }

@@ -9,6 +9,8 @@ import java.io.Serializable;
 public class DocDefDataSync extends DocDefDataSyncKey implements Serializable {
     private String targetArgs;
 
+    private Integer reExecute;
+
     private String conditionSpEL;
 
     private String dataSpEL;
@@ -34,6 +36,15 @@ public class DocDefDataSync extends DocDefDataSyncKey implements Serializable {
 
     public void setTargetArgs(String targetArgs) {
         this.targetArgs = targetArgs;
+    }
+
+    @cn.nkpro.ts5.basic.wsdoc.annotation.CodeFieldNotes("")
+    public Integer getReExecute() {
+        return reExecute;
+    }
+
+    public void setReExecute(Integer reExecute) {
+        this.reExecute = reExecute;
     }
 
     @cn.nkpro.ts5.basic.wsdoc.annotation.CodeFieldNotes("")

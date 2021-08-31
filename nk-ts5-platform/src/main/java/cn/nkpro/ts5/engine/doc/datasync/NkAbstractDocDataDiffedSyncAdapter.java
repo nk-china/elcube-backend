@@ -13,12 +13,12 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings({"all"})
 @Slf4j
-public abstract class NkAbstractDocDataDiffedSync<K> extends NkAbstractDocDataSync<K> {
+public abstract class NkAbstractDocDataDiffedSyncAdapter<K> extends NkAbstractDocDataSupport implements NkDocDataSyncAdapter<K> {
 
     @Autowired
     protected TfmsSpELManager spELManager;
 
-    protected void execute(Object dataUnmapping, Object dataOriginalUnmapping, EvaluationContext context1, EvaluationContext context2, DocDefDataSync def){
+    protected void doSync(Object dataUnmapping, Object dataOriginalUnmapping, EvaluationContext context1, EvaluationContext context2, DocDefDataSync def){
         if(dataUnmapping instanceof List || dataOriginalUnmapping instanceof List){
             // 对数组进行数据逐条处理
 

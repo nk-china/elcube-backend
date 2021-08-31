@@ -191,7 +191,7 @@ public class DefaultRedisSupportImpl<T> implements RedisSupport<T>{
     }
 
     @Override
-    public boolean lock(String key, String value, int expire) {
+    public boolean lock(String key, String value, int retry, int expire) {
         ValueOperations<String, String> ops = stringRedisTemplate.opsForValue();
         int i=0;
         do{
@@ -205,10 +205,16 @@ public class DefaultRedisSupportImpl<T> implements RedisSupport<T>{
             } catch (InterruptedException e) {
                 throw new TfmsSystemException(e.getMessage(),e);
             }
-        }while (++i <= expire);
+        }while (++i <= retry);
         log.info("尝试获取锁[{}]失败，请检查是否有死锁", key);
 
         return false;
+    }
+    @Override
+    public boolean lock(String key, String value, int expire) {
+        ValueOperations<String, String> ops = stringRedisTemplate.opsForValue();
+        Boolean ret = ops.setIfAbsent("LOCK:"+key, value, expire, TimeUnit.SECONDS);
+        return ret != null && ret;
     }
     @Override
     public void unLock(String key, String value){

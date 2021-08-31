@@ -40,6 +40,7 @@ public interface RedisSupport<T> {
     void            delete(String hash, Object... keys);
     void            delete(String hash, Collection<String> keys);
 
+    boolean lock(String key, String value, int retry, int expire);
     boolean lock(String key, String value, int expire);
     void    unLock(String key, String value);
 

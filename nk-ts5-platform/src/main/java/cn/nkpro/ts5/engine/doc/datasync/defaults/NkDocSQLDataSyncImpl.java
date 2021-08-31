@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.engine.doc.datasync.defaults;
 
-import cn.nkpro.ts5.engine.doc.datasync.NkAbstractDocDataDiffedSync;
+import cn.nkpro.ts5.engine.doc.datasync.NkAbstractDocDataDiffedSyncAdapter;
 import cn.nkpro.ts5.exception.TfmsDefineException;
 import cn.nkpro.ts5.orm.mb.gen.DocDefDataSync;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Component("NkDocSQLDataSync")
-public class NkDocSQLDataSyncImpl extends NkAbstractDocDataDiffedSync<Map<String,Object>> {
+public class NkDocSQLDataSyncImpl extends NkAbstractDocDataDiffedSyncAdapter<Map<String,Object>> {
 
     @Autowired@SuppressWarnings("all")
     private JdbcTemplate jdbcTemplate;

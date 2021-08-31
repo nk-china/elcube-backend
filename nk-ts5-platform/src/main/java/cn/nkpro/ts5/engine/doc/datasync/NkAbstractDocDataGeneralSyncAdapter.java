@@ -12,25 +12,25 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings({"all"})
 @Slf4j
-public abstract class NkAbstractDocDataSimpleSync<K> extends NkAbstractDocDataSync<K> {
+public abstract class NkAbstractDocDataGeneralSyncAdapter<K> extends NkAbstractDocDataSupport implements NkDocDataSyncAdapter<K> {
 
     @Autowired
     protected TfmsSpELManager spELManager;
 
-    protected void execute(Object dataUnmapping, Object dataOriginalUnmapping, EvaluationContext context1, EvaluationContext context2, DocDefDataSync def){
+    protected void doSync(Object dataUnmapping, Object dataOriginalUnmapping, EvaluationContext context1, EvaluationContext context2, DocDefDataSync def){
         if(dataUnmapping instanceof List){
-            executeMultiple((List<Map<String, Object>>) ((List) dataUnmapping).stream()
+            doSyncMultiple((List<Map<String, Object>>) ((List) dataUnmapping).stream()
                     .map(value -> {
                         context1.setVariable("row", value);
                         return (Map<String, Object>) (spELManager.invoke(def.getMappingSpEL(), context1));
                     }).collect(Collectors.toList()), def);
         }else{
             context1.setVariable("row", dataUnmapping);
-            executeSingle((Map)(spELManager.invoke(def.getMappingSpEL(), context1)), def);
+            doSyncSingle((Map)(spELManager.invoke(def.getMappingSpEL(), context1)), def);
         }
     }
 
-    protected abstract void executeSingle(Map<String,Object> singleData, DocDefDataSync def);
+    protected abstract void doSyncSingle(Map<String,Object> singleData, DocDefDataSync def);
 
-    protected abstract void executeMultiple(List<Map<String,Object>> multipleData, DocDefDataSync def);
+    protected abstract void doSyncMultiple(List<Map<String,Object>> multipleData, DocDefDataSync def);
 }

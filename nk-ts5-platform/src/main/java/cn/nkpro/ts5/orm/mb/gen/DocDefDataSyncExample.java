@@ -534,6 +534,66 @@ public class DocDefDataSyncExample {
             return (Criteria) this;
         }
 
+        public Criteria andReExecuteIsNull() {
+            addCriterion("RE_EXECUTE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andReExecuteIsNotNull() {
+            addCriterion("RE_EXECUTE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andReExecuteEqualTo(Integer value) {
+            addCriterion("RE_EXECUTE =", value, "reExecute");
+            return (Criteria) this;
+        }
+
+        public Criteria andReExecuteNotEqualTo(Integer value) {
+            addCriterion("RE_EXECUTE <>", value, "reExecute");
+            return (Criteria) this;
+        }
+
+        public Criteria andReExecuteGreaterThan(Integer value) {
+            addCriterion("RE_EXECUTE >", value, "reExecute");
+            return (Criteria) this;
+        }
+
+        public Criteria andReExecuteGreaterThanOrEqualTo(Integer value) {
+            addCriterion("RE_EXECUTE >=", value, "reExecute");
+            return (Criteria) this;
+        }
+
+        public Criteria andReExecuteLessThan(Integer value) {
+            addCriterion("RE_EXECUTE <", value, "reExecute");
+            return (Criteria) this;
+        }
+
+        public Criteria andReExecuteLessThanOrEqualTo(Integer value) {
+            addCriterion("RE_EXECUTE <=", value, "reExecute");
+            return (Criteria) this;
+        }
+
+        public Criteria andReExecuteIn(List<Integer> values) {
+            addCriterion("RE_EXECUTE in", values, "reExecute");
+            return (Criteria) this;
+        }
+
+        public Criteria andReExecuteNotIn(List<Integer> values) {
+            addCriterion("RE_EXECUTE not in", values, "reExecute");
+            return (Criteria) this;
+        }
+
+        public Criteria andReExecuteBetween(Integer value1, Integer value2) {
+            addCriterion("RE_EXECUTE between", value1, value2, "reExecute");
+            return (Criteria) this;
+        }
+
+        public Criteria andReExecuteNotBetween(Integer value1, Integer value2) {
+            addCriterion("RE_EXECUTE not between", value1, value2, "reExecute");
+            return (Criteria) this;
+        }
+
         public Criteria andConditionSpELIsNull() {
             addCriterion("CONDITION_SP_E_L is null");
             return (Criteria) this;
