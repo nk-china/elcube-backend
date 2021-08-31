@@ -67,7 +67,7 @@ public class SysDebugController {
         try{
             EvaluationContext context = spELManager.createContext(StringUtils.isNotBlank(docId)?docEngine.detail(docId):null);
             if(isTemplate){
-                return new R(spELManager.convert(context, el),null,null);
+                return new R(spELManager.convert(el, context),null,null);
             }else {
                 return new R(spELManager.invoke(el, context),null,null);
             }

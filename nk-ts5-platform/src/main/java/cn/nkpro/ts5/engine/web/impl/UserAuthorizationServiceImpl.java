@@ -94,7 +94,7 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
                         .map(limits::get)
                         .filter(limit->limit!=null && limit.getContent()!=null)
                         .map(SysAuthLimit::getContent)
-                        .map(limit->spELManager.convert(partner,limit))
+                        .map(limit->spELManager.convert(limit,partner))
                         .collect(Collectors.toList());
                 if(querys.size()>1){
                     authority.setLimitQuery(

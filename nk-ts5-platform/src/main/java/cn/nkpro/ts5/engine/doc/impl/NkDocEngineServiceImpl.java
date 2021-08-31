@@ -405,7 +405,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
             if(log.isInfoEnabled())
                 log.info("{}保存单据内容 创建重建index任务", NkDocEngineContext.currLog());
 
-            index(doc, optionalOriginal.orElse(null));
+            execDataSync(doc, optionalOriginal.orElse(null));
 
             // 预创建一个持久化对象，在事务提交后使用
             docHPersistent = doc.toPersistent();
@@ -459,12 +459,13 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
      * 重建索引，单据没有修改，所以两个doc是一样的
      */
     @Override
-    public void index(DocHV doc){
-        this.index(doc, doc);
+    public void reDataSync(DocHV doc){
+        this.dataSync(doc, doc);
     }
 
-    private void index(DocHV doc, DocHV original){
-        indexCustom(doc, original);
+    private void execDataSync(DocHV doc, DocHV original){
+        //indexCustom(doc, original);
+        super.dataSync(doc, original);
         searchEngine.indexBeforeCommit(DocHES.from(doc));
     }
 

@@ -63,7 +63,7 @@ public class NkDocEngineIndexService {
                     DocHV docHV = docEngineFrontService.detail(doc.getDocId());
 
                     // 创建单据索引
-                    docEngineFrontService.index(docHV);
+                    docEngineFrontService.reDataSync(docHV);
 
                     // 创建任务索引
                     bpmTaskManager.indexDocTask(docHV);

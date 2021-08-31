@@ -5,6 +5,8 @@ import java.io.Serializable;
 public class DocDefDataSyncKey implements Serializable {
     private String docType;
 
+    private Integer orderBy;
+
     private String targetSvr;
 
     private String version;
@@ -24,6 +26,15 @@ public class DocDefDataSyncKey implements Serializable {
 
     public void setDocType(String docType) {
         this.docType = docType;
+    }
+
+    @cn.nkpro.ts5.basic.wsdoc.annotation.CodeFieldNotes("")
+    public Integer getOrderBy() {
+        return orderBy;
+    }
+
+    public void setOrderBy(Integer orderBy) {
+        this.orderBy = orderBy;
     }
 
     @cn.nkpro.ts5.basic.wsdoc.annotation.CodeFieldNotes("")

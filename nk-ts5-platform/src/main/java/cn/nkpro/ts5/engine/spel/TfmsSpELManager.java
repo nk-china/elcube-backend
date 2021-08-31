@@ -50,16 +50,9 @@ public class TfmsSpELManager {
     }
 
     public Object invoke(String el, Object root){
-        StandardEvaluationContext ctx = new StandardEvaluationContext(root);
-        ctx.addPropertyAccessor(new MapAccessor());
-        try{
-            return parser.parseExpression(el).getValue(ctx);
-        }catch (ParseException | EvaluationException e){
-            throw new TfmsDefineException(String.format("表达式 %s 错误: %s",el, e.getMessage()),e);
-        }
-    }
-
-    public Object invoke(String el, EvaluationContext context){
+        StandardEvaluationContext context = new StandardEvaluationContext(root);
+        context.addPropertyAccessor(new MapAccessor());
+        el = convert(el, context);
         try{
             return parser.parseExpression(el).getValue(context);
         }catch (ParseException | EvaluationException e){
@@ -67,11 +60,20 @@ public class TfmsSpELManager {
         }
     }
 
-    public String convert(DocHV doc,String input){
-        return convert(createContext(doc),input);
+    public Object invoke(String el, EvaluationContext context){
+        el = convert(el, context);
+        try{
+            return parser.parseExpression(el).getValue(context);
+        }catch (ParseException | EvaluationException e){
+            throw new TfmsDefineException(String.format("表达式 %s 错误: %s",el, e.getMessage()),e);
+        }
     }
 
-    public String convert(EvaluationContext context,String input){
+    public String convert(String input,DocHV doc){
+        return convert(input, createContext(doc));
+    }
+
+    public String convert(String input,EvaluationContext context){
 
         if(StringUtils.isBlank(input)){
             return StringUtils.EMPTY;

@@ -23,5 +23,5 @@ public interface NkDocEngineFrontService extends NkDocEngine {
 
     void onBpmKilled(String docId, String processKey, String optSource);
 
-    void index(DocHV doc);
+    void reDataSync(DocHV doc);
 }

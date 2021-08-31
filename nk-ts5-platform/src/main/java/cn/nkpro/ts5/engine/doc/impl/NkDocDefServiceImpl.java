@@ -9,6 +9,7 @@ import cn.nkpro.ts5.engine.co.DebugContextManager;
 import cn.nkpro.ts5.engine.co.NkCustomObject;
 import cn.nkpro.ts5.engine.co.NkCustomObjectManager;
 import cn.nkpro.ts5.engine.doc.NkCard;
+import cn.nkpro.ts5.engine.doc.NkDocDataSync;
 import cn.nkpro.ts5.engine.doc.NkDocProcessor;
 import cn.nkpro.ts5.engine.doc.interceptor.*;
 import cn.nkpro.ts5.engine.doc.model.DocDefFlowV;
@@ -128,6 +129,7 @@ public class NkDocDefServiceImpl implements NkDocDefService {
         options.put("docCreateInterceptors",    customObjectManager.getCustomObjectDescriptionList(NkDocCreateInterceptor.class,    true,null));
         options.put("docUpdateInterceptors",    customObjectManager.getCustomObjectDescriptionList(NkDocUpdateInterceptor.class,    true,null));
         options.put("docFlowInterceptors",      customObjectManager.getCustomObjectDescriptionList(NkDocFlowInterceptor.class,      true,null));
+        options.put("docDataSyncs",             customObjectManager.getCustomObjectDescriptionList(NkDocDataSync.class,             false,null));
         options.put("cards",                    customObjectManager.getCustomObjectDescriptionList(NkCard.class,                    false,null));
         return options;
     }

@@ -109,7 +109,7 @@ public class NkFormCardHelper {
                                     item.getSpELControl()
                             );
                         try {
-                            item.setOptionsObject(JSON.parse(spELManager.convert(context, item.getOptions())));
+                            item.setOptionsObject(JSON.parse(spELManager.convert(item.getOptions(), context)));
                         }catch(Exception e){
                             throw new TfmsDefineException(
                                     String.format("KEY=%s T=OPTIONS %s",

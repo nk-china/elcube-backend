@@ -5,13 +5,13 @@ package cn.nkpro.ts5.engine.co;
  */
 public interface NkCustomObject {
 
-    default String getBeanName(){return getClass().getName();};
+    default String getBeanName(){return getClass().getName();}
 
     default boolean isFinal(){
         return false;
     }
 
     default String desc() {
-        return getClass().getSimpleName();
+        return getBeanName();
     }
 }
