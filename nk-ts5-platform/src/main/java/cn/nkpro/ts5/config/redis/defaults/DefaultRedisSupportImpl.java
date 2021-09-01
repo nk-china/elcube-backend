@@ -36,7 +36,7 @@ public class DefaultRedisSupportImpl<T> implements RedisSupport<T>{
     @Override
     public void clear() {
 
-        List<String> keysKeepPrefix = Arrays.asList("stream","debug");
+        List<String> keysKeepPrefix = Arrays.asList("stream","debug","lock","keep");
 
         Optional.ofNullable(redisTemplate.keys("*"))
             .ifPresent(list->{
