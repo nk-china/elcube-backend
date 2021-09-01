@@ -2,6 +2,8 @@ package cn.nkpro.ts5.controller.def;
 
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
+import cn.nkpro.ts5.config.security.SecurityUtilz;
+import cn.nkpro.ts5.config.security.TfmsSecurityRunner;
 import cn.nkpro.ts5.engine.doc.NkDocEngine;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocDefIV;
@@ -128,12 +130,16 @@ public class SysDocDefController {
     @Autowired
     @Qualifier("nkTaskExecutor")
     private TaskExecutor taskExecutor;
+    @Autowired
+    private TfmsSecurityRunner securityRunner;
 
     @WsDocNote("12.随机生成单据")
     @RequestMapping(value = "/random/{docType}/{count}")
     public void init(@PathVariable String docType, @PathVariable Integer count) {
+        String user = SecurityUtilz.getUser().getUsername();
         for(int a=0;a<16;a++){
             taskExecutor.execute(() -> {
+                securityRunner.runAsUser(user);
                 for(int i=0;i<count;i++){
                     docEngine.doUpdate(docEngine.random(docEngine.create(docType, null)),"随机生成");
                 }

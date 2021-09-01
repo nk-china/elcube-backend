@@ -1,7 +1,6 @@
-package cn.nkpro.ts5.config.security.validate;
+package cn.nkpro.ts5.config.security;
 
-import cn.nkpro.ts5.config.security.TfmsUserDetails;
-import cn.nkpro.ts5.config.security.TfmsUserDetailsService;
+import cn.nkpro.ts5.config.security.validate.TfmsPasswordAuthentication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
