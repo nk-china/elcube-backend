@@ -58,7 +58,6 @@ public class NkDocSQLDataSyncImpl extends NkAbstractDocDataDiffedSyncAdapter<Map
     @Override
     public void onModify(Map<Map<String,Object>,Map<String,Object>> list, DocDefDataSync def) {
 
-
         list.entrySet()
                 .stream()
                 .findAny()
@@ -72,7 +71,7 @@ public class NkDocSQLDataSyncImpl extends NkAbstractDocDataDiffedSyncAdapter<Map
                                 "select count(1) from %s where %s in (%s)",
                                 def.getTargetArgs(),
                                 listKeys.stream().findFirst().orElse(null),
-                                e.getValue().keySet().stream().map(i -> "?").collect(Collectors.joining(","))
+                                list.keySet().stream().map(i -> "?").collect(Collectors.joining(","))
                         );
                     }else{
                         countSql = String.format(

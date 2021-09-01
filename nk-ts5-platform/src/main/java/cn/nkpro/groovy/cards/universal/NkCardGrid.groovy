@@ -7,6 +7,7 @@ import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote
 import cn.nkpro.ts5.engine.doc.abstracts.NkAbstractCard
 import cn.nkpro.ts5.engine.doc.model.DocDefIV
 import cn.nkpro.ts5.engine.doc.model.DocHV
+import com.apifan.common.random.source.NumberSource
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
@@ -73,13 +74,23 @@ class NkCardGrid extends NkAbstractCard<List<Map<String,Object>>,NkCardGridDef> 
         return data
     }
 
+    @Override
+    List<Map<String, Object>> random(DocHV docHV, DocDefIV defIV, NkCardGridDef d) {
+        int size = NumberSource.getInstance().randomInt(1,11)
+        List list = new ArrayList()
+        for(int i=0;i<size;i++){
+            list.add(nkFormCardHelper.random(d.getItems()))
+        }
+        return list
+    }
+
     @SuppressWarnings("unused")
     @JsonIgnoreProperties(ignoreUnknown=true)
     static class NkCardGridDef {
 
         private String preSpEL
 
-        private List<NkCardFormDefI> items
+        private List<NkCardFormDefI> items = new ArrayList<>()
 
         List<NkCardFormDefI> getItems() {
             return items
@@ -87,6 +98,9 @@ class NkCardGrid extends NkAbstractCard<List<Map<String,Object>>,NkCardGridDef> 
 
         void setItems(List<NkCardFormDefI> items) {
             this.items = items
+            if(this.items == null){
+                this.items = new ArrayList<>()
+            }
         }
     }
 }

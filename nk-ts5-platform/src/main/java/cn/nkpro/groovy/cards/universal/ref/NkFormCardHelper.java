@@ -1,11 +1,16 @@
 package cn.nkpro.groovy.cards.universal.ref;
 
+import cn.nkpro.ts5.engine.doc.NkDocEngine;
 import cn.nkpro.ts5.engine.doc.service.NkDocEngineContext;
 import cn.nkpro.ts5.engine.doc.model.DocDefIV;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.engine.spel.TfmsSpELManager;
 import cn.nkpro.ts5.exception.TfmsDefineException;
 import com.alibaba.fastjson.JSON;
+import com.apifan.common.random.source.AreaSource;
+import com.apifan.common.random.source.DateTimeSource;
+import com.apifan.common.random.source.NumberSource;
+import com.apifan.common.random.source.OtherSource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -15,10 +20,9 @@ import org.springframework.expression.EvaluationContext;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDate;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -26,6 +30,63 @@ public class NkFormCardHelper {
 
     @Autowired
     private TfmsSpELManager spELManager;
+
+    public Map random(List<NkCardFormDefI> items){
+
+        Map<String,Object> docRef = new HashMap<>();
+        docRef.put("docName","支付表");
+        docRef.put("docId","8f79d0bc-7cb9-4031-98f0-034ab2968071");
+
+        Map<String,Object> map = new HashMap<>();
+
+        if(items!=null){
+            items.forEach(item->{
+
+                Object value = null;
+                switch (item.getInputType()){
+                    case "text":
+                        value = OtherSource.getInstance().randomChineseSentence();
+                        break;
+                    case "integer":
+                        value = NumberSource.getInstance().randomInt(100, 10000);
+                        break;
+                    case "decimal":
+                        value = NumberSource.getInstance().randomDouble(10000D, 100000D);
+                        break;
+                    case "percent":
+                        value = NumberSource.getInstance().randomDouble(0.01D, 0.99D);
+                        break;
+                    case "switch":
+                        value = NumberSource.getInstance().randomInt(0,2)==1;
+                        break;
+                    case "select":
+                        if(StringUtils.equals(item.getSelectMode(),"multiple")){
+                            value = new Integer[]{NumberSource.getInstance().randomInt(1,3)};
+                        }else{
+                            value = NumberSource.getInstance().randomInt(1,3);
+                        }
+                        break;
+                    case "cascader":
+                    case "tree":
+                        value = AreaSource.getInstance().randomCity(",").split(",");
+                        break;
+                    case "date":
+                    case "datetime":
+                        value = DateTimeSource.getInstance().randomTimestamp(LocalDate.of(2021, 11, 30))/1000;
+                        break;
+                    case "ref":
+                        value = docRef.get("docId");
+                        map.put(item.getKey() + "$doc", docRef);
+                        break;
+                    default:
+                }
+
+                map.put(item.getKey(),value);
+            });
+        }
+
+        return map;
+    }
 
     public Map execSpEL(DocHV doc, Map<String, Object> data, DocDefIV defIV, List<NkCardFormDefI> items, boolean isNewCreate, boolean execOptions){
 
@@ -73,6 +134,15 @@ public class NkFormCardHelper {
                         }
                     }
 
+                    if(data.get(item.getKey())==null){
+                        if("switch".equals(item.getInputType())){
+                            data.put(item.getKey(),true);
+                        }else if("select".equals(item.getInputType()) && "multiple".equals(item.getSelectMode())){
+                            data.put(item.getKey(),new ArrayList<>());
+                        }else{
+                            data.put(item.getKey(),null);
+                        }
+                    }
                     context.setVariable(item.getKey(), data.get(item.getKey()));
                 }
             })

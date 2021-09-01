@@ -19,7 +19,6 @@ import cn.nkpro.ts5.engine.elasticearch.SearchEngine;
 import cn.nkpro.ts5.engine.elasticearch.model.DocHES;
 import cn.nkpro.ts5.engine.task.NkBpmTaskService;
 import cn.nkpro.ts5.exception.TfmsDefineException;
-import cn.nkpro.ts5.exception.TfmsSystemException;
 import cn.nkpro.ts5.orm.mb.gen.*;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import com.alibaba.fastjson.JSON;
@@ -27,7 +26,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.IllegalTransactionStateException;
 import org.springframework.transaction.annotation.Propagation;
@@ -42,8 +44,9 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDocEngineFrontService {
+public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDocEngineFrontService, ApplicationContextAware {
 
+    private ApplicationContext applicationContext;
     @Autowired@SuppressWarnings("all")
     private DocHMapper docHMapper;
     @Autowired@SuppressWarnings("all")
@@ -122,20 +125,13 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
             }
             // 获取原始数据
             DocHPersistent docHPersistent = fetchDoc(docId);
+            Assert.notNull(docHPersistent,"单据不存在");
 
             // 检查权限
             docPermService.assertHasDocPerm(NkDocPermService.MODE_READ, docId, docHPersistent.getDocType());
 
             DocHV docHV = NkDocEngineContext.getDoc(docId, (id)-> fetchDocProcess(docHPersistent));
-
-            if(docHV==null)return null;
-
-            if(StringUtils.isNotBlank(docHV.getProcessInstanceId())){
-                docHV.setBpmTask(
-                        bpmTaskService.taskByBusinessAndAssignee(docId, SecurityUtilz.getUser().getId())
-                );
-                if(log.isInfoEnabled())log.info("{}获取单据任务", NkDocEngineContext.currLog());
-            }
+            Assert.notNull(docHV,"单据不存在");
 
             processView(docHV);
             if(log.isInfoEnabled()){
@@ -201,22 +197,14 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
             iIndexExample.createCriteria()
                     .andDocIdEqualTo(docId);
             iIndexExample.setOrderByClause("ORDER_BY");
-            doc.setDynamics(
-                    docIIndexMapper.selectByExample(iIndexExample)
-                            .stream()
-                            .collect(Collectors.toMap(
-                                    DocIIndexKey::getName,
-                                    e->{
-                                        try {
-                                            return JSON.parseObject(e.getValue(),Class.forName(e.getDataType()));
-                                        } catch (ClassNotFoundException ex) {
-                                            return StringUtils.EMPTY;
-                                        }
-                                    }
-                            ))
-            );
-        }else{
-            throw new TfmsSystemException("单据不存在");
+
+            docIIndexMapper.selectByExample(iIndexExample).forEach(docIIndex -> {
+                try {
+                    doc.getDynamics().put(docIIndex.getName(),JSON.parseObject(docIIndex.getValue(),Class.forName(docIIndex.getDataType())));
+                } catch (ClassNotFoundException ex) {
+                    doc.getDynamics().put(docIIndex.getName(),null);
+                }
+            });
         }
 
         return doc;
@@ -237,7 +225,6 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
 
             return docProcessor.detail(def, docProcessor.deserialize(def, docHPersistent));
         }
-
         return null;
     }
 
@@ -322,14 +309,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
                 original.getData().forEach((k,v)-> docHV.getData().putIfAbsent(k,v));
             }
 
-            DocHV doc = execUpdate(docHV, optSource, lockId);
-
-            if(StringUtils.isNotBlank(doc.getProcessInstanceId())){
-                doc.setBpmTask(
-                        bpmTaskService.taskByBusinessAndAssignee(doc.getDocId(), SecurityUtilz.getUser().getId())
-                );
-            }
-            processView(doc);
+            DocHV doc = processView(execUpdate(docHV, optSource, lockId));
 
             if(debugContextManager.isDebug()){
                 debugContextManager.addDebugResource("$"+doc.getDocId(), doc.toPersistent());
@@ -362,6 +342,25 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
             doc.clearItemContent();
         }
 
+    }
+
+    @Override
+    public DocHV random(DocHV doc) {
+        NkDocEngineContext.startLog("RANDOM", doc.getDocId());
+        if(log.isInfoEnabled())log.info("{}开始生成随机数据", NkDocEngineContext.currLog());
+        try{
+
+            validate(doc);
+            DocDefHV def = docDefService.deserializeDef(doc.getDef());
+
+            // 获取单据处理器 并执行
+            return customObjectManager
+                    .getCustomObject(def.getRefObjectType(), NkDocProcessor.class)
+                    .random(doc);
+        }finally {
+            if(log.isInfoEnabled())log.info("{}生成随机数据 完成", NkDocEngineContext.currLog());
+            NkDocEngineContext.endLog();
+        }
     }
 
     private DocHV execUpdate(DocHV doc, String optSource, String lockId){
@@ -515,7 +514,14 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
     /**
      * 处理可创建的后续单据类型
      */
-    private void processView(DocHV docHV){
+    private DocHV processView(DocHV docHV){
+
+        if(StringUtils.isNotBlank(docHV.getProcessInstanceId())){
+            docHV.setBpmTask(
+                    bpmTaskService.taskByBusinessAndAssignee(docHV.getDocId(), SecurityUtilz.getUser().getId())
+            );
+            if(log.isInfoEnabled())log.info("{}获取单据任务", NkDocEngineContext.currLog());
+        }
 
         docPermService.filterDocCards(null, docHV);
 
@@ -560,5 +566,12 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
                     NkDocEngineContext.currLog(),
                     docHV.getDef().getNextFlows().size()
             );
+
+        return docHV;
+    }
+
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+        this.applicationContext = applicationContext;
     }
 }

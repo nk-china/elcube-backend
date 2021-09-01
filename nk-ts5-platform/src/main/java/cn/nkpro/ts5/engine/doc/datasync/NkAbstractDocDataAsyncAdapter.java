@@ -47,17 +47,23 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
                         context1.setVariable("row", value);
                         return (Map<String, Object>) (spELManager.invoke(def.getMappingSpEL(), context1));
                     }).collect(Collectors.toList());
-            asyncData.original = (List<Map<String,Object>>) ((List) dataOriginalUnmapping).stream()
-                    .map(value -> {
-                        context2.setVariable("row", value);
-                        return (Map<String, Object>) (spELManager.invoke(def.getMappingSpEL(), context2));
-                    }).collect(Collectors.toList());
+
+            if(dataOriginalUnmapping != null) {
+                asyncData.original = (List<Map<String, Object>>) ((List) dataOriginalUnmapping).stream()
+                        .map(value -> {
+                            context2.setVariable("row", value);
+                            return (Map<String, Object>) (spELManager.invoke(def.getMappingSpEL(), context2));
+                        }).collect(Collectors.toList());
+            }
         }else{
             asyncData.single = true;
             context1.setVariable("row", dataUnmapping);
             asyncData.data = (Map<String,Object>)(spELManager.invoke(def.getMappingSpEL(), context1));
-            context2.setVariable("row", dataOriginalUnmapping);
-            asyncData.original = (Map<String,Object>)(spELManager.invoke(def.getMappingSpEL(), context2));
+
+            if(dataOriginalUnmapping != null){
+                context2.setVariable("row", dataOriginalUnmapping);
+                asyncData.original = (Map<String,Object>)(spELManager.invoke(def.getMappingSpEL(), context2));
+            }
         }
 
         NkAsyncQueueWithBLOBs queue = new NkAsyncQueueWithBLOBs();

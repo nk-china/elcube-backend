@@ -33,10 +33,15 @@ class NkCardForm extends NkAbstractCard<Map,NkCardFormDef> {
         return nkFormCardHelper.execSpEL(doc, data, defIV, d.getItems(), false, true)
     }
 
+    @Override
+    Map random(DocHV docHV, DocDefIV defIV, NkCardFormDef d) {
+        return nkFormCardHelper.random(d.getItems())
+    }
+
     @JsonIgnoreProperties(ignoreUnknown=true)
     static class NkCardFormDef {
         private int col
-        private List<NkCardFormDefI> items
+        private List<NkCardFormDefI> items = new ArrayList<>()
 
         int getCol() {
             return col
@@ -52,6 +57,9 @@ class NkCardForm extends NkAbstractCard<Map,NkCardFormDef> {
 
         void setItems(List<NkCardFormDefI> items) {
             this.items = items
+            if(this.items == null){
+                this.items = new ArrayList<>()
+            }
         }
     }
 }

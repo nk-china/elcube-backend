@@ -5,9 +5,11 @@ import cn.nkpro.ts5.orm.mb.gen.SysAccount;
 import cn.nkpro.ts5.orm.mb.gen.SysAuthGroup;
 import cn.nkpro.ts5.orm.mb.gen.SysAuthPermission;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 public class UserGroupBO extends SysAuthGroup {
 

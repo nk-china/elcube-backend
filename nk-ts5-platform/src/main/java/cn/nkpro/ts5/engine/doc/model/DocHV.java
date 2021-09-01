@@ -1,11 +1,15 @@
 package cn.nkpro.ts5.engine.doc.model;
 
+import cn.nkpro.ts5.engine.doc.model.easy.EasyCollection;
+import cn.nkpro.ts5.engine.doc.model.easy.EasySingle;
 import cn.nkpro.ts5.engine.task.model.BpmTask;
 import cn.nkpro.ts5.orm.mb.gen.DocI;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.Assert;
 
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -37,6 +41,25 @@ public class DocHV extends DocHBasis implements Cloneable {
             clone.setBpmTask((BpmTask) bpmTask.clone());
 
         return clone;
+    }
+
+    public EasySingle fetch(String cardKey){
+        Object o = getData().get(cardKey);
+        Assert.notNull(o,String.format("卡片数据[ %s ]不存在",cardKey));
+        return EasySingle.from(o);
+    }
+
+    public EasyCollection fetchList(String cardKey){
+        Object o = getData().get(cardKey);
+        Assert.notNull(o,String.format("卡片数据[ %s ]不存在",cardKey));
+
+        DocDefIV docDefIV = getDef().getCards()
+                .stream()
+                .filter(c -> StringUtils.equals(c.getCardKey(), cardKey)).findFirst()
+                .orElse(null);
+        Assert.notNull(docDefIV,String.format("卡片配置[ %s ]不存在",cardKey));
+
+        return EasyCollection.from(o);
     }
 
     public DocHPersistent toPersistent(){

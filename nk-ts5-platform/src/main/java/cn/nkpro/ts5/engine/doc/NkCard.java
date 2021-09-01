@@ -63,4 +63,6 @@ public interface NkCard<DT,DDT> extends NkCustomObject {
     boolean isDebug();
 
     default boolean enableDataDiff(){return true;}
+
+    DT random(DocHV docHV, DocDefIV defIV, DDT def);
 }

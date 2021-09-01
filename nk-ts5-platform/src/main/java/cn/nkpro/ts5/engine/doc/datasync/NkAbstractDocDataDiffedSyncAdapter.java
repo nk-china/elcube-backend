@@ -22,7 +22,10 @@ public abstract class NkAbstractDocDataDiffedSyncAdapter<K> extends NkAbstractDo
         if(dataUnmapping instanceof List || dataOriginalUnmapping instanceof List){
             // 对数组进行数据逐条处理
 
-            Assert.isTrue(dataUnmapping instanceof List && dataOriginalUnmapping instanceof List,"数据同步服务 ["+getBeanName() + "] 数据类型错误");
+            Assert.isTrue(
+                    dataUnmapping instanceof List &&
+                    (dataOriginalUnmapping == null || dataOriginalUnmapping instanceof List),
+                    "数据同步服务 ["+getBeanName() + "] 数据类型错误");
 
             List<Object> list1 = (List<Object>)dataUnmapping;
             List<Object> list2 = (List<Object>)dataOriginalUnmapping;

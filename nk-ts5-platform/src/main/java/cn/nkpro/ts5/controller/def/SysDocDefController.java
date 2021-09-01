@@ -2,14 +2,20 @@ package cn.nkpro.ts5.controller.def;
 
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
+import cn.nkpro.ts5.engine.doc.NkDocEngine;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocDefIV;
+import cn.nkpro.ts5.engine.doc.model.DocHV;
+import cn.nkpro.ts5.engine.doc.model.easy.EasyCollection;
 import cn.nkpro.ts5.engine.doc.service.NkDocDefService;
 import cn.nkpro.ts5.orm.mb.gen.DocDefH;
+import com.apifan.common.random.source.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +28,9 @@ import java.util.Map;
 @PreAuthorize("hasAnyAuthority('*:*','DEF:*','DEF:DOCTYPE')")
 public class SysDocDefController {
 
+
+    @Autowired@SuppressWarnings("all")
+    private NkDocEngine docEngine;
     @Autowired@SuppressWarnings("all")
     private NkDocDefService defDocTypeService;
 
@@ -112,5 +121,13 @@ public class SysDocDefController {
     @RequestMapping("/card/{cardHandlerName}")
     public DocDefIV cardDescribe(@WsDocNote("分类")@PathVariable String cardHandlerName){
         return defDocTypeService.getCardDescribe(cardHandlerName);
+    }
+
+    @WsDocNote("12.随机生成单据")
+    @RequestMapping(value = "/random/{docType}/{count}")
+    public void init(@PathVariable String docType, @PathVariable Integer count) {
+        for(int i=0;i<count;i++){
+            docEngine.doUpdate(docEngine.random(docEngine.create(docType, null)),"随机生成");
+        }
     }
 }

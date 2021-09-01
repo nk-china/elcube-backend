@@ -11,8 +11,10 @@ nk:
   component-base-packages:
     - cn.nkpro.ts5.cards
     - cn.nkpro.groovy
-  component-disable-online-editing: false
-  component-reload-class-path: false
+# component-disable-online-editing 表示是否禁用在线编辑组件代码
+  component-disable-online-editing: true
+# component-reload-class-path 如果为false，那么程序启动后，修改ide中的vue文件前端不会生效
+  component-reload-class-path: true
 #  aliyun:
 #    access-key-id: LTAI4G6YUdTBx8b9C8uR3gTU
 #    access-key-secret: zeqaRsOAOkwwTLK8E2QyR1aEcj6RAL

@@ -181,7 +181,11 @@ public abstract class NkAbstractCard<DT,DDT> extends NkAbstractCustomScriptObjec
 
     @Override
     public void stateChanged(DocHV doc, DocHV original, DT data, DocDefIV defIV, DDT d){
+    }
 
+    @Override
+    public DT random(DocHV docHV, DocDefIV defIV, DDT d) {
+        return deserialize(null);
     }
 
     @SuppressWarnings("all")

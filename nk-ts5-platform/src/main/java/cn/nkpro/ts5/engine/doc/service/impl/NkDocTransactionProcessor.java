@@ -24,6 +24,9 @@ import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.apifan.common.random.source.NumberSource;
+import com.apifan.common.random.source.OtherSource;
+import com.apifan.common.random.source.PersonInfoSource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -591,6 +594,24 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
                 this.doUpdate(docHV,docHV,optSource);
             }
         }
+    }
+
+    @Override
+    public DocHV random(DocHV doc) {
+
+        doc.setDocName(OtherSource.getInstance().randomChinese(NumberSource.getInstance().randomInt(5, 21)));
+        doc.setDocDesc(OtherSource.getInstance().randomChineseSentence());
+        doc.getDynamics().put("partnerName_keyword", PersonInfoSource.getInstance().randomChineseName());
+
+        AtomicReference<DocHV> atomic = new AtomicReference(doc);
+        docDefService.runLoopCards(atomic.get().getDocId(), atomic.get().getDef(),false, (card, defIV)->
+            atomic.get().getData().put(
+                    defIV.getCardKey(),
+                    card.random(atomic.get(), defIV, defIV.getConfig())
+            )
+        );
+
+        return atomic.get();
     }
 
     private boolean existsOriginal(DocHV original, DocDefIV defIV){

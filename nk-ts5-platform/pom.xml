@@ -267,6 +267,12 @@
 <!--            <version>2.0.2</version>-->
 <!--        </dependency>-->
 
+        <dependency>
+            <groupId>com.apifan.common</groupId>
+            <artifactId>common-random</artifactId>
+            <version>1.0.7</version>
+        </dependency>
+
 
     </dependencies>
 

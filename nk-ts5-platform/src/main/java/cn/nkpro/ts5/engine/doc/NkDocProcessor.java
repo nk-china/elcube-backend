@@ -14,17 +14,19 @@ public interface NkDocProcessor extends NkCustomObject {
     }
     EnumDocClassify classify();
 
-    DocHV calculate(DocHV doc, String fromCard, String options);
-
-    Object call(DocHV doc, String fromCard, String method, String options);
-
-    DocHBasis deserialize(DocDefHV def, DocHPersistent docHD);
-
     DocHV detail  (DocDefHV def, DocHBasis docHD);
 
     DocHV toCreate(DocDefHV def, DocHV preDoc);
 
     DocHV doUpdate(DocHV doc, DocHV original, String optSource);
 
+    DocHV calculate(DocHV doc, String fromCard, String options);
+
+    Object call(DocHV doc, String fromCard, String method, String options);
+
     void doOnBpmKilled(DocHV docHV, String processKey, String optSource);
+
+    DocHV random(DocHV doc);
+
+    DocHBasis deserialize(DocDefHV def, DocHPersistent docHD);
 }

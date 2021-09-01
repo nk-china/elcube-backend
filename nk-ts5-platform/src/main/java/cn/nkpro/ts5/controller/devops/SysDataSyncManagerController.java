@@ -19,7 +19,7 @@ import java.util.UUID;
 @WsDocNote("22.[DevOps]索引管理")
 @RestController
 @RequestMapping("/ops/datasync")
-@PreAuthorize("hasAnyAuthority('*:*','DEVOPS:*','DEVOPS:ES')")
+@PreAuthorize("hasAnyAuthority('*:*','DEVOPS:*','DEVOPS:DATASYNC')")
 public class SysDataSyncManagerController {
 
     @Autowired@SuppressWarnings("all")

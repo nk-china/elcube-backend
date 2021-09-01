@@ -20,7 +20,7 @@ import java.util.UUID;
 @WsDocNote("23.[DevOps]缓存管理")
 @RestController
 @RequestMapping("/ops/cache")
-@PreAuthorize("hasAnyAuthority('*:*','DEVOPS:*','DEVOPS:ES')")
+@PreAuthorize("hasAnyAuthority('*:*','DEVOPS:*','DEVOPS:CACHE')")
 public class SysCacheManagerController {
 
     @Autowired@SuppressWarnings("all")

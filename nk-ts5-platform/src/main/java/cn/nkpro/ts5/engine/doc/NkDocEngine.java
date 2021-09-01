@@ -11,4 +11,6 @@ public interface NkDocEngine {
     DocHV calculate(DocHV doc, String fromCard, String options);
 
     DocHV doUpdate(DocHV doc, String optSource);
+
+    DocHV random(DocHV doc);
 }
