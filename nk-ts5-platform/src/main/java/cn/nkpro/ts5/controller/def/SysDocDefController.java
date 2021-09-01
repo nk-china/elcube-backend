@@ -7,25 +7,22 @@ import cn.nkpro.ts5.config.security.TfmsSecurityRunner;
 import cn.nkpro.ts5.engine.doc.NkDocEngine;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocDefIV;
-import cn.nkpro.ts5.engine.doc.model.DocHV;
-import cn.nkpro.ts5.engine.doc.model.easy.EasyCollection;
 import cn.nkpro.ts5.engine.doc.service.NkDocDefService;
 import cn.nkpro.ts5.orm.mb.gen.DocDefH;
-import com.apifan.common.random.source.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
  * Created by bean on 2020/1/15.
  */
+@Slf4j
 @WsDocNote("33.[DevDef]单据配置")
 @RestController
 @RequestMapping("/def/doc")
@@ -141,7 +138,11 @@ public class SysDocDefController {
             taskExecutor.execute(() -> {
                 securityRunner.runAsUser(user);
                 for(int i=0;i<count;i++){
-                    docEngine.doUpdate(docEngine.random(docEngine.create(docType, null)),"随机生成");
+                    try{
+                        docEngine.doUpdate(docEngine.random(docEngine.create(docType, null)),"随机生成");
+                    }catch (Exception e){
+                        log.error(e.getMessage(),e);
+                    }
                 }
             });
         }

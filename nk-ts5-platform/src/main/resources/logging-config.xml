@@ -24,13 +24,13 @@
 <!--        </encoder>-->
 <!--    </appender>-->
 
-    <root level="info">
+    <root level="warn">
         <appender-ref ref="console" />
 <!--        <appender-ref ref="nk" />-->
     </root>
-    <logger name="org.springframework.jdbc.datasource.DataSourceTransactionManager" level="INFO"/>
-    <logger name="org.apache.ibatis" level="INFO"/>
-    <logger name="org.beanopen" level="debug"/>
-    <logger name="cn.nkpro" level="debug"/>
+    <logger name="org.springframework.jdbc.datasource.DataSourceTransactionManager" level="warn"/>
+    <logger name="org.apache.ibatis" level="warn"/>
+    <logger name="org.beanopen" level="info"/>
+    <logger name="cn.nkpro" level="info"/>
 
 </configuration>
