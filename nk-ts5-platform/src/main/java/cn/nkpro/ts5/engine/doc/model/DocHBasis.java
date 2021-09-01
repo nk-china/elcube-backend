@@ -16,6 +16,8 @@ import java.util.Map;
 @JsonInclude()
 public class DocHBasis extends DocHPersistent implements Cloneable {
 
+    private String partnerName;
+
     private String docTypeDesc;
 
     private String docStateDesc;
@@ -32,6 +34,7 @@ public class DocHBasis extends DocHPersistent implements Cloneable {
     @Override
     protected Object clone() throws CloneNotSupportedException {
         DocHBasis clone = (DocHBasis) super.clone();
+        clone.setPartnerName(partnerName);
         clone.setDocTypeDesc(docTypeDesc);
         clone.setDocStateDesc(docStateDesc);
         clone.setDef(def);
