@@ -23,6 +23,7 @@ import org.elasticsearch.search.aggregations.bucket.filter.FilterAggregationBuil
 import org.elasticsearch.search.aggregations.bucket.filter.ParsedFilter;
 import org.elasticsearch.search.aggregations.bucket.terms.ParsedStringTerms;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
 import org.elasticsearch.search.sort.SortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
@@ -31,9 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -74,36 +73,60 @@ public class SearchService {
         if(preQueryBuilder!=null){
             postQueryBuilder.must(preQueryBuilder);
         }
+        // 功能前置条件
         if(params.containsKey("preCondition")) {
             postQueryBuilder.must(
                     QueryBuilders.wrapperQuery(params.getString("preCondition"))
             );
         }
         postQueryBuilder.must(
-                docPermService.buildDocFilter(NkDocPermService.MODE_READ, null,null,false)
+            docPermService.buildDocFilter(NkDocPermService.MODE_READ, null,null,false)
         );
-
-        // 处理查询条件
-        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery()
-                .must(
-                        QueryBuilders.queryStringQuery(
-                                StringUtils.defaultIfBlank(params.getString("keyword"),"*")
-                        ).defaultField("$keyword")
-                );
-
-        if(params.containsKey("condition")) {
-            boolQueryBuilder.must(
-                    QueryBuilders.wrapperQuery(params.getString("condition"))
-            );
-        }
 
         // 构造检索语句
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder()
                 // 过滤权限
                 .postFilter(postQueryBuilder)
-                .query(boolQueryBuilder)
                 .from(params.getInteger("from"))
                 .size(params.getInteger("rows"));
+
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+        if(params.containsKey("condition")) {
+            boolQueryBuilder.must(
+                    QueryBuilders.wrapperQuery(params.getString("condition"))
+            );
+        }
+        // 关键字
+        String keyword = params.getString("keyword");
+        String keywordField = params.getString("_keywordField");
+        if(StringUtils.isNotBlank(keyword)){
+            boolQueryBuilder.must(
+                    QueryBuilders.multiMatchQuery(
+                            params.getString("keyword"),
+                            StringUtils.defaultIfBlank(keywordField,"$keyword").split("[,]")
+                    )
+            );
+        }
+
+        sourceBuilder.query(boolQueryBuilder);
+
+        // 高亮
+        Set<String> highlightField = new HashSet<>();
+        if(StringUtils.isNoneBlank(keywordField,keyword))
+            highlightField.addAll(Arrays.asList(StringUtils.split(keywordField,",")));
+        String highlight = params.getString("_highlight");
+        if(StringUtils.isNotBlank(highlight))
+            highlightField.addAll(Arrays.asList(StringUtils.split(highlight,",")));
+
+        if(!highlightField.isEmpty()){
+            HighlightBuilder highlightBuilder = new HighlightBuilder();
+            highlightBuilder.preTags("<span class='highlight'>");
+            highlightBuilder.postTags("</span>");
+            for(String field : highlightField){
+                highlightBuilder.field(new HighlightBuilder.Field(field));
+            }
+            sourceBuilder.highlighter(highlightBuilder);
+        }
 
         // 排序
         if(StringUtils.isNotBlank(params.getString("orderField"))){
@@ -152,7 +175,17 @@ public class SearchService {
         SearchResponse response = searchEngine.search(docType, builder);
 
         List<T> collect = Arrays.stream(response.getHits().getHits())
-                .map(hit -> new JSONObject(hit.getSourceAsMap()).toJavaObject(docType))
+                .map(hit -> {
+                    JSONObject jsonObject = new JSONObject(hit.getSourceAsMap());
+
+                    hit.getHighlightFields().forEach((k,v)-> {
+                        if(v.getFragments()!=null && v.getFragments().length>0){
+                            jsonObject.put(k,v.getFragments()[0].string());
+                        }
+                    });
+
+                    return jsonObject.toJavaObject(docType);
+                })
                 .collect(Collectors.toList());
 
         Map<String,ESAgg> aggs = null;
