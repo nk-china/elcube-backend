@@ -22,8 +22,10 @@ import cn.nkpro.ts5.exception.TfmsDefineException;
 import cn.nkpro.ts5.orm.mb.gen.*;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
+import cn.nkpro.ts5.utils.TextUtils;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
+import com.apifan.common.random.source.AreaSource;
 import com.apifan.common.random.source.NumberSource;
 import com.apifan.common.random.source.OtherSource;
 import com.apifan.common.random.source.PersonInfoSource;
@@ -599,8 +601,8 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
     @Override
     public DocHV random(DocHV doc) {
 
-        doc.setDocName(OtherSource.getInstance().randomChinese(NumberSource.getInstance().randomInt(5, 21)));
-        doc.setDocDesc(OtherSource.getInstance().randomChineseSentence());
+        doc.setDocName(TextUtils.randomText());
+        doc.setDocDesc(TextUtils.randomText());
         doc.getDynamics().put("partnerName_keyword", PersonInfoSource.getInstance().randomChineseName());
 
         AtomicReference<DocHV> atomic = new AtomicReference(doc);

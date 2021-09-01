@@ -6,11 +6,10 @@ import cn.nkpro.ts5.engine.doc.model.DocDefIV;
 import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.engine.spel.TfmsSpELManager;
 import cn.nkpro.ts5.exception.TfmsDefineException;
+import cn.nkpro.ts5.utils.TextUtils;
 import com.alibaba.fastjson.JSON;
-import com.apifan.common.random.source.AreaSource;
-import com.apifan.common.random.source.DateTimeSource;
-import com.apifan.common.random.source.NumberSource;
-import com.apifan.common.random.source.OtherSource;
+import com.apifan.common.random.constant.CreditCardType;
+import com.apifan.common.random.source.*;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -45,7 +44,7 @@ public class NkFormCardHelper {
                 Object value = null;
                 switch (item.getInputType()){
                     case "text":
-                        value = OtherSource.getInstance().randomChineseSentence();
+                        value = TextUtils.randomText();
                         break;
                     case "integer":
                         value = NumberSource.getInstance().randomInt(100, 10000);
