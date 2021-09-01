@@ -86,7 +86,7 @@ public class DebugContextManager implements ApplicationContextAware {
         if(context!=null){
             ((GenericApplicationContext)context).stop();
         }
-        redisForResoure.deleteHash(String.format("DEBUG:%s", debugId));
+        redisForResoure.delete(String.format("DEBUG:%s", debugId));
         redisForResoure.deleteHash(Constants.CACHE_DEBUG_CONTEXT,debugId);
     }
 

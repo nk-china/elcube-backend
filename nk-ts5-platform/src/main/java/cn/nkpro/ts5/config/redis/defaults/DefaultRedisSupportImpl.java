@@ -35,10 +35,20 @@ public class DefaultRedisSupportImpl<T> implements RedisSupport<T>{
 
     @Override
     public void clear() {
+
+        List<String> keysKeepPrefix = Arrays.asList("stream","debug");
+
         Optional.ofNullable(redisTemplate.keys("*"))
             .ifPresent(list->{
                 List<String> collect = list.stream()
-                        .filter(key -> !(key.startsWith("stream.") || key.startsWith("stream:")))
+                        .filter(key ->
+                            keysKeepPrefix.stream()
+                                .noneMatch(pre->{
+                                    String keyUpper = key.toUpperCase();
+                                    String preUpper = pre.toUpperCase();
+                                    return (keyUpper.startsWith(preUpper+":")||keyUpper.startsWith(preUpper+"_"));
+                                })
+                        )
                         .collect(Collectors.toList());
                 if(collect.size()>0)
                     redisTemplate.delete(collect);

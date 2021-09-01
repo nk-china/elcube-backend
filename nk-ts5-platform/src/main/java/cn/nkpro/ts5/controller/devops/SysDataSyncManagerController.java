@@ -18,9 +18,9 @@ import java.util.UUID;
  */
 @WsDocNote("22.[DevOps]索引管理")
 @RestController
-@RequestMapping("/ops/index")
+@RequestMapping("/ops/datasync")
 @PreAuthorize("hasAnyAuthority('*:*','DEVOPS:*','DEVOPS:ES')")
-public class SysIndexManagerController {
+public class SysDataSyncManagerController {
 
     @Autowired@SuppressWarnings("all")
     private SearchEngine searchEngine;
@@ -36,16 +36,16 @@ public class SysIndexManagerController {
         searchService.dropAndInit();
     }
 
-    @WsDocNote("2.重建单据索引")
-    @RequestMapping(value = "/docs/reindex")
+    @WsDocNote("2.立即执行同步")
+    @RequestMapping(value = "/redo")
     public String reIndex(Boolean dropFirst, String docType) throws IOException {
         String asyncTaskId = UUID.randomUUID().toString();
         docEngineIndexService.reindex(asyncTaskId, dropFirst, docType);
         return asyncTaskId;
     }
 
-    @WsDocNote("3.获取重建单据索引信息")
-    @RequestMapping(value = "/docs/reindex/{asyncTaskId}")
+    @WsDocNote("3.获取同步信息")
+    @RequestMapping(value = "/redo/{asyncTaskId}")
     public Object reIndex(@PathVariable String asyncTaskId) {
         return docEngineIndexService.getReindexInfo(asyncTaskId);
     }
