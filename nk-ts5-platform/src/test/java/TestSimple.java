@@ -1,8 +1,12 @@
 import camundajar.impl.scala.Int;
+import cn.nkpro.ts5.utils.TextUtils;
 import com.alibaba.fastjson.JSON;
+import com.apifan.common.random.source.AreaSource;
+import com.apifan.common.random.source.PersonInfoSource;
 import org.junit.Test;
 
 import java.lang.reflect.Method;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -10,41 +14,10 @@ import java.util.regex.Pattern;
 public class TestSimple {
 
 
+    LocalDate beginDate = LocalDate.of(1990,1,1);
+    LocalDate endDate   = LocalDate.of(2021,12,31);
     @Test
     public void test() throws Exception {
-//        Arrays.stream(
-//                A.class.getDeclaredMethods()
-//        ).forEach(System.out::println);
-        Method runB = B.class.getMethod("run");
-        Method runC = C.class.getMethod("run");
-
-        System.out.println(runB.getDeclaringClass()==A.class);
-        System.out.println(runC.getDeclaringClass()==A.class);
-
-
-        System.out.println(Class.forName("java.lang.Void").cast(null));
-        System.out.println(Class.forName("java.lang.Integer").cast(1));
-
-
-        System.out.println(JSON.parseObject("1", Integer.class));
-        System.out.println(JSON.parseObject("1", String.class));
-
-        System.out.println(JSON.toJSONString(null));
-        System.out.println(JSON.parseObject("null", Void.class)==null);
-
-    }
-}
-
-interface A{
-    default void run(){
-
-    }
-}
-class B implements A{
-}
-class C extends B{
-    @Override
-    public void run() {
-
+        System.out.println(AreaSource.getInstance().randomPhoneNumber(AreaSource.getInstance().randomProvince(), "-"));
     }
 }
