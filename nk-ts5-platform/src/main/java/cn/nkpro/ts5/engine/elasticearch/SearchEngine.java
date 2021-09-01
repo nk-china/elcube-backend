@@ -49,7 +49,8 @@ public class SearchEngine extends ESContentBuilder{
     public <T extends AbstractESDoc> SearchResponse search(Class<T> docType, SearchSourceBuilder builder) throws IOException {
         return client.search(new SearchRequest()
                 .indices(documentIndex(parseDocument(docType)))
-                .source(builder.timeout(new TimeValue(10, TimeUnit.SECONDS))), RequestOptions.DEFAULT);
+                //track_total_hits : true 解决查询列表最大total限制10000的问题
+                .source(builder.trackTotalHits(true).timeout(new TimeValue(10, TimeUnit.SECONDS))), RequestOptions.DEFAULT);
     }
 
     public <T extends AbstractESDoc> boolean exists(Class<T> docType, SearchSourceBuilder builder) throws IOException {
