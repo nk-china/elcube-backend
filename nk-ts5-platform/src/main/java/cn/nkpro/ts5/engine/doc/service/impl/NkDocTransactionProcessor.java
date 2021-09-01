@@ -441,9 +441,9 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         if(log.isInfoEnabled())log.info("{}保存单据内容 计算动态索引字段", NkDocEngineContext.currLog());
         EvaluationContext context = spELManager.createContext(atomic.get());
 
-        DocIIndexExample example = new DocIIndexExample();
-        example.createCriteria().andDocIdEqualTo(atomic.get().getDocId());
-        docIIndexMapper.deleteByExample(example);
+        //DocIIndexExample example = new DocIIndexExample();
+        //example.createCriteria().andDocIdEqualTo(atomic.get().getDocId());
+        //docIIndexMapper.deleteByExample(example);
 
         if(atomic.get().getDef().getIndexRules()!=null)
             atomic.get().getDef()

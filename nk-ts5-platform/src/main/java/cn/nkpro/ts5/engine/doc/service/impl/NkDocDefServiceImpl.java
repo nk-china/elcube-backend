@@ -307,7 +307,7 @@ public class NkDocDefServiceImpl implements NkDocDefService {
                     .forEach(indexRule -> {
                         Assert.hasLength(indexRule.getIndexName(),"索引 字段名 不能为空");
                         Assert.hasLength(indexRule.getIndexType(),"索引 字段名 不能为空");
-                        Assert.hasLength(indexRule.getRuleSpEL(),"索引 规则 不能为空");
+                        Assert.hasLength(indexRule.getRuleSpEL(), "索引 规则 不能为空");
                         indexRule.setDocType(docDefHV.getDocType());
                         indexRule.setVersion(docDefHV.getVersion());
                         indexRule.setOrderBy(docDefHV.getIndexRules().indexOf(indexRule));
