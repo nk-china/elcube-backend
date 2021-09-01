@@ -603,7 +603,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
 
         doc.setDocName(TextUtils.randomText());
         doc.setDocDesc(TextUtils.randomText());
-        doc.getDynamics().put("partnerName_keyword", PersonInfoSource.getInstance().randomChineseName());
+        doc.setPartnerName(PersonInfoSource.getInstance().randomChineseName());
 
         AtomicReference<DocHV> atomic = new AtomicReference(doc);
         docDefService.runLoopCards(atomic.get().getDocId(), atomic.get().getDef(),false, (card, defIV)->
