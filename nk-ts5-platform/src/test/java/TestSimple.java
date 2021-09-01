@@ -2,6 +2,7 @@ import camundajar.impl.scala.Int;
 import cn.nkpro.ts5.utils.TextUtils;
 import com.alibaba.fastjson.JSON;
 import com.apifan.common.random.source.AreaSource;
+import com.apifan.common.random.source.NumberSource;
 import com.apifan.common.random.source.PersonInfoSource;
 import org.junit.Test;
 
@@ -18,6 +19,6 @@ public class TestSimple {
     LocalDate endDate   = LocalDate.of(2021,12,31);
     @Test
     public void test() throws Exception {
-        System.out.println(AreaSource.getInstance().randomPhoneNumber(AreaSource.getInstance().randomProvince(), "-"));
+        System.out.println(NumberSource.getInstance().randomInt(100, 10000));
     }
 }

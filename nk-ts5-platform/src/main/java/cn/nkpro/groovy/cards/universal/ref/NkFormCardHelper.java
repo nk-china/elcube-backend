@@ -47,7 +47,7 @@ public class NkFormCardHelper {
                         value = TextUtils.randomText();
                         break;
                     case "integer":
-                        value = NumberSource.getInstance().randomInt(100, 10000);
+                        value = NumberSource.getInstance().randomInt(0, 100000001);
                         break;
                     case "decimal":
                         value = NumberSource.getInstance().randomDouble(10000D, 100000D);
