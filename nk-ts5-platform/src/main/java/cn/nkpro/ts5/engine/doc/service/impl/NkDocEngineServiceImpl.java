@@ -466,8 +466,12 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
     }
 
     private void execDataSync(DocHV doc, DocHV original){
+        long start1 = System.currentTimeMillis();
         super.dataSync(doc, original, false);
+        if(log.isInfoEnabled())log.info("{}保存单据 同步数据 耗时{}ms", NkDocEngineContext.currLog(), System.currentTimeMillis() - start1);
+        long start2 = System.currentTimeMillis();
         searchEngine.indexBeforeCommit(DocHES.from(doc));
+        if(log.isInfoEnabled())log.info("{}保存单据 更新索引 耗时{}ms", NkDocEngineContext.currLog(), System.currentTimeMillis() - start2);
     }
 
 
