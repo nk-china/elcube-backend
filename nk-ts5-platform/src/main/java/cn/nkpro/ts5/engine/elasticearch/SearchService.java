@@ -24,6 +24,7 @@ import org.elasticsearch.search.aggregations.bucket.filter.ParsedFilter;
 import org.elasticsearch.search.aggregations.bucket.terms.ParsedStringTerms;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.FieldSortBuilder;
+import org.elasticsearch.search.sort.SortBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,33 +97,32 @@ public class SearchService {
             );
         }
 
-        FieldSortBuilder sortBuilder = SortBuilders
-                .fieldSort(
-                        StringUtils.defaultIfBlank(params.getString("orderField"),"updatedTime")
-                )
-                .order(
-                        SortOrder.fromString(
-                                StringUtils.defaultIfBlank(params.getString("order"),"desc")
-                        )
-                );
-
         // 构造检索语句
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder()
                 // 过滤权限
                 .postFilter(postQueryBuilder)
                 .query(boolQueryBuilder)
-                .sort(sortBuilder)
-                .sort(SortBuilders.scoreSort())
-                .sort(SortBuilders.fieldSort("updatedTime").order(SortOrder.DESC))
                 .from(params.getInteger("from"))
                 .size(params.getInteger("rows"));
 
+        // 排序
+        if(StringUtils.isNotBlank(params.getString("orderField"))){
+            sourceBuilder.sort(SortBuilders
+                .fieldSort(params.getString("orderField"))
+                .order(SortOrder.fromString(StringUtils.defaultIfBlank(params.getString("order"),"desc")))
+            );
+        }
+        sourceBuilder.sort(SortBuilders.scoreSort());
+        if(StringUtils.isBlank(params.getString("orderField"))||!"updatedTime".equals(params.getString("orderField"))){
+            sourceBuilder.sort(SortBuilders.fieldSort("updatedTime").order(SortOrder.DESC));
+        }
+
+        // 过滤字段
         if(params.containsKey("_source")){
             @SuppressWarnings("all")
             String[] fields = params.getJSONArray("_source").toArray(new String[0]);
             sourceBuilder.fetchSource(fields,null);
         }
-
 
         // 汇总数据
         if(params.containsKey("$aggs")) {
