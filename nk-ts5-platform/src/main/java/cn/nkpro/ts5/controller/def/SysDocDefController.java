@@ -11,6 +11,8 @@ import cn.nkpro.ts5.engine.doc.service.NkDocDefService;
 import cn.nkpro.ts5.orm.mb.gen.DocDefH;
 import com.apifan.common.random.source.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.task.TaskExecutor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -123,11 +125,19 @@ public class SysDocDefController {
         return defDocTypeService.getCardDescribe(cardHandlerName);
     }
 
+    @Autowired
+    @Qualifier("nkTaskExecutor")
+    private TaskExecutor taskExecutor;
+
     @WsDocNote("12.随机生成单据")
     @RequestMapping(value = "/random/{docType}/{count}")
     public void init(@PathVariable String docType, @PathVariable Integer count) {
-        for(int i=0;i<count;i++){
-            docEngine.doUpdate(docEngine.random(docEngine.create(docType, null)),"随机生成");
+        for(int a=0;a<16;a++){
+            taskExecutor.execute(() -> {
+                for(int i=0;i<count;i++){
+                    docEngine.doUpdate(docEngine.random(docEngine.create(docType, null)),"随机生成");
+                }
+            });
         }
     }
 }
