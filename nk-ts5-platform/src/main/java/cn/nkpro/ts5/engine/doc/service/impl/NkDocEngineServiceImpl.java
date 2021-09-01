@@ -463,6 +463,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
     @Override
     public void reDataSync(DocHV doc){
         this.dataSync(doc, doc, true);
+        searchEngine.indexBeforeCommit(DocHES.from(doc));
     }
 
     private void execDataSync(DocHV doc, DocHV original){

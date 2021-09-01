@@ -13,12 +13,6 @@ public class NkDocSimpleAsyncImpl extends NkAbstractDocDataAsyncAdapter<String> 
     @Override
     protected void schedule(NkAsyncQueue asyncQueue) {
         log.info(asyncQueue.toString());
-
-        try {
-            Thread.sleep(5000l);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         if(Math.random()>0)
             throw new TfmsSystemException("自定义错误");
     }
