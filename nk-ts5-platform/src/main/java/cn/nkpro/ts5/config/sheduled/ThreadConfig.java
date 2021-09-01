@@ -14,10 +14,10 @@ public class ThreadConfig {
     @Bean
     public ThreadPoolTaskExecutor nkTaskExecutor(){
         ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
-        taskExecutor.setCorePoolSize(10);
-        taskExecutor.setMaxPoolSize(20);
-        taskExecutor.setKeepAliveSeconds(60);
+        taskExecutor.setCorePoolSize(32);
+        taskExecutor.setMaxPoolSize(2147483647);
         taskExecutor.setQueueCapacity(2147483647);
+        taskExecutor.setKeepAliveSeconds(60);
         taskExecutor.setThreadNamePrefix("nk-async-executor-");
         taskExecutor.setWaitForTasksToCompleteOnShutdown(true);
         taskExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.DiscardPolicy());
