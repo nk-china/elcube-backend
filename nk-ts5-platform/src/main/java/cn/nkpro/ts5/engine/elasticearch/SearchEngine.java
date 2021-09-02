@@ -3,6 +3,7 @@ package cn.nkpro.ts5.engine.elasticearch;
 import cn.nkpro.ts5.engine.LocalSyncUtilz;
 import cn.nkpro.ts5.engine.elasticearch.annotation.ESDocument;
 import cn.nkpro.ts5.engine.elasticearch.model.AbstractESDoc;
+import cn.nkpro.ts5.exception.TfmsSystemException;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.delete.DeleteRequest;
@@ -46,38 +47,51 @@ public class SearchEngine extends ESContentBuilder{
         }
     }
 
-    public <T extends AbstractESDoc> SearchResponse search(Class<T> docType, SearchSourceBuilder builder) throws IOException {
-        return client.search(new SearchRequest()
-                .indices(documentIndex(parseDocument(docType)))
-                //track_total_hits : true 解决查询列表最大total限制10000的问题
-                .source(builder.trackTotalHits(true).timeout(new TimeValue(10, TimeUnit.SECONDS))), RequestOptions.DEFAULT);
+    public <T extends AbstractESDoc> SearchResponse search(Class<T> docType, SearchSourceBuilder builder) {
+        try {
+            return client.search(new SearchRequest()
+                    .indices(documentIndex(parseDocument(docType)))
+                    //track_total_hits : true 解决查询列表最大total限制10000的问题
+                    .source(builder.trackTotalHits(true).timeout(new TimeValue(10, TimeUnit.SECONDS))), RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            throw new TfmsSystemException("搜索引擎发生错误："+e.getMessage(), e);
+        }
     }
 
     public <T extends AbstractESDoc> boolean exists(Class<T> docType, SearchSourceBuilder builder) throws IOException {
+        try {
+            ESDocument document = docType.getAnnotation(ESDocument.class);
+            if(document==null) {
+                throw new RuntimeException(String.format("类型 %s 的 ESDocument 注解不存在",docType.getName()));
+            }
 
-        ESDocument document = docType.getAnnotation(ESDocument.class);
-        if(document==null) {
-            throw new RuntimeException(String.format("类型 %s 的 ESDocument 注解不存在",docType.getName()));
+            SearchRequest searchRequest = new SearchRequest()
+                    .indices(documentIndex(document))
+                    .source(
+                            builder
+                                    .timeout(new TimeValue(10, TimeUnit.SECONDS))
+                                    .fetchSource(false)
+                    );
+
+            return client.search(searchRequest, RequestOptions.DEFAULT).getHits().getTotalHits().value > 0;
+        } catch (IOException e) {
+            throw new TfmsSystemException("搜索引擎发生错误："+e.getMessage(), e);
         }
-
-        SearchRequest searchRequest = new SearchRequest()
-                .indices(documentIndex(document))
-                .source(
-                        builder
-                                .timeout(new TimeValue(10, TimeUnit.SECONDS))
-                                .fetchSource(false)
-                );
-
-        return client.search(searchRequest, RequestOptions.DEFAULT).getHits().getTotalHits().value > 0;
     }
 
     public void deleteBeforeCommit(Class<? extends AbstractESDoc> esType, QueryBuilder query){
-        LocalSyncUtilz.runBeforeCommit(()-> client.deleteByQuery(
-                new DeleteByQueryRequest(
-                        documentIndex(parseDocument(esType))
-                ).setQuery(query),
-                RequestOptions.DEFAULT
-        ));
+        LocalSyncUtilz.runBeforeCommit(()-> {
+            try{
+                client.deleteByQuery(
+                        new DeleteByQueryRequest(
+                                documentIndex(parseDocument(esType))
+                        ).setQuery(query),
+                        RequestOptions.DEFAULT
+                );
+            } catch (IOException e) {
+                throw new TfmsSystemException("搜索引擎发生错误："+e.getMessage(), e);
+            }
+        });
     }
 
     public void deleteBeforeCommit(Class<? extends AbstractESDoc> esType, String... id){
@@ -86,11 +100,15 @@ public class SearchEngine extends ESContentBuilder{
 
     public void deleteBeforeCommit(Class<? extends AbstractESDoc> esType, Collection<String> keys){
         LocalSyncUtilz.runBeforeCommit(()-> {
-            for(String id : keys) {
-                client.delete(
-                        new DeleteRequest(documentIndex(parseDocument(esType)), id),
-                        RequestOptions.DEFAULT
-                );
+            try{
+                for(String id : keys) {
+                    client.delete(
+                            new DeleteRequest(documentIndex(parseDocument(esType)), id),
+                            RequestOptions.DEFAULT
+                    );
+                }
+            } catch (IOException e) {
+                throw new TfmsSystemException("搜索引擎发生错误："+e.getMessage(), e);
             }
         });
     }
@@ -102,19 +120,21 @@ public class SearchEngine extends ESContentBuilder{
     public void updateBeforeCommit(Collection<AbstractESDoc> docs){
 
         LocalSyncUtilz.runBeforeCommit(()-> {
-
-
             for(AbstractESDoc doc : docs){
                 doc.validateDynamic();
             }
-            for(AbstractESDoc doc : docs){
-                client.update(
-                        new UpdateRequest(documentIndex(parseDocument(doc.getClass())), parseDocId(doc))
-                                .docAsUpsert(true)
-                                .upsert()
-                                .doc(doc.toSource()),
-                        RequestOptions.DEFAULT
-                );
+            try{
+                for(AbstractESDoc doc : docs){
+                    client.update(
+                            new UpdateRequest(documentIndex(parseDocument(doc.getClass())), parseDocId(doc))
+                                    .docAsUpsert(true)
+                                    .upsert()
+                                    .doc(doc.toSource()),
+                            RequestOptions.DEFAULT
+                    );
+                }
+            } catch (IOException e) {
+                throw new TfmsSystemException("搜索引擎发生错误："+e.getMessage(), e);
             }
         });
     }
@@ -130,41 +150,51 @@ public class SearchEngine extends ESContentBuilder{
             if(log.isInfoEnabled()){
                 log.info("重建索引开始 数量 = {}", docs.size());
             }
-
             for(AbstractESDoc doc : docs){
                 doc.validateDynamic();
             }
+            try{
+                for(AbstractESDoc doc : docs){
+                    client.index(
+                            new IndexRequest(documentIndex(parseDocument(doc.getClass())))
+                                    .id(parseDocId(doc))
+                                    .source(doc.toSource()),
+                            RequestOptions.DEFAULT);
 
-            for(AbstractESDoc doc : docs){
-                client.index(
-                        new IndexRequest(documentIndex(parseDocument(doc.getClass())))
-                                .id(parseDocId(doc))
-                                .source(doc.toSource()),
-                        RequestOptions.DEFAULT);
-
-                if(log.isInfoEnabled()) {
-                    log.info("重建索引 DOC = {}", doc);
+                    if(log.isInfoEnabled()) {
+                        log.info("重建索引 DOC = {}", doc);
+                    }
                 }
-            }
 
-            if(log.isInfoEnabled()){
-                log.info("重建索引完成 数量 = {}", docs.size());
+                if(log.isInfoEnabled()){
+                    log.info("重建索引完成 数量 = {}", docs.size());
+                }
+            } catch (IOException e) {
+                throw new TfmsSystemException("搜索引擎发生错误："+e.getMessage(), e);
             }
         });
     }
 
     private boolean existsIndices(Class<? extends AbstractESDoc> docType) throws IOException {
-        ESDocument document = parseDocument(docType);
-        return client.indices()
-                .exists(new GetIndexRequest(documentIndex(document)), RequestOptions.DEFAULT);
+        try{
+            ESDocument document = parseDocument(docType);
+            return client.indices()
+                    .exists(new GetIndexRequest(documentIndex(document)), RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            throw new TfmsSystemException("搜索引擎发生错误："+e.getMessage(), e);
+        }
     }
 
 
     void deleteIndices(Class<? extends AbstractESDoc> docType) throws IOException {
         if(existsIndices(docType)){
-            ESDocument document = parseDocument(docType);
-            client.indices()
-                    .delete(new DeleteIndexRequest(documentIndex(document)), RequestOptions.DEFAULT);
+            try{
+                ESDocument document = parseDocument(docType);
+                client.indices()
+                        .delete(new DeleteIndexRequest(documentIndex(document)), RequestOptions.DEFAULT);
+            } catch (IOException e) {
+                throw new TfmsSystemException("搜索引擎发生错误："+e.getMessage(), e);
+            }
         }
     }
 
@@ -174,12 +204,16 @@ public class SearchEngine extends ESContentBuilder{
             return;
 
         ESDocument document = parseDocument(docType);
+        try{
+            CreateIndexRequest request = new CreateIndexRequest(documentIndex(document));
 
-        CreateIndexRequest request = new CreateIndexRequest(documentIndex(document));
+            request.settings(buildNgramTokenizer());
+            request.mapping(buildMapping(docType));
 
-        request.settings(buildNgramTokenizer());
-        request.mapping(buildMapping(docType));
+            client.indices().create(request, RequestOptions.DEFAULT);
 
-        client.indices().create(request, RequestOptions.DEFAULT);
+        } catch (IOException e) {
+            throw new TfmsSystemException("搜索引擎发生错误："+e.getMessage(), e);
+        }
     }
 }
