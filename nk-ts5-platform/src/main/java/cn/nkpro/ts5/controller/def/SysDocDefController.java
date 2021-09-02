@@ -2,8 +2,6 @@ package cn.nkpro.ts5.controller.def;
 
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
-import cn.nkpro.ts5.config.security.SecurityUtilz;
-import cn.nkpro.ts5.config.security.TfmsSecurityRunner;
 import cn.nkpro.ts5.engine.doc.NkDocEngine;
 import cn.nkpro.ts5.engine.doc.model.DocDefHV;
 import cn.nkpro.ts5.engine.doc.model.DocDefIV;
@@ -11,8 +9,6 @@ import cn.nkpro.ts5.engine.doc.service.NkDocDefService;
 import cn.nkpro.ts5.orm.mb.gen.DocDefH;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -124,27 +120,19 @@ public class SysDocDefController {
         return defDocTypeService.getCardDescribe(cardHandlerName);
     }
 
-    @Autowired
-    @Qualifier("nkTaskExecutor")
-    private TaskExecutor taskExecutor;
-    @Autowired
-    private TfmsSecurityRunner securityRunner;
-
     @WsDocNote("12.随机生成单据")
     @RequestMapping(value = "/random/{docType}/{count}")
-    public void init(@PathVariable String docType, @PathVariable Integer count) {
-        String user = SecurityUtilz.getUser().getUsername();
-        for(int a=0;a<16;a++){
-            taskExecutor.execute(() -> {
-                securityRunner.runAsUser(user);
-                for(int i=0;i<count;i++){
-                    try{
-                        docEngine.doUpdate(docEngine.random(docEngine.create(docType, null)),"随机生成");
-                    }catch (Exception e){
-                        log.error(e.getMessage(),e);
-                    }
-                }
-            });
+    public int random(@PathVariable String docType, @PathVariable Integer count) {
+
+        int ret = 0;
+        for(int i=0;i<count;i++){
+            try{
+                docEngine.doUpdate(docEngine.random(docEngine.create(docType, null)),"随机生成");
+                ret ++;
+            }catch (Exception e){
+                log.error(e.getMessage(),e);
+            }
         }
+        return ret;
     }
 }

@@ -4,6 +4,7 @@ import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote;
 import cn.nkpro.ts5.engine.co.DebugContextManager;
 import cn.nkpro.ts5.engine.doc.NkDocEngine;
 import cn.nkpro.ts5.engine.spel.TfmsSpELManager;
+import cn.nkpro.ts5.test.RandomDocCreator;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -82,5 +83,13 @@ public class SysDebugController {
         Object result;
         String errorMessage;
         String[] causeStackTrace;
+    }
+
+    @Autowired
+    private RandomDocCreator randomDocCreator;
+    @WsDocNote("13.随机生成单据")
+    @RequestMapping(value = "/random")
+    public void random() {
+        randomDocCreator.random(100000000);
     }
 }

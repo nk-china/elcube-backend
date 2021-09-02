@@ -96,7 +96,7 @@ public class TextUtils {
                     case 6: return PersonInfoSource.getInstance().randomMaleIdCard(AreaSource.getInstance().randomProvince(), beginDate, endDate);
                     case 7: return PersonInfoSource.getInstance().randomFemaleIdCard(AreaSource.getInstance().randomProvince(), beginDate, endDate);
                     case 8: return AreaSource.getInstance().randomPhoneNumber(AreaSource.getInstance().randomProvince(), "-");
-                    case 9:return InternetSource.getInstance().randomAppName();
+                    case 9: return InternetSource.getInstance().randomAppName();
                     case 10:return InternetSource.getInstance().randomDomain(16);
                     case 11:return InternetSource.getInstance().randomEmail(20);
                     case 12:return OtherSource.getInstance().randomCompanyDepartment();

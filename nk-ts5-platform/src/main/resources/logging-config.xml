@@ -42,5 +42,4 @@
         <logger name="cn.nkpro" level="info"/>
     </springProfile>
 
-
 </configuration>
