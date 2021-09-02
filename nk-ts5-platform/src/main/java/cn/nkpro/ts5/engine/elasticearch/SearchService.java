@@ -134,9 +134,9 @@ public class SearchService {
                 .fieldSort(params.getString("orderField"))
                 .order(SortOrder.fromString(StringUtils.defaultIfBlank(params.getString("order"),"desc")))
             );
-        }
-        sourceBuilder.sort(SortBuilders.scoreSort());
-        if(StringUtils.isBlank(params.getString("orderField"))||!"updatedTime".equals(params.getString("orderField"))){
+            sourceBuilder.sort(SortBuilders.scoreSort());
+        }else{
+            sourceBuilder.sort(SortBuilders.scoreSort());
             sourceBuilder.sort(SortBuilders.fieldSort("updatedTime").order(SortOrder.DESC));
         }
 
