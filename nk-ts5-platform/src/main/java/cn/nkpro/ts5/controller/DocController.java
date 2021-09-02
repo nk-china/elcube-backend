@@ -9,6 +9,8 @@ import cn.nkpro.ts5.engine.doc.model.DocHV;
 import cn.nkpro.ts5.engine.doc.service.NkDocDefService;
 import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService;
 import cn.nkpro.ts5.engine.elasticearch.ESPageList;
+import cn.nkpro.ts5.engine.elasticearch.model.AbstractESDoc;
+import cn.nkpro.ts5.engine.elasticearch.model.CustomES;
 import cn.nkpro.ts5.engine.elasticearch.model.DocHES;
 import cn.nkpro.ts5.orm.mb.gen.SysLogDocRecord;
 import com.alibaba.fastjson.JSONObject;
@@ -17,6 +19,7 @@ import eu.bitwalker.useragentutils.UserAgent;
 import eu.bitwalker.useragentutils.Version;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -45,9 +48,10 @@ public class DocController {
     private NkDocHistoryService docHistoryService;
     
     @WsDocNote("1.拉取交易列表数据")
-    @RequestMapping(value = "/list",method = RequestMethod.POST)
-    public ESPageList<DocHES> list(@RequestBody JSONObject params) {
-        return searchService.queryList(DocHES.class, null, params);
+    @RequestMapping(value = "/list/{index}",method = RequestMethod.POST)
+    public ESPageList<? extends AbstractESDoc> list(@RequestBody JSONObject params, @PathVariable String index) {
+        Class<? extends AbstractESDoc> type = (StringUtils.equals(index,"custom")? CustomES.class: DocHES.class);
+        return searchService.queryList(type, null, params);
     }
 
     
