@@ -16,12 +16,12 @@ spring:
     password: VTOZ8clUpSerX6hI
     driver-class-name: com.mysql.jdbc.Driver
   redis:
-    host: 119.3.228.18
-    port: 6379
+    host: 47.99.236.56
+    port: 666
     password: 1qazxsw2
   elasticsearch:
     rest:
-      uris: ["http://119.3.228.18:9200"]
-      username: elastic
-      password: 1qazxsw2
+      uris: [ "http://47.114.120.178:9200" ]
+      username:
+      password:
 
