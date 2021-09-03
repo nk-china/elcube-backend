@@ -1,9 +1,9 @@
 package cn.nkpro.ts5.co;
 
 import cn.nkpro.ts5.NkProperties;
-import cn.nkpro.ts5.co.utils.ClassUtils;
-import cn.nkpro.ts5.co.utils.GroovyUtils;
-import cn.nkpro.ts5.co.utils.ResourceUtils;
+import cn.nkpro.ts5.utils.ClassUtils;
+import cn.nkpro.ts5.utils.GroovyUtils;
+import cn.nkpro.ts5.utils.ResourceUtils;
 import cn.nkpro.ts5.wsdoc.annotation.WsDocNote;
 import com.alibaba.fastjson.JSON;
 import lombok.Getter;

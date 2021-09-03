@@ -4,8 +4,8 @@ import cn.nkpro.ts5.Constants;
 import cn.nkpro.ts5.Keep;
 import cn.nkpro.ts5.exception.TfmsSystemException;
 import cn.nkpro.ts5.redis.RedisSupport;
-import cn.nkpro.ts5.co.utils.GroovyUtils;
-import cn.nkpro.ts5.co.utils.OsUtils;
+import cn.nkpro.ts5.utils.GroovyUtils;
+import cn.nkpro.ts5.utils.OsUtils;
 import groovy.lang.GroovyObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -195,7 +195,7 @@ public class DebugContextManager implements ApplicationContextAware {
             throw new RuntimeException("组件处理程序必须实现[ "+ NkCustomScriptObject.class.getSimpleName()+" ]");
         }
 
-        String beanName = cn.nkpro.ts5.co.utils.ClassUtils.decapitateBeanName(clazz);
+        String beanName = cn.nkpro.ts5.utils.ClassUtils.decapitateBeanName(clazz);
 
         Assert.isTrue(StringUtils.equals(beanName,scriptDef.getScriptName()),"对象名称与脚本名称必须保持一致");
 

@@ -21,7 +21,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-@Keep
 @Slf4j
 @Component
 public class TfmsSpELManager {
