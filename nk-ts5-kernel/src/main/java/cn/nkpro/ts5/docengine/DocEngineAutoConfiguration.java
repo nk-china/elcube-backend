@@ -4,7 +4,6 @@ import cn.nkpro.ts5.docengine.service.NkBpmTaskService;
 import cn.nkpro.ts5.docengine.service.SequenceSupport;
 import cn.nkpro.ts5.docengine.service.impl.DefaultBpmTaskServiceImpl;
 import cn.nkpro.ts5.docengine.service.impl.DefaultSequenceSupportImpl;
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
@@ -12,7 +11,6 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-@MapperScan(basePackages = {"cn.nkpro.ts5.docengine.gen"})
 @Configuration
 public class DocEngineAutoConfiguration implements ApplicationRunner {
 

@@ -1,7 +1,6 @@
 package cn.nkpro.ts5.co;
 
 import org.apache.commons.lang3.StringUtils;
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -14,7 +13,6 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Created by bean on 2019/12/30.
  */
-@MapperScan(basePackages = {"cn.nkpro.ts5.co.mybatis"})
 @Configuration
 public class DebugContextConfigurer implements WebMvcConfigurer {
 

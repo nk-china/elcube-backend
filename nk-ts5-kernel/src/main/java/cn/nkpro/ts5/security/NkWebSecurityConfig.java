@@ -4,7 +4,6 @@ import cn.nkpro.ts5.security.validate.NkPasswordAuthenticationProvider;
 import cn.nkpro.ts5.security.validate.NkTokenAuthenticationFilter;
 import cn.nkpro.ts5.security.validate.NkPasswordAuthenticationFilter;
 import cn.nkpro.ts5.security.validate.NkTokenAuthenticationProvider;
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -22,7 +21,6 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 /**
  * Created by bean on 2019/12/30.
  */
-@MapperScan(basePackages = {"cn.nkpro.ts5.security.mybatis"})
 @Configuration
 @EnableGlobalMethodSecurity(securedEnabled=true,prePostEnabled = true)
 public class NkWebSecurityConfig extends WebSecurityConfigurerAdapter {

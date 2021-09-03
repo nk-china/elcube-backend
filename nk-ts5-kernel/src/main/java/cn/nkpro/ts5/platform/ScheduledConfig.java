@@ -1,18 +1,15 @@
 package cn.nkpro.ts5.platform;
 
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
-import org.springframework.scheduling.support.CronTrigger;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
-@MapperScan(basePackages = {"cn.nkpro.ts5.platform.mybatis"})
 @Configuration
 public class ScheduledConfig implements SchedulingConfigurer {
 
