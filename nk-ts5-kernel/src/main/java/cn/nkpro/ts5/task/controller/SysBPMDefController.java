@@ -3,7 +3,7 @@ package cn.nkpro.ts5.task.controller;
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.task.NkBpmDefService;
 import cn.nkpro.ts5.task.model.BpmProcessDefinition;
-import cn.nkpro.ts5.wsdoc.annotation.WsDocNote;
+import cn.nkpro.ts5.annotation.NkNote;
 import cn.nkpro.ts5.task.model.BpmDeployment;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import org.apache.commons.lang3.StringUtils;
@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  * Created by bean on 2020/7/17.
  */
-@WsDocNote("36.[DevDef]工作流配置")
+@NkNote("36.[DevDef]工作流配置")
 @RestController
 @RequestMapping("/def/bpm")
 @PreAuthorize("hasAnyAuthority('*:*','DEF:*','DEF:BPM')")
@@ -28,15 +28,15 @@ public class SysBPMDefController {
     @Autowired
     private NkBpmDefService defBpmService;
 
-    @WsDocNote("1.拉取定义")
+    @NkNote("1.拉取定义")
     @RequestMapping(value = "/process/definitions")
     public PageList<BpmProcessDefinition> processDefinitions(
-            @WsDocNote("查询条目")@RequestParam(value = "latest",       required = false, defaultValue = "false") Boolean latest,
-            @WsDocNote("查询条目")@RequestParam(value = "keyword",      required = false) String key,
-            @WsDocNote("查询条目")@RequestParam(value = "orderField",   required = false) String orderField,
-            @WsDocNote("查询条目")@RequestParam(value = "order",        required = false) String order,
-            @WsDocNote("起始条目")@RequestParam("from") Integer from,
-            @WsDocNote("查询条目")@RequestParam("rows") Integer rows){
+            @NkNote("查询条目")@RequestParam(value = "latest",       required = false, defaultValue = "false") Boolean latest,
+            @NkNote("查询条目")@RequestParam(value = "keyword",      required = false) String key,
+            @NkNote("查询条目")@RequestParam(value = "orderField",   required = false) String orderField,
+            @NkNote("查询条目")@RequestParam(value = "order",        required = false) String order,
+            @NkNote("起始条目")@RequestParam("from") Integer from,
+            @NkNote("查询条目")@RequestParam("rows") Integer rows){
 
         ProcessDefinitionQuery query = processEngine.getRepositoryService()
                 .createProcessDefinitionQuery();
@@ -70,23 +70,23 @@ public class SysBPMDefController {
                 rows,
                 query.count());
     }
-    @WsDocNote("2.拉取定义详情")
+    @NkNote("2.拉取定义详情")
     @RequestMapping(value = "/process/definition/detail")
     public BpmProcessDefinition processDefinitionDetail(String definitionId){
         return defBpmService.getProcessDefinition(definitionId);
     }
 
-    @WsDocNote("3.部署流程定义")
+    @NkNote("3.部署流程定义")
     @RequestMapping(value = "/deploy",method = RequestMethod.POST)
     public BpmDeployment deploy(@RequestBody BpmProcessDefinition definition){
         return defBpmService.deploy(definition);
     }
 
-    @WsDocNote("4.拉取部署记录")
+    @NkNote("4.拉取部署记录")
     @RequestMapping(value = "/deployments")
     public PageList<BpmDeployment> deployments(
-            @WsDocNote("起始条目")@RequestParam("from") Integer from,
-            @WsDocNote("查询条目")@RequestParam("rows") Integer rows){
+            @NkNote("起始条目")@RequestParam("from") Integer from,
+            @NkNote("查询条目")@RequestParam("rows") Integer rows){
 
         DeploymentQuery query = processEngine.getRepositoryService()
                 .createDeploymentQuery();

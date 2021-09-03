@@ -1,9 +1,8 @@
 package cn.nkpro.ts5.security.bo;
 
-import cn.nkpro.ts5.security.NkGrantedAuthority;
-import cn.nkpro.ts5.security.mybatis.gen.SysAccount;
-import cn.nkpro.ts5.security.mybatis.gen.SysAuthGroup;
-import cn.nkpro.ts5.security.mybatis.gen.SysAuthPermission;
+import cn.nkpro.ts5.security.gen.SysAccount;
+import cn.nkpro.ts5.security.gen.SysAuthGroup;
+import cn.nkpro.ts5.security.gen.SysAuthPermission;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -13,7 +12,7 @@ import java.util.List;
 @Data
 public class UserGroupBO extends SysAuthGroup {
 
-    private List<NkGrantedAuthority> authorities;
+    private List<GrantedAuthority> authorities;
 
     private List<SysAuthPermission> permissions;
 

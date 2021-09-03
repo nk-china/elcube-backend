@@ -1,9 +1,9 @@
 package cn.nkpro.ts5.docengine.datasync;
 
-import cn.nkpro.ts5.Keep;
-import cn.nkpro.ts5.redis.RedisSupport;
-import cn.nkpro.ts5.LocalSyncUtilz;
-import cn.nkpro.ts5.spel.TfmsSpELManager;
+import cn.nkpro.ts5.basic.Keep;
+import cn.nkpro.ts5.data.redis.RedisSupport;
+import cn.nkpro.ts5.basic.TransactionSync;
+import cn.nkpro.ts5.spel.NkSpELManager;
 import cn.nkpro.ts5.docengine.gen.DocDefDataSync;
 import cn.nkpro.ts5.docengine.gen.NkAsyncQueue;
 import cn.nkpro.ts5.docengine.gen.NkAsyncQueueMapper;
@@ -32,7 +32,7 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
     @Autowired
     private RedisSupport<String> redisSupport;
     @Autowired
-    protected TfmsSpELManager spELManager;
+    protected NkSpELManager spELManager;
     @Autowired
     private NkAsyncQueueMapper asyncQueueMapper;
     @Autowired
@@ -79,7 +79,7 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
         queue.setUpdatedTime(queue.getCreatedTime());
         asyncQueueMapper.insert(queue);
 
-        LocalSyncUtilz.runAfterCommitLast(()->{
+        TransactionSync.runAfterCommitLast(()->{
             taskExecutor.execute(new RunInner(queue));
         });
     }

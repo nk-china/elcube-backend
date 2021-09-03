@@ -3,7 +3,7 @@ package cn.nkpro.ts5.task.impl;
 import cn.nkpro.ts5.task.NkBpmDefService;
 import cn.nkpro.ts5.task.model.BpmDeployment;
 import cn.nkpro.ts5.task.model.BpmProcessDefinition;
-import cn.nkpro.ts5.exception.TfmsDefineException;
+import cn.nkpro.ts5.exception.NkDefineException;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -34,7 +34,7 @@ public class NkBpmDefServiceImpl implements NkBpmDefService {
 
         // 判断key是否允许覆盖
         if(existsDefinition!=null && (definition.getFromId()==null || !StringUtils.equals(definition.getFromId().split(":")[0],definition.getKey()))){
-            throw new TfmsDefineException(String.format("流程定义[%s]已经存在，请从历史版本进行创建",definition.getKey()));
+            throw new NkDefineException(String.format("流程定义[%s]已经存在，请从历史版本进行创建",definition.getKey()));
         }
 
         return BeanUtilz.copyFromObject(

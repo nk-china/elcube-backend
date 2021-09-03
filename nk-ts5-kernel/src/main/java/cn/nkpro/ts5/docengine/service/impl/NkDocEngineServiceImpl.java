@@ -1,9 +1,9 @@
 package cn.nkpro.ts5.docengine.service.impl;
 
-import cn.nkpro.ts5.Constants;
+import cn.nkpro.ts5.basic.Constants;
 import cn.nkpro.ts5.basic.PageList;
-import cn.nkpro.ts5.exception.TfmsDefineException;
-import cn.nkpro.ts5.LocalSyncUtilz;
+import cn.nkpro.ts5.exception.NkDefineException;
+import cn.nkpro.ts5.basic.TransactionSync;
 import cn.nkpro.ts5.co.DebugContextManager;
 import cn.nkpro.ts5.co.NkCustomObjectManager;
 import cn.nkpro.ts5.docengine.NkDocProcessor;
@@ -12,9 +12,9 @@ import cn.nkpro.ts5.docengine.interceptor.NkDocFlowInterceptor;
 import cn.nkpro.ts5.docengine.model.*;
 import cn.nkpro.ts5.docengine.model.es.DocHES;
 import cn.nkpro.ts5.docengine.service.*;
-import cn.nkpro.ts5.elasticearch.SearchEngine;
-import cn.nkpro.ts5.mybatis.pagination.PaginationContext;
-import cn.nkpro.ts5.redis.RedisSupport;
+import cn.nkpro.ts5.data.elasticearch.SearchEngine;
+import cn.nkpro.ts5.data.mybatis.pagination.PaginationContext;
+import cn.nkpro.ts5.data.redis.RedisSupport;
 import cn.nkpro.ts5.security.SecurityUtilz;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import com.alibaba.fastjson.JSON;
@@ -412,7 +412,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
             // tips: 先删除缓存，避免事务提交成功后，缓存更新失败
             redisSupport.deleteHash(Constants.CACHE_DOC, docId);
 
-            LocalSyncUtilz.runAfterCompletion((status)-> {
+            TransactionSync.runAfterCompletion((status)-> {
 
                 try{
                     if(status == TransactionSynchronization.STATUS_COMMITTED){
@@ -438,7 +438,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
         customObjectManager.getCustomObject(docHV.getDef().getRefObjectType(), NkDocProcessor.class)
                 .doOnBpmKilled(docHV, processKey, optSource);
         // 事务提交后清空缓存
-        LocalSyncUtilz.runAfterCommit(()-> redisSupport.deleteHash(Constants.CACHE_DOC, docId));
+        TransactionSync.runAfterCommit(()-> redisSupport.deleteHash(Constants.CACHE_DOC, docId));
         NkDocEngineContext.endLog();
     }
 
@@ -488,15 +488,15 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
                 .stream()
                 .filter(item -> StringUtils.equals(item.getPreDocType(), preDocType))
                 .findFirst()
-                .orElseThrow(()->new TfmsDefineException("没有找到业务流配置"));
+                .orElseThrow(()->new NkDefineException("没有找到业务流配置"));
 
         if(!StringUtils.equalsAny(flowV.getPreDocState(),preDocState, "@")){
-            throw new TfmsDefineException("状态不满足条件");
+            throw new NkDefineException("状态不满足条件");
         }
         if(StringUtils.isNotBlank(flowV.getRefObjectType())){
             NkDocFlowInterceptor.FlowDescribe flowDescribe = applyDocFlowInterceptor(flowV.getRefObjectType(), preDoc);
             if(!flowDescribe.isVisible()){
-                throw new TfmsDefineException(flowDescribe.getVisibleDesc());
+                throw new NkDefineException(flowDescribe.getVisibleDesc());
             }
         }
         if(log.isInfoEnabled())

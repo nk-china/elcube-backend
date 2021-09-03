@@ -1,7 +1,8 @@
 package cn.nkpro.ts5.security;
 
 import cn.nkpro.ts5.security.bo.UserAccountBO;
-import cn.nkpro.ts5.security.mybatis.gen.SysAccount;
+import cn.nkpro.ts5.security.bo.UserDetails;
+import cn.nkpro.ts5.security.gen.SysAccount;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -29,5 +30,5 @@ public interface UserAccountService extends UserDetailsService {
 
     Map<String, Object> refreshToken();
 
-    TfmsUserDetails loadUserByUsernameFromCache(String username) throws UsernameNotFoundException;
+    UserDetails loadUserByUsernameFromCache(String username) throws UsernameNotFoundException;
 }

@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.platform.service;
 
 import cn.nkpro.ts5.platform.model.WebMenuBO;
-import cn.nkpro.ts5.platform.mybatis.gen.SysWebappMenu;
+import cn.nkpro.ts5.platform.gen.SysWebappMenu;
 
 import java.util.List;
 

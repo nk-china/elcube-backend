@@ -4,15 +4,13 @@
 		"http://mybatis.org/dtd/mybatis-generator-config_1_0.dtd" >
 <generatorConfiguration>
 
-
-
 	<context id="co">
 
 		<property name="javaFileEncoding" value="UTF-8"/>
 
 		<plugin type="org.beanopen.tools.mybatis.generator.MySQLPaginationPlugin2" />
 		<plugin type="org.beanopen.tools.mybatis.generator.WsDocPlugin">
-			<property name="annotationType" value="cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes" />
+			<property name="annotationType" value="cn.nkpro.ts5.annotation.CodeFieldNotes" />
 		</plugin>
 		<plugin type="org.beanopen.tools.mybatis.generator.ZJsonIgnorePropertiesPlugin" />
 		<plugin type="org.mybatis.generator.plugins.SerializablePlugin" />
@@ -26,9 +24,9 @@
 			<property name="forceBigDecimals" value="false" />
 		</javaTypeResolver>
 
-		<javaModelGenerator 	targetPackage="cn.nkpro.ts5.co.mybatis.gen" 	targetProject="src/main/java" />
-		<sqlMapGenerator 		targetPackage="cn.nkpro.ts5.co.mybatis.gen" 	targetProject="src/main/resources" />
-		<javaClientGenerator 	targetPackage="cn.nkpro.ts5.co.mybatis.gen" 	targetProject="src/main/java" type="XMLMAPPER" />
+		<javaModelGenerator 	targetPackage="cn.nkpro.ts5.co.gen" 	targetProject="src/main/java" />
+		<sqlMapGenerator 		targetPackage="cn.nkpro.ts5.co.gen" 	targetProject="src/main/resources" />
+		<javaClientGenerator 	targetPackage="cn.nkpro.ts5.co.gen" 	targetProject="src/main/java" type="XMLMAPPER" />
 
 		<!-- 2.0 -->
 		<table tableName="nk_script_def_h" enableDeleteByExample="false" domainObjectName="ScriptDefH" />
@@ -40,7 +38,7 @@
 
 		<plugin type="org.beanopen.tools.mybatis.generator.MySQLPaginationPlugin2" />
 		<plugin type="org.beanopen.tools.mybatis.generator.WsDocPlugin">
-			<property name="annotationType" value="cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes" />
+			<property name="annotationType" value="cn.nkpro.ts5.annotation.CodeFieldNotes" />
 		</plugin>
 		<plugin type="org.beanopen.tools.mybatis.generator.ZJsonIgnorePropertiesPlugin" />
 		<plugin type="org.mybatis.generator.plugins.SerializablePlugin" />
@@ -54,9 +52,9 @@
 			<property name="forceBigDecimals" value="false" />
 		</javaTypeResolver>
 
-		<javaModelGenerator 	targetPackage="cn.nkpro.ts5.security.mybatis.gen" 	targetProject="src/main/java" />
-		<sqlMapGenerator 		targetPackage="cn.nkpro.ts5.security.mybatis.gen" 	targetProject="src/main/resources" />
-		<javaClientGenerator 	targetPackage="cn.nkpro.ts5.security.mybatis.gen" 	targetProject="src/main/java" type="XMLMAPPER" />
+		<javaModelGenerator 	targetPackage="cn.nkpro.ts5.security.gen" 	targetProject="src/main/java" />
+		<sqlMapGenerator 		targetPackage="cn.nkpro.ts5.security.gen" 	targetProject="src/main/resources" />
+		<javaClientGenerator 	targetPackage="cn.nkpro.ts5.security.gen" 	targetProject="src/main/java" type="XMLMAPPER" />
 
 
 		<table tableName="sys_account"		 			 	enableDeleteByExample="false"/>
@@ -72,7 +70,7 @@
 
 		<plugin type="org.beanopen.tools.mybatis.generator.MySQLPaginationPlugin2" />
 		<plugin type="org.beanopen.tools.mybatis.generator.WsDocPlugin">
-			<property name="annotationType" value="cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes" />
+			<property name="annotationType" value="cn.nkpro.ts5.annotation.CodeFieldNotes" />
 		</plugin>
 		<plugin type="org.beanopen.tools.mybatis.generator.ZJsonIgnorePropertiesPlugin" />
 		<plugin type="org.mybatis.generator.plugins.SerializablePlugin" />
@@ -118,7 +116,7 @@
 
 		<plugin type="org.beanopen.tools.mybatis.generator.MySQLPaginationPlugin2" />
 		<plugin type="org.beanopen.tools.mybatis.generator.WsDocPlugin">
-			<property name="annotationType" value="cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes" />
+			<property name="annotationType" value="cn.nkpro.ts5.annotation.CodeFieldNotes" />
 		</plugin>
 		<plugin type="org.beanopen.tools.mybatis.generator.ZJsonIgnorePropertiesPlugin" />
 		<plugin type="org.mybatis.generator.plugins.SerializablePlugin" />
@@ -132,9 +130,9 @@
 			<property name="forceBigDecimals" value="false" />
 		</javaTypeResolver>
 
-		<javaModelGenerator 	targetPackage="cn.nkpro.ts5.platform.mybatis.gen" 	targetProject="src/main/java" />
-		<sqlMapGenerator 		targetPackage="cn.nkpro.ts5.platform.mybatis.gen" 	targetProject="src/main/resources" />
-		<javaClientGenerator 	targetPackage="cn.nkpro.ts5.platform.mybatis.gen" 	targetProject="src/main/java" type="XMLMAPPER" />
+		<javaModelGenerator  targetPackage="cn.nkpro.ts5.platform.gen" targetProject="src/main/java" />
+		<sqlMapGenerator 	 targetPackage="cn.nkpro.ts5.platform.gen" targetProject="src/main/resources" />
+		<javaClientGenerator targetPackage="cn.nkpro.ts5.platform.gen" targetProject="src/main/java" type="XMLMAPPER" />
 
 
 		<!-- 基础组件 -->

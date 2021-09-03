@@ -1,8 +1,8 @@
 package cn.nkpro.ts5.docengine.service.impl;
 
 import cn.nkpro.ts5.basic.GUID;
-import cn.nkpro.ts5.exception.TfmsDefineException;
-import cn.nkpro.ts5.LocalSyncUtilz;
+import cn.nkpro.ts5.exception.NkDefineException;
+import cn.nkpro.ts5.basic.TransactionSync;
 import cn.nkpro.ts5.co.NkCustomObjectManager;
 import cn.nkpro.ts5.docengine.NkCard;
 import cn.nkpro.ts5.docengine.NkDocCycle;
@@ -15,8 +15,8 @@ import cn.nkpro.ts5.docengine.interceptor.NkDocUpdateInterceptor;
 import cn.nkpro.ts5.docengine.model.*;
 import cn.nkpro.ts5.docengine.service.*;
 import cn.nkpro.ts5.docengine.utils.RandomUtils;
-import cn.nkpro.ts5.elasticearch.SearchEngine;
-import cn.nkpro.ts5.spel.TfmsSpELManager;
+import cn.nkpro.ts5.data.elasticearch.SearchEngine;
+import cn.nkpro.ts5.spel.NkSpELManager;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
 import com.alibaba.fastjson.JSON;
@@ -66,7 +66,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
     @Autowired@SuppressWarnings("all")
     private NkDocHistoryService docHistoryService;
     @Autowired@SuppressWarnings("all")
-    private TfmsSpELManager spELManager;
+    private NkSpELManager spELManager;
 
     @Override
     public EnumDocClassify classify() {
@@ -414,7 +414,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
 
             // 调用 卡片 updateCommitted
             if(isOverride(card)){
-                LocalSyncUtilz.runAfterCommit(()->
+                TransactionSync.runAfterCommit(()->
                         card.updateCommitted(
                                 atomic.get(),
                                 atomic.get().getData().get(defIV.getCardKey()),
@@ -492,7 +492,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
                         .stream()
                         .filter(e->!StringUtils.equals(e.getDocId(),atomic.get().getDocId()))
                         .findFirst()
-                        .ifPresent((e)->{throw new TfmsDefineException("业务主键重复");});
+                        .ifPresent((e)->{throw new NkDefineException("业务主键重复");});
             }
         }
 
@@ -557,7 +557,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         final String currLog = NkDocEngineContext.currLog();
-        LocalSyncUtilz.runAfterCommit(()->{
+        TransactionSync.runAfterCommit(()->{
             if(log.isInfoEnabled())log.info("{}保存单据内容 触发单据 afterUpdateCommitted 接口", currLog);
                 processCycle(atomic.get(), NkDocCycle.afterUpdateCommitted, (beanName)->{
                             customObjectManager

@@ -1,5 +1,7 @@
 package cn.nkpro.ts5.docengine.gen;
 
+import cn.nkpro.ts5.annotation.CodeFieldNotes;
+
 import java.io.Serializable;
 
 public class DocDefFlowKey implements Serializable {
@@ -24,7 +26,7 @@ public class DocDefFlowKey implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getDocType() {
         return docType;
     }
@@ -40,7 +42,7 @@ public class DocDefFlowKey implements Serializable {
      *
      * @mbggenerated
      */
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("前置单据状态条件")
+    @CodeFieldNotes("前置单据状态条件")
     public String getPreDocState() {
         return preDocState;
     }
@@ -56,7 +58,7 @@ public class DocDefFlowKey implements Serializable {
         this.preDocState = preDocState;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getPreDocType() {
         return preDocType;
     }
@@ -65,7 +67,7 @@ public class DocDefFlowKey implements Serializable {
         this.preDocType = preDocType;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getVersion() {
         return version;
     }

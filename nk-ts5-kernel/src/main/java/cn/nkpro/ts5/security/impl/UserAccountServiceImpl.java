@@ -1,13 +1,14 @@
 package cn.nkpro.ts5.security.impl;
 
-import cn.nkpro.ts5.Constants;
-import cn.nkpro.ts5.NkProperties;
-import cn.nkpro.ts5.redis.RedisSupport;
+import cn.nkpro.ts5.basic.Constants;
+import cn.nkpro.ts5.basic.NkProperties;
+import cn.nkpro.ts5.data.redis.RedisSupport;
 import cn.nkpro.ts5.security.*;
 import cn.nkpro.ts5.security.bo.UserAccountBO;
-import cn.nkpro.ts5.security.mybatis.gen.SysAccount;
-import cn.nkpro.ts5.security.mybatis.gen.SysAccountExample;
-import cn.nkpro.ts5.security.mybatis.gen.SysAccountMapper;
+import cn.nkpro.ts5.security.bo.UserDetails;
+import cn.nkpro.ts5.security.gen.SysAccount;
+import cn.nkpro.ts5.security.gen.SysAccountExample;
+import cn.nkpro.ts5.security.gen.SysAccountMapper;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
 import org.apache.commons.lang3.StringUtils;
@@ -172,15 +173,15 @@ public class UserAccountServiceImpl implements UserAccountService {
         return token;
     }
     @Override
-    public TfmsUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return Optional.ofNullable(getAccount(username,true))
-                .map(account-> BeanUtilz.copyFromObject(account,TfmsUserDetails.class))
+                .map(account-> BeanUtilz.copyFromObject(account, UserDetails.class))
                 .orElse(null);
     }
     @Override
-    public TfmsUserDetails loadUserByUsernameFromCache(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsernameFromCache(String username) throws UsernameNotFoundException {
         return Optional.ofNullable(getAccount(username,false))
-                .map(account->BeanUtilz.copyFromObject(account,TfmsUserDetails.class))
+                .map(account->BeanUtilz.copyFromObject(account, UserDetails.class))
                 .orElse(null);
     }
 }

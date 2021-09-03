@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.docengine.datasync.defaults;
 
-import cn.nkpro.ts5.exception.TfmsDefineException;
+import cn.nkpro.ts5.exception.NkDefineException;
 import cn.nkpro.ts5.docengine.datasync.NkAbstractDocDataDiffedSyncAdapter;
 import cn.nkpro.ts5.docengine.gen.DocDefDataSync;
 import lombok.extern.slf4j.Slf4j;
@@ -33,7 +33,7 @@ public class NkDocSQLDataSyncImpl extends NkAbstractDocDataDiffedSyncAdapter<Map
                     e.getKey().keySet().stream()
                             .filter(k-> e.getValue().containsKey(k))
                             .findAny()
-                            .ifPresent(i->{throw new TfmsDefineException(String.format("数据同步服务 %s 配置错误，KEY[ %s ]重复",def.getTargetSvr(),i));});
+                            .ifPresent(i->{throw new NkDefineException(String.format("数据同步服务 %s 配置错误，KEY[ %s ]重复",def.getTargetSvr(),i));});
 
                     String keyFields       = String.join(",", e.getKey().keySet());
                     String keyPlaceholder  = e.getKey().keySet().stream().map(i->"?").collect(Collectors.joining(","));

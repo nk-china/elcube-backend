@@ -3,7 +3,7 @@ package cn.nkpro.ts5.docengine;
 import cn.nkpro.ts5.docengine.model.BpmTaskES;
 import cn.nkpro.ts5.docengine.model.es.CustomES;
 import cn.nkpro.ts5.docengine.service.NkDocPermService;
-import cn.nkpro.ts5.elasticearch.*;
+import cn.nkpro.ts5.data.elasticearch.*;
 import cn.nkpro.ts5.docengine.model.es.DocHES;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;

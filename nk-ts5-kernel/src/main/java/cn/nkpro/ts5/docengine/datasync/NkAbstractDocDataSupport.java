@@ -3,7 +3,7 @@ package cn.nkpro.ts5.docengine.datasync;
 import cn.nkpro.ts5.co.NkAbstractCustomScriptObject;
 import cn.nkpro.ts5.docengine.gen.DocDefDataSync;
 import cn.nkpro.ts5.docengine.model.DocHV;
-import cn.nkpro.ts5.spel.TfmsSpELManager;
+import cn.nkpro.ts5.spel.NkSpELManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.expression.EvaluationContext;
@@ -14,7 +14,7 @@ import java.util.Arrays;
 public abstract class NkAbstractDocDataSupport extends NkAbstractCustomScriptObject {
 
     @Autowired
-    protected TfmsSpELManager spELManager;
+    protected NkSpELManager spELManager;
 
     public final void sync(DocHV doc, DocHV original, EvaluationContext context, EvaluationContext contextOriginal, DocDefDataSync config) {
 

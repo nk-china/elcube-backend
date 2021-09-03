@@ -1,5 +1,7 @@
 package cn.nkpro.ts5.docengine.gen;
 
+import cn.nkpro.ts5.annotation.CodeFieldNotes;
+
 import java.io.Serializable;
 
 public class DocDefIWithBLOBs extends DocDefI implements Serializable {
@@ -15,7 +17,7 @@ public class DocDefIWithBLOBs extends DocDefI implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getCardContent() {
         return cardContent;
     }
@@ -24,7 +26,7 @@ public class DocDefIWithBLOBs extends DocDefI implements Serializable {
         this.cardContent = cardContent;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getMarkdown() {
         return markdown;
     }

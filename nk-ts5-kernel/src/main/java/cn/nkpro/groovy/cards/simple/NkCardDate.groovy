@@ -3,12 +3,12 @@ package cn.nkpro.groovy.cards.simple
 import cn.nkpro.ts5.docengine.abstracts.NkAbstractCard
 import cn.nkpro.ts5.docengine.model.DocDefHV
 import cn.nkpro.ts5.docengine.model.DocHV
-import cn.nkpro.ts5.wsdoc.annotation.WsDocNote
+import cn.nkpro.ts5.annotation.NkNote
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 
-@WsDocNote("日期")
+@NkNote("日期")
 @Component("NkCardDate")
 class NkCardDate extends NkAbstractCard<Map,Map> {
 

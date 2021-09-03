@@ -1,10 +1,10 @@
 package cn.nkpro.ts5.docengine.model;
 
 import cn.nkpro.ts5.docengine.model.es.AbstractBaseES;
-import cn.nkpro.ts5.elasticearch.ESFieldType;
-import cn.nkpro.ts5.elasticearch.annotation.ESDocument;
-import cn.nkpro.ts5.elasticearch.annotation.ESField;
-import cn.nkpro.ts5.elasticearch.annotation.ESId;
+import cn.nkpro.ts5.data.elasticearch.ESFieldType;
+import cn.nkpro.ts5.data.elasticearch.annotation.ESDocument;
+import cn.nkpro.ts5.data.elasticearch.annotation.ESField;
+import cn.nkpro.ts5.data.elasticearch.annotation.ESId;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

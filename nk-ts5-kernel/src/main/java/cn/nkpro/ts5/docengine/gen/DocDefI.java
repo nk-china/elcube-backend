@@ -1,5 +1,6 @@
 package cn.nkpro.ts5.docengine.gen;
 
+import cn.nkpro.ts5.annotation.CodeFieldNotes;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
@@ -31,7 +32,7 @@ public class DocDefI extends DocDefIKey implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getBeanName() {
         return beanName;
     }
@@ -40,7 +41,7 @@ public class DocDefI extends DocDefIKey implements Serializable {
         this.beanName = beanName;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getCardName() {
         return cardName;
     }
@@ -49,7 +50,7 @@ public class DocDefI extends DocDefIKey implements Serializable {
         this.cardName = cardName;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public Integer getOrderBy() {
         return orderBy;
     }
@@ -58,7 +59,7 @@ public class DocDefI extends DocDefIKey implements Serializable {
         this.orderBy = orderBy;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public Integer getCalcOrder() {
         return calcOrder;
     }
@@ -67,7 +68,7 @@ public class DocDefI extends DocDefIKey implements Serializable {
         this.calcOrder = calcOrder;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public Integer getCalcTimes() {
         return calcTimes;
     }
@@ -76,7 +77,7 @@ public class DocDefI extends DocDefIKey implements Serializable {
         this.calcTimes = calcTimes;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getEditableSpEL() {
         return editableSpEL;
     }
@@ -85,7 +86,7 @@ public class DocDefI extends DocDefIKey implements Serializable {
         this.editableSpEL = editableSpEL;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public Integer getMarkdownFlag() {
         return markdownFlag;
     }
@@ -94,7 +95,7 @@ public class DocDefI extends DocDefIKey implements Serializable {
         this.markdownFlag = markdownFlag;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public Long getUpdatedTime() {
         return updatedTime;
     }

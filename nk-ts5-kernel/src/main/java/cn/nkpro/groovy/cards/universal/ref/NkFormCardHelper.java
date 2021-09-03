@@ -4,8 +4,8 @@ import cn.nkpro.ts5.docengine.model.DocDefIV;
 import cn.nkpro.ts5.docengine.model.DocHV;
 import cn.nkpro.ts5.docengine.service.NkDocEngineContext;
 import cn.nkpro.ts5.docengine.utils.RandomUtils;
-import cn.nkpro.ts5.exception.TfmsDefineException;
-import cn.nkpro.ts5.spel.TfmsSpELManager;
+import cn.nkpro.ts5.exception.NkDefineException;
+import cn.nkpro.ts5.spel.NkSpELManager;
 import com.alibaba.fastjson.JSON;
 import com.apifan.common.random.source.AreaSource;
 import com.apifan.common.random.source.DateTimeSource;
@@ -27,7 +27,7 @@ import java.util.*;
 public class NkFormCardHelper {
 
     @Autowired
-    private TfmsSpELManager spELManager;
+    private NkSpELManager spELManager;
 
     public Map random(List<NkCardFormDefI> items){
 
@@ -121,7 +121,7 @@ public class NkFormCardHelper {
                             try{
                                 data.put(item.getKey(),spELManager.invoke(item.getSpELContent(),context));
                             }catch(Exception e){
-                                throw new TfmsDefineException(
+                                throw new NkDefineException(
                                         String.format("KEY=%s T=%s %s",
                                                 item.getKey(),
                                                 trigger,
@@ -159,7 +159,7 @@ public class NkFormCardHelper {
                         try{
                             item.setControl((Integer) spELManager.invoke(item.getSpELControl(),context));
                         }catch(Exception e){
-                            throw new TfmsDefineException(
+                            throw new NkDefineException(
                                     String.format("KEY=%s T=CONTROL %s",
                                             item.getKey(),
                                             e.getMessage()
@@ -179,7 +179,7 @@ public class NkFormCardHelper {
                         try {
                             item.setOptionsObject(JSON.parse(spELManager.convert(item.getOptions(), context)));
                         }catch(Exception e){
-                            throw new TfmsDefineException(
+                            throw new NkDefineException(
                                     String.format("KEY=%s T=OPTIONS %s",
                                             item.getKey(),
                                             e.getMessage()

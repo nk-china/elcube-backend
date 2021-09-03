@@ -1,5 +1,6 @@
 package cn.nkpro.ts5.docengine.gen;
 
+import cn.nkpro.ts5.annotation.CodeFieldNotes;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
@@ -43,7 +44,7 @@ public class SysLogDocRecord implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getId() {
         return id;
     }
@@ -52,7 +53,7 @@ public class SysLogDocRecord implements Serializable {
         this.id = id;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getDocId() {
         return docId;
     }
@@ -61,7 +62,7 @@ public class SysLogDocRecord implements Serializable {
         this.docId = docId;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public Integer getVersion() {
         return version;
     }
@@ -70,7 +71,7 @@ public class SysLogDocRecord implements Serializable {
         this.version = version;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getStateOriginal() {
         return stateOriginal;
     }
@@ -79,7 +80,7 @@ public class SysLogDocRecord implements Serializable {
         this.stateOriginal = stateOriginal;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getStateOriginalDesc() {
         return stateOriginalDesc;
     }
@@ -88,7 +89,7 @@ public class SysLogDocRecord implements Serializable {
         this.stateOriginalDesc = stateOriginalDesc;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getState() {
         return state;
     }
@@ -97,7 +98,7 @@ public class SysLogDocRecord implements Serializable {
         this.state = state;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getStateDesc() {
         return stateDesc;
     }
@@ -106,7 +107,7 @@ public class SysLogDocRecord implements Serializable {
         this.stateDesc = stateDesc;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getCardNames() {
         return cardNames;
     }
@@ -115,7 +116,7 @@ public class SysLogDocRecord implements Serializable {
         this.cardNames = cardNames;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getUserId() {
         return userId;
     }
@@ -124,7 +125,7 @@ public class SysLogDocRecord implements Serializable {
         this.userId = userId;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getUserRealname() {
         return userRealname;
     }
@@ -133,7 +134,7 @@ public class SysLogDocRecord implements Serializable {
         this.userRealname = userRealname;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getSource() {
         return source;
     }
@@ -142,7 +143,7 @@ public class SysLogDocRecord implements Serializable {
         this.source = source;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getLogGroupId() {
         return logGroupId;
     }
@@ -151,7 +152,7 @@ public class SysLogDocRecord implements Serializable {
         this.logGroupId = logGroupId;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public Long getUpdatedTime() {
         return updatedTime;
     }
@@ -160,7 +161,7 @@ public class SysLogDocRecord implements Serializable {
         this.updatedTime = updatedTime;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getData() {
         return data;
     }

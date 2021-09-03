@@ -1,5 +1,6 @@
 package cn.nkpro.ts5.docengine.gen;
 
+import cn.nkpro.ts5.annotation.CodeFieldNotes;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
@@ -54,7 +55,7 @@ public class DocH implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getDocId() {
         return docId;
     }
@@ -63,7 +64,7 @@ public class DocH implements Serializable {
         this.docId = docId;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getClassify() {
         return classify;
     }
@@ -72,7 +73,7 @@ public class DocH implements Serializable {
         this.classify = classify;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getDefVersion() {
         return defVersion;
     }
@@ -81,7 +82,7 @@ public class DocH implements Serializable {
         this.defVersion = defVersion;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getDocType() {
         return docType;
     }
@@ -90,7 +91,7 @@ public class DocH implements Serializable {
         this.docType = docType;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getDocName() {
         return docName;
     }
@@ -99,7 +100,7 @@ public class DocH implements Serializable {
         this.docName = docName;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getDocDesc() {
         return docDesc;
     }
@@ -108,7 +109,7 @@ public class DocH implements Serializable {
         this.docDesc = docDesc;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getDocNumber() {
         return docNumber;
     }
@@ -117,7 +118,7 @@ public class DocH implements Serializable {
         this.docNumber = docNumber;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getDocState() {
         return docState;
     }
@@ -126,7 +127,7 @@ public class DocH implements Serializable {
         this.docState = docState;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getDocTags() {
         return docTags;
     }
@@ -135,7 +136,7 @@ public class DocH implements Serializable {
         this.docTags = docTags;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getPreDocId() {
         return preDocId;
     }
@@ -151,7 +152,7 @@ public class DocH implements Serializable {
      *
      * @mbggenerated
      */
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("交易伙伴ID（注意是roleID）")
+    @CodeFieldNotes("交易伙伴ID（注意是roleID）")
     public String getPartnerId() {
         return partnerId;
     }
@@ -167,7 +168,7 @@ public class DocH implements Serializable {
         this.partnerId = partnerId;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getIdentification() {
         return identification;
     }
@@ -176,7 +177,7 @@ public class DocH implements Serializable {
         this.identification = identification;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getRefObjectId() {
         return refObjectId;
     }
@@ -185,7 +186,7 @@ public class DocH implements Serializable {
         this.refObjectId = refObjectId;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getBusinessKey() {
         return businessKey;
     }
@@ -194,7 +195,7 @@ public class DocH implements Serializable {
         this.businessKey = businessKey;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getProcessInstanceId() {
         return processInstanceId;
     }
@@ -203,7 +204,7 @@ public class DocH implements Serializable {
         this.processInstanceId = processInstanceId;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public Long getCreatedTime() {
         return createdTime;
     }
@@ -212,7 +213,7 @@ public class DocH implements Serializable {
         this.createdTime = createdTime;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public Long getUpdatedTime() {
         return updatedTime;
     }

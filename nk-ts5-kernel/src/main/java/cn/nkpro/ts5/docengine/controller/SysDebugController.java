@@ -4,8 +4,8 @@ import cn.nkpro.ts5.co.DebugContextManager;
 import cn.nkpro.ts5.docengine.NkDocEngine;
 import cn.nkpro.ts5.docengine.RandomDocCreator;
 import cn.nkpro.ts5.security.SecurityUtilz;
-import cn.nkpro.ts5.spel.TfmsSpELManager;
-import cn.nkpro.ts5.wsdoc.annotation.WsDocNote;
+import cn.nkpro.ts5.spel.NkSpELManager;
+import cn.nkpro.ts5.annotation.NkNote;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * Created by bean on 2020/7/17.
  */
-@WsDocNote("31.[DevDef]调试工具")
+@NkNote("31.[DevDef]调试工具")
 @RestController
 @RequestMapping("/debug")
 public class SysDebugController {
@@ -31,35 +31,35 @@ public class SysDebugController {
     @Autowired
     private DebugContextManager debugSupport;
     @Autowired
-    private TfmsSpELManager spELManager;
+    private NkSpELManager spELManager;
     @Autowired
     private NkDocEngine docEngine;
 
-    @WsDocNote("1.获取正在调试的上下文列表")
+    @NkNote("1.获取正在调试的上下文列表")
     @RequestMapping("/contexts")
     public Collection<DebugContextManager.ContextDescribe> list(){
         return debugSupport.getDebugContextList();
     }
 
-    @WsDocNote("2.停止一个调试")
+    @NkNote("2.停止一个调试")
     @RequestMapping("/stop/{debugId}")
     public void stop(@PathVariable String debugId){
         debugSupport.removeContext(debugId);
     }
 
-    @WsDocNote("3.创建一个调试")
+    @NkNote("3.创建一个调试")
     @RequestMapping("/start")
     public String start(@RequestParam String desc){
         return debugSupport.createContext(desc, SecurityUtilz.getUser().getUsername());
     }
 
-    @WsDocNote("4.获取调试中的资源")
+    @NkNote("4.获取调试中的资源")
     @RequestMapping("/resources")
     public List<Object> resources(){
         return debugSupport.getDebugResources("@","#");
     }
 
-    @WsDocNote("5.调试SpEL")
+    @NkNote("5.调试SpEL")
     @RequestMapping("/spel/test")
     public R spELTest(
             @RequestParam String el,
@@ -88,7 +88,7 @@ public class SysDebugController {
 
     @Autowired
     private RandomDocCreator randomDocCreator;
-    @WsDocNote("13.随机生成单据")
+    @NkNote("13.随机生成单据")
     @RequestMapping(value = "/random")
     public void random() {
         randomDocCreator.random(100000000);

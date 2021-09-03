@@ -5,12 +5,12 @@ import cn.nkpro.ts5.docengine.abstracts.NkAbstractCard
 import cn.nkpro.ts5.docengine.model.DocDefHV
 import cn.nkpro.ts5.docengine.model.DocDefIV
 import cn.nkpro.ts5.docengine.model.DocHV
-import cn.nkpro.ts5.wsdoc.annotation.WsDocNote
+import cn.nkpro.ts5.annotation.NkNote
 import com.alibaba.fastjson.JSON
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
-@WsDocNote("测试")
+@NkNote("测试")
 @Component("NkCardSimple")
 class NkCardSimple extends NkAbstractCard<NkCardSimpleData,NkCardSimpleDef> {
 

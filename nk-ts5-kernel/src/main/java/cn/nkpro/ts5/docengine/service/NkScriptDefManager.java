@@ -3,8 +3,8 @@ package cn.nkpro.ts5.docengine.service;
 
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.co.ScriptDefHV;
-import cn.nkpro.ts5.co.mybatis.gen.ScriptDefH;
-import cn.nkpro.ts5.co.mybatis.gen.ScriptDefHWithBLOBs;
+import cn.nkpro.ts5.co.gen.ScriptDefH;
+import cn.nkpro.ts5.co.gen.ScriptDefHWithBLOBs;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.transaction.annotation.Transactional;

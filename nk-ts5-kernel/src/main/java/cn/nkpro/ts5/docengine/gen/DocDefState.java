@@ -1,5 +1,6 @@
 package cn.nkpro.ts5.docengine.gen;
 
+import cn.nkpro.ts5.annotation.CodeFieldNotes;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
@@ -46,7 +47,7 @@ public class DocDefState extends DocDefStateKey implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getDocStateDesc() {
         return docStateDesc;
     }
@@ -55,7 +56,7 @@ public class DocDefState extends DocDefStateKey implements Serializable {
         this.docStateDesc = docStateDesc;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getSysState() {
         return sysState;
     }
@@ -71,7 +72,7 @@ public class DocDefState extends DocDefStateKey implements Serializable {
      *
      * @mbggenerated
      */
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("业务逻辑处理类")
+    @CodeFieldNotes("业务逻辑处理类")
     public String getRefObjectType() {
         return refObjectType;
     }
@@ -94,7 +95,7 @@ public class DocDefState extends DocDefStateKey implements Serializable {
      *
      * @mbggenerated
      */
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("0 不可编辑，1 可编辑，2 流程中可编辑")
+    @CodeFieldNotes("0 不可编辑，1 可编辑，2 流程中可编辑")
     public Integer getEditPerm() {
         return editPerm;
     }
@@ -110,7 +111,7 @@ public class DocDefState extends DocDefStateKey implements Serializable {
         this.editPerm = editPerm;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public Integer getDisplayPrimary() {
         return displayPrimary;
     }
@@ -119,7 +120,7 @@ public class DocDefState extends DocDefStateKey implements Serializable {
         this.displayPrimary = displayPrimary;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public Long getUpdatedTime() {
         return updatedTime;
     }
@@ -135,7 +136,7 @@ public class DocDefState extends DocDefStateKey implements Serializable {
      *
      * @mbggenerated
      */
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("ACTIVATE, CANCEL")
+    @CodeFieldNotes("ACTIVATE, CANCEL")
     public String getAction() {
         return action;
     }
@@ -151,7 +152,7 @@ public class DocDefState extends DocDefStateKey implements Serializable {
         this.action = action;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public Integer getOrderBy() {
         return orderBy;
     }

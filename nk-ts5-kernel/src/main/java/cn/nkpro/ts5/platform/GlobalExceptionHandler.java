@@ -1,9 +1,9 @@
 package cn.nkpro.ts5.platform;
 
 
-import cn.nkpro.ts5.docengine.TfmsComponentException;
-import cn.nkpro.ts5.exception.TfmsAccessDeniedException;
-import cn.nkpro.ts5.exception.TfmsDefineException;
+import cn.nkpro.ts5.docengine.NkComponentException;
+import cn.nkpro.ts5.exception.NkAccessDeniedException;
+import cn.nkpro.ts5.exception.NkDefineException;
 import cn.nkpro.ts5.exception.abstracts.NkCaution;
 import cn.nkpro.ts5.exception.abstracts.NkRuntimeException;
 import lombok.extern.slf4j.Slf4j;
@@ -37,11 +37,11 @@ public class GlobalExceptionHandler {
         codes.put(AuthenticationException.class,401);
 
         // 没有权限，拒绝访问
-        codes.put(TfmsAccessDeniedException.class,403);
+        codes.put(NkAccessDeniedException.class,403);
 
         // 系统错误
-        codes.put(TfmsComponentException.class,501);
-        codes.put(TfmsDefineException.class,501);
+        codes.put(NkComponentException.class,501);
+        codes.put(NkDefineException.class,501);
         codes.put(NkRuntimeException.class,501);
     }
 

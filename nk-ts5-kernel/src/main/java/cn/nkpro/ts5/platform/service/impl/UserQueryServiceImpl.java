@@ -1,11 +1,11 @@
 package cn.nkpro.ts5.platform.service.impl;
 
 import cn.nkpro.ts5.basic.GUID;
-import cn.nkpro.ts5.platform.mybatis.gen.SysUserSavedQuery;
-import cn.nkpro.ts5.platform.mybatis.gen.SysUserSavedQueryExample;
-import cn.nkpro.ts5.platform.mybatis.gen.SysUserSavedQueryMapper;
+import cn.nkpro.ts5.platform.gen.SysUserSavedQuery;
+import cn.nkpro.ts5.platform.gen.SysUserSavedQueryExample;
+import cn.nkpro.ts5.platform.gen.SysUserSavedQueryMapper;
 import cn.nkpro.ts5.security.SecurityUtilz;
-import cn.nkpro.ts5.security.TfmsUserDetails;
+import cn.nkpro.ts5.security.bo.UserDetails;
 import cn.nkpro.ts5.platform.service.UserQueryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,7 +26,7 @@ public class UserQueryServiceImpl implements UserQueryService {
 
     @Override
     public List<SysUserSavedQuery> getList(String source){
-        TfmsUserDetails user = SecurityUtilz.getUser();
+        UserDetails user = SecurityUtilz.getUser();
         SysUserSavedQueryExample example = new SysUserSavedQueryExample();
         example.createCriteria().andSourceEqualTo(source)
                 .andUserIdEqualTo(user.getId());
@@ -36,7 +36,7 @@ public class UserQueryServiceImpl implements UserQueryService {
 
     @Override
     public void create(SysUserSavedQuery query){
-        TfmsUserDetails user = SecurityUtilz.getUser();
+        UserDetails user = SecurityUtilz.getUser();
         query.setId(guid.nextId(SysUserSavedQuery.class));
         query.setUserId(user.getId());
         queryMapper.insertSelective(query);

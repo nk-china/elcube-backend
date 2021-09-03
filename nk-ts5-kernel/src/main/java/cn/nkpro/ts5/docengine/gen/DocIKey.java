@@ -1,5 +1,7 @@
 package cn.nkpro.ts5.docengine.gen;
 
+import cn.nkpro.ts5.annotation.CodeFieldNotes;
+
 import java.io.Serializable;
 
 public class DocIKey implements Serializable {
@@ -15,7 +17,7 @@ public class DocIKey implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getCardKey() {
         return cardKey;
     }
@@ -24,7 +26,7 @@ public class DocIKey implements Serializable {
         this.cardKey = cardKey;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getDocId() {
         return docId;
     }

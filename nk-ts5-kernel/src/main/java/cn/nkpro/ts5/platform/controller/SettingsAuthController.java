@@ -2,11 +2,11 @@ package cn.nkpro.ts5.platform.controller;
 
 import cn.nkpro.ts5.security.UserAuthorizationService;
 import cn.nkpro.ts5.security.bo.UserGroupBO;
-import cn.nkpro.ts5.security.mybatis.gen.SysAccount;
-import cn.nkpro.ts5.security.mybatis.gen.SysAuthGroup;
-import cn.nkpro.ts5.security.mybatis.gen.SysAuthLimit;
-import cn.nkpro.ts5.security.mybatis.gen.SysAuthPermission;
-import cn.nkpro.ts5.wsdoc.annotation.WsDocNote;
+import cn.nkpro.ts5.security.gen.SysAccount;
+import cn.nkpro.ts5.security.gen.SysAuthGroup;
+import cn.nkpro.ts5.security.gen.SysAuthLimit;
+import cn.nkpro.ts5.security.gen.SysAuthPermission;
+import cn.nkpro.ts5.annotation.NkNote;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-@WsDocNote("12.权限设置")
+@NkNote("12.权限设置")
 @RestController
 @RequestMapping("/settings/auth")
 @PreAuthorize("hasAnyAuthority('*:*','SETTINGS:*','SETTINGS:AUTH')")

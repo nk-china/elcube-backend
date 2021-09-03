@@ -5,8 +5,8 @@ import cn.nkpro.ts5.co.NkCustomObjectManager;
 import cn.nkpro.ts5.co.NkCustomScriptObject;
 import cn.nkpro.ts5.co.ScriptDefHV;
 import cn.nkpro.ts5.docengine.NkCard;
-import cn.nkpro.ts5.exception.TfmsSystemException;
-import cn.nkpro.ts5.wsdoc.annotation.WsDocNote;
+import cn.nkpro.ts5.exception.NkSystemException;
+import cn.nkpro.ts5.annotation.NkNote;
 import groovy.lang.GroovyObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -23,7 +23,7 @@ import java.util.Map;
 /**
  * Created by bean on 2020/1/15.
  */
-@WsDocNote("35.[DevDef]脚本资源")
+@NkNote("35.[DevDef]脚本资源")
 @RestController
 @RequestMapping("/def/resources")
 public class SysScriptResController {
@@ -31,7 +31,7 @@ public class SysScriptResController {
     @Autowired@SuppressWarnings("all")
     private NkCustomObjectManager customObjectManager;
 
-    @WsDocNote("1.获取卡片信息")
+    @NkNote("1.获取卡片信息")
     @RequestMapping("/vue")
     public Map<Object, Object> vueTemplates() {
 
@@ -42,7 +42,7 @@ public class SysScriptResController {
         return vueMap;
     }
 
-    @WsDocNote("5.获取脚本的Groovy类名")
+    @NkNote("5.获取脚本的Groovy类名")
     @RequestMapping("/bean/{beanName}")
     public BeanDescribe className(@PathVariable("beanName") String beanName){
 
@@ -84,7 +84,7 @@ public class SysScriptResController {
             try {
                 bean = ((Advised)bean).getTargetSource().getTarget();
             } catch (Exception e) {
-                throw new TfmsSystemException(e.getMessage(),e);
+                throw new NkSystemException(e.getMessage(),e);
             }
         }
         return bean;

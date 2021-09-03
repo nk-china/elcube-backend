@@ -1,5 +1,7 @@
 package cn.nkpro.ts5.docengine.gen;
 
+import cn.nkpro.ts5.annotation.CodeFieldNotes;
+
 import java.io.Serializable;
 
 public class DocDefIndexCustomKey implements Serializable {
@@ -17,7 +19,7 @@ public class DocDefIndexCustomKey implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getCustomType() {
         return customType;
     }
@@ -26,7 +28,7 @@ public class DocDefIndexCustomKey implements Serializable {
         this.customType = customType;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getDocType() {
         return docType;
     }
@@ -35,7 +37,7 @@ public class DocDefIndexCustomKey implements Serializable {
         this.docType = docType;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getVersion() {
         return version;
     }

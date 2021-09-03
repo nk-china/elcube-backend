@@ -3,7 +3,7 @@ package cn.nkpro.ts5.docengine.datasync.defaults;
 import cn.nkpro.ts5.docengine.datasync.NkAbstractDocDataDiffedSyncAdapter;
 import cn.nkpro.ts5.docengine.gen.DocDefDataSync;
 import cn.nkpro.ts5.docengine.model.es.CustomES;
-import cn.nkpro.ts5.elasticearch.SearchEngine;
+import cn.nkpro.ts5.data.elasticearch.SearchEngine;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;

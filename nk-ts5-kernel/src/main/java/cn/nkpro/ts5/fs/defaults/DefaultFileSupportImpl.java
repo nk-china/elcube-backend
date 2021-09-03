@@ -2,7 +2,7 @@ package cn.nkpro.ts5.fs.defaults;
 
 import cn.nkpro.ts5.fs.FSConfig;
 import cn.nkpro.ts5.fs.FileUploadStatus;
-import cn.nkpro.ts5.NkProperties;
+import cn.nkpro.ts5.basic.NkProperties;
 import cn.nkpro.ts5.fs.FSSupport;
 import cn.nkpro.ts5.security.UserAccountService;
 import org.springframework.beans.factory.annotation.Autowired;

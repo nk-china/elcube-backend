@@ -1,14 +1,14 @@
 package cn.nkpro.ts5.security.impl;
 
-import cn.nkpro.ts5.Constants;
+import cn.nkpro.ts5.basic.Constants;
 import cn.nkpro.ts5.basic.GUID;
-import cn.nkpro.ts5.redis.RedisSupport;
-import cn.nkpro.ts5.security.NkGrantedAuthority;
+import cn.nkpro.ts5.data.redis.RedisSupport;
 import cn.nkpro.ts5.security.UserAuthorizationService;
 import cn.nkpro.ts5.security.UserBusinessAdapter;
+import cn.nkpro.ts5.security.bo.GrantedAuthority;
 import cn.nkpro.ts5.security.bo.UserGroupBO;
-import cn.nkpro.ts5.security.mybatis.gen.*;
-import cn.nkpro.ts5.spel.TfmsSpELManager;
+import cn.nkpro.ts5.security.gen.*;
+import cn.nkpro.ts5.spel.NkSpELManager;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
@@ -44,7 +44,7 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
     @Autowired@SuppressWarnings("all")
     private RedisSupport<SysAuthLimit> redisSupportLimit;
     @Autowired@SuppressWarnings("all")
-    private TfmsSpELManager spELManager;
+    private NkSpELManager spELManager;
     @Autowired
     private UserBusinessAdapter userBusinessAdapter;
 
@@ -55,12 +55,12 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
      * @return List<NkGrantedAuthority>
      */
     @Override
-    public List<NkGrantedAuthority> buildGrantedPerms(String accountId, String partnerId){
+    public List<GrantedAuthority> buildGrantedPerms(String accountId, String partnerId){
 
         Object user = userBusinessAdapter.getUser(accountId);
 
         // 构造权限列表
-        List<NkGrantedAuthority> permList = new ArrayList<>();
+        List<GrantedAuthority> permList = new ArrayList<>();
 
         SysAuthGroupRefExample authGroupRefExample = new SysAuthGroupRefExample();
         authGroupRefExample.createCriteria()
@@ -149,7 +149,7 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
                     g.setPermissions(authPermissionMapper.selectByExampleWithBLOBs(authPermissionExample));
 
                     // 创建Group下的授权模型
-                    List<NkGrantedAuthority> authoritys = new ArrayList<>();
+                    List<GrantedAuthority> authoritys = new ArrayList<>();
                     g.getPermissions()
                         .forEach(permission -> {
                             if(StringUtils.startsWith(permission.getPermResource(),Constants.BIZ_DEFAULT_EMPTY)
@@ -187,8 +187,8 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
      * @param group group
      * @return NkGrantedAuthority
      */
-    private NkGrantedAuthority buildAuthority(String resource, SysAuthPermission perm, SysAuthGroup group){
-        NkGrantedAuthority authority = new NkGrantedAuthority();
+    private GrantedAuthority buildAuthority(String resource, SysAuthPermission perm, SysAuthGroup group){
+        GrantedAuthority authority = new GrantedAuthority();
         authority.setPermResource(resource);
         authority.setPermOperate(perm.getPermOperate());
         authority.setSubResource(perm.getSubResource());

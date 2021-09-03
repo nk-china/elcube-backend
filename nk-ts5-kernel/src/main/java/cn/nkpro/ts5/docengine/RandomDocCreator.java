@@ -4,7 +4,7 @@ import cn.nkpro.ts5.docengine.gen.DocHMapper;
 import cn.nkpro.ts5.docengine.gen.DocH;
 import cn.nkpro.ts5.docengine.model.es.CustomES;
 import cn.nkpro.ts5.docengine.utils.RandomUtils;
-import cn.nkpro.ts5.elasticearch.SearchEngine;
+import cn.nkpro.ts5.data.elasticearch.SearchEngine;
 import com.apifan.common.random.constant.CompetitionType;
 import com.apifan.common.random.constant.CreditCardType;
 import com.apifan.common.random.source.*;

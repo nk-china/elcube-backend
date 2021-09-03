@@ -311,9 +311,8 @@
                         <option>-keepnames class cn.nkpro.ts5.**.gen.** { *; }</option>
                         <option>-keepnames class cn.nkpro.ts5.**.bo.** { *; }</option>
                         <option>-keepnames class cn.nkpro.ts5.**.model.** { *; }</option>
-                        <option>-keepnames class cn.nkpro.ts5.security.NkGrantedAuthority { *; }</option>
-                        <option>-keepnames class cn.nkpro.ts5.mybatis.pagination.dialect.** { public *; }</option>
-                        <option>-keepnames @cn.nkpro.ts5.Keep class cn.nkpro.ts5.** { *; }</option> <!-- @Keep注解 -->
+                        <option>-keepnames class cn.nkpro.ts5.config.mybatis.pagination.dialect.** { public *; }</option>
+                        <option>-keepnames @cn.nkpro.ts5.basic.Keep class cn.nkpro.ts5.** { *; }</option> <!-- @Keep注解 -->
                         <option>-keep @org.springframework.stereotype.Controller class cn.nkpro.ts5.** { *; }</option>
                         <option>-keep @org.springframework.web.bind.annotation.RestController class cn.nkpro.ts5.** { *; }</option>
 

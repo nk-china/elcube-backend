@@ -4,7 +4,7 @@ import cn.nkpro.ts5.fs.FileUploadStatus;
 import cn.nkpro.ts5.fs.properties.HuaweiProperties;
 import cn.nkpro.ts5.fs.FSConfig;
 import cn.nkpro.ts5.fs.FSSupport;
-import cn.nkpro.ts5.NkProperties;
+import cn.nkpro.ts5.basic.NkProperties;
 import com.obs.services.ObsClient;
 import com.obs.services.ObsConfiguration;
 import com.obs.services.model.*;

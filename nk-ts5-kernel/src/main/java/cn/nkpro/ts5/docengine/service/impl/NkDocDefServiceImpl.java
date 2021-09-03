@@ -1,15 +1,15 @@
 package cn.nkpro.ts5.docengine.service.impl;
 
-import cn.nkpro.ts5.Constants;
+import cn.nkpro.ts5.basic.Constants;
 import cn.nkpro.ts5.basic.PageList;
-import cn.nkpro.ts5.exception.TfmsDefineException;
-import cn.nkpro.ts5.LocalSyncUtilz;
+import cn.nkpro.ts5.exception.NkDefineException;
+import cn.nkpro.ts5.basic.TransactionSync;
 import cn.nkpro.ts5.co.DebugContextManager;
 import cn.nkpro.ts5.co.NkCustomObject;
 import cn.nkpro.ts5.co.NkCustomObjectManager;
 import cn.nkpro.ts5.docengine.NkCard;
 import cn.nkpro.ts5.docengine.NkDocProcessor;
-import cn.nkpro.ts5.docengine.TfmsComponentException;
+import cn.nkpro.ts5.docengine.NkComponentException;
 import cn.nkpro.ts5.docengine.datasync.NkDocDataAdapter;
 import cn.nkpro.ts5.docengine.gen.*;
 import cn.nkpro.ts5.docengine.interceptor.*;
@@ -19,8 +19,8 @@ import cn.nkpro.ts5.docengine.model.DocDefIV;
 import cn.nkpro.ts5.docengine.model.DocDefStateV;
 import cn.nkpro.ts5.docengine.service.NkDocDefService;
 import cn.nkpro.ts5.docengine.service.NkDocEngineContext;
-import cn.nkpro.ts5.mybatis.pagination.PaginationContext;
-import cn.nkpro.ts5.redis.RedisSupport;
+import cn.nkpro.ts5.data.mybatis.pagination.PaginationContext;
+import cn.nkpro.ts5.data.redis.RedisSupport;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
 import com.alibaba.fastjson.JSONObject;
@@ -446,7 +446,7 @@ public class NkDocDefServiceImpl implements NkDocDefService {
 
         // 一旦单据激活，更新缓存中的业务流
         DocDefHV def = docDefHV;
-        LocalSyncUtilz.runBeforeCommit(()->
+        TransactionSync.runBeforeCommit(()->
             redisSupportFlows.set(Constants.CACHE_DEF_DOC_FLOWS, def.getDocType(), def.getFlows())
         );
 
@@ -742,13 +742,13 @@ public class NkDocDefServiceImpl implements NkDocDefService {
             // 找到对应的组件实现类
             NkCard nkCard = customObjectManager.getCustomObjectIfExists(docDefI.getBeanName(), NkCard.class);
             if(nkCard==null && !ignoreError){
-                throw new TfmsDefineException(String.format("自定义对象[%s]不存在",docDefI.getBeanName()));
+                throw new NkDefineException(String.format("自定义对象[%s]不存在",docDefI.getBeanName()));
             }
             try {
                 function.run(nkCard, docDefI);
             }catch (Exception e){
                 if(!ignoreError){
-                    throw new TfmsComponentException(nkCard,e);
+                    throw new NkComponentException(nkCard,e);
                 }
             }
         }

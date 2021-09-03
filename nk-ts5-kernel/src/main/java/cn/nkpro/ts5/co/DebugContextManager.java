@@ -1,9 +1,9 @@
 package cn.nkpro.ts5.co;
 
-import cn.nkpro.ts5.Constants;
-import cn.nkpro.ts5.Keep;
-import cn.nkpro.ts5.exception.TfmsSystemException;
-import cn.nkpro.ts5.redis.RedisSupport;
+import cn.nkpro.ts5.basic.Constants;
+import cn.nkpro.ts5.basic.Keep;
+import cn.nkpro.ts5.exception.NkSystemException;
+import cn.nkpro.ts5.data.redis.RedisSupport;
 import cn.nkpro.ts5.utils.GroovyUtils;
 import cn.nkpro.ts5.utils.OsUtils;
 import groovy.lang.GroovyObject;
@@ -100,12 +100,12 @@ public class DebugContextManager implements ApplicationContextAware {
 
         // 如果上下文不存在 抛出错误
         if(debugContext==null){
-            throw new TfmsSystemException("当前调试上下文不存在");
+            throw new NkSystemException("当前调试上下文不存在");
         }
 
         // 如果上下文的mac地址不一致 抛出错误
         if(!StringUtils.equals(OsUtils.getMacAddress(),debugContext.getMac())){
-            throw new TfmsSystemException("当前调试上下文与运行环境不一致");
+            throw new NkSystemException("当前调试上下文与运行环境不一致");
         }
 
         // 检查Spring Application 是否已经启动，如果没有，则启动，并初始化debug对象
@@ -149,7 +149,7 @@ public class DebugContextManager implements ApplicationContextAware {
 
         ApplicationContext debugApplicationContext = Optional.ofNullable(localDebugId.get())
                 .map(debugApplications::get)
-                .orElseThrow(()->new TfmsSystemException("没有找到调试上下文"));
+                .orElseThrow(()->new NkSystemException("没有找到调试上下文"));
 
         if(resource instanceof ScriptDefHV){
             ((ScriptDefHV) resource).setDebug(true);
@@ -157,7 +157,7 @@ public class DebugContextManager implements ApplicationContextAware {
         }else if(resource instanceof DebugAble){
             ((DebugAble) resource).setDebug(true);
         }else{
-            throw new TfmsSystemException(resource.getClass().getName() + " 不支持调试");
+            throw new NkSystemException(resource.getClass().getName() + " 不支持调试");
         }
 
         redisForResoure.set(String.format("DEBUG:%s", localDebugId.get()), key, resource);

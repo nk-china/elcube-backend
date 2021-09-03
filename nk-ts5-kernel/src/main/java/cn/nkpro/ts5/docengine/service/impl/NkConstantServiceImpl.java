@@ -1,11 +1,11 @@
 package cn.nkpro.ts5.docengine.service.impl;
 
-import cn.nkpro.ts5.Constants;
+import cn.nkpro.ts5.basic.Constants;
 import cn.nkpro.ts5.docengine.service.NkConstantService;
 import cn.nkpro.ts5.docengine.gen.ConstantDef;
 import cn.nkpro.ts5.docengine.gen.ConstantDefExample;
 import cn.nkpro.ts5.docengine.gen.ConstantDefMapper;
-import cn.nkpro.ts5.redis.RedisSupport;
+import cn.nkpro.ts5.data.redis.RedisSupport;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

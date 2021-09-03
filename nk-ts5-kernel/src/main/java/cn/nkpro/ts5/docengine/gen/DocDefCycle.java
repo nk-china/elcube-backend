@@ -1,5 +1,6 @@
 package cn.nkpro.ts5.docengine.gen;
 
+import cn.nkpro.ts5.annotation.CodeFieldNotes;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
@@ -21,7 +22,7 @@ public class DocDefCycle extends DocDefCycleKey implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getDocCycle() {
         return docCycle;
     }
@@ -30,7 +31,7 @@ public class DocDefCycle extends DocDefCycleKey implements Serializable {
         this.docCycle = docCycle;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getRefObjectType() {
         return refObjectType;
     }
@@ -39,7 +40,7 @@ public class DocDefCycle extends DocDefCycleKey implements Serializable {
         this.refObjectType = refObjectType;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public Long getUpdatedTime() {
         return updatedTime;
     }

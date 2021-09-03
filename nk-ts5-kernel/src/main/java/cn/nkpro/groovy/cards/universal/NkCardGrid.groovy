@@ -6,14 +6,14 @@ import cn.nkpro.groovy.cards.universal.ref.NkFormCardHelper
 import cn.nkpro.ts5.docengine.abstracts.NkAbstractCard
 import cn.nkpro.ts5.docengine.model.DocDefIV
 import cn.nkpro.ts5.docengine.model.DocHV
-import cn.nkpro.ts5.wsdoc.annotation.WsDocNote
+import cn.nkpro.ts5.annotation.NkNote
 import com.apifan.common.random.source.NumberSource
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
-@WsDocNote("基础表格")
+@NkNote("基础表格")
 @Component("NkCardGrid")
 class NkCardGrid extends NkAbstractCard<List<Map<String,Object>>,NkCardGridDef> {
 

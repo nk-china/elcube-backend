@@ -1,11 +1,11 @@
 package cn.nkpro.ts5.platform.controller;
 
 import cn.nkpro.ts5.security.SecurityUtilz;
-import cn.nkpro.ts5.security.TfmsUserDetails;
+import cn.nkpro.ts5.security.bo.UserDetails;
 import cn.nkpro.ts5.security.UserAccountService;
 import cn.nkpro.ts5.security.UserAuthorizationService;
-import cn.nkpro.ts5.security.mybatis.gen.SysAuthLimit;
-import cn.nkpro.ts5.wsdoc.annotation.WsDocNote;
+import cn.nkpro.ts5.security.gen.SysAuthLimit;
+import cn.nkpro.ts5.annotation.NkNote;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -21,7 +21,7 @@ import java.util.Map;
  */
 
 @PreAuthorize("authenticated")
-@WsDocNote("2.用户验证服务")
+@NkNote("2.用户验证服务")
 @RestController
 @RequestMapping("/authentication")
 public class UserAuthController {
@@ -34,33 +34,33 @@ public class UserAuthController {
     private UserAuthorizationService permService;
 
     @PreAuthorize("hasAnyAuthority('*:*','SYS:LOGIN')")
-    @WsDocNote("1.获取token登陆")
+    @NkNote("1.获取token登陆")
     @RequestMapping("/token")
     public Map<String,Object> token(){
         return tfmsSysAccountService.createToken();
     }
 
-    @WsDocNote("2.刷新token")
+    @NkNote("2.刷新token")
     @RequestMapping("/refresh_token")
     public Map<String, Object> refreshToken(){
         return tfmsSysAccountService.refreshToken();
     }
 
-    @WsDocNote("3.清除token并退出")
+    @NkNote("3.清除token并退出")
     @RequestMapping("/clear")
     public void clear(){
         tfmsSysAccountService.clear();
     }
 
-    @WsDocNote("4.获取用户信息")
+    @NkNote("4.获取用户信息")
     @RequestMapping("/info")
-    public TfmsUserDetails info(){
-        TfmsUserDetails user = SecurityUtilz.getUser();
+    public UserDetails info(){
+        UserDetails user = SecurityUtilz.getUser();
         user.setPassword(null);
         return user;
     }
 
-    @WsDocNote("5.获取用户授权限制")
+    @NkNote("5.获取用户授权限制")
     @RequestMapping("/info/limits")
     public List<SysAuthLimit> limits(@RequestBody String[] limitIds){
         if(ArrayUtils.isEmpty(limitIds)){
@@ -69,7 +69,7 @@ public class UserAuthController {
         return permService.getLimits(limitIds);
     }
 
-    @WsDocNote("6.修改密码")
+    @NkNote("6.修改密码")
     @RequestMapping("/change_password")
     public void changePassword(@RequestParam("oldPassword") String oldPassword, @RequestParam("newPassword")String newPassword){
         tfmsSysAccountService.doChangePassword(SecurityUtilz.getUser().getId(),oldPassword,newPassword);

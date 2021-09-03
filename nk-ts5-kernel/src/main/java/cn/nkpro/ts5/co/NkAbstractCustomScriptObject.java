@@ -1,10 +1,10 @@
 package cn.nkpro.ts5.co;
 
-import cn.nkpro.ts5.NkProperties;
+import cn.nkpro.ts5.basic.NkProperties;
 import cn.nkpro.ts5.utils.ClassUtils;
 import cn.nkpro.ts5.utils.GroovyUtils;
 import cn.nkpro.ts5.utils.ResourceUtils;
-import cn.nkpro.ts5.wsdoc.annotation.WsDocNote;
+import cn.nkpro.ts5.annotation.NkNote;
 import com.alibaba.fastjson.JSON;
 import lombok.Getter;
 import lombok.Setter;
@@ -78,7 +78,7 @@ public abstract class NkAbstractCustomScriptObject implements NkCustomScriptObje
 
             scriptDefH.setScriptType(interfaces.contains(NkScriptCard.class) ? "Card" : "Service");
 
-            WsDocNote annotation = groovy.getAnnotation(WsDocNote.class);
+            NkNote annotation = groovy.getAnnotation(NkNote.class);
             scriptDefH.setScriptDesc(annotation != null ? annotation.value() : beanName);
             return scriptDefH;
         }

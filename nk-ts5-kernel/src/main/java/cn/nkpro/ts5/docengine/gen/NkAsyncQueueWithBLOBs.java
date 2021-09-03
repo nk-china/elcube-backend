@@ -1,5 +1,7 @@
 package cn.nkpro.ts5.docengine.gen;
 
+import cn.nkpro.ts5.annotation.CodeFieldNotes;
+
 import java.io.Serializable;
 
 public class NkAsyncQueueWithBLOBs extends NkAsyncQueue implements Serializable {
@@ -15,7 +17,7 @@ public class NkAsyncQueueWithBLOBs extends NkAsyncQueue implements Serializable 
      */
     private static final long serialVersionUID = 1L;
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getAsyncJson() {
         return asyncJson;
     }
@@ -24,7 +26,7 @@ public class NkAsyncQueueWithBLOBs extends NkAsyncQueue implements Serializable 
         this.asyncJson = asyncJson;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getAsyncCauseStackTrace() {
         return asyncCauseStackTrace;
     }

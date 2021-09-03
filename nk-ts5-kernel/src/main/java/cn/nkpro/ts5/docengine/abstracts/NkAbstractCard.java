@@ -2,10 +2,10 @@ package cn.nkpro.ts5.docengine.abstracts;
 
 import cn.nkpro.ts5.docengine.model.DocDefHV;
 import cn.nkpro.ts5.docengine.model.DocHV;
-import cn.nkpro.ts5.exception.TfmsDefineException;
-import cn.nkpro.ts5.exception.TfmsSystemException;
-import cn.nkpro.ts5.wsdoc.annotation.WsDocNote;
-import cn.nkpro.ts5.NkProperties;
+import cn.nkpro.ts5.exception.NkDefineException;
+import cn.nkpro.ts5.exception.NkSystemException;
+import cn.nkpro.ts5.annotation.NkNote;
+import cn.nkpro.ts5.basic.NkProperties;
 import cn.nkpro.ts5.co.NkAbstractCustomScriptObject;
 import cn.nkpro.ts5.docengine.NkCard;
 import cn.nkpro.ts5.docengine.model.DocDefIV;
@@ -40,8 +40,8 @@ public abstract class NkAbstractCard<DT,DDT> extends NkAbstractCustomScriptObjec
 
     public NkAbstractCard(){
         super();
-        this.cardName = Optional.ofNullable(getClass().getAnnotation(WsDocNote.class))
-                .map(WsDocNote::value)
+        this.cardName = Optional.ofNullable(getClass().getAnnotation(NkNote.class))
+                .map(NkNote::value)
                 .orElse(beanName);
     }
 
@@ -200,7 +200,7 @@ public abstract class NkAbstractCard<DT,DDT> extends NkAbstractCustomScriptObjec
                 }else if(targetType instanceof Class){
                     clazz = (Class)targetType;
                 }else{
-                    throw TfmsSystemException.of("未知的参数类型："+targetType);
+                    throw NkSystemException.of("未知的参数类型："+targetType);
                 }
 
                 if(clazz.isInterface()){
@@ -210,12 +210,12 @@ public abstract class NkAbstractCard<DT,DDT> extends NkAbstractCustomScriptObjec
                     if(Map.class.isAssignableFrom(clazz)){
                         return new HashMap<>();
                     }
-                    throw new TfmsDefineException("卡片数据类型不支持 "+clazz.getName());
+                    throw new NkDefineException("卡片数据类型不支持 "+clazz.getName());
                 }else{
                     try {
                         return ((Class)targetType).getConstructor().newInstance();
                     } catch (Exception e) {
-                        throw new TfmsDefineException("卡片数据类型必须声明空构造方法 "+e.getMessage(),e);
+                        throw new NkDefineException("卡片数据类型必须声明空构造方法 "+e.getMessage(),e);
                     }
                 }
 
@@ -231,7 +231,7 @@ public abstract class NkAbstractCard<DT,DDT> extends NkAbstractCustomScriptObjec
                 return JSON.parseObject(JSON.toJSONString(obj),targetType);
             }
         }
-        throw new TfmsDefineException("不能解析卡片对象["+getClass()+"]的数据类型");
+        throw new NkDefineException("不能解析卡片对象["+getClass()+"]的数据类型");
     }
 
     private final static Map<Class,Type[]> cache = new ConcurrentHashMap<>();

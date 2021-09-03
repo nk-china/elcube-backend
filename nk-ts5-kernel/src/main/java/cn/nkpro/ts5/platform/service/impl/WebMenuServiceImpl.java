@@ -1,14 +1,14 @@
 package cn.nkpro.ts5.platform.service.impl;
 
-import cn.nkpro.ts5.Constants;
+import cn.nkpro.ts5.basic.Constants;
 import cn.nkpro.ts5.platform.model.WebMenuBO;
-import cn.nkpro.ts5.platform.mybatis.gen.SysWebappMenuExample;
-import cn.nkpro.ts5.platform.mybatis.gen.SysWebappMenuMapper;
-import cn.nkpro.ts5.redis.RedisSupport;
+import cn.nkpro.ts5.platform.gen.SysWebappMenuExample;
+import cn.nkpro.ts5.platform.gen.SysWebappMenuMapper;
+import cn.nkpro.ts5.data.redis.RedisSupport;
 import cn.nkpro.ts5.security.SecurityUtilz;
 import cn.nkpro.ts5.platform.TfmsDefDeployAble;
 import cn.nkpro.ts5.platform.service.WebMenuService;
-import cn.nkpro.ts5.platform.mybatis.gen.SysWebappMenu;
+import cn.nkpro.ts5.platform.gen.SysWebappMenu;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
 import com.alibaba.fastjson.JSONArray;

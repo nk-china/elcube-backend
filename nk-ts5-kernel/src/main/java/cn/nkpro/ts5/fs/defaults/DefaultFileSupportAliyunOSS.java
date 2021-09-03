@@ -4,7 +4,7 @@ import cn.nkpro.ts5.fs.FSConfig;
 import cn.nkpro.ts5.fs.FileUploadStatus;
 import cn.nkpro.ts5.fs.properties.AliyunProperties;
 import cn.nkpro.ts5.fs.FSSupport;
-import cn.nkpro.ts5.NkProperties;
+import cn.nkpro.ts5.basic.NkProperties;
 import com.aliyun.oss.HttpMethod;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;

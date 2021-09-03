@@ -2,9 +2,9 @@ package cn.nkpro.ts5.task.impl;
 
 import cn.nkpro.ts5.docengine.model.DocHV;
 import cn.nkpro.ts5.docengine.service.NkDocEngineFrontService;
-import cn.nkpro.ts5.exception.TfmsDefineException;
+import cn.nkpro.ts5.exception.NkDefineException;
 import cn.nkpro.ts5.docengine.model.BpmTaskTransition;
-import cn.nkpro.ts5.elasticearch.SearchEngine;
+import cn.nkpro.ts5.data.elasticearch.SearchEngine;
 import cn.nkpro.ts5.docengine.model.BpmTaskES;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import org.apache.commons.lang3.StringUtils;
@@ -92,7 +92,7 @@ public abstract class AbstractNkBpmSupport {
                 //如果是会签节点，那么 activityId 格式为： activityId#multiInstanceBody
                 .filter(activity -> StringUtils.equals(activity.getId().split("#")[0],taskDefinitionKey))
                 .findFirst()
-                .orElseThrow(()->new TfmsDefineException("没有找到流程任务定义"));
+                .orElseThrow(()->new NkDefineException("没有找到流程任务定义"));
 
         return pvmActivity.getOutgoingTransitions()
                 .stream()

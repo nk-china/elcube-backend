@@ -1,5 +1,6 @@
 package cn.nkpro.ts5.docengine.gen;
 
+import cn.nkpro.ts5.annotation.CodeFieldNotes;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
@@ -71,7 +72,7 @@ public class DocDefH extends DocDefHKey implements Serializable {
      *
      * @mbggenerated
      */
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("暂时不启用")
+    @CodeFieldNotes("暂时不启用")
     public Integer getVersionHead() {
         return versionHead;
     }
@@ -87,7 +88,7 @@ public class DocDefH extends DocDefHKey implements Serializable {
         this.versionHead = versionHead;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getDocClassify() {
         return docClassify;
     }
@@ -103,7 +104,7 @@ public class DocDefH extends DocDefHKey implements Serializable {
      *
      * @mbggenerated
      */
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("单据名称")
+    @CodeFieldNotes("单据名称")
     public String getDocName() {
         return docName;
     }
@@ -119,7 +120,7 @@ public class DocDefH extends DocDefHKey implements Serializable {
         this.docName = docName;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getRefObjectType() {
         return refObjectType;
     }
@@ -128,7 +129,7 @@ public class DocDefH extends DocDefHKey implements Serializable {
         this.refObjectType = refObjectType;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getBusinessKeySpEL() {
         return businessKeySpEL;
     }
@@ -137,7 +138,7 @@ public class DocDefH extends DocDefHKey implements Serializable {
         this.businessKeySpEL = businessKeySpEL;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public Integer getDocEntrance() {
         return docEntrance;
     }
@@ -153,7 +154,7 @@ public class DocDefH extends DocDefHKey implements Serializable {
      *
      * @mbggenerated
      */
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("暂时不启用")
+    @CodeFieldNotes("暂时不启用")
     public String getValidFrom() {
         return validFrom;
     }
@@ -176,7 +177,7 @@ public class DocDefH extends DocDefHKey implements Serializable {
      *
      * @mbggenerated
      */
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("暂时不启用")
+    @CodeFieldNotes("暂时不启用")
     public String getValidTo() {
         return validTo;
     }
@@ -192,7 +193,7 @@ public class DocDefH extends DocDefHKey implements Serializable {
         this.validTo = validTo;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getState() {
         return state;
     }
@@ -201,7 +202,7 @@ public class DocDefH extends DocDefHKey implements Serializable {
         this.state = state;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public Integer getMarkdownFlag() {
         return markdownFlag;
     }
@@ -217,7 +218,7 @@ public class DocDefH extends DocDefHKey implements Serializable {
      *
      * @mbggenerated
      */
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("最后修改时间秒数")
+    @CodeFieldNotes("最后修改时间秒数")
     public Long getUpdatedTime() {
         return updatedTime;
     }
@@ -233,7 +234,7 @@ public class DocDefH extends DocDefHKey implements Serializable {
         this.updatedTime = updatedTime;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getMarkdown() {
         return markdown;
     }

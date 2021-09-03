@@ -1,9 +1,9 @@
 package cn.nkpro.ts5.docengine.model.es;
 
-import cn.nkpro.ts5.elasticearch.ESAnalyzerType;
-import cn.nkpro.ts5.elasticearch.ESFieldType;
-import cn.nkpro.ts5.elasticearch.annotation.ESField;
-import cn.nkpro.ts5.elasticearch.AbstractESModel;
+import cn.nkpro.ts5.data.elasticearch.ESAnalyzerType;
+import cn.nkpro.ts5.data.elasticearch.ESFieldType;
+import cn.nkpro.ts5.data.elasticearch.annotation.ESField;
+import cn.nkpro.ts5.data.elasticearch.AbstractESModel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

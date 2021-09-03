@@ -1,14 +1,14 @@
 package cn.nkpro.ts5.docengine.service.impl;
 
 import cn.nkpro.ts5.docengine.service.NkDocPermService;
-import cn.nkpro.ts5.exception.TfmsSystemException;
+import cn.nkpro.ts5.exception.NkSystemException;
 import cn.nkpro.ts5.docengine.model.DocDefHV;
 import cn.nkpro.ts5.docengine.model.DocDefIV;
 import cn.nkpro.ts5.docengine.model.DocHV;
 import cn.nkpro.ts5.docengine.model.es.DocHES;
-import cn.nkpro.ts5.elasticearch.SearchEngine;
-import cn.nkpro.ts5.exception.TfmsAccessDeniedException;
-import cn.nkpro.ts5.security.NkGrantedAuthority;
+import cn.nkpro.ts5.data.elasticearch.SearchEngine;
+import cn.nkpro.ts5.exception.NkAccessDeniedException;
+import cn.nkpro.ts5.security.bo.GrantedAuthority;
 import cn.nkpro.ts5.security.SecurityUtilz;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
@@ -83,7 +83,7 @@ public class NkDocPermServiceImpl implements NkDocPermService {
     @Override
     public void assertHasDocPerm(String mode, String docType){
         if(!hasDocPerm(mode,docType)){
-            throw new TfmsAccessDeniedException(String.format("没有单据类型[%s]-[%s]访问权限",docType, mode));
+            throw new NkAccessDeniedException(String.format("没有单据类型[%s]-[%s]访问权限",docType, mode));
         }
     }
 
@@ -103,15 +103,15 @@ public class NkDocPermServiceImpl implements NkDocPermService {
      * @param mode 操作
      * @param docId 单据ID
      * @param docType 允许为空，查询所有
-     * @throws TfmsAccessDeniedException 访问被拒绝
+     * @throws NkAccessDeniedException 访问被拒绝
      */
     @Override
     public void assertHasDocPerm(String mode, String docId, String docType){
         if(!hasDocPerm(mode,docId,docType)){
             if(docType!=null)
-                throw new TfmsAccessDeniedException(String.format("没有单据[%s:%s]-[%s]的访问权限", docType, docId, mode));
+                throw new NkAccessDeniedException(String.format("没有单据[%s:%s]-[%s]的访问权限", docType, docId, mode));
             else
-                throw new TfmsAccessDeniedException(String.format("没有单据[%s]-[%s]的访问权限", docId, mode));
+                throw new NkAccessDeniedException(String.format("没有单据[%s]-[%s]的访问权限", docId, mode));
         }
     }
     /**
@@ -140,7 +140,7 @@ public class NkDocPermServiceImpl implements NkDocPermService {
             if(log.isInfoEnabled())log.info("* 检测到 权限 = {}, filter = {}",has, filter);
             return has;
         } catch (IOException e) {
-            throw new TfmsSystemException(e);
+            throw new NkSystemException(e);
         }
     }
 
@@ -155,7 +155,7 @@ public class NkDocPermServiceImpl implements NkDocPermService {
     @Override
     public BoolQueryBuilder buildDocFilter(String mode, String docType, String typeKey, boolean ignoreLimit){
         // 处理权限
-        List<NkGrantedAuthority> authorities = getDocAuthorities(mode, docType);
+        List<GrantedAuthority> authorities = getDocAuthorities(mode, docType);
 
         BoolQueryBuilder filter = QueryBuilders.boolQuery();
 
@@ -165,7 +165,7 @@ public class NkDocPermServiceImpl implements NkDocPermService {
         }
 
         // 这里优化了下，把相同limit的单据类型条件合并
-        Map<String, NkGrantedAuthority> distinct = new HashMap<>();
+        Map<String, GrantedAuthority> distinct = new HashMap<>();
         authorities.forEach(authority -> distinct.putIfAbsent(authority.getDocType(),authority));
 
         Map<String,List<String>> collectByLimit = new HashMap<>();
@@ -197,7 +197,7 @@ public class NkDocPermServiceImpl implements NkDocPermService {
      * @param docType 单据类型
      * @return 授权模型对象集合
      */
-    private List<NkGrantedAuthority> getDocAuthorities(String mode, String docType){
+    private List<GrantedAuthority> getDocAuthorities(String mode, String docType){
         return SecurityUtilz.getUser().getAuthorities()
                 .stream()
                 .filter(authority->

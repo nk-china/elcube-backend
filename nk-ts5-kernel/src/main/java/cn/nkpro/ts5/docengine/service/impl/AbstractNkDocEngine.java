@@ -3,7 +3,7 @@ package cn.nkpro.ts5.docengine.service.impl;
 import cn.nkpro.ts5.co.NkCustomObjectManager;
 import cn.nkpro.ts5.docengine.datasync.NkDocDataAdapter;
 import cn.nkpro.ts5.docengine.model.DocHV;
-import cn.nkpro.ts5.spel.TfmsSpELManager;
+import cn.nkpro.ts5.spel.NkSpELManager;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.expression.EvaluationContext;
@@ -11,7 +11,7 @@ import org.springframework.expression.EvaluationContext;
 class AbstractNkDocEngine {
 
     @Autowired
-    private TfmsSpELManager spELManager;
+    private NkSpELManager spELManager;
     @Autowired
     private NkCustomObjectManager customObjectManager;
 

@@ -5,13 +5,13 @@ import cn.nkpro.groovy.cards.universal.ref.NkFormCardHelper
 import cn.nkpro.ts5.docengine.abstracts.NkAbstractCard
 import cn.nkpro.ts5.docengine.model.DocDefIV
 import cn.nkpro.ts5.docengine.model.DocHV
-import cn.nkpro.ts5.wsdoc.annotation.WsDocNote
+import cn.nkpro.ts5.annotation.NkNote
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 @SuppressWarnings("unused")
-@WsDocNote("基础表单")
+@NkNote("基础表单")
 @Component("NkCardForm")
 class NkCardForm extends NkAbstractCard<Map,NkCardFormDef> {
 

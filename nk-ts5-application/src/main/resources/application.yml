@@ -99,7 +99,7 @@ logging:
 
 mybatis:
   config-location: classpath:/mybatis-configuration.xml
-  dialect: cn.nkpro.ts5.mybatis.pagination.dialect.MySQLDialect
+  dialect: cn.nkpro.ts5.config.mybatis.pagination.dialect.MySQLDialect
 
 camunda:
   bpm:

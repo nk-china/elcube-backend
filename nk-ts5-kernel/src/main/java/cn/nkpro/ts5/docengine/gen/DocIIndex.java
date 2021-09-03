@@ -1,5 +1,6 @@
 package cn.nkpro.ts5.docengine.gen;
 
+import cn.nkpro.ts5.annotation.CodeFieldNotes;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
@@ -23,7 +24,7 @@ public class DocIIndex extends DocIIndexKey implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getValue() {
         return value;
     }
@@ -32,7 +33,7 @@ public class DocIIndex extends DocIIndexKey implements Serializable {
         this.value = value;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public String getDataType() {
         return dataType;
     }
@@ -41,7 +42,7 @@ public class DocIIndex extends DocIIndexKey implements Serializable {
         this.dataType = dataType;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public Integer getOrderBy() {
         return orderBy;
     }
@@ -50,7 +51,7 @@ public class DocIIndex extends DocIIndexKey implements Serializable {
         this.orderBy = orderBy;
     }
 
-    @cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes("")
+    @CodeFieldNotes("")
     public Long getUpdatedTime() {
         return updatedTime;
     }

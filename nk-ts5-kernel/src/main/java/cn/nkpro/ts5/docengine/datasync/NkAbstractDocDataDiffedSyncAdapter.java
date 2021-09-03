@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.docengine.datasync;
 
 import cn.nkpro.ts5.docengine.gen.DocDefDataSync;
-import cn.nkpro.ts5.spel.TfmsSpELManager;
+import cn.nkpro.ts5.spel.NkSpELManager;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 public abstract class NkAbstractDocDataDiffedSyncAdapter<K> extends NkAbstractDocDataSupport implements NkDocDataSyncAdapter<K> {
 
     @Autowired
-    protected TfmsSpELManager spELManager;
+    protected NkSpELManager spELManager;
 
     protected void doSync(Object dataUnmapping, Object dataOriginalUnmapping, EvaluationContext context1, EvaluationContext context2, DocDefDataSync def){
         if(dataUnmapping instanceof List || dataOriginalUnmapping instanceof List){

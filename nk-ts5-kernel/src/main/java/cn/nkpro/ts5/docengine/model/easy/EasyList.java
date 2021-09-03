@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.docengine.model.easy;
 
-import cn.nkpro.ts5.exception.TfmsOperateNotAllowedCaution;
+import cn.nkpro.ts5.exception.NkOperateNotAllowedCaution;
 
 import java.util.Collection;
 import java.util.Map;
@@ -51,12 +51,12 @@ public class EasyList implements EasyCollection<EasySingle> {
 
     @Override
     public boolean add(EasySingle e) {
-        throw new TfmsOperateNotAllowedCaution("不支持的操作");
+        throw new NkOperateNotAllowedCaution("不支持的操作");
     }
 
     @Override
     public boolean addAll(Collection<? extends EasySingle> c) {
-        throw new TfmsOperateNotAllowedCaution("不支持的操作");
+        throw new NkOperateNotAllowedCaution("不支持的操作");
     }
 
     @Override
@@ -70,7 +70,7 @@ public class EasyList implements EasyCollection<EasySingle> {
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        throw new TfmsOperateNotAllowedCaution("不支持的操作");
+        throw new NkOperateNotAllowedCaution("不支持的操作");
     }
 
     @Override
@@ -111,7 +111,7 @@ public class EasyList implements EasyCollection<EasySingle> {
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        throw new TfmsOperateNotAllowedCaution("不支持的操作");
+        throw new NkOperateNotAllowedCaution("不支持的操作");
     }
 
     @Override

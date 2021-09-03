@@ -1,11 +1,11 @@
 package cn.nkpro.groovy.cards.header
 
+import cn.nkpro.ts5.annotation.NkNote
 import cn.nkpro.ts5.docengine.abstracts.NkAbstractCard
-import cn.nkpro.ts5.wsdoc.annotation.WsDocNote
 import org.springframework.stereotype.Component
 
 
-@WsDocNote("交易抬头")
+@NkNote("交易抬头")
 @Component("NkCardHeaderDefault")
 class NkCardHeaderDefault extends NkAbstractCard<Map,Map> {
 

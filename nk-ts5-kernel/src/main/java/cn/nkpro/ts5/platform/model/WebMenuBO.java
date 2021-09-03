@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.platform.model;
 
-import cn.nkpro.ts5.platform.mybatis.gen.SysWebappMenu;
+import cn.nkpro.ts5.platform.gen.SysWebappMenu;
 import lombok.Getter;
 import lombok.Setter;
 

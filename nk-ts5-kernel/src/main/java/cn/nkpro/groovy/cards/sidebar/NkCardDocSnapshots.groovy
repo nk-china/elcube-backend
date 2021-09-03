@@ -5,11 +5,11 @@ import cn.nkpro.ts5.docengine.gen.SysLogDocRecord
 import cn.nkpro.ts5.docengine.model.DocDefIV
 import cn.nkpro.ts5.docengine.model.DocHV
 import cn.nkpro.ts5.docengine.service.NkDocHistoryService
-import cn.nkpro.ts5.wsdoc.annotation.WsDocNote
+import cn.nkpro.ts5.annotation.NkNote
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
-@WsDocNote("变更历史")
+@NkNote("变更历史")
 @Component("NkCardDocSnapshots")
 class NkCardDocSnapshots extends NkAbstractCard<List<SysLogDocRecord>,Map> {
 

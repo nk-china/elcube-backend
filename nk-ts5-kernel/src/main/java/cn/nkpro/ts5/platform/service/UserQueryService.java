@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.platform.service;
 
-import cn.nkpro.ts5.platform.mybatis.gen.SysUserSavedQuery;
+import cn.nkpro.ts5.platform.gen.SysUserSavedQuery;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;

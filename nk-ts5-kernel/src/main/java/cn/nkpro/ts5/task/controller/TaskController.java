@@ -2,8 +2,8 @@ package cn.nkpro.ts5.task.controller;
 
 import cn.nkpro.ts5.docengine.model.BpmTaskES;
 import cn.nkpro.ts5.docengine.SearchService;
-import cn.nkpro.ts5.elasticearch.ESPageList;
-import cn.nkpro.ts5.wsdoc.annotation.WsDocNote;
+import cn.nkpro.ts5.data.elasticearch.ESPageList;
+import cn.nkpro.ts5.annotation.NkNote;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 /**
  * Created by bean on 2020/7/21.
  */
-@WsDocNote("4.工作流")
+@NkNote("4.工作流")
 @RestController
 @RequestMapping("/task")
 public class TaskController {
@@ -24,7 +24,7 @@ public class TaskController {
     @Autowired
     private SearchService searchService;
 
-    @WsDocNote("1、拉取交易列表数据")
+    @NkNote("1、拉取交易列表数据")
     @RequestMapping(value = "/tasks",method = RequestMethod.POST)
     public ESPageList<BpmTaskES> list(@RequestBody JSONObject params) {
 

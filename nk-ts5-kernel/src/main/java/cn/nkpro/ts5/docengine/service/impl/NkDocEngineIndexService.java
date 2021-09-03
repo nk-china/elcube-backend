@@ -6,7 +6,7 @@ import cn.nkpro.ts5.docengine.gen.DocH;
 import cn.nkpro.ts5.docengine.model.DocHV;
 import cn.nkpro.ts5.docengine.service.NkBpmTaskManager;
 import cn.nkpro.ts5.docengine.service.NkDocEngineFrontService;
-import cn.nkpro.ts5.redis.RedisSupport;
+import cn.nkpro.ts5.data.redis.RedisSupport;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;

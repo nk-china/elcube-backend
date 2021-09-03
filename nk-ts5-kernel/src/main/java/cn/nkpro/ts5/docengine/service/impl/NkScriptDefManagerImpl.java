@@ -1,13 +1,13 @@
 package cn.nkpro.ts5.docengine.service.impl;
 
-import cn.nkpro.ts5.Constants;
+import cn.nkpro.ts5.basic.Constants;
 import cn.nkpro.ts5.basic.PageList;
-import cn.nkpro.ts5.exception.TfmsDefineException;
+import cn.nkpro.ts5.co.gen.*;
+import cn.nkpro.ts5.exception.NkDefineException;
 import cn.nkpro.ts5.co.*;
-import cn.nkpro.ts5.co.mybatis.gen.*;
 import cn.nkpro.ts5.docengine.service.NkScriptDefManager;
-import cn.nkpro.ts5.mybatis.pagination.PaginationContext;
-import cn.nkpro.ts5.redis.RedisSupport;
+import cn.nkpro.ts5.data.mybatis.pagination.PaginationContext;
+import cn.nkpro.ts5.data.redis.RedisSupport;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
 import lombok.SneakyThrows;
@@ -117,7 +117,7 @@ public class NkScriptDefManagerImpl implements NkScriptDefManager {
 
         return Optional
                 .ofNullable(scriptDefHMapper.selectByPrimaryKey(key))
-                .orElseThrow(()->new TfmsDefineException("配置没有找到"));
+                .orElseThrow(()->new NkDefineException("配置没有找到"));
     }
 
     @Override

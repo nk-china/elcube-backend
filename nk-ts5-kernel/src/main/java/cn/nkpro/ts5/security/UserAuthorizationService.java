@@ -1,10 +1,11 @@
 package cn.nkpro.ts5.security;
 
 import cn.nkpro.ts5.security.bo.UserGroupBO;
-import cn.nkpro.ts5.security.mybatis.gen.SysAccount;
-import cn.nkpro.ts5.security.mybatis.gen.SysAuthGroup;
-import cn.nkpro.ts5.security.mybatis.gen.SysAuthLimit;
-import cn.nkpro.ts5.security.mybatis.gen.SysAuthPermission;
+import cn.nkpro.ts5.security.bo.GrantedAuthority;
+import cn.nkpro.ts5.security.gen.SysAccount;
+import cn.nkpro.ts5.security.gen.SysAuthGroup;
+import cn.nkpro.ts5.security.gen.SysAuthLimit;
+import cn.nkpro.ts5.security.gen.SysAuthPermission;
 
 import java.util.List;
 
@@ -16,7 +17,7 @@ public interface UserAuthorizationService {
     Integer GROUP_TO_PERM = 1;
 
 
-    List<NkGrantedAuthority> buildGrantedPerms(String accountId, String partnerId);
+    List<GrantedAuthority> buildGrantedPerms(String accountId, String partnerId);
 
     List<SysAuthLimit> getLimits(String[] limitIds);
 
