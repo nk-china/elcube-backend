@@ -1,6 +1,5 @@
 package cn.nkpro.ts5;
 
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -14,8 +13,8 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableScheduling
 @EnableTransactionManagement
 @SpringBootApplication(scanBasePackages = {"cn.nkpro.ts5"})
-public class TS5PlatformApplication {
+public class TS5Application {
     public static void main(String[] args) {
-        SpringApplication.run(TS5PlatformApplication.class, args);
+        SpringApplication.run(TS5Application.class, args);
     }
 }
