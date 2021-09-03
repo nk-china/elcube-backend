@@ -39,7 +39,7 @@ spring:
   application:
     name: nk-ts5-beebattle-dev
   profiles:
-    active: default
+    active: dev
   aop:
     proxy-target-class: false
   servlet:
