@@ -9,7 +9,7 @@ import java.util.Date;
 /**
  * Created by bean on 2020/7/9.
  */
-public class DateTimeUtilz {
+public interface DateTimeUtilz {
 
     public static String todayShortString(){
         return new SimpleDateFormat("yyyyMMdd").format(new Date());

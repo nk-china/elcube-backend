@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-public class TextUtils {
+public interface TextUtils {
 
     public static String compress(String str) {
         if (str == null || str.length() == 0) {

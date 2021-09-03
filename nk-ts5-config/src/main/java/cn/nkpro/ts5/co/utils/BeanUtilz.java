@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 /**
  * Created by bean on 2020/1/3.
  */
-public class BeanUtilz {
+public interface BeanUtilz {
 
     public static <T> T cloneWithFastjson(Object source){
         if(source==null)return null;

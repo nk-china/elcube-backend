@@ -1,5 +1,6 @@
 package cn.nkpro.ts5.spel;
 
+import cn.nkpro.ts5.Keep;
 import cn.nkpro.ts5.co.NkCustomObjectManager;
 import cn.nkpro.ts5.exception.TfmsDefineException;
 import com.alibaba.fastjson.JSON;
@@ -20,6 +21,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+@Keep
 @Slf4j
 @Component
 public class TfmsSpELManager {

@@ -1,6 +1,7 @@
 package cn.nkpro.ts5.co;
 
 import cn.nkpro.ts5.Constants;
+import cn.nkpro.ts5.Keep;
 import cn.nkpro.ts5.exception.TfmsSystemException;
 import cn.nkpro.ts5.redis.RedisSupport;
 import cn.nkpro.ts5.co.utils.GroovyUtils;
@@ -22,6 +23,7 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -270,7 +272,8 @@ public class DebugContextManager implements ApplicationContextAware {
     @NoArgsConstructor
     @AllArgsConstructor
     @Data
-    public static class ContextDescribe {
+    @Keep
+    public static class ContextDescribe implements Serializable {
         private String id;
         private String mac;
         private String createUser;
