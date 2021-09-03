@@ -20,6 +20,13 @@
     <modules>
         <module>nk-ts5-platform</module>
         <module>nk-ts5-starter</module>
+        <module>nk-ts5-kernel</module>
+        <module>nk-ts5-data</module>
+        <module>nk-ts5-config</module>
+        <module>nk-ts5-security</module>
+        <module>nk-ts5-task</module>
+        <module>nk-ts5-docengine</module>
+        <module>nk-ts5-application</module>
     </modules>
 
 
@@ -88,8 +95,6 @@
         </dependency>
 
 
-
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-devtools</artifactId>
@@ -113,6 +118,36 @@
             <version>4.12</version>
         </dependency>
     </dependencies>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.elasticsearch</groupId>
+                <artifactId>elasticsearch</artifactId>
+                <version>7.7.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.elasticsearch.client</groupId>
+                <artifactId>elasticsearch-rest-client</artifactId>
+                <version>7.7.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.elasticsearch.client</groupId>
+                <artifactId>elasticsearch-rest-high-level-client</artifactId>
+                <version>7.7.1</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.elasticsearch</groupId>
+                        <artifactId>elasticsearch</artifactId>
+                    </exclusion>
+                    <exclusion>
+                        <groupId>org.elasticsearch.client</groupId>
+                        <artifactId>elasticsearch-rest-client</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 
     <build>

@@ -2,10 +2,10 @@ package cn.nkpro.groovy.cards.universal
 
 import cn.nkpro.groovy.cards.universal.ref.NkCardFormDefI
 import cn.nkpro.groovy.cards.universal.ref.NkFormCardHelper
-import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote
-import cn.nkpro.ts5.engine.doc.abstracts.NkAbstractCard
-import cn.nkpro.ts5.engine.doc.model.DocDefIV
-import cn.nkpro.ts5.engine.doc.model.DocHV
+import cn.nkpro.ts5.docengine.abstracts.NkAbstractCard
+import cn.nkpro.ts5.docengine.model.DocDefIV
+import cn.nkpro.ts5.docengine.model.DocHV
+import cn.nkpro.ts5.wsdoc.annotation.WsDocNote
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component

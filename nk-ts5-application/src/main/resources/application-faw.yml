@@ -1,0 +1,13 @@
+
+
+spring:
+  redis:
+    port: 666
+    host: 47.99.236.56
+    password: 1qazxsw2
+  elasticsearch:
+    rest:
+      uris: [ "http://47.114.120.178:9200" ]
+      username:
+      password:
+

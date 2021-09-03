@@ -1,15 +1,15 @@
 package cn.nkpro.groovy.cards.universal.ref;
 
-import cn.nkpro.ts5.engine.doc.NkDocEngine;
-import cn.nkpro.ts5.engine.doc.service.NkDocEngineContext;
-import cn.nkpro.ts5.engine.doc.model.DocDefIV;
-import cn.nkpro.ts5.engine.doc.model.DocHV;
-import cn.nkpro.ts5.engine.spel.TfmsSpELManager;
+import cn.nkpro.ts5.docengine.model.DocDefIV;
+import cn.nkpro.ts5.docengine.model.DocHV;
+import cn.nkpro.ts5.docengine.service.NkDocEngineContext;
+import cn.nkpro.ts5.docengine.utils.RandomUtils;
 import cn.nkpro.ts5.exception.TfmsDefineException;
-import cn.nkpro.ts5.utils.TextUtils;
+import cn.nkpro.ts5.spel.TfmsSpELManager;
 import com.alibaba.fastjson.JSON;
-import com.apifan.common.random.constant.CreditCardType;
-import com.apifan.common.random.source.*;
+import com.apifan.common.random.source.AreaSource;
+import com.apifan.common.random.source.DateTimeSource;
+import com.apifan.common.random.source.NumberSource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -21,7 +21,6 @@ import org.springframework.stereotype.Component;
 import java.lang.reflect.Array;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -44,7 +43,7 @@ public class NkFormCardHelper {
                 Object value = null;
                 switch (item.getInputType()){
                     case "text":
-                        value = TextUtils.randomText();
+                        value = RandomUtils.randomText();
                         break;
                     case "integer":
                         value = NumberSource.getInstance().randomInt(0, 100000001);

@@ -1,13 +1,12 @@
 package cn.nkpro.groovy.cards.bpm
 
-import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote
-import cn.nkpro.ts5.engine.doc.abstracts.NkAbstractCard
-import cn.nkpro.ts5.engine.doc.model.DocHV
+import cn.nkpro.ts5.docengine.abstracts.NkAbstractCard
+import cn.nkpro.ts5.wsdoc.annotation.WsDocNote
 import org.springframework.stereotype.Component
 
 @WsDocNote("工作流")
 @Component("NkCardBpm")
-class NkCardBpm extends NkAbstractCard<BpmData,BpmDef>{
+class NkCardBpm extends NkAbstractCard<BpmData,BpmDef> {
 
 }
 @SuppressWarnings("unused")

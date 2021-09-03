@@ -1,0 +1,115 @@
+
+# TS5 默认配置文件
+nk:
+  env-key: ts5-platform-beebattle-dev
+  env-name: 研发环境 in BeeBattle
+  file-root-path: /Users/bean/Downloads/tfms
+  #长度介于6-16位，且必须包含1个大写字母，1个小写字母，及1个特殊符号
+  password-strategy: ^.*(?=.{6,16})(?=.*\d)(?=.*[A-Z]{1,})(?=.*[a-z]{1,})(?=.*[.!@#$%^&*?\(\)]).*$
+  compress:
+    enabled: false #开发环境不压缩
+  component-base-packages:
+    - cn.nkpro.ts5.cards
+    - cn.nkpro.groovy
+# component-disable-online-editing 表示是否禁用在线编辑组件代码
+  component-disable-online-editing: true
+# component-reload-class-path 如果为false，那么程序启动后，修改ide中的vue文件前端不会生效
+  component-reload-class-path: true
+#  aliyun:
+#    access-key-id: LTAI4G6YUdTBx8b9C8uR3gTU
+#    access-key-secret: zeqaRsOAOkwwTLK8E2QyR1aEcj6RAL
+#    oss:
+#      bucket: tfms
+#  huawei:
+#    access-key-id: IBWKXXXUIYGWN5DCPL58
+#    access-key-secret: CdDHj5aM2w8kLT89NsLAjxGRzY9b7C0ZduzGvimf
+#    obs:
+#      bucket: tfms
+
+server:
+  port: 9200
+  compression:
+    enabled: false
+    mime-types: application/javascript,text/css,application/json,application/xml,text/html,text/xml,text/plain
+    min-response-size: 2KB
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: nk-ts5-beebattle-dev
+  profiles:
+    active: default
+  aop:
+    proxy-target-class: false
+  servlet:
+    multipart:
+      max-file-size: 30MB
+      max-request-size: 30MB
+  resources:
+    static-locations: classpath:/testStatic/,classpath:/META-INF/resources/,classpath:/static/,classpath:/public
+  main:
+    allow-bean-definition-overriding: true
+  datasource:
+    url: jdbc:mysql://121.36.76.251:3306/ts5_beebattle_dev
+    username: root
+    password: VTOZ8clUpSerX6hI
+    driver-class-name: com.mysql.jdbc.Driver
+    hikari:
+      connection-timeout: 30000
+      idle-timeout: 60000
+      max-lifetime: 1800000
+      minimumIdle: 5
+      maximumPoolSize: 10
+  redis:
+    port: 6379
+    host: 119.3.228.18
+    password: 1qazxsw2
+    jedis:
+      pool:
+        max-idle: 8
+        min-idle: 2
+        max-active: 32
+        max-wait: 500ms
+  elasticsearch:
+    rest:
+      uris: ["http://119.3.228.18:9200"]
+      username: elastic
+      password: 1qazxsw2
+      connection-timeout: 1s
+      read-timeout: 30s
+  liquibase:
+    enabled: false
+    change-log: classpath:nk/liquibase/master.xml
+    database-change-log-table: SYS_DATABASECHANGEDLOG
+    database-change-log-lock-table: SYS_DATABASECHANGEDLOGLOCK
+    drop-first: true
+  devtools:
+    restart:
+      enabled: true
+      exclude: META-INF/maven/**,META-INF/resources/**,resources/**,static/**,public/**,templates/**,**/*Test.class,**/*Tests.class,git.properties,META-INF/build-info.properties,**/*.vue,**/*.nk.json
+  jpa:
+    show-sql: true
+
+
+
+logging:
+  config: classpath:logging-config.xml
+
+
+mybatis:
+  config-location: classpath:/mybatis-configuration.xml
+  dialect: cn.nkpro.ts5.mybatis.pagination.dialect.MySQLDialect
+
+camunda:
+  bpm:
+    database:
+      schema-update: true
+    admin-user:
+      id: admin
+      password: nk@2020
+    filter:
+      create: All tasks
+    webapp:
+      application-path: bpm
+      index-redirect-enabled: false

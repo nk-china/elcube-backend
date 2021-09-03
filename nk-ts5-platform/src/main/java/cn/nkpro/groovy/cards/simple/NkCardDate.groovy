@@ -1,9 +1,9 @@
 package cn.nkpro.groovy.cards.simple
 
-import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote
-import cn.nkpro.ts5.engine.doc.abstracts.NkAbstractCard
-import cn.nkpro.ts5.engine.doc.model.DocDefHV
-import cn.nkpro.ts5.engine.doc.model.DocHV
+import cn.nkpro.ts5.docengine.abstracts.NkAbstractCard
+import cn.nkpro.ts5.docengine.model.DocDefHV
+import cn.nkpro.ts5.docengine.model.DocHV
+import cn.nkpro.ts5.wsdoc.annotation.WsDocNote
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component

@@ -11,7 +11,7 @@
 		
 		<plugin type="org.beanopen.tools.mybatis.generator.MySQLPaginationPlugin2" />
 		<plugin type="org.beanopen.tools.mybatis.generator.WsDocPlugin">
-			<property name="annotationType" value="cn.nkpro.ts5.basic.wsdoc.annotation.CodeFieldNotes" />
+			<property name="annotationType" value="cn.nkpro.ts5.wsdoc.annotation.CodeFieldNotes" />
 		</plugin>
 		<plugin type="org.beanopen.tools.mybatis.generator.ZJsonIgnorePropertiesPlugin" />
 		<plugin type="org.mybatis.generator.plugins.SerializablePlugin" />
@@ -25,44 +25,18 @@
             <property name="forceBigDecimals" value="false" />
         </javaTypeResolver>
 
-		<javaModelGenerator 	targetPackage="cn.nkpro.ts5.orm.mb.gen" 	targetProject="src/main/java" />
-		<sqlMapGenerator 		targetPackage="cn.nkpro.ts5.orm.mb.gen" 	targetProject="src/main/resources" />
-		<javaClientGenerator 	targetPackage="cn.nkpro.ts5.orm.mb.gen" 	targetProject="src/main/java" type="XMLMAPPER" />
+		<javaModelGenerator 	targetPackage="cn.nkpro.ts5.platform.mybatis.gen" 	targetProject="src/main/java" />
+		<sqlMapGenerator 		targetPackage="cn.nkpro.ts5.platform.mybatis.gen" 	targetProject="src/main/resources" />
+		<javaClientGenerator 	targetPackage="cn.nkpro.ts5.platform.mybatis.gen" 	targetProject="src/main/java" type="XMLMAPPER" />
 
-		<!-- 2.0 -->
-		<table tableName="nk_constant_def"					enableDeleteByExample="true"  domainObjectName="ConstantDef"/>
-
-		<table tableName="nk_script_def_h"					enableDeleteByExample="false" domainObjectName="ScriptDefH" />
-
-		<table tableName="nk_doc_h"		  					enableDeleteByExample="false" domainObjectName="DocH"/>
-        <table tableName="nk_doc_i"		 					enableDeleteByExample="false" domainObjectName="DocI"/>
-        <table tableName="nk_doc_i_index"		 			enableDeleteByExample="true"  domainObjectName="DocIIndex"/>
-		<table tableName="nk_doc_def_h"		 				enableDeleteByExample="false" domainObjectName="DocDefH"/>
-		<table tableName="nk_doc_def_i"		 				enableDeleteByExample="true"  domainObjectName="DocDefI"/>
-		<table tableName="nk_doc_def_state"				 	enableDeleteByExample="true"  domainObjectName="DocDefState"/>
-		<table tableName="nk_doc_def_cycle"				 	enableDeleteByExample="true"  domainObjectName="DocDefCycle"/>
-		<table tableName="nk_doc_def_index_rule"			enableDeleteByExample="true"  domainObjectName="DocDefIndexRule"/>
-		<table tableName="nk_doc_def_index_custom"			enableDeleteByExample="true"  domainObjectName="DocDefIndexCustom"/>
-		<table tableName="nk_doc_def_data_sync"				enableDeleteByExample="true"  domainObjectName="DocDefDataSync"/>
-		<table tableName="nk_doc_def_flow"				 	enableDeleteByExample="true"  domainObjectName="DocDefFlow"/>
-		<table tableName="nk_doc_def_bpm"					enableDeleteByExample="true"  domainObjectName="DocDefBpm"/>
-
-		<table tableName="nk_async_queue"					enableDeleteByExample="false"/>
 
 		<!-- 基础组件 -->
-
-		<table tableName="sys_account"		 			 	enableDeleteByExample="false"/>
-		<table tableName="sys_auth_group"			 	 	enableDeleteByExample="false"/>
-		<table tableName="sys_auth_group_ref"			 	enableDeleteByExample="true"/>
-		<table tableName="sys_auth_permission"			 	enableDeleteByExample="false"/>
-		<table tableName="sys_auth_limit"			 	 	enableDeleteByExample="false"/>
 
 		<table tableName="sys_webapp_menu"				 	enableDeleteByExample="true"/>
 		<table tableName="sys_user_saved_query"			 	enableDeleteByExample="false"/>
 		<table tableName="sys_user_dashboard"			 	enableDeleteByExample="false"/>
 		<table tableName="sys_user_dashboard_ref"			enableDeleteByExample="true"/>
 
-		<table tableName="sys_log_doc_record"			 	enableDeleteByExample="false"/>
 	</context>
 
 </generatorConfiguration>

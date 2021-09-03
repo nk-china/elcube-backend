@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>nk-ts5-project</artifactId>
+        <groupId>cn.nkpro</groupId>
+        <version>2.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>nk-ts5-kernel</artifactId>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>cn.nkpro</groupId>
+            <artifactId>nk-ts5-data</artifactId>
+            <version>2.0-SNAPSHOT</version>
+        </dependency>
+
+        <!-- Groovy -->
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>3.0.4</version>
+            <type>pom</type>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.junit.jupiter</groupId>
+                    <artifactId>junit-jupiter-api</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <optional>true</optional>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <!--打包时，排除local开头的配置文件-->
+                        <exclude>application-local**</exclude>
+                        <exclude>logging-config.xml</exclude>
+                        <exclude>generatorConfig**.xml</exclude>
+                        <exclude>cn/nkpro/ts5/TS5PlatformApplication.class</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>com.github.wvengen</groupId>
+                <artifactId>proguard-maven-plugin</artifactId>
+                <version>2.4.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>proguard</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <injar>${project.build.finalName}.jar</injar>
+                    <outjar>${project.build.finalName}-pg.jar</outjar>
+                    <obfuscate>true</obfuscate>
+                    <options>
+                        <!--  ##默认是开启的，这里关闭shrink，即不删除没有使用的类/成员-->
+                        <option>-dontshrink</option>
+                        <!-- ##默认是开启的，这里关闭字节码级别的优化-->
+                        <option>-dontoptimize</option>
+                        <!--##对于类成员的命名的混淆采取唯一策略-->
+                        <option>-useuniqueclassmembernames</option>
+                        <!--- 混淆类名之后，对使用Class.forName('className')之类的地方进行相应替代-->
+                        <option>-adaptclassstrings </option>
+                        <option>-ignorewarnings</option>
+                        <!-- 混淆时不生成大小写混合的类名，默认是可以大小写混合-->
+                        <option>-dontusemixedcaseclassnames</option>
+                        <!-- This option will replace all strings in reflections method invocations with new class names.
+                             For example, invokes Class.forName('className')-->
+                        <!-- <option>-adaptclassstrings</option> -->
+                        <!-- This option will save all original annotations and etc. Otherwise all we be removed from files.-->
+                        <!-- 不混淆所有特殊的类-->
+                        <option>-keepattributes Exceptions,InnerClasses,Signature,Deprecated,
+                            SourceFile,LineNumberTable,*Annotation*,EnclosingMethod</option>
+                        <!-- This option will save all original names in interfaces (without obfuscate).-->
+                        <option>-keepnames interface **</option>
+                        <!-- This option will save all original methods parameters in files defined in -keep sections,
+                             otherwise all parameter names will be obfuscate.-->
+                        <option>-keepparameternames</option>
+                        <!-- <option>-libraryjars **</option> -->
+                        <!-- This option will save all original class files (without obfuscate) but obfuscate all in domain package.-->
+                        <!--<option>-keep class !com.slm.proguard.example.spring.boot.domain.** { *; }</option>-->
+                        <option>-keep class !cn.nkpro.** { *; }</option>
+                        <option>-keep class cn.nkpro.ts5.orm.** { *; }</option><!--保留不然Mybatis报错-->
+                        <option>-keep class cn.nkpro.ts5.config.** { *; }</option>
+                        <option>-keep class * implements java.io.Serializable </option>
+                        <!-- This option will save all original class files (without obfuscate) in service package-->
+                        <!--<option>-keep class com.slm.proguard.example.spring.boot.service { *; }</option>-->
+                        <!-- This option will save all original interfaces files (without obfuscate) in all packages.-->
+                        <option>-keep interface * extends * { *; }</option>
+                        <!-- <option>-keep @org.springframework.stereotype.Service class *</option> -->
+                        <!-- This option will save all original defined annotations in all class in all packages.-->
+                        <option>-keepclassmembers class * {
+                            <!-- @org.springframework.beans.factory.annotation.Autowired *; -->
+                            @org.springframework.beans.factory.annotation.Value *;
+                            }
+                        </option>
+                    </options>
+                    <libs>
+                        <lib>/Library/Java/JavaVirtualMachines/jdk-11.0.8.jdk/Contents/Home/lib/jrt-fs.jar</lib>
+                    </libs>
+                    <proguardVersion>6.2.2</proguardVersion>
+                </configuration>
+                <dependencies>
+                    <dependency>
+                        <groupId>net.sf.proguard</groupId>
+                        <artifactId>proguard-base</artifactId>
+                        <version>6.2.2</version>
+                    </dependency>
+                </dependencies>
+            </plugin>
+        </plugins>
+    </build>
+
+</project>

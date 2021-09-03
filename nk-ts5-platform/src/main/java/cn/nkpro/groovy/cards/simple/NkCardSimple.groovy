@@ -1,11 +1,11 @@
 package cn.nkpro.groovy.cards.simple
 
-import cn.nkpro.ts5.basic.wsdoc.annotation.WsDocNote
-import cn.nkpro.ts5.engine.doc.abstracts.NkAbstractCard
-import cn.nkpro.ts5.engine.doc.model.DocDefHV
-import cn.nkpro.ts5.engine.doc.model.DocDefIV
-import cn.nkpro.ts5.engine.doc.model.DocHV
-import cn.nkpro.ts5.engine.doc.service.NkDocEngineFrontService
+import cn.nkpro.ts5.docengine.NkDocEngine
+import cn.nkpro.ts5.docengine.abstracts.NkAbstractCard
+import cn.nkpro.ts5.docengine.model.DocDefHV
+import cn.nkpro.ts5.docengine.model.DocDefIV
+import cn.nkpro.ts5.docengine.model.DocHV
+import cn.nkpro.ts5.wsdoc.annotation.WsDocNote
 import com.alibaba.fastjson.JSON
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component
 class NkCardSimple extends NkAbstractCard<NkCardSimpleData,NkCardSimpleDef> {
 
     @Autowired
-    NkDocEngineFrontService docEngineFrontService;
+    NkDocEngine docEngine;
 
     @Override
     NkCardSimpleDef afterGetDef(DocDefHV defHV, DocDefIV defIV, NkCardSimpleDef cardDef) {
