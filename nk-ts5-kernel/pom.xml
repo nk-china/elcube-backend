@@ -335,7 +335,7 @@
 
                     </options>
                     <libs>
-                        <lib>$JAVA_HOME/jre/lib/rt.jar</lib>
+                        <lib>${JAVA_HOME}/jre/lib/rt.jar</lib>
 <!--                        <lib>/Library/Java/JavaVirtualMachines/jdk-11.0.8.jdk/Contents/Home/lib/jrt-fs.jar</lib>-->
                     </libs>
                     <proguardVersion>6.2.2</proguardVersion>
