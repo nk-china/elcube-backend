@@ -4,6 +4,7 @@ import cn.nkpro.ts5.docengine.abstracts.NkAbstractCard
 import cn.nkpro.ts5.annotation.NkNote
 import org.springframework.stereotype.Component
 
+@SuppressWarnings("unused")
 @NkNote("工作流")
 @Component("NkCardBpm")
 class NkCardBpm extends NkAbstractCard<BpmData,BpmDef> {

@@ -1,11 +1,11 @@
 package cn.nkpro.groovy.defaults
 
-import cn.nkpro.ts5.co.NkAbstractCustomScriptObject
-import cn.nkpro.ts5.docengine.interceptor.NkDocFlowInterceptor
+
+import cn.nkpro.ts5.docengine.interceptor.abstracts.NkAbstractDocFlowInterceptor
 import org.springframework.stereotype.Component
 
+@SuppressWarnings("unused")
 @Component("NkDefaultDocFlowInterceptor")
 class NkDefaultDocFlowInterceptor
-        extends NkAbstractCustomScriptObject
-        implements NkDocFlowInterceptor {
+        extends NkAbstractDocFlowInterceptor{
 }

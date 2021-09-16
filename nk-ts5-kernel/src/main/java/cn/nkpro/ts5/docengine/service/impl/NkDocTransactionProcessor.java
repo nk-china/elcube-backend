@@ -1,21 +1,18 @@
 package cn.nkpro.ts5.docengine.service.impl;
 
 import cn.nkpro.ts5.basic.GUID;
-import cn.nkpro.ts5.exception.NkDefineException;
 import cn.nkpro.ts5.basic.TransactionSync;
 import cn.nkpro.ts5.co.NkCustomObjectManager;
+import cn.nkpro.ts5.data.elasticearch.SearchEngine;
 import cn.nkpro.ts5.docengine.NkCard;
 import cn.nkpro.ts5.docengine.NkDocCycle;
 import cn.nkpro.ts5.docengine.NkDocProcessor;
 import cn.nkpro.ts5.docengine.gen.*;
-import cn.nkpro.ts5.docengine.interceptor.NkDocCommittedInterceptor;
-import cn.nkpro.ts5.docengine.interceptor.NkDocCreateInterceptor;
-import cn.nkpro.ts5.docengine.interceptor.NkDocExecuteInterceptor;
-import cn.nkpro.ts5.docengine.interceptor.NkDocUpdateInterceptor;
+import cn.nkpro.ts5.docengine.interceptor.NkDocCycleInterceptor;
 import cn.nkpro.ts5.docengine.model.*;
 import cn.nkpro.ts5.docengine.service.*;
 import cn.nkpro.ts5.docengine.utils.RandomUtils;
-import cn.nkpro.ts5.data.elasticearch.SearchEngine;
+import cn.nkpro.ts5.exception.NkDefineException;
 import cn.nkpro.ts5.spel.NkSpELManager;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
@@ -37,8 +34,6 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Slf4j
 @SuppressWarnings("unchecked")
@@ -106,13 +101,11 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         doc.setDef(def);
 
         AtomicReference<DocHV> atomic = new AtomicReference(doc);
-        atomic.set(
-            processCycle(atomic.get(), NkDocCycle.beforeCreate, (beanName)->
-                customObjectManager
-                        .getCustomObject(beanName, NkDocCreateInterceptor.class)
-                        .apply(atomic.get(),preDoc, NkDocCycle.beforeCreate)
-            )
-        );
+
+        NkDocCycleContext context = NkDocCycleContext
+                .build(NkDocCycle.beforeCreate)
+                .prev(preDoc);
+        atomic.set(processCycle(atomic.get(), context));
 
         docDefService.runLoopCards(atomic.get().getDocId(), def,false, (card, defIV)->
                 atomic.get().getData().put(
@@ -121,11 +114,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
             )
         );
 
-        return processCycle(atomic.get(), NkDocCycle.afterCreated, (beanName)->
-                customObjectManager
-                        .getCustomObject(beanName, NkDocCreateInterceptor.class)
-                        .apply(atomic.get(),preDoc, NkDocCycle.afterCreated)
-        );
+        return processCycle(atomic.get(), context.cycle(NkDocCycle.afterCreated));
     }
 
     @Override
@@ -170,13 +159,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
             )
         );
 
-        atomic.set(
-            processCycle(atomic.get(), NkDocCycle.beforeCalculate, (beanName)->
-                    customObjectManager
-                            .getCustomObject(beanName, NkDocExecuteInterceptor.class)
-                            .apply(atomic.get(), NkDocCycle.beforeCalculate)
-            )
-        );
+        atomic.set(processCycle(atomic.get(), NkDocCycleContext.build(NkDocCycle.beforeCalculate)));
 
         docDefService.runLoopCards(atomic.get().getDocId(), atomic.get().getDef(),false, (card, defIV)->{
 
@@ -194,11 +177,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
             );
         });
 
-        return processCycle(atomic.get(), NkDocCycle.afterCalculated, (beanName)->
-                customObjectManager
-                        .getCustomObject(beanName, NkDocExecuteInterceptor.class)
-                        .apply(atomic.get(), NkDocCycle.afterCalculated)
-        );
+        return processCycle(atomic.get(), NkDocCycleContext.build(NkDocCycle.afterCalculated));
     }
 
     @Override
@@ -317,13 +296,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if(log.isInfoEnabled())log.info("{}保存单据内容 触发单据 beforeUpdate 接口", NkDocEngineContext.currLog());
-        atomic.set(
-            processCycle(doc, NkDocCycle.beforeUpdate, (beanName)->
-                    customObjectManager
-                            .getCustomObject(beanName, NkDocUpdateInterceptor.class)
-                            .apply(doc, original, NkDocCycle.beforeUpdate)
-            )
-        );
+        atomic.set(processCycle(doc, NkDocCycleContext.build(NkDocCycle.beforeUpdate)));
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -523,12 +496,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if(log.isInfoEnabled())log.info("{}保存单据内容 触发单据 afterUpdated 接口", NkDocEngineContext.currLog());
-        processCycle(atomic.get(), NkDocCycle.afterUpdated, (beanName)->{
-            customObjectManager
-                    .getCustomObject(beanName, NkDocUpdateInterceptor.class)
-                    .apply(atomic.get(), original, NkDocCycle.afterUpdated);
-            return atomic.get();
-        });
+        processCycle(atomic.get(), NkDocCycleContext.build(NkDocCycle.afterCalculated).original(original));
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -559,12 +527,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         final String currLog = NkDocEngineContext.currLog();
         TransactionSync.runAfterCommit(()->{
             if(log.isInfoEnabled())log.info("{}保存单据内容 触发单据 afterUpdateCommitted 接口", currLog);
-                processCycle(atomic.get(), NkDocCycle.afterUpdateCommitted, (beanName)->{
-                            customObjectManager
-                                    .getCustomObject(beanName, NkDocCommittedInterceptor.class)
-                                    .apply(atomic.get(), NkDocCycle.afterUpdateCommitted);
-                            return atomic.get();
-                });
+            processCycle(atomic.get(), NkDocCycleContext.build(NkDocCycle.afterUpdateCommitted));
         });
 
         atomic.get().setNewCreate(false);
@@ -637,17 +600,17 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         }
     }
 
-    private DocHV processCycle(DocHV doc, NkDocCycle cycleName, Function<String, DocHV> function){
+    private DocHV processCycle(DocHV doc, NkDocCycleContext context){
 
         if(doc.getDef().getLifeCycles()!=null){
-            List<DocDefCycle> collect =  doc.getDef().getLifeCycles()
+            doc.getDef().getLifeCycles()
                     .stream()
-                    .filter(cycle -> StringUtils.equals(cycle.getDocCycle(), cycleName.name()))
-                    .collect(Collectors.toList());
-
-            for(DocDefCycle cycle : collect){
-                doc = function.apply(cycle.getRefObjectType());
-            }
+                    .filter(cycle -> StringUtils.equals(cycle.getDocCycle(), context.getCycle().name()))
+                    .forEach(cycle ->
+                        customObjectManager
+                            .getCustomObject(cycle.getRefObjectType(), NkDocCycleInterceptor.class)
+                            .apply(doc,context)
+                    );
         }
 
         return doc;

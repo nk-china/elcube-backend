@@ -125,10 +125,7 @@ public class NkDocDefServiceImpl implements NkDocDefService {
         Map<String,Object> options = new HashMap<>();
         options.put("docProcessors",            customObjectManager.getCustomObjectDescriptionList(NkDocProcessor.class,            false,predicate));
         options.put("docStateInterceptors",     customObjectManager.getCustomObjectDescriptionList(NkDocStateInterceptor.class,     true,null));
-        options.put("docExecuteInterceptors",   customObjectManager.getCustomObjectDescriptionList(NkDocExecuteInterceptor.class,   true,null));
-        options.put("docCommittedInterceptors", customObjectManager.getCustomObjectDescriptionList(NkDocCommittedInterceptor.class, true,null));
-        options.put("docCreateInterceptors",    customObjectManager.getCustomObjectDescriptionList(NkDocCreateInterceptor.class,    true,null));
-        options.put("docUpdateInterceptors",    customObjectManager.getCustomObjectDescriptionList(NkDocUpdateInterceptor.class,    true,null));
+        options.put("docCycleInterceptor",      customObjectManager.getCustomObjectDescriptionList(NkDocCycleInterceptor.class,     true,null));
         options.put("docFlowInterceptors",      customObjectManager.getCustomObjectDescriptionList(NkDocFlowInterceptor.class,      true,null));
         options.put("docDataSyncAdapters",      customObjectManager.getCustomObjectDescriptionList(NkDocDataAdapter.class,          false,null));
         options.put("cards",                    customObjectManager.getCustomObjectDescriptionList(NkCard.class,                    false,null));

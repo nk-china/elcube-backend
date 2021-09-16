@@ -1,11 +1,11 @@
 package cn.nkpro.groovy.defaults
 
-import cn.nkpro.ts5.co.NkAbstractCustomScriptObject
-import cn.nkpro.ts5.docengine.interceptor.NkDocStateInterceptor
+
+import cn.nkpro.ts5.docengine.interceptor.abstracts.NkAbstractDocStateInterceptor
 import org.springframework.stereotype.Component
 
+@SuppressWarnings("unused")
 @Component("NkDefaultDocStateInterceptor")
 class NkDefaultDocStateInterceptor
-        extends NkAbstractCustomScriptObject
-        implements NkDocStateInterceptor {
+        extends NkAbstractDocStateInterceptor {
 }

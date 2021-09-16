@@ -273,6 +273,28 @@
     </dependencies>
 
 
+    <profiles>
+        <profile>
+            <id>ts5-dev</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <rt-lib>/Library/Java/JavaVirtualMachines/jdk-11.0.8.jdk/Contents/Home/lib/jrt-fs.jar</rt-lib>
+            </properties>
+        </profile>
+        <profile>
+            <id>ts5-release</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <!--suppress UnresolvedMavenProperty -->
+                <rt-lib>${JAVA_HOME}/jre/lib/rt.jar</rt-lib>
+            </properties>
+        </profile>
+    </profiles>
+
     <build>
         <plugins>
             <plugin>
@@ -327,16 +349,15 @@
 
                         <option>-keepnames @org.springframework.context.annotation.Configuration class cn.nkpro.ts5.** { *; }</option>
                         <option>-keepclassmembernames @org.springframework.boot.context.properties.ConfigurationProperties class cn.nkpro.ts5.** { public *; }</option>
-                        <!--                        -->
-                        <!--                        <option>-keep class ** { *; }</option>-->
-                        <!--                        <option>-keep class cn.nkpro.ts5.** { *; }</option>-->
-                        <!--                        <option>-keepnames @org.springframework.stereotype.Component class cn.nkpro.ts5.** { public *; }</option>-->
-                        <!--                        <option>-keepnames @org.springframework.stereotype.Service class cn.nkpro.ts5.** { public *; }</option>-->
+
+                        <!--<option>-keep class ** { *; }</option>-->
+                        <!--<option>-keep class cn.nkpro.ts5.** { *; }</option>-->
+                        <!--<option>-keepnames @org.springframework.stereotype.Component class cn.nkpro.ts5.** { public *; }</option>-->
+                        <!--<option>-keepnames @org.springframework.stereotype.Service class cn.nkpro.ts5.** { public *; }</option>-->
 
                     </options>
                     <libs>
-                        <lib>${JAVA_HOME}/jre/lib/rt.jar</lib>
-<!--                        <lib>/Library/Java/JavaVirtualMachines/jdk-11.0.8.jdk/Contents/Home/lib/jrt-fs.jar</lib>-->
+                        <lib>${rt-lib}</lib>
                     </libs>
                     <proguardVersion>6.2.2</proguardVersion>
                 </configuration>
