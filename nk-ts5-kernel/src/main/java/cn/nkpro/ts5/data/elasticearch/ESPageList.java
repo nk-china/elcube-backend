@@ -1,11 +1,13 @@
 package cn.nkpro.ts5.data.elasticearch;
 
+import cn.nkpro.ts5.basic.Keep;
 import cn.nkpro.ts5.basic.PageList;
 import lombok.Getter;
 
 import java.util.List;
 import java.util.Map;
 
+@Keep
 public class ESPageList<T> extends PageList<T> {
 
 	@Getter
