@@ -1,5 +1,6 @@
 package cn.nkpro.ts5.docengine.controller;
 
+import cn.nkpro.ts5.basic.Keep;
 import cn.nkpro.ts5.co.NkCustomObject;
 import cn.nkpro.ts5.co.NkCustomObjectManager;
 import cn.nkpro.ts5.co.NkCustomScriptObject;
@@ -90,6 +91,7 @@ public class SysScriptResController {
         return bean;
     }
 
+    @Keep
     @Data
     @AllArgsConstructor
     public static
