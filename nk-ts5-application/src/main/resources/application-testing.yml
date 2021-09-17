@@ -94,6 +94,3 @@ logging:
 mybatis:
   config-location: classpath:/mybatis-configuration.xml
   dialect: cn.nkpro.ts5.data.mybatis.pagination.dialect.MySQLDialect
-
-flowable:
-  database-schema-update: false
