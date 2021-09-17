@@ -12,7 +12,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.StandardCharsets;
@@ -20,6 +23,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 @SuppressWarnings("all")
 @Configuration
+@EnableAsync
+@EnableScheduling
+@EnableTransactionManagement
 @MapperScan(basePackages = {
         "cn.nkpro.ts5.co.gen",
         "cn.nkpro.ts5.security.gen",

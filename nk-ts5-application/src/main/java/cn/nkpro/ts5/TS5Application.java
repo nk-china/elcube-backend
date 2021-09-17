@@ -9,16 +9,11 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
- * Created by bean on 2019/12/18.
+ * Created by bean on 2021/9/17.
  */
-@EnableAsync
-@EnableScheduling
-@EnableTransactionManagement
 @SpringBootApplication
-@ComponentScan(
-        nameGenerator = FullyQualifiedAnnotationBeanNameGenerator.class,
-        basePackages = {"cn.nkpro.ts5","cn.nkpro.groovy"}
-        )
+@ComponentScan(nameGenerator = FullyQualifiedAnnotationBeanNameGenerator.class,
+                basePackages = {"cn.nkpro.ts5","cn.nkpro.groovy"})
 public class TS5Application {
     public static void main(String[] args) {
         SpringApplication.run(TS5Application.class, args);
