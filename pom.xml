@@ -18,7 +18,7 @@
     </modules>
 
     <build>
-        <defaultGoal>clean compile package deploy</defaultGoal>
+        <defaultGoal>clean compile package install</defaultGoal>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
