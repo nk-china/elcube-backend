@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.task.controller;
 
 import cn.nkpro.ts5.docengine.model.BpmTaskES;
-import cn.nkpro.ts5.docengine.SearchService;
+import cn.nkpro.ts5.docengine.NkDocSearchService;
 import cn.nkpro.ts5.data.elasticearch.ESPageList;
 import cn.nkpro.ts5.annotation.NkNote;
 import com.alibaba.fastjson.JSONObject;
@@ -22,7 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class TaskController {
 
     @Autowired
-    private SearchService searchService;
+    private NkDocSearchService searchService;
 
     @NkNote("1、拉取交易列表数据")
     @RequestMapping(value = "/tasks",method = RequestMethod.POST)

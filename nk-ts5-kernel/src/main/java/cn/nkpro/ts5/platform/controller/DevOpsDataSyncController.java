@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.platform.controller;
 
-import cn.nkpro.ts5.docengine.SearchService;
+import cn.nkpro.ts5.docengine.NkDocSearchService;
 import cn.nkpro.ts5.docengine.service.impl.NkDocEngineIndexService;
 import cn.nkpro.ts5.data.elasticearch.SearchEngine;
 import cn.nkpro.ts5.annotation.NkNote;
@@ -26,7 +26,7 @@ public class DevOpsDataSyncController {
     private SearchEngine searchEngine;
 
     @Autowired
-    private SearchService searchService;
+    private NkDocSearchService searchService;
     @Autowired
     private NkDocEngineIndexService docEngineIndexService;
 

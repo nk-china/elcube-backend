@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.docengine.abstracts;
+package cn.nkpro.ts5.docengine;
 
 import cn.nkpro.ts5.docengine.model.DocDefHV;
 import cn.nkpro.ts5.docengine.model.DocHV;

@@ -1,6 +1,6 @@
 package cn.nkpro.groovy.cards.simple
 
-import cn.nkpro.ts5.docengine.abstracts.NkAbstractCard
+import cn.nkpro.ts5.docengine.NkAbstractCard
 import cn.nkpro.ts5.docengine.model.DocDefHV
 import cn.nkpro.ts5.docengine.model.DocHV
 import cn.nkpro.ts5.annotation.NkNote

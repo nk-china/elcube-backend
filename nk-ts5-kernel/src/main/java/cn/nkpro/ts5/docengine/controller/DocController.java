@@ -6,7 +6,7 @@ import cn.nkpro.ts5.docengine.model.DocHV;
 import cn.nkpro.ts5.docengine.service.NkDocDefService;
 import cn.nkpro.ts5.docengine.service.NkDocEngineFrontService;
 import cn.nkpro.ts5.docengine.service.NkDocHistoryService;
-import cn.nkpro.ts5.docengine.SearchService;
+import cn.nkpro.ts5.docengine.NkDocSearchService;
 import cn.nkpro.ts5.docengine.gen.SysLogDocRecord;
 import cn.nkpro.ts5.docengine.model.es.CustomES;
 import cn.nkpro.ts5.docengine.model.es.DocHES;
@@ -42,7 +42,7 @@ public class DocController {
     @Autowired@SuppressWarnings("all")
     private NkDocEngineFrontService docEngine;
     @Autowired@SuppressWarnings("all")
-    private SearchService searchService;
+    private NkDocSearchService searchService;
     @Autowired@SuppressWarnings("all")
     private NkDocHistoryService docHistoryService;
     

@@ -30,7 +30,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Component
-public class SearchService {
+public class NkDocSearchService {
 
     @Autowired@SuppressWarnings("all")
     private SearchEngine searchEngine;

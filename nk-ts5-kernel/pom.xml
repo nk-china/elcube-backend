@@ -3,9 +3,10 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>nk-ts5-project</artifactId>
+        <artifactId>nk-ts5-parent</artifactId>
         <groupId>cn.nkpro</groupId>
         <version>2.0-SNAPSHOT</version>
+        <relativePath/>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
@@ -275,16 +276,13 @@
 
     <profiles>
         <profile>
-            <id>ts5-dev</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
+            <id>ts5-proguard-local</id>
             <properties>
                 <rt-lib>/Library/Java/JavaVirtualMachines/jdk-11.0.8.jdk/Contents/Home/lib/jrt-fs.jar</rt-lib>
             </properties>
         </profile>
         <profile>
-            <id>ts5-release</id>
+            <id>ts5-proguard-rt</id>
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
@@ -316,6 +314,7 @@
                 <configuration>
                     <excludes>
                         <exclude>generatorConfig**.xml</exclude>
+                        <exclude>logging-config.xml</exclude>
                     </excludes>
                 </configuration>
             </plugin>
@@ -370,6 +369,7 @@
 
                     </options>
                     <libs>
+                        <!--suppress UnresolvedMavenProperty -->
                         <lib>${rt-lib}</lib>
                     </libs>
                     <proguardVersion>6.2.2</proguardVersion>

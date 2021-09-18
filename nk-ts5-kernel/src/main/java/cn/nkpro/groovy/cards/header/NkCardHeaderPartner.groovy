@@ -1,6 +1,6 @@
 package cn.nkpro.groovy.cards.header
 
-import cn.nkpro.ts5.docengine.abstracts.NkAbstractCard
+import cn.nkpro.ts5.docengine.NkAbstractCard
 import cn.nkpro.ts5.annotation.NkNote
 import org.springframework.stereotype.Component
 

@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.docengine.service.impl;
 
 import cn.nkpro.ts5.basic.PageList;
-import cn.nkpro.ts5.docengine.SearchService;
+import cn.nkpro.ts5.docengine.NkDocSearchService;
 import cn.nkpro.ts5.docengine.gen.DocH;
 import cn.nkpro.ts5.docengine.model.DocHV;
 import cn.nkpro.ts5.docengine.service.NkBpmTaskManager;
@@ -20,7 +20,7 @@ import java.io.IOException;
 @Component
 public class NkDocEngineIndexService {
     @Autowired
-    private SearchService searchService;
+    private NkDocSearchService searchService;
     @Autowired
     private NkDocEngineFrontService docEngineFrontService;
     @Autowired@SuppressWarnings("all")
