@@ -60,9 +60,15 @@ public class NkBpmDefServiceImpl implements NkBpmDefService {
 
     @Override
     public BpmProcessDefinition getDmnDefinition(String definitionId){
+//        BpmProcessDefinition definition = BeanUtilz.copyFromObject(processEngine.getRepositoryService()
+//                .createDecisionRequirementsDefinitionQuery()
+//                .decisionRequirementsDefinitionId(definitionId)
+//                .singleResult(), BpmProcessDefinition.class);
+
+
         BpmProcessDefinition definition = BeanUtilz.copyFromObject(processEngine.getRepositoryService()
-                .createDecisionRequirementsDefinitionQuery()
-                .decisionRequirementsDefinitionId(definitionId)
+                .createDecisionDefinitionQuery()
+                .decisionDefinitionId(definitionId)
                 .singleResult(), BpmProcessDefinition.class);
 
         definition.setBpmnXml(getBpmnXml(definition.getDeploymentId(),definition.getResourceName()));

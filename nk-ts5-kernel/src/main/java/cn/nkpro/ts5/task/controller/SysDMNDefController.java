@@ -5,16 +5,16 @@ import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.task.NkBpmDefService;
 import cn.nkpro.ts5.task.model.BpmDeployment;
 import cn.nkpro.ts5.task.model.BpmProcessDefinition;
+import cn.nkpro.ts5.task.model.DmnDecisionDefinition;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
-import org.camunda.bpm.engine.repository.DecisionRequirementsDefinitionQuery;
-import org.camunda.bpm.engine.repository.DeploymentQuery;
-import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
+import org.camunda.bpm.engine.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * Created by bean on 2020/7/17.
@@ -32,7 +32,7 @@ public class SysDMNDefController {
 
     @NkNote("1.拉取定义")
     @RequestMapping(value = "/definitions")
-    public PageList<BpmProcessDefinition> processDefinitions(
+    public PageList<DmnDecisionDefinition> processDefinitions(
             @NkNote("查询条目")@RequestParam(value = "latest",       required = false, defaultValue = "false") Boolean latest,
             @NkNote("查询条目")@RequestParam(value = "keyword",      required = false) String key,
             @NkNote("查询条目")@RequestParam(value = "orderField",   required = false) String orderField,
@@ -40,8 +40,8 @@ public class SysDMNDefController {
             @NkNote("起始条目")@RequestParam("from") Integer from,
             @NkNote("查询条目")@RequestParam("rows") Integer rows){
 
-        DecisionRequirementsDefinitionQuery query = processEngine.getRepositoryService()
-                .createDecisionRequirementsDefinitionQuery();
+        DecisionDefinitionQuery query = processEngine.getRepositoryService()
+                .createDecisionDefinitionQuery();
 
         if(latest)
             query.latestVersion();
@@ -50,13 +50,13 @@ public class SysDMNDefController {
         if(StringUtils.isNotBlank(orderField)){
             switch (orderField){
                 case "key":
-                    query.orderByDecisionRequirementsDefinitionKey();
+                    query.orderByDecisionDefinitionKey();
                     break;
                 case "name":
-                    query.orderByDecisionRequirementsDefinitionName();
+                    query.orderByDecisionDefinitionName();
                     break;
                 case "version":
-                    query.orderByDecisionRequirementsDefinitionVersion();
+                    query.orderByDecisionDefinitionVersion();
                     break;
             }
             if("desc".equalsIgnoreCase(order)){
@@ -67,7 +67,7 @@ public class SysDMNDefController {
         }
 
         return new PageList<>(
-                BeanUtilz.copyFromList(query.listPage(from,rows), BpmProcessDefinition.class),
+                BeanUtilz.copyFromList(query.listPage(from,rows), DmnDecisionDefinition.class),
                 from,
                 rows,
                 query.count());
