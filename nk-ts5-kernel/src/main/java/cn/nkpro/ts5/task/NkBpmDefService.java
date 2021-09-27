@@ -9,4 +9,6 @@ public interface NkBpmDefService {
     BpmDeployment deploy(BpmProcessDefinition definition);
 
     BpmProcessDefinition getProcessDefinition(String definitionId);
+
+    BpmProcessDefinition getDmnDefinition(String definitionId);
 }
