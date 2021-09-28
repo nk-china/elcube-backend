@@ -1,14 +1,14 @@
 package cn.nkpro.ts5.task;
 
 
-import cn.nkpro.ts5.task.model.BpmDeployment;
-import cn.nkpro.ts5.task.model.BpmProcessDefinition;
+import cn.nkpro.ts5.task.model.ResourceDeployment;
+import cn.nkpro.ts5.task.model.ResourceDefinition;
 
 public interface NkBpmDefService {
 
-    BpmDeployment deploy(BpmProcessDefinition definition);
+    ResourceDeployment deploy(ResourceDefinition definition);
 
-    BpmProcessDefinition getProcessDefinition(String definitionId);
+    ResourceDefinition getProcessDefinition(String definitionId);
 
-    BpmProcessDefinition getDmnDefinition(String definitionId);
+    ResourceDefinition getDmnDefinition(String definitionId);
 }

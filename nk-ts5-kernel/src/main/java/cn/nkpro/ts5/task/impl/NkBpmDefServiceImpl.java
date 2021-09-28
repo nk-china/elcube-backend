@@ -1,8 +1,8 @@
 package cn.nkpro.ts5.task.impl;
 
 import cn.nkpro.ts5.task.NkBpmDefService;
-import cn.nkpro.ts5.task.model.BpmDeployment;
-import cn.nkpro.ts5.task.model.BpmProcessDefinition;
+import cn.nkpro.ts5.task.model.ResourceDeployment;
+import cn.nkpro.ts5.task.model.ResourceDefinition;
 import cn.nkpro.ts5.exception.NkDefineException;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import org.apache.commons.lang3.StringUtils;
@@ -24,7 +24,7 @@ public class NkBpmDefServiceImpl implements NkBpmDefService {
     private ProcessEngine processEngine;
 
     @Override
-    public BpmDeployment deploy(BpmProcessDefinition definition){
+    public ResourceDeployment deploy(ResourceDefinition definition){
 
         ProcessDefinition existsDefinition = processEngine.getRepositoryService()
                 .createProcessDefinitionQuery()
@@ -40,38 +40,38 @@ public class NkBpmDefServiceImpl implements NkBpmDefService {
         return BeanUtilz.copyFromObject(
                 processEngine.getRepositoryService()
                     .createDeployment()
-                    .addString(definition.getResourceName(),definition.getBpmnXml())
+                    .addString(definition.getResourceName(),definition.getXml())
                     .deploy(),
-                BpmDeployment.class
+                ResourceDeployment.class
         );
     }
 
     @Override
-    public BpmProcessDefinition getProcessDefinition(String definitionId){
-        BpmProcessDefinition definition = BeanUtilz.copyFromObject(processEngine.getRepositoryService()
+    public ResourceDefinition getProcessDefinition(String definitionId){
+        ResourceDefinition definition = BeanUtilz.copyFromObject(processEngine.getRepositoryService()
                 .createProcessDefinitionQuery()
                 .processDefinitionId(definitionId)
-                .singleResult(), BpmProcessDefinition.class);
+                .singleResult(), ResourceDefinition.class);
 
-        definition.setBpmnXml(getBpmnXml(definition.getDeploymentId(),definition.getResourceName()));
+        definition.setXml(getBpmnXml(definition.getDeploymentId(),definition.getResourceName()));
 
         return definition;
     }
 
     @Override
-    public BpmProcessDefinition getDmnDefinition(String definitionId){
+    public ResourceDefinition getDmnDefinition(String definitionId){
 //        BpmProcessDefinition definition = BeanUtilz.copyFromObject(processEngine.getRepositoryService()
 //                .createDecisionRequirementsDefinitionQuery()
 //                .decisionRequirementsDefinitionId(definitionId)
 //                .singleResult(), BpmProcessDefinition.class);
 
 
-        BpmProcessDefinition definition = BeanUtilz.copyFromObject(processEngine.getRepositoryService()
+        ResourceDefinition definition = BeanUtilz.copyFromObject(processEngine.getRepositoryService()
                 .createDecisionDefinitionQuery()
                 .decisionDefinitionId(definitionId)
-                .singleResult(), BpmProcessDefinition.class);
+                .singleResult(), ResourceDefinition.class);
 
-        definition.setBpmnXml(getBpmnXml(definition.getDeploymentId(),definition.getResourceName()));
+        definition.setXml(getBpmnXml(definition.getDeploymentId(),definition.getResourceName()));
 
         return definition;
     }

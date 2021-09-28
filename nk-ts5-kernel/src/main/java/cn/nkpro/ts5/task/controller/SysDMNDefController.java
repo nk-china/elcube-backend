@@ -3,18 +3,23 @@ package cn.nkpro.ts5.task.controller;
 import cn.nkpro.ts5.annotation.NkNote;
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.task.NkBpmDefService;
-import cn.nkpro.ts5.task.model.BpmDeployment;
-import cn.nkpro.ts5.task.model.BpmProcessDefinition;
+import cn.nkpro.ts5.task.model.DmnDecisionRunModel;
+import cn.nkpro.ts5.task.model.ResourceDeployment;
+import cn.nkpro.ts5.task.model.ResourceDefinition;
 import cn.nkpro.ts5.task.model.DmnDecisionDefinition;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import org.apache.commons.lang3.StringUtils;
+import org.camunda.bpm.dmn.engine.*;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.ByteArrayInputStream;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by bean on 2020/7/17.
@@ -74,15 +79,32 @@ public class SysDMNDefController {
     }
     @NkNote("2.拉取定义详情")
     @RequestMapping(value = "/definition/detail")
-    public BpmProcessDefinition processDefinitionDetail(String definitionId){
+    public ResourceDefinition processDefinitionDetail(String definitionId){
         return defBpmService.getDmnDefinition(definitionId);
     }
 
     @NkNote("3.部署流程定义")
     @RequestMapping(value = "/deploy",method = RequestMethod.POST)
-    public BpmDeployment deploy(@RequestBody BpmProcessDefinition definition){
+    public ResourceDeployment deploy(@RequestBody ResourceDefinition definition){
         return defBpmService.deploy(definition);
     }
+
+    private DmnEngine dmnEngine = DmnEngineConfiguration.createDefaultDmnEngineConfiguration().buildEngine();
+
+    @NkNote("4.测试运行")
+    @RequestMapping(value = "/run",method = RequestMethod.POST)
+    public List<DmnDecisionResultEntries> run(@RequestBody DmnDecisionRunModel run){
+        DmnDecision decision = dmnEngine.parseDecision(run.getDecisionKey(),new ByteArrayInputStream(run.getXml().getBytes()));
+        return evaluateDecision(decision, run.getVariables(), new ArrayList<>());
+    }
+
+    private List<DmnDecisionResultEntries> evaluateDecision(DmnDecision decision, Map<String,Object> variables, List<DmnDecisionResultEntries> result){
+        result.addAll(dmnEngine.evaluateDecision(decision, variables));
+        decision.getRequiredDecisions()
+                .forEach(dmnDecision -> evaluateDecision(dmnDecision,variables,result));
+        return result;
+    }
+
 
 //    @NkNote("4.拉取部署记录")
 //    @RequestMapping(value = "/deployments")

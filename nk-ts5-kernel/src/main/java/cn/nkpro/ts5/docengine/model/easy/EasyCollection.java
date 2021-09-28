@@ -13,7 +13,7 @@ public interface EasyCollection<T> extends Collection<T> {
 
     EasySingle append();
 
-    EasySingle find(Function<Object, Boolean> function);
+    EasySingle find(Function<EasySingle, Boolean> function);
 
     EasySingle get(int index);
 

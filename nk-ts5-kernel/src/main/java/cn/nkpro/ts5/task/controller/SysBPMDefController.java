@@ -2,9 +2,9 @@ package cn.nkpro.ts5.task.controller;
 
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.task.NkBpmDefService;
-import cn.nkpro.ts5.task.model.BpmProcessDefinition;
+import cn.nkpro.ts5.task.model.ResourceDefinition;
 import cn.nkpro.ts5.annotation.NkNote;
-import cn.nkpro.ts5.task.model.BpmDeployment;
+import cn.nkpro.ts5.task.model.ResourceDeployment;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -30,7 +30,7 @@ public class SysBPMDefController {
 
     @NkNote("1.拉取定义")
     @RequestMapping(value = "/process/definitions")
-    public PageList<BpmProcessDefinition> processDefinitions(
+    public PageList<ResourceDefinition> processDefinitions(
             @NkNote("查询条目")@RequestParam(value = "latest",       required = false, defaultValue = "false") Boolean latest,
             @NkNote("查询条目")@RequestParam(value = "keyword",      required = false) String key,
             @NkNote("查询条目")@RequestParam(value = "orderField",   required = false) String orderField,
@@ -65,26 +65,26 @@ public class SysBPMDefController {
         }
 
         return new PageList<>(
-                BeanUtilz.copyFromList(query.listPage(from,rows), BpmProcessDefinition.class),
+                BeanUtilz.copyFromList(query.listPage(from,rows), ResourceDefinition.class),
                 from,
                 rows,
                 query.count());
     }
     @NkNote("2.拉取定义详情")
     @RequestMapping(value = "/process/definition/detail")
-    public BpmProcessDefinition processDefinitionDetail(String definitionId){
+    public ResourceDefinition processDefinitionDetail(String definitionId){
         return defBpmService.getProcessDefinition(definitionId);
     }
 
     @NkNote("3.部署流程定义")
     @RequestMapping(value = "/deploy",method = RequestMethod.POST)
-    public BpmDeployment deploy(@RequestBody BpmProcessDefinition definition){
+    public ResourceDeployment deploy(@RequestBody ResourceDefinition definition){
         return defBpmService.deploy(definition);
     }
 
     @NkNote("4.拉取部署记录")
     @RequestMapping(value = "/deployments")
-    public PageList<BpmDeployment> deployments(
+    public PageList<ResourceDeployment> deployments(
             @NkNote("起始条目")@RequestParam("from") Integer from,
             @NkNote("查询条目")@RequestParam("rows") Integer rows){
 
@@ -94,7 +94,7 @@ public class SysBPMDefController {
         return new PageList<>(
                 BeanUtilz.copyFromList(query.orderByDeploymentTime().desc()
                         .orderByDeploymentName().desc()
-                        .listPage(from,rows), BpmDeployment.class),
+                        .listPage(from,rows), ResourceDeployment.class),
                 from,
                 rows,
                 query.count());

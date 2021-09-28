@@ -37,7 +37,7 @@ public class EasyList implements EasyCollection<EasySingle> {
     }
 
     @Override
-    public EasySingle find(Function<Object, Boolean> function){
+    public EasySingle find(Function<EasySingle, Boolean> function){
         return easies.stream()
                 .filter(function::apply)
                 .findFirst()

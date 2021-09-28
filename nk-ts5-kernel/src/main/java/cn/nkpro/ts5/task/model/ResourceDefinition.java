@@ -3,7 +3,7 @@ package cn.nkpro.ts5.task.model;
 import lombok.Data;
 
 @Data
-public class BpmProcessDefinition {
+public class ResourceDefinition {
 
         private String id;
         private String deploymentId;
@@ -11,6 +11,6 @@ public class BpmProcessDefinition {
         private String name;
         private Integer version;
         private String resourceName;
-        private String bpmnXml;
+        private String xml;
         private String fromId;
 }

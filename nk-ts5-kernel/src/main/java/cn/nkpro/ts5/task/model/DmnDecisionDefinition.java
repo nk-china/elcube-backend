@@ -5,7 +5,7 @@ import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class DmnDecisionDefinition extends BpmProcessDefinition {
+public class DmnDecisionDefinition extends ResourceDefinition {
 
         private String decisionRequirementsDefinitionId;
         private String decisionRequirementsDefinitionKey;
