@@ -1,6 +1,7 @@
 package cn.nkpro.ts5.task.controller;
 
 import cn.nkpro.ts5.annotation.NkNote;
+import cn.nkpro.ts5.basic.Keep;
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.task.NkBpmDefService;
 import cn.nkpro.ts5.task.model.DmnDecisionDefinition;
@@ -134,6 +135,7 @@ public class SysDMNDefController {
             }))
             .buildEngine();
 
+    @Keep
     @Data
     @AllArgsConstructor
     static class DmnResult{
