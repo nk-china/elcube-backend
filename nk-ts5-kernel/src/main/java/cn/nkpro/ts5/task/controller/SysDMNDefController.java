@@ -3,24 +3,33 @@ package cn.nkpro.ts5.task.controller;
 import cn.nkpro.ts5.annotation.NkNote;
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.task.NkBpmDefService;
-import cn.nkpro.ts5.task.model.DmnDecisionRunModel;
-import cn.nkpro.ts5.task.model.ResourceDeployment;
-import cn.nkpro.ts5.task.model.ResourceDefinition;
 import cn.nkpro.ts5.task.model.DmnDecisionDefinition;
+import cn.nkpro.ts5.task.model.DmnDecisionRunModel;
+import cn.nkpro.ts5.task.model.ResourceDefinition;
+import cn.nkpro.ts5.task.model.ResourceDeployment;
 import cn.nkpro.ts5.utils.BeanUtilz;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
-import org.camunda.bpm.dmn.engine.*;
+import org.camunda.bpm.dmn.engine.DmnDecision;
+import org.camunda.bpm.dmn.engine.DmnDecisionResult;
+import org.camunda.bpm.dmn.engine.DmnEngine;
+import org.camunda.bpm.dmn.engine.DmnEngineConfiguration;
+import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationEvent;
+import org.camunda.bpm.dmn.engine.delegate.DmnDecisionTableEvaluationListener;
+import org.camunda.bpm.dmn.engine.delegate.DmnEvaluatedDecisionRule;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.repository.*;
+import org.camunda.bpm.engine.repository.DecisionDefinitionQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayInputStream;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by bean on 2020/7/17.
@@ -90,8 +99,6 @@ public class SysDMNDefController {
         return defBpmService.deploy(definition);
     }
 
-    private DmnEngine dmnEngine = DmnEngineConfiguration.createDefaultDmnEngineConfiguration().buildEngine();
-
     @NkNote("4.测试运行")
     @RequestMapping(value = "/run",method = RequestMethod.POST)
     public Map<String,Object> run(@RequestBody DmnDecisionRunModel run){
@@ -100,28 +107,37 @@ public class SysDMNDefController {
     }
 
     private Map<String,Object> evaluateDecision(DmnDecision decision, Map<String,Object> variables, Map<String,Object> result){
-        result.put(decision.getKey(),dmnEngine.evaluateDecision(decision, variables));
+
+        threadLocal.remove();
+        result.put(decision.getKey(),new DmnResult(
+                dmnEngine.evaluateDecision(decision, variables),
+                threadLocal.get()!=null?
+                        threadLocal.get()
+                            .getMatchingRules()
+                            .stream()
+                            .map(DmnEvaluatedDecisionRule::getId)
+                            .collect(Collectors.toList())
+                        :null
+        ));
         decision.getRequiredDecisions()
                 .forEach(dmnDecision -> evaluateDecision(dmnDecision,variables,result));
         return result;
     }
 
+    private ThreadLocal<DmnDecisionTableEvaluationEvent> threadLocal = new ThreadLocal<>();
+    private DmnEngine dmnEngine = DmnEngineConfiguration.createDefaultDmnEngineConfiguration()
+            .customPostDecisionTableEvaluationListeners(Collections.singletonList(new DmnDecisionTableEvaluationListener() {
+                @Override
+                public void notify(DmnDecisionTableEvaluationEvent dmnDecisionTableEvaluationEvent) {
+                    threadLocal.set(dmnDecisionTableEvaluationEvent);
+                }
+            }))
+            .buildEngine();
 
-//    @NkNote("4.拉取部署记录")
-//    @RequestMapping(value = "/deployments")
-//    public PageList<BpmDeployment> deployments(
-//            @NkNote("起始条目")@RequestParam("from") Integer from,
-//            @NkNote("查询条目")@RequestParam("rows") Integer rows){
-//
-//        DeploymentQuery query = processEngine.getRepositoryService()
-//                .createDeploymentQuery();
-//
-//        return new PageList<>(
-//                BeanUtilz.copyFromList(query.orderByDeploymentTime().desc()
-//                        .orderByDeploymentName().desc()
-//                        .listPage(from,rows), BpmDeployment.class),
-//                from,
-//                rows,
-//                query.count());
-//    }
+    @Data
+    @AllArgsConstructor
+    static class DmnResult{
+        DmnDecisionResult result;
+        List<String> matchedRules;
+    }
 }
