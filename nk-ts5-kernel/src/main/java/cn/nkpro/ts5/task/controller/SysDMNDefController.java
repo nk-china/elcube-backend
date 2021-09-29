@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayInputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -93,13 +94,13 @@ public class SysDMNDefController {
 
     @NkNote("4.测试运行")
     @RequestMapping(value = "/run",method = RequestMethod.POST)
-    public List<DmnDecisionResultEntries> run(@RequestBody DmnDecisionRunModel run){
+    public Map<String,Object> run(@RequestBody DmnDecisionRunModel run){
         DmnDecision decision = dmnEngine.parseDecision(run.getDecisionKey(),new ByteArrayInputStream(run.getXml().getBytes()));
-        return evaluateDecision(decision, run.getVariables(), new ArrayList<>());
+        return evaluateDecision(decision, run.getVariables(), new HashMap<>());
     }
 
-    private List<DmnDecisionResultEntries> evaluateDecision(DmnDecision decision, Map<String,Object> variables, List<DmnDecisionResultEntries> result){
-        result.addAll(dmnEngine.evaluateDecision(decision, variables));
+    private Map<String,Object> evaluateDecision(DmnDecision decision, Map<String,Object> variables, Map<String,Object> result){
+        result.put(decision.getKey(),dmnEngine.evaluateDecision(decision, variables));
         decision.getRequiredDecisions()
                 .forEach(dmnDecision -> evaluateDecision(dmnDecision,variables,result));
         return result;
