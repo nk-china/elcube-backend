@@ -696,12 +696,12 @@ public class NkDocDefServiceImpl implements NkDocDefService {
     public DocDefHV deserializeDef(DocDefHV docDefHV) {
 
         runLoopCards(docDefHV,true, (nkCard,item)->{
-            item.setConfig(nkCard.deserializeDef(item.getConfig()));
+            log.info("{}\tdeserializeDef docType = {} cardKey = {}",NkDocEngineContext.currLog(), docDefHV.getDocType(), item.getCardKey());
             item.setPosition(nkCard.getPosition());
             item.setDataComponentName(nkCard.getDataComponentName());
             item.setDefComponentNames(nkCard.getAutoDefComponentNames());
             item.setCardContent(null);
-            log.info("{}\tdeserializeDef docType = {} cardKey = {}",NkDocEngineContext.currLog(), docDefHV.getDocType(), item.getCardKey());
+            item.setConfig(nkCard.deserializeDef(item.getConfig()));
         });
 
         return docDefHV;
@@ -710,12 +710,12 @@ public class NkDocDefServiceImpl implements NkDocDefService {
     private DocDefHV deserializeDefFromContent(DocDefHV docDefHV) {
 
         runLoopCards(docDefHV,true, (nkCard,item)->{
-            item.setConfig(nkCard.deserializeDef(item.getCardContent()));
+            log.info("{}\tdeserializeDef docType = {} cardKey = {}",NkDocEngineContext.currLog(), docDefHV.getDocType(), item.getCardKey());
             item.setPosition(nkCard.getPosition());
             item.setDataComponentName(nkCard.getDataComponentName());
             item.setDefComponentNames(nkCard.getAutoDefComponentNames());
             item.setCardContent(null);
-            log.info("{}\tdeserializeDef docType = {} cardKey = {}",NkDocEngineContext.currLog(), docDefHV.getDocType(), item.getCardKey());
+            item.setConfig(nkCard.deserializeDef(item.getCardContent()));
         });
 
         return docDefHV;
@@ -744,6 +744,7 @@ public class NkDocDefServiceImpl implements NkDocDefService {
             try {
                 function.run(nkCard, docDefI);
             }catch (Exception e){
+                log.error(e.getMessage(),e);
                 if(!ignoreError){
                     throw new NkComponentException(nkCard,e);
                 }

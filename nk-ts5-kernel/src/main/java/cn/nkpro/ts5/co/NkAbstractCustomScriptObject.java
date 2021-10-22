@@ -8,6 +8,7 @@ import cn.nkpro.ts5.annotation.NkNote;
 import com.alibaba.fastjson.JSON;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -70,7 +71,7 @@ public abstract class NkAbstractCustomScriptObject implements NkCustomScriptObje
             scriptDefH.setVersion("@");
             scriptDefH.setGroovyMain(groovyCode.stream().findFirst().orElse(null));
             scriptDefH.setVueMain(vueMainCode.stream().findFirst().orElse(null));
-            scriptDefH.setVueDefs(JSON.toJSONString(vueDefsCode));
+            scriptDefH.setVueDefs(CollectionUtils.isEmpty(vueDefsCode)?null:JSON.toJSONString(vueDefsCode));
             scriptDefH.setState("Active");
 
             Class<?> groovy = GroovyUtils.compileGroovy(className, scriptDefH.getGroovyMain());
