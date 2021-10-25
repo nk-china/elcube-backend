@@ -140,8 +140,8 @@ public class UserAccountServiceImpl implements UserAccountService {
         map.put("username",SecurityContextHolder.getContext().getAuthentication().getPrincipal());
         map.put("password",SecurityContextHolder.getContext().getAuthentication().getCredentials());
 
-        long time   = 1000 * 60 * 45;             // 有效期默认为45分钟
-        long expire = 1000 * 60 * 15;             // 过期时间设定为15分钟
+        long time   = 1000L * 60 * 45;             // 有效期默认为45分钟
+        long expire = 1000L * 60 * 15;             // 过期时间设定为15分钟
 
         String token = jwt.createJWT(map,time);
 
@@ -160,18 +160,6 @@ public class UserAccountServiceImpl implements UserAccountService {
     }
 
 
-
-    public String createToken2(String phone){
-        Map<String,Object> map = new HashMap<>();
-        map.put("token",phone);
-
-        long time   = 1000 * 60 * 45;             // 有效期默认为45分钟
-        long expire = 1000 * 60 * 15;             // 过期时间设定为15分钟
-
-        String token = jwt.createJWT(map,time);
-
-        return token;
-    }
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return Optional.ofNullable(getAccount(username,true))

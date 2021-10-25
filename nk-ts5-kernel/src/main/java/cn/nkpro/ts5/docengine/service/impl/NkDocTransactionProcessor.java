@@ -309,7 +309,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
             Object cardData  = card.beforeUpdate(
                     atomic.get(),
                     atomic.get().getData().get(defIV.getCardKey()),
-                    existsOriginal ? original.getData().get(defIV.getCardKey()) : null,
+                    existsOriginal ? optionalOriginal.get().getData().get(defIV.getCardKey()) : null,
                     defIV,
                     defIV.getConfig()
             );
@@ -317,7 +317,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
             // 如果原始单据数据存在则更新，否则插入数据
             if(existsOriginal){
 
-                DocI docI = BeanUtilz.copyFromObject(original.getItems().get(defIV.getCardKey()),DocI.class);
+                DocI docI = BeanUtilz.copyFromObject(optionalOriginal.get().getItems().get(defIV.getCardKey()),DocI.class);
                 docI.setCardContent(JSON.toJSONString(cardData));
 
                 docIMapper.updateByPrimaryKeyWithBLOBs(docI);
@@ -438,24 +438,27 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
                     }
                 });
         // 删除已过时的索引
-        if(optionalOriginal.isPresent()){
-            original.getDynamics().forEach((k,v)->{
-                if(!atomic.get().getDynamics().containsKey(k)){
-                    DocIIndexKey key = new DocIIndexKey();
-                    key.setDocId(atomic.get().getDocId());
-                    key.setName(k);
-                    docIIndexMapper.deleteByPrimaryKey(key);
-                }
-            });
-        }
+        optionalOriginal.ifPresent(o -> o.getDynamics().forEach((k, v) -> {
+            if (!atomic.get().getDynamics().containsKey(k)) {
+                DocIIndexKey key = new DocIIndexKey();
+                key.setDocId(atomic.get().getDocId());
+                key.setName(k);
+                docIIndexMapper.deleteByPrimaryKey(key);
+            }
+        }));
 
         // 业务主键
         atomic.get().setBusinessKey(StringUtils.EMPTY);
         if(StringUtils.isNotBlank(atomic.get().getDef().getBusinessKeySpEL())){
             Object businessKey = spELManager.invoke(atomic.get().getDef().getBusinessKeySpEL(), context);
             atomic.get().setBusinessKey(businessKey!=null?businessKey.toString():StringUtils.EMPTY);
-            if(StringUtils.isNotBlank(atomic.get().getBusinessKey())&&
-                    !(optionalOriginal.isPresent() && StringUtils.equals(atomic.get().getBusinessKey(),original.getBusinessKey()))){
+            if(
+                    StringUtils.isNotBlank(atomic.get().getBusinessKey())&&
+                    !(
+                            optionalOriginal.isPresent() &&
+                                    StringUtils.equals(atomic.get().getBusinessKey(),optionalOriginal.get().getBusinessKey())
+                    )
+            ){
 
                 DocHExample docHExample = new DocHExample();
                 docHExample.createCriteria()

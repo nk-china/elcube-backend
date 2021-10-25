@@ -19,30 +19,30 @@ public class JwtHelper {
     /**
      * token 过期时间, 单位: 秒. 这个值表示 10 天
      */
-    private static final long TOKEN_EXPIRED_TIME = 10 * 24 * 60 * 60 * 1000;
+    private static final long TOKEN_EXPIRED_TIME = 10L * 24 * 60 * 60 * 1000;
     /**
      * token 还有3天过期时重新生成
      */
-    private static final long TOKEN_RENEW_TIME = 5 * 24 * 60 * 60 * 1000;
+    private static final long TOKEN_RENEW_TIME = 5L * 24 * 60 * 60 * 1000;
 
     //private static final long TOKEN_RENEW_TIME = 864000000-300000;
 
     /**
      * token 过期时间, 单位: 秒. 这个值表示 60 分钟
      */
-    private static final long TOKEN_EXPIRED_TIME_WEB = 60 * 60 * 1000;
+    private static final long TOKEN_EXPIRED_TIME_WEBL = 60L * 60 * 1000;
 
     /**
      * token 还有30分钟过期时重新生成
      */
-    private static final long TOKEN_RENEW_TIME_WEB = 30 * 60 * 1000;
+    private static final long TOKEN_RENEW_TIME_WEB = 30L * 60 * 1000;
 
     /**
      * jwt 加密解密密钥
      */
     private static final String JWT_SECRET = "MDk4ZjZiY2Q0NjIxZDM3M2NhZGU0ZTgzMjYyN2I0ZjY=";
 
-    public static final String jwtId = "tokenId";
+    private static final String jwtId = "tokenId";
     /**
      * 创建JWT
      */
