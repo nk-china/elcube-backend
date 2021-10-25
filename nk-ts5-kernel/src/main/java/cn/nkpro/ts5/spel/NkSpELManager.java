@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 public class NkSpELManager {
 
     private static final ExpressionParser parser = new SpelExpressionParser();
-    private static final Pattern pattern = Pattern.compile("\"?\\$\\{(?:[^\"'}]|\"[^\"]*\"|'[^']*'|\\{\\{|}})*}\"?");
+    private static final Pattern pattern = Pattern.compile("\"?\\$\\{(?:[^\"'}]|\"[^\"]*\"|'[^']*'|\\{\\{|}})*+}\"?");
 
 
     @Autowired@SuppressWarnings("all")
@@ -120,4 +120,11 @@ public class NkSpELManager {
 
         return input;
     }
+//
+//    public static void main(String[] args) {
+//        System.out.println(pattern.matcher("${a}").find());
+//        System.out.println(pattern.matcher("\"${a}\"").find());
+//        System.out.println(pattern.matcher("[${a}]").find());
+//        System.out.println(pattern.matcher("[\"${a}\"]").find());
+//    }
 }
