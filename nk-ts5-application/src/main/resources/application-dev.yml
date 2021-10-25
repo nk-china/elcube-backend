@@ -8,7 +8,7 @@ nk:
     - cn.nkpro.ts5.cards
     - cn.nkpro.groovy
   component-disable-online-editing: true
-  component-reload-class-path: true
+  component-reload-class-path: false
 spring:
   datasource:
     url: jdbc:mysql://121.36.76.251:3306/ts5_beebattle_dev

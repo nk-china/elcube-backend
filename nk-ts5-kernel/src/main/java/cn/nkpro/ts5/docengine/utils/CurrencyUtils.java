@@ -18,12 +18,12 @@ public interface CurrencyUtils {
     /*
      * ir - interest rate per month            月利率
      * np - number of periods (months)         还款次数
-     * pv - present value                      限值
+     * pv - present value                      现值
      * fv - future value (residual value)      终值
      * type - 0 or 1 need to implement that    期末
      */
     static double pmt(double ir, int np, double pv, double fv, int type ) {
-        if(np==0||pv==0D)return 0d;
+        if(np==0||pv<0.0000001)return 0d;
         if(ir < 0.0000001)return pv/np;
         return halfUp(( ir * ( pv * Math.pow ( (ir+1), np ) + fv ) ) / ( ( ir * type + 1 ) * ( Math.pow ( (ir+1), np) -1 ) ));
 
