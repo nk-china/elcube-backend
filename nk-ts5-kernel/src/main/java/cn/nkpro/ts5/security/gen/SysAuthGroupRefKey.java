@@ -1,7 +1,5 @@
 package cn.nkpro.ts5.security.gen;
 
-import cn.nkpro.ts5.annotation.CodeFieldNotes;
-
 import java.io.Serializable;
 
 public class SysAuthGroupRefKey implements Serializable {
@@ -19,7 +17,7 @@ public class SysAuthGroupRefKey implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getGroupId() {
         return groupId;
     }
@@ -28,7 +26,7 @@ public class SysAuthGroupRefKey implements Serializable {
         this.groupId = groupId;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getRefId() {
         return refId;
     }
@@ -37,7 +35,7 @@ public class SysAuthGroupRefKey implements Serializable {
         this.refId = refId;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public Integer getRefType() {
         return refType;
     }

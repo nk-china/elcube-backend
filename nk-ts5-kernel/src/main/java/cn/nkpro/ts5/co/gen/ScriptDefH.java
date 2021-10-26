@@ -1,6 +1,5 @@
 package cn.nkpro.ts5.co.gen;
 
-import cn.nkpro.ts5.annotation.CodeFieldNotes;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
@@ -45,7 +44,7 @@ public class ScriptDefH extends ScriptDefHKey implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getScriptType() {
         return scriptType;
     }
@@ -54,7 +53,7 @@ public class ScriptDefH extends ScriptDefHKey implements Serializable {
         this.scriptType = scriptType;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getScriptDesc() {
         return scriptDesc;
     }
@@ -70,7 +69,7 @@ public class ScriptDefH extends ScriptDefHKey implements Serializable {
      *
      * @mbggenerated
      */
-    @CodeFieldNotes("组件描述")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("组件描述")
     public String getScriptDoc() {
         return scriptDoc;
     }
@@ -93,7 +92,7 @@ public class ScriptDefH extends ScriptDefHKey implements Serializable {
      *
      * @mbggenerated
      */
-    @CodeFieldNotes("Active Version, boolean Value, 1 or 0")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("Active Version, boolean Value, 1 or 0")
     public String getState() {
         return state;
     }
@@ -116,7 +115,7 @@ public class ScriptDefH extends ScriptDefHKey implements Serializable {
      *
      * @mbggenerated
      */
-    @CodeFieldNotes("ref User ID")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("ref User ID")
     public String getOwner() {
         return owner;
     }
@@ -132,7 +131,7 @@ public class ScriptDefH extends ScriptDefHKey implements Serializable {
         this.owner = owner;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public Long getCreatedTime() {
         return createdTime;
     }
@@ -141,7 +140,7 @@ public class ScriptDefH extends ScriptDefHKey implements Serializable {
         this.createdTime = createdTime;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public Long getUpdatedTime() {
         return updatedTime;
     }

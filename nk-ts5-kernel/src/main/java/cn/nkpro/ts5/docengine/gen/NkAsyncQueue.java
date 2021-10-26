@@ -1,6 +1,5 @@
 package cn.nkpro.ts5.docengine.gen;
 
-import cn.nkpro.ts5.annotation.CodeFieldNotes;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
@@ -34,7 +33,7 @@ public class NkAsyncQueue implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getAsyncId() {
         return asyncId;
     }
@@ -43,7 +42,7 @@ public class NkAsyncQueue implements Serializable {
         this.asyncId = asyncId;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getAsyncObjectRef() {
         return asyncObjectRef;
     }
@@ -52,7 +51,7 @@ public class NkAsyncQueue implements Serializable {
         this.asyncObjectRef = asyncObjectRef;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public Integer getAsyncRetry() {
         return asyncRetry;
     }
@@ -61,7 +60,7 @@ public class NkAsyncQueue implements Serializable {
         this.asyncRetry = asyncRetry;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public Integer getAsyncLimit() {
         return asyncLimit;
     }
@@ -70,7 +69,7 @@ public class NkAsyncQueue implements Serializable {
         this.asyncLimit = asyncLimit;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getAsyncRule() {
         return asyncRule;
     }
@@ -79,7 +78,7 @@ public class NkAsyncQueue implements Serializable {
         this.asyncRule = asyncRule;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getAsyncState() {
         return asyncState;
     }
@@ -88,7 +87,7 @@ public class NkAsyncQueue implements Serializable {
         this.asyncState = asyncState;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getAsyncNext() {
         return asyncNext;
     }
@@ -97,7 +96,7 @@ public class NkAsyncQueue implements Serializable {
         this.asyncNext = asyncNext;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public Long getCreatedTime() {
         return createdTime;
     }
@@ -106,7 +105,7 @@ public class NkAsyncQueue implements Serializable {
         this.createdTime = createdTime;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public Long getUpdatedTime() {
         return updatedTime;
     }

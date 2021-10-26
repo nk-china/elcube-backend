@@ -1,17 +1,12 @@
 package cn.nkpro.ts5.platform.gen;
 
-import cn.nkpro.ts5.annotation.CodeFieldNotes;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class SysUserDashboardRef implements Serializable {
-    private String id;
-
-    private String accountId;
-
+public class SysUserDashboardRef extends SysUserDashboardRefKey implements Serializable {
     private String name;
 
     private Integer orderBy;
@@ -24,25 +19,7 @@ public class SysUserDashboardRef implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    @CodeFieldNotes("")
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    @CodeFieldNotes("")
-    public String getAccountId() {
-        return accountId;
-    }
-
-    public void setAccountId(String accountId) {
-        this.accountId = accountId;
-    }
-
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getName() {
         return name;
     }
@@ -51,7 +28,7 @@ public class SysUserDashboardRef implements Serializable {
         this.name = name;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public Integer getOrderBy() {
         return orderBy;
     }

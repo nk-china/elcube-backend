@@ -1,7 +1,5 @@
 package cn.nkpro.ts5.docengine.gen;
 
-import cn.nkpro.ts5.annotation.CodeFieldNotes;
-
 import java.io.Serializable;
 
 public class DocDefBpmKey implements Serializable {
@@ -19,7 +17,7 @@ public class DocDefBpmKey implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getDocType() {
         return docType;
     }
@@ -28,7 +26,7 @@ public class DocDefBpmKey implements Serializable {
         this.docType = docType;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getProcessKey() {
         return processKey;
     }
@@ -37,7 +35,7 @@ public class DocDefBpmKey implements Serializable {
         this.processKey = processKey;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getVersion() {
         return version;
     }

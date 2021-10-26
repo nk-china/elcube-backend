@@ -1,6 +1,5 @@
 package cn.nkpro.ts5.security.gen;
 
-import cn.nkpro.ts5.annotation.CodeFieldNotes;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
@@ -24,7 +23,7 @@ public class SysAuthLimit implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getLimitId() {
         return limitId;
     }
@@ -33,7 +32,7 @@ public class SysAuthLimit implements Serializable {
         this.limitId = limitId;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getLimitDesc() {
         return limitDesc;
     }
@@ -42,7 +41,7 @@ public class SysAuthLimit implements Serializable {
         this.limitDesc = limitDesc;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getLimitLevel() {
         return limitLevel;
     }
@@ -51,7 +50,7 @@ public class SysAuthLimit implements Serializable {
         this.limitLevel = limitLevel;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getContent() {
         return content;
     }

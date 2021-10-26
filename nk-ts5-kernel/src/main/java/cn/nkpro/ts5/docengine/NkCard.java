@@ -58,7 +58,7 @@ public interface NkCard<DT,DDT> extends NkScriptCard {
     void stateChanged(DocHV doc, DocHV original, DT data, DocDefIV defIV, DDT def);
 
     @Transactional(propagation = Propagation.NOT_SUPPORTED, readOnly = true)
-    default void updateCommitted(DocHV doc, DT data, DocDefIV defIV, DDT def){};
+    default void updateCommitted(DocHV doc, DT data, DocDefIV defIV, DDT def){}
 
     boolean isDebug();
 

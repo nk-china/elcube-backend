@@ -1,10 +1,10 @@
-package cn.nkpro.ts5.docengine.controller;
+package cn.nkpro.ts5.co.controller;
 
 import cn.nkpro.ts5.basic.NkProperties;
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.co.ScriptDefHV;
 import cn.nkpro.ts5.co.gen.ScriptDefH;
-import cn.nkpro.ts5.docengine.service.NkScriptDefManager;
+import cn.nkpro.ts5.co.service.NkScriptDefManager;
 import cn.nkpro.ts5.annotation.NkNote;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;

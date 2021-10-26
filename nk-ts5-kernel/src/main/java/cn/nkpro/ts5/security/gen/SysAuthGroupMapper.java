@@ -1,5 +1,7 @@
 package cn.nkpro.ts5.security.gen;
 
+import cn.nkpro.ts5.security.gen.SysAuthGroup;
+import cn.nkpro.ts5.security.gen.SysAuthGroupExample;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.RowBounds;

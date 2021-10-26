@@ -1,6 +1,5 @@
 package cn.nkpro.ts5.docengine.gen;
 
-import cn.nkpro.ts5.annotation.CodeFieldNotes;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
@@ -24,7 +23,7 @@ public class DocDefBpm extends DocDefBpmKey implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getStartBy() {
         return startBy;
     }
@@ -33,7 +32,7 @@ public class DocDefBpm extends DocDefBpmKey implements Serializable {
         this.startBy = startBy;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getRollbackTo() {
         return rollbackTo;
     }
@@ -42,7 +41,7 @@ public class DocDefBpm extends DocDefBpmKey implements Serializable {
         this.rollbackTo = rollbackTo;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public Long getUpdatedTime() {
         return updatedTime;
     }
@@ -51,7 +50,7 @@ public class DocDefBpm extends DocDefBpmKey implements Serializable {
         this.updatedTime = updatedTime;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public Integer getOrderBy() {
         return orderBy;
     }

@@ -1,6 +1,5 @@
 package cn.nkpro.ts5.security.gen;
 
-import cn.nkpro.ts5.annotation.CodeFieldNotes;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
@@ -20,7 +19,7 @@ public class SysAuthGroup implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getGroupId() {
         return groupId;
     }
@@ -29,7 +28,7 @@ public class SysAuthGroup implements Serializable {
         this.groupId = groupId;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getGroupDesc() {
         return groupDesc;
     }

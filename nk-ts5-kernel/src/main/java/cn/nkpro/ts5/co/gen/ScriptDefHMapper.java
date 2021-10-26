@@ -1,5 +1,9 @@
 package cn.nkpro.ts5.co.gen;
 
+import cn.nkpro.ts5.co.gen.ScriptDefH;
+import cn.nkpro.ts5.co.gen.ScriptDefHExample;
+import cn.nkpro.ts5.co.gen.ScriptDefHKey;
+import cn.nkpro.ts5.co.gen.ScriptDefHWithBLOBs;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.RowBounds;

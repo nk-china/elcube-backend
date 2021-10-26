@@ -1,5 +1,7 @@
 package cn.nkpro.ts5.platform.gen;
 
+import cn.nkpro.ts5.platform.gen.SysWebappMenu;
+import cn.nkpro.ts5.platform.gen.SysWebappMenuExample;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.RowBounds;

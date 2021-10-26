@@ -1,7 +1,5 @@
 package cn.nkpro.ts5.co.gen;
 
-import cn.nkpro.ts5.annotation.CodeFieldNotes;
-
 import java.io.Serializable;
 
 public class ScriptDefHKey implements Serializable {
@@ -17,7 +15,7 @@ public class ScriptDefHKey implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getScriptName() {
         return scriptName;
     }
@@ -26,7 +24,7 @@ public class ScriptDefHKey implements Serializable {
         this.scriptName = scriptName;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getVersion() {
         return version;
     }

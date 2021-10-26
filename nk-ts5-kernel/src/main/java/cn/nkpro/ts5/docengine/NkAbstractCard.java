@@ -35,9 +35,6 @@ public abstract class NkAbstractCard<DT,DDT> extends NkAbstractCustomScriptObjec
     @Getter
     private String position = NkCard.POSITION_DEFAULT;
 
-    @Autowired
-    private NkProperties properties;
-
     public NkAbstractCard(){
         super();
         this.cardName = Optional.ofNullable(getClass().getAnnotation(NkNote.class))
@@ -78,16 +75,6 @@ public abstract class NkAbstractCard<DT,DDT> extends NkAbstractCustomScriptObjec
         }
 
         return getDefComponentNames();
-    }
-
-    private ScriptDefHV scriptDefHV(){
-        if(!isDebug() && properties.isComponentReloadClassPath()){
-            ScriptDefHV defHV = super.loadScriptFromClassPath();
-            if(defHV!=null){
-                return defHV;
-            }
-        }
-        return this.scriptDef;
     }
 
     @Override

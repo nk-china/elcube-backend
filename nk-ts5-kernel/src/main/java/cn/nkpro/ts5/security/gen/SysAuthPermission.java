@@ -1,6 +1,5 @@
 package cn.nkpro.ts5.security.gen;
 
-import cn.nkpro.ts5.annotation.CodeFieldNotes;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
@@ -50,7 +49,7 @@ public class SysAuthPermission implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getPermId() {
         return permId;
     }
@@ -59,7 +58,7 @@ public class SysAuthPermission implements Serializable {
         this.permId = permId;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getPermDesc() {
         return permDesc;
     }
@@ -75,7 +74,7 @@ public class SysAuthPermission implements Serializable {
      *
      * @mbggenerated
      */
-    @CodeFieldNotes("资源，如单据 D:ZR01 ")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("资源，如单据 D:ZR01 ")
     public String getPermResource() {
         return permResource;
     }
@@ -98,7 +97,7 @@ public class SysAuthPermission implements Serializable {
      *
      * @mbggenerated
      */
-    @CodeFieldNotes("操作 CRUD")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("操作 CRUD")
     public String getPermOperate() {
         return permOperate;
     }
@@ -121,7 +120,7 @@ public class SysAuthPermission implements Serializable {
      *
      * @mbggenerated
      */
-    @CodeFieldNotes("限制，主要针对数据权限控制")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("限制，主要针对数据权限控制")
     public String getLimitId() {
         return limitId;
     }
@@ -137,7 +136,7 @@ public class SysAuthPermission implements Serializable {
         this.limitId = limitId;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getPermLevel() {
         return permLevel;
     }
@@ -153,7 +152,7 @@ public class SysAuthPermission implements Serializable {
      *
      * @mbggenerated
      */
-    @CodeFieldNotes("子资源，如卡片")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("子资源，如卡片")
     public String getSubResource() {
         return subResource;
     }

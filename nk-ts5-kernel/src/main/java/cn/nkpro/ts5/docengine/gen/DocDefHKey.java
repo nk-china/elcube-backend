@@ -1,7 +1,5 @@
 package cn.nkpro.ts5.docengine.gen;
 
-import cn.nkpro.ts5.annotation.CodeFieldNotes;
-
 import java.io.Serializable;
 
 public class DocDefHKey implements Serializable {
@@ -17,7 +15,7 @@ public class DocDefHKey implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getDocType() {
         return docType;
     }
@@ -26,7 +24,7 @@ public class DocDefHKey implements Serializable {
         this.docType = docType;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getVersion() {
         return version;
     }

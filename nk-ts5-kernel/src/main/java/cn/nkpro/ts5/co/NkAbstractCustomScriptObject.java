@@ -58,6 +58,17 @@ public abstract class NkAbstractCustomScriptObject implements NkCustomScriptObje
         }
     }
 
+
+    protected ScriptDefHV scriptDefHV(){
+        if(!scriptDef.isDebug() && properties.isComponentReloadClassPath()){
+            ScriptDefHV defHV = loadScriptFromClassPath();
+            if(defHV!=null){
+                return defHV;
+            }
+        }
+        return this.scriptDef;
+    }
+
     protected ScriptDefHV loadScriptFromClassPath() {
 
         String className = getClass().getSimpleName();

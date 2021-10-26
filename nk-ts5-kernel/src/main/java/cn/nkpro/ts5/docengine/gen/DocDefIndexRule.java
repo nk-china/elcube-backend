@@ -1,6 +1,5 @@
 package cn.nkpro.ts5.docengine.gen;
 
-import cn.nkpro.ts5.annotation.CodeFieldNotes;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
@@ -24,7 +23,7 @@ public class DocDefIndexRule extends DocDefIndexRuleKey implements Serializable 
      */
     private static final long serialVersionUID = 1L;
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getIndexType() {
         return indexType;
     }
@@ -33,7 +32,7 @@ public class DocDefIndexRule extends DocDefIndexRuleKey implements Serializable 
         this.indexType = indexType;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getRuleSpEL() {
         return ruleSpEL;
     }
@@ -42,7 +41,7 @@ public class DocDefIndexRule extends DocDefIndexRuleKey implements Serializable 
         this.ruleSpEL = ruleSpEL;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public Long getUpdatedTime() {
         return updatedTime;
     }
@@ -51,7 +50,7 @@ public class DocDefIndexRule extends DocDefIndexRuleKey implements Serializable 
         this.updatedTime = updatedTime;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public Integer getOrderBy() {
         return orderBy;
     }

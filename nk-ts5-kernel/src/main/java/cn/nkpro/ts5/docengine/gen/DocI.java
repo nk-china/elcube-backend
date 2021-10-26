@@ -1,6 +1,5 @@
 package cn.nkpro.ts5.docengine.gen;
 
-import cn.nkpro.ts5.annotation.CodeFieldNotes;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
@@ -22,7 +21,7 @@ public class DocI extends DocIKey implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public Long getCreatedTime() {
         return createdTime;
     }
@@ -31,7 +30,7 @@ public class DocI extends DocIKey implements Serializable {
         this.createdTime = createdTime;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public Long getUpdatedTime() {
         return updatedTime;
     }
@@ -40,7 +39,7 @@ public class DocI extends DocIKey implements Serializable {
         this.updatedTime = updatedTime;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getCardContent() {
         return cardContent;
     }

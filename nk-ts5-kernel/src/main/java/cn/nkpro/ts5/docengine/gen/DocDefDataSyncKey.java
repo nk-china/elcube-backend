@@ -1,7 +1,5 @@
 package cn.nkpro.ts5.docengine.gen;
 
-import cn.nkpro.ts5.annotation.CodeFieldNotes;
-
 import java.io.Serializable;
 
 public class DocDefDataSyncKey implements Serializable {
@@ -21,7 +19,7 @@ public class DocDefDataSyncKey implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getDocType() {
         return docType;
     }
@@ -30,7 +28,7 @@ public class DocDefDataSyncKey implements Serializable {
         this.docType = docType;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public Integer getOrderBy() {
         return orderBy;
     }
@@ -39,7 +37,7 @@ public class DocDefDataSyncKey implements Serializable {
         this.orderBy = orderBy;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getTargetSvr() {
         return targetSvr;
     }
@@ -48,7 +46,7 @@ public class DocDefDataSyncKey implements Serializable {
         this.targetSvr = targetSvr;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getVersion() {
         return version;
     }

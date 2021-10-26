@@ -1,7 +1,5 @@
 package cn.nkpro.ts5.docengine.gen;
 
-import cn.nkpro.ts5.annotation.CodeFieldNotes;
-
 import java.io.Serializable;
 
 public class DocDefStateKey implements Serializable {
@@ -21,7 +19,7 @@ public class DocDefStateKey implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getDocState() {
         return docState;
     }
@@ -30,7 +28,7 @@ public class DocDefStateKey implements Serializable {
         this.docState = docState;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getDocType() {
         return docType;
     }
@@ -39,7 +37,7 @@ public class DocDefStateKey implements Serializable {
         this.docType = docType;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getPreDocState() {
         return preDocState;
     }
@@ -48,7 +46,7 @@ public class DocDefStateKey implements Serializable {
         this.preDocState = preDocState;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getVersion() {
         return version;
     }

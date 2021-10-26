@@ -1,6 +1,5 @@
 package cn.nkpro.ts5.platform.gen;
 
-import cn.nkpro.ts5.annotation.CodeFieldNotes;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
@@ -36,7 +35,7 @@ public class SysWebappMenu implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getMenuId() {
         return menuId;
     }
@@ -45,7 +44,7 @@ public class SysWebappMenu implements Serializable {
         this.menuId = menuId;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getTitle() {
         return title;
     }
@@ -54,7 +53,7 @@ public class SysWebappMenu implements Serializable {
         this.title = title;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getSubTitle() {
         return subTitle;
     }
@@ -63,7 +62,7 @@ public class SysWebappMenu implements Serializable {
         this.subTitle = subTitle;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getParentId() {
         return parentId;
     }
@@ -72,7 +71,7 @@ public class SysWebappMenu implements Serializable {
         this.parentId = parentId;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public Integer getOrderBy() {
         return orderBy;
     }
@@ -81,7 +80,7 @@ public class SysWebappMenu implements Serializable {
         this.orderBy = orderBy;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getUrl() {
         return url;
     }
@@ -90,7 +89,7 @@ public class SysWebappMenu implements Serializable {
         this.url = url;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getIcon() {
         return icon;
     }
@@ -99,7 +98,7 @@ public class SysWebappMenu implements Serializable {
         this.icon = icon;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getAuthorityOptions() {
         return authorityOptions;
     }
@@ -108,7 +107,7 @@ public class SysWebappMenu implements Serializable {
         this.authorityOptions = authorityOptions;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public Long getUpdatedTime() {
         return updatedTime;
     }
@@ -117,7 +116,7 @@ public class SysWebappMenu implements Serializable {
         this.updatedTime = updatedTime;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getMenuOptions() {
         return menuOptions;
     }

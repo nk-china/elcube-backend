@@ -1,6 +1,5 @@
 package cn.nkpro.ts5.security.gen;
 
-import cn.nkpro.ts5.annotation.CodeFieldNotes;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
@@ -38,7 +37,7 @@ public class SysAccount implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getId() {
         return id;
     }
@@ -47,7 +46,7 @@ public class SysAccount implements Serializable {
         this.id = id;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getUsername() {
         return username;
     }
@@ -56,7 +55,7 @@ public class SysAccount implements Serializable {
         this.username = username;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getPassword() {
         return password;
     }
@@ -65,7 +64,7 @@ public class SysAccount implements Serializable {
         this.password = password;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public Integer getLocked() {
         return locked;
     }
@@ -74,7 +73,7 @@ public class SysAccount implements Serializable {
         this.locked = locked;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getValidFrom() {
         return validFrom;
     }
@@ -83,7 +82,7 @@ public class SysAccount implements Serializable {
         this.validFrom = validFrom;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getValidTo() {
         return validTo;
     }
@@ -92,7 +91,7 @@ public class SysAccount implements Serializable {
         this.validTo = validTo;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getRealname() {
         return realname;
     }
@@ -101,7 +100,7 @@ public class SysAccount implements Serializable {
         this.realname = realname;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public Long getCreatedTime() {
         return createdTime;
     }
@@ -110,7 +109,7 @@ public class SysAccount implements Serializable {
         this.createdTime = createdTime;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public Long getUpdatedTime() {
         return updatedTime;
     }
@@ -119,7 +118,7 @@ public class SysAccount implements Serializable {
         this.updatedTime = updatedTime;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public Long getLastActived() {
         return lastActived;
     }
@@ -128,7 +127,7 @@ public class SysAccount implements Serializable {
         this.lastActived = lastActived;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getObjectId() {
         return objectId;
     }

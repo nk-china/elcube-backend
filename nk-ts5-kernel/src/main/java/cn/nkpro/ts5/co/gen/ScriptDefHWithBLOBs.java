@@ -1,7 +1,5 @@
 package cn.nkpro.ts5.co.gen;
 
-import cn.nkpro.ts5.annotation.CodeFieldNotes;
-
 import java.io.Serializable;
 
 public class ScriptDefHWithBLOBs extends ScriptDefH implements Serializable {
@@ -55,7 +53,7 @@ public class ScriptDefHWithBLOBs extends ScriptDefH implements Serializable {
      *
      * @mbggenerated
      */
-    @CodeFieldNotes("组件的服务类入口")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("组件的服务类入口")
     public String getGroovyMain() {
         return groovyMain;
     }
@@ -78,7 +76,7 @@ public class ScriptDefHWithBLOBs extends ScriptDefH implements Serializable {
      *
      * @mbggenerated
      */
-    @CodeFieldNotes("组件的依赖类集合")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("组件的依赖类集合")
     public String getGroovyRefs() {
         return groovyRefs;
     }
@@ -101,7 +99,7 @@ public class ScriptDefHWithBLOBs extends ScriptDefH implements Serializable {
      *
      * @mbggenerated
      */
-    @CodeFieldNotes("组件的数据界面入口")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("组件的数据界面入口")
     public String getVueMain() {
         return vueMain;
     }
@@ -124,7 +122,7 @@ public class ScriptDefHWithBLOBs extends ScriptDefH implements Serializable {
      *
      * @mbggenerated
      */
-    @CodeFieldNotes("组件的配置界面入口")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("组件的配置界面入口")
     public String getVueDefs() {
         return vueDefs;
     }
@@ -147,7 +145,7 @@ public class ScriptDefHWithBLOBs extends ScriptDefH implements Serializable {
      *
      * @mbggenerated
      */
-    @CodeFieldNotes("组件的依赖界面组件集合")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("组件的依赖界面组件集合")
     public String getVueComponents() {
         return vueComponents;
     }

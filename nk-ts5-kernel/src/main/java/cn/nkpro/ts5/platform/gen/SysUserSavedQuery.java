@@ -1,6 +1,5 @@
 package cn.nkpro.ts5.platform.gen;
 
-import cn.nkpro.ts5.annotation.CodeFieldNotes;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
@@ -26,7 +25,7 @@ public class SysUserSavedQuery implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getId() {
         return id;
     }
@@ -35,7 +34,7 @@ public class SysUserSavedQuery implements Serializable {
         this.id = id;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getName() {
         return name;
     }
@@ -44,7 +43,7 @@ public class SysUserSavedQuery implements Serializable {
         this.name = name;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getUserId() {
         return userId;
     }
@@ -53,7 +52,7 @@ public class SysUserSavedQuery implements Serializable {
         this.userId = userId;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getSource() {
         return source;
     }
@@ -62,7 +61,7 @@ public class SysUserSavedQuery implements Serializable {
         this.source = source;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getJson() {
         return json;
     }

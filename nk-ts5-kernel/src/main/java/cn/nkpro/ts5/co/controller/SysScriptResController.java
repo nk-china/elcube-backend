@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.docengine.controller;
+package cn.nkpro.ts5.co.controller;
 
 import cn.nkpro.ts5.basic.Keep;
 import cn.nkpro.ts5.co.NkCustomObject;
@@ -8,6 +8,7 @@ import cn.nkpro.ts5.co.ScriptDefHV;
 import cn.nkpro.ts5.docengine.NkCard;
 import cn.nkpro.ts5.exception.NkSystemException;
 import cn.nkpro.ts5.annotation.NkNote;
+import cn.nkpro.ts5.platform.dashboard.NkMeter;
 import groovy.lang.GroovyObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -40,6 +41,12 @@ public class SysScriptResController {
         customObjectManager.getCustomObjects(NkCard.class)
                 .values()
                 .forEach(nkCard -> vueMap.putAll(nkCard.getVueTemplate()));
+
+        customObjectManager.getCustomObjects(NkMeter.class)
+                .values()
+                .forEach(nkMeter -> vueMap.putAll(nkMeter.getVueTemplate()));
+
+
         return vueMap;
     }
 

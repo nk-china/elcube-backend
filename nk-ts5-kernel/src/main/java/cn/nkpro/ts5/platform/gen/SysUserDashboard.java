@@ -1,6 +1,5 @@
 package cn.nkpro.ts5.platform.gen;
 
-import cn.nkpro.ts5.annotation.CodeFieldNotes;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
@@ -28,7 +27,7 @@ public class SysUserDashboard implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getId() {
         return id;
     }
@@ -37,7 +36,7 @@ public class SysUserDashboard implements Serializable {
         this.id = id;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getName() {
         return name;
     }
@@ -46,7 +45,7 @@ public class SysUserDashboard implements Serializable {
         this.name = name;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getAccountId() {
         return accountId;
     }
@@ -55,7 +54,7 @@ public class SysUserDashboard implements Serializable {
         this.accountId = accountId;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public Long getUpdatedTime() {
         return updatedTime;
     }
@@ -64,7 +63,7 @@ public class SysUserDashboard implements Serializable {
         this.updatedTime = updatedTime;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public Integer getShared() {
         return shared;
     }
@@ -73,7 +72,7 @@ public class SysUserDashboard implements Serializable {
         this.shared = shared;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getConfig() {
         return config;
     }

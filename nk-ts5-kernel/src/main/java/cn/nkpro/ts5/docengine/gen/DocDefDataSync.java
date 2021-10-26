@@ -1,6 +1,5 @@
 package cn.nkpro.ts5.docengine.gen;
 
-import cn.nkpro.ts5.annotation.CodeFieldNotes;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
@@ -30,7 +29,7 @@ public class DocDefDataSync extends DocDefDataSyncKey implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getTargetArgs() {
         return targetArgs;
     }
@@ -39,7 +38,7 @@ public class DocDefDataSync extends DocDefDataSyncKey implements Serializable {
         this.targetArgs = targetArgs;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public Integer getReExecute() {
         return reExecute;
     }
@@ -48,7 +47,7 @@ public class DocDefDataSync extends DocDefDataSyncKey implements Serializable {
         this.reExecute = reExecute;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getConditionSpEL() {
         return conditionSpEL;
     }
@@ -57,7 +56,7 @@ public class DocDefDataSync extends DocDefDataSyncKey implements Serializable {
         this.conditionSpEL = conditionSpEL;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getDataSpEL() {
         return dataSpEL;
     }
@@ -66,7 +65,7 @@ public class DocDefDataSync extends DocDefDataSyncKey implements Serializable {
         this.dataSpEL = dataSpEL;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getKeySpEL() {
         return keySpEL;
     }
@@ -75,7 +74,7 @@ public class DocDefDataSync extends DocDefDataSyncKey implements Serializable {
         this.keySpEL = keySpEL;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getMappingSpEL() {
         return mappingSpEL;
     }
@@ -84,7 +83,7 @@ public class DocDefDataSync extends DocDefDataSyncKey implements Serializable {
         this.mappingSpEL = mappingSpEL;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public Long getUpdatedTime() {
         return updatedTime;
     }

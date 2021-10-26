@@ -1,6 +1,5 @@
 package cn.nkpro.ts5.docengine.gen;
 
-import cn.nkpro.ts5.annotation.CodeFieldNotes;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import java.io.Serializable;
@@ -28,7 +27,7 @@ public class DocDefIndexCustom extends DocDefIndexCustomKey implements Serializa
      */
     private static final long serialVersionUID = 1L;
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getConditionSpEL() {
         return conditionSpEL;
     }
@@ -37,7 +36,7 @@ public class DocDefIndexCustom extends DocDefIndexCustomKey implements Serializa
         this.conditionSpEL = conditionSpEL;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getDataSpEL() {
         return dataSpEL;
     }
@@ -46,7 +45,7 @@ public class DocDefIndexCustom extends DocDefIndexCustomKey implements Serializa
         this.dataSpEL = dataSpEL;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getKeySpEL() {
         return keySpEL;
     }
@@ -55,7 +54,7 @@ public class DocDefIndexCustom extends DocDefIndexCustomKey implements Serializa
         this.keySpEL = keySpEL;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getMappingSpEL() {
         return mappingSpEL;
     }
@@ -64,7 +63,7 @@ public class DocDefIndexCustom extends DocDefIndexCustomKey implements Serializa
         this.mappingSpEL = mappingSpEL;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public Long getUpdatedTime() {
         return updatedTime;
     }
@@ -73,7 +72,7 @@ public class DocDefIndexCustom extends DocDefIndexCustomKey implements Serializa
         this.updatedTime = updatedTime;
     }
 
-    @CodeFieldNotes("")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public Integer getOrderBy() {
         return orderBy;
     }
