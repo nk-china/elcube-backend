@@ -700,8 +700,8 @@ public class NkDocDefServiceImpl implements NkDocDefService {
             item.setPosition(nkCard.getPosition());
             item.setDataComponentName(nkCard.getDataComponentName());
             item.setDefComponentNames(nkCard.getAutoDefComponentNames());
-            item.setCardContent(null);
             item.setConfig(nkCard.deserializeDef(item.getConfig()));
+            item.setCardContent(null);
         });
 
         return docDefHV;
@@ -714,8 +714,8 @@ public class NkDocDefServiceImpl implements NkDocDefService {
             item.setPosition(nkCard.getPosition());
             item.setDataComponentName(nkCard.getDataComponentName());
             item.setDefComponentNames(nkCard.getAutoDefComponentNames());
-            item.setCardContent(null);
             item.setConfig(nkCard.deserializeDef(item.getCardContent()));
+            item.setCardContent(null);
         });
 
         return docDefHV;
