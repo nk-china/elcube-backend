@@ -8,7 +8,7 @@ public interface NkDocEngine {
 
     DocHV create(String docType, String preDocId);
 
-    DocHV calculate(DocHV doc, String fromCard, String options);
+    DocHV calculate(DocHV doc, String fromCard, Object options);
 
     DocHV doUpdate(DocHV doc, String optSource);
 

@@ -34,6 +34,8 @@ public interface NkCard<DT,DDT> extends NkScriptCard {
 
     DDT afterGetDef(DocDefHV defHV, DocDefIV defIV, DDT def);
 
+    Object callDef(DDT def, Object options);
+
     // 解析数据
     DT deserialize(Object data);
 
@@ -44,10 +46,10 @@ public interface NkCard<DT,DDT> extends NkScriptCard {
     DT afterGetData(DocHV doc, DT data, DocDefIV defIV, DDT def);
 
     // 计算方法
-    DT calculate(DocHV doc, DT data, DocDefIV defIV, DDT def, boolean isTrigger, String options);
+    DT calculate(DocHV doc, DT data, DocDefIV defIV, DDT def, boolean isTrigger, Object options);
 
     // 调用方法
-    DT call(DocHV doc, DT data, DocDefIV defIV, DDT def, String options);
+    DT call(DocHV doc, DT data, DocDefIV defIV, DDT def, Object options);
 
     // 更新方法
     DT beforeUpdate(DocHV doc, DT data, DT original, DocDefIV defIV, DDT def);

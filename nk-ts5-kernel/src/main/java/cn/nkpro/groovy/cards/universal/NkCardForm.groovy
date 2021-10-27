@@ -29,7 +29,7 @@ class NkCardForm extends NkAbstractCard<Map,NkCardFormDef> {
     }
 
     @Override
-    Map calculate(DocHV doc, Map data, DocDefIV defIV, NkCardFormDef d, boolean isTrigger, String options) {
+    Map calculate(DocHV doc, Map data, DocDefIV defIV, NkCardFormDef d, boolean isTrigger, Object options) {
         return nkFormCardHelper.execSpEL(doc, data, defIV, d.getItems(), false, true)
     }
 
@@ -37,6 +37,8 @@ class NkCardForm extends NkAbstractCard<Map,NkCardFormDef> {
     Map random(DocHV docHV, DocDefIV defIV, NkCardFormDef d) {
         return nkFormCardHelper.random(d.getItems())
     }
+
+
 
     @JsonIgnoreProperties(ignoreUnknown=true)
     static class NkCardFormDef {

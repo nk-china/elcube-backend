@@ -121,20 +121,18 @@ public class DocController {
         return docEngine.doUpdateView(doc, info);
     }
 
-    @EqualsAndHashCode(callSuper = true)
     @Data
-    static class CalcModel extends DocHV{
+    static class CalcModel{
         String fromCard;
-        String options;
+        Object options;
         DocHV doc;
     }
 
-    @EqualsAndHashCode(callSuper = true)
     @Data
-    static class CallModel extends DocHV{
+    static class CallModel{
         String fromCard;
         String method;
-        String options;
+        Object options;
         DocHV doc;
     }
 }

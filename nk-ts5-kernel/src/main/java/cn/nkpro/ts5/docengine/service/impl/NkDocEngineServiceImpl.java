@@ -226,7 +226,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
      */
     @Override
     @Transactional(propagation = Propagation.NEVER)
-    public DocHV calculate(DocHV doc, String fromCard, String options) {
+    public DocHV calculate(DocHV doc, String fromCard, Object options) {
         NkDocEngineContext.startLog("CALCULATE", doc.getDocId());
         if(log.isInfoEnabled())log.info("{}开始单据计算", NkDocEngineContext.currLog());
         try{
@@ -253,7 +253,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
      */
     @Override
     @Transactional(propagation = Propagation.NEVER)
-    public Object call(DocHV doc, String fromCard, String method, String options) {
+    public Object call(DocHV doc, String fromCard, String method, Object options) {
         NkDocEngineContext.startLog("CALL", doc.getDocId());
         if(log.isInfoEnabled())log.info("{}开始调用单据程序", NkDocEngineContext.currLog());
         try{

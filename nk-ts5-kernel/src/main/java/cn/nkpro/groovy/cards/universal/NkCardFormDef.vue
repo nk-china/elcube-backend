@@ -192,10 +192,10 @@ export default {
     },
     created() {
         this.$nkSortableVxeTable(true);
-        console.log(this.def.items)
         if(!this.def.items){
             this.$set(this.def,'items',[]);
         }
+        this.nk$callDef(1);
     },
     methods:{
         boolFormat : ({cellValue})=>{return cellValue?'是':''},

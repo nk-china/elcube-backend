@@ -64,7 +64,7 @@ class NkCardDocSnapshots extends NkAbstractCard<List<SysLogDocRecord>,Map> {
     }
 
     @Override
-    List<SysLogDocRecord> call(DocHV doc, List<SysLogDocRecord> data, DocDefIV defIV, Map map, String options) {
-        return docHistoryService.getHistories(doc.getDocId(), Integer.parseInt(options))
+    List<SysLogDocRecord> call(DocHV doc, List<SysLogDocRecord> data, DocDefIV defIV, Map map, Object options) {
+        return docHistoryService.getHistories(doc.getDocId(), options as int)
     }
 }

@@ -2,6 +2,7 @@ package cn.nkpro.ts5.docengine.service.impl;
 
 import cn.nkpro.ts5.basic.Constants;
 import cn.nkpro.ts5.basic.PageList;
+import cn.nkpro.ts5.docengine.model.*;
 import cn.nkpro.ts5.exception.NkDefineException;
 import cn.nkpro.ts5.basic.TransactionSync;
 import cn.nkpro.ts5.co.DebugContextManager;
@@ -13,10 +14,6 @@ import cn.nkpro.ts5.docengine.NkComponentException;
 import cn.nkpro.ts5.docengine.datasync.NkDocDataAdapter;
 import cn.nkpro.ts5.docengine.gen.*;
 import cn.nkpro.ts5.docengine.interceptor.*;
-import cn.nkpro.ts5.docengine.model.DocDefFlowV;
-import cn.nkpro.ts5.docengine.model.DocDefHV;
-import cn.nkpro.ts5.docengine.model.DocDefIV;
-import cn.nkpro.ts5.docengine.model.DocDefStateV;
 import cn.nkpro.ts5.docengine.service.NkDocDefService;
 import cn.nkpro.ts5.docengine.service.NkDocEngineContext;
 import cn.nkpro.ts5.data.mybatis.pagination.PaginationContext;
@@ -29,6 +26,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
@@ -757,6 +755,22 @@ public class NkDocDefServiceImpl implements NkDocDefService {
         this.runLoopCards(docDefHV,ignoreError,function);
         NkDocEngineContext.unlockDoc(docId);
     }
+
+    @Transactional(propagation = Propagation.NEVER)
+    @Override
+    public Object callDef(Object def, String fromCard, Object options) {
+
+        NkCard card = customObjectManager
+                .getCustomObject(fromCard, NkCard.class);
+
+        Object deserializeDef = card.deserializeDef(def);
+
+        @SuppressWarnings("all")
+        Object r = card.callDef(deserializeDef, options);
+
+        return r;
+    }
+
     /**
      * 获取最后一次更新
      * @param docType docType

@@ -3,10 +3,12 @@ package cn.nkpro.ts5.docengine.controller;
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.docengine.NkDocEngine;
 import cn.nkpro.ts5.docengine.model.DocDefHV;
+import cn.nkpro.ts5.docengine.model.DocHV;
 import cn.nkpro.ts5.docengine.service.NkDocDefService;
 import cn.nkpro.ts5.docengine.gen.DocDefH;
 import cn.nkpro.ts5.docengine.model.DocDefIV;
 import cn.nkpro.ts5.annotation.NkNote;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -120,6 +122,13 @@ public class SysDocDefController {
         return defDocTypeService.getCardDescribe(cardHandlerName);
     }
 
+    @NkNote("8、简单调用")
+    @RequestMapping(value = "/call",method = RequestMethod.POST)
+    public Object callDef(
+            @NkNote(value="单据JSON") @RequestBody CallDefModel callModel) {
+        return defDocTypeService.callDef(callModel.getDef(),callModel.getFromCard(),callModel.getOptions());
+    }
+
     @NkNote("12.随机生成单据")
     @RequestMapping(value = "/random/{docType}/{count}")
     public int random(@PathVariable String docType, @PathVariable Integer count) {
@@ -134,5 +143,12 @@ public class SysDocDefController {
             }
         }
         return ret;
+    }
+
+    @Data
+    static class CallDefModel {
+        String fromCard;
+        Object options;
+        Object def;
     }
 }

@@ -39,7 +39,7 @@ class NkCardGrid extends NkAbstractCard<List<Map<String,Object>>,NkCardGridDef> 
     }
 
     @Override
-    List<Map<String,Object>> calculate(DocHV doc, List<Map<String,Object>> data, DocDefIV defIV, NkCardGridDef d, boolean isTrigger, String options) {
+    List<Map<String,Object>> calculate(DocHV doc, List<Map<String,Object>> data, DocDefIV defIV, NkCardGridDef d, boolean isTrigger, Object options) {
         return execSpEL(doc, data, defIV, d)
     }
 

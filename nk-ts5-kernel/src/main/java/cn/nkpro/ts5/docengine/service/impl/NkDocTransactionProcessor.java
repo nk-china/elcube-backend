@@ -118,7 +118,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
     }
 
     @Override
-    public Object call(DocHV doc, String fromCard, String method, String options) {
+    public Object call(DocHV doc, String fromCard, String method, Object options) {
 
         docDefService.runLoopCards(doc.getDocId(), doc.getDef(),false, (card, defIV)->
                 doc.getData().put(
@@ -148,7 +148,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
     }
 
     @Override
-    public DocHV calculate(DocHV doc, String fromCard, String options){
+    public DocHV calculate(DocHV doc, String fromCard, Object options){
 
         AtomicReference<DocHV> atomic = new AtomicReference(doc);
 
@@ -167,7 +167,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
             boolean isTrigger = StringUtils.equals(fromCard,defIV.getCardKey());
 
             // 获取计算函数的自定义选项
-            String itemOptions = isTrigger?options:null;
+            Object itemOptions = isTrigger?options:null;
 
             Object cardData = atomic.get().getData().get(defIV.getCardKey());
 

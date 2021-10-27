@@ -118,6 +118,11 @@ public abstract class NkAbstractCard<DT,DDT> extends NkAbstractCustomScriptObjec
         return def;
     }
 
+    @Override
+    public Object callDef(DDT def, Object options) {
+        return null;
+    }
+
     /**
      * 预解析数据，并转换成DT类型
      */
@@ -147,12 +152,12 @@ public abstract class NkAbstractCard<DT,DDT> extends NkAbstractCustomScriptObjec
      */
     @Override
     @SuppressWarnings("all")
-    public DT calculate(DocHV doc, DT data, DocDefIV defIV, DDT d, boolean isTrigger, String options){
+    public DT calculate(DocHV doc, DT data, DocDefIV defIV, DDT d, boolean isTrigger, Object options){
         return data;
     }
 
     @Override
-    public DT call(DocHV doc, DT data, DocDefIV defIV, DDT d, String options) {
+    public DT call(DocHV doc, DT data, DocDefIV defIV, DDT d, Object options) {
         return null;
     }
 
