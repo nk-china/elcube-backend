@@ -130,14 +130,17 @@ public class NkDocPermServiceImpl implements NkDocPermService {
             if(log.isInfoEnabled())log.info("检测到 超级权限 pass");
             return true;
         }
-        BoolQueryBuilder filter = buildDocFilter(mode, docType, null, false);
-        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder()
-                .postFilter(filter)
-                .query(QueryBuilders.termQuery("docId",docId));
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+
+        BoolQueryBuilder permQuery = buildDocFilter(mode, docType, null, false);
+        if(permQuery!=null)
+            sourceBuilder.postFilter(permQuery);
+
+        sourceBuilder.query(QueryBuilders.termQuery("docId",docId));
         try {
             boolean has = searchEngine.exists(DocHES.class,sourceBuilder);
 
-            if(log.isInfoEnabled())log.info("* 检测到 权限 = {}, filter = {}",has, filter);
+            if(log.isInfoEnabled())log.info("* 检测到 权限 = {}, filter = {}", has, permQuery);
             return has;
         } catch (IOException e) {
             throw new NkSystemException(e);
@@ -176,17 +179,26 @@ public class NkDocPermServiceImpl implements NkDocPermService {
             collectByLimit.get(limit).add(authority.getDocType());
         });
 
+        /*
+         *  todo 注意，这里有个隐藏的bug
+         *  如果用户的权限中包含*:*，或@*:*，且权限中还包含其他非*的单据类型权限，那么需要将*号解析为not exists docTypes
+         *  否则的话，其他单据类型的limit在这个过滤条件中将失效，导致用户能查询到所有的单据数据
+         */
         collectByLimit.forEach((limit,docTypes)->{
             BoolQueryBuilder builder = QueryBuilders.boolQuery();
 
-            if(!docTypes.contains("*"))
+            if(!docTypes.contains("*")){// 如果单据类型包含*号，表示需要匹配所有单据类型，因此不需要增加terms条件
                 builder.must(QueryBuilders.termsQuery(StringUtils.defaultIfBlank(typeKey,"docType"), docTypes));
-            if(StringUtils.isNotBlank(limit))
+            }
+
+            if(StringUtils.isNotBlank(limit)){
                 builder.must(QueryBuilders.wrapperQuery(limit));
+            }
+
             filter.should(builder);
         });
 
-        log.debug("单据查询权限过滤:\n"+filter);
+        log.trace("查询权限过滤:\n"+filter);
 
         return filter;
     }

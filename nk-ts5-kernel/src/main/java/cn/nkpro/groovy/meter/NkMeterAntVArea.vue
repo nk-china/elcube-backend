@@ -6,7 +6,10 @@
                 <nk-form-item title="标题" :width="80">
                     <a-input slot="edit" v-model="configEdit.title"></a-input>
                 </nk-form-item>
-                <nk-form-item title="数据" :width="80">
+                <nk-form-item title="查询语句" :width="80">
+                    <a-textarea slot="edit" v-model="configEdit.sql" rows="5"></a-textarea>
+                </nk-form-item>
+                <nk-form-item title="静态数据" :width="80">
                     <a-textarea slot="edit" v-model="configEdit.data" rows="5"></a-textarea>
                 </nk-form-item>
                 <nk-form-item title="X轴字段" :width="80">
@@ -53,15 +56,15 @@
             this.render(this.config);
         },
         methods:{
+            load(config){
+                return config.sql ?
+                    this.$http.postJSON(`/api/dashboard/card/get/${this.$options._componentTag}`,config) :
+                    new Promise((r)=>{setTimeout(()=>{r({data:JSON.parse(config.data)});},100);});
+            },
             render(config){
-
-                new Promise((resolve)=>{
-                    setTimeout(()=>{
-                        resolve(JSON.parse(config.data));
-                    },100);
-                }).then((data)=>{
+                this.load(config).then(res=>{
                     const gConfig = {
-                        data,
+                        data : res.data,
                         padding: 'auto',
                         xField: config.xField,
                         yField: config.yField,

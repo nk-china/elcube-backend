@@ -1,10 +1,15 @@
-package cn.nkpro.groovy.meter;
+package cn.nkpro.groovy.meter
 
+import cn.nkpro.ts5.docengine.NkDocSearchService;
 import cn.nkpro.ts5.platform.dashboard.NkAbstractMeter
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 @Component("NkMeterAntVWaterfall")
-class NkMeterAntVWaterfall extends NkAbstractMeter<Map> {
+class NkMeterAntVWaterfall extends NkAbstractMeter<List> {
+
+    @Autowired
+    NkDocSearchService searchService
 
     @Override
     String getName() {
@@ -12,7 +17,7 @@ class NkMeterAntVWaterfall extends NkAbstractMeter<Map> {
     }
 
     @Override
-    Map getData() {
-        return null
+    List getData(Object config) {
+        return searchService.searchBySql((config as Map).get("sql") as String).toList();
     }
 }

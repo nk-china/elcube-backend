@@ -8,7 +8,7 @@ public interface NkMeter<DT> extends NkCustomObject {
 
     String getName();
 
-    DT getData();
+    DT getData(Object config);
 
     default int getW(){
         return 4;

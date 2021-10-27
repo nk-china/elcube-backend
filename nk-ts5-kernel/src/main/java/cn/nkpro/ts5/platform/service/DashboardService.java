@@ -123,4 +123,8 @@ public class DashboardService {
                     return jsonObject;
                 }).collect(Collectors.toList());
     }
+
+    public Object getCardData(String meterName,Object config){
+        return customObjectManager.getCustomObject(meterName, NkMeter.class).getData(config);
+    }
 }

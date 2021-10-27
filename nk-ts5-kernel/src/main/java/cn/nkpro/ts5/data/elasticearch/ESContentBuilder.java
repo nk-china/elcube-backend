@@ -189,6 +189,14 @@ class ESContentBuilder {
         return document.value();
     }
 
+    String getIndexPrefix(){
+        String prefix = properties.getEnvKey();
+        if(StringUtils.isNotBlank(prefix)){
+            return String.format("%s-",prefix);
+        }
+        return StringUtils.EMPTY;
+    }
+
 
 // 临时内容，待删除
 //            aggs = response.getAggregations().asList().stream()

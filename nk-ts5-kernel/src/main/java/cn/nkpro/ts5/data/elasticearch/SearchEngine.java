@@ -1,16 +1,20 @@
 package cn.nkpro.ts5.data.elasticearch;
 
 import cn.nkpro.ts5.basic.TransactionSync;
-import cn.nkpro.ts5.exception.NkSystemException;
 import cn.nkpro.ts5.data.elasticearch.annotation.ESDocument;
+import cn.nkpro.ts5.exception.NkSystemException;
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.util.EntityUtils;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.delete.DeleteRequest;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.client.Request;
 import org.elasticsearch.client.RequestOptions;
+import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.GetIndexRequest;
@@ -26,6 +30,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 /**
  * Created by bean on 2020/6/15.
@@ -33,6 +38,8 @@ import java.util.concurrent.TimeUnit;
 @Slf4j
 @Component
 public class SearchEngine extends ESContentBuilder{
+
+    private static Pattern p = Pattern.compile("\\s[Ff][Rf][Oo][Mn]\\s*[\"]?([^\\s\"]*)[\"]?");
 
     @Autowired
     private RestHighLevelClient client;
@@ -43,6 +50,27 @@ public class SearchEngine extends ESContentBuilder{
             client.ping(RequestOptions.DEFAULT);
         } catch (IOException e) {
             log.error("indices heartbeat error",e);
+        }
+    }
+
+    public ESSqlResponse sql(ESSqlRequest sqlRequest){
+
+        sqlRequest.setQuery(
+            p.matcher(sqlRequest.getQuery()).replaceFirst(" FROM \""+getIndexPrefix()+"$1\"")
+        );
+
+        Request request = new Request("GET","/_sql");
+        request.setJsonEntity(sqlRequest.toString());
+
+        try {
+
+            Response response = client.getLowLevelClient()
+                    .performRequest(request);
+
+            return JSONObject.parseObject(EntityUtils.toString(response.getEntity()),ESSqlResponse.class);
+
+        } catch (IOException e) {
+            throw new NkSystemException("搜索引擎发生错误："+e.getMessage(), e);
         }
     }
 

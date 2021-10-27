@@ -5,6 +5,7 @@ import cn.nkpro.ts5.docengine.model.es.CustomES;
 import cn.nkpro.ts5.docengine.service.NkDocPermService;
 import cn.nkpro.ts5.data.elasticearch.*;
 import cn.nkpro.ts5.docengine.model.es.DocHES;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.search.SearchResponse;
@@ -54,6 +55,15 @@ public class NkDocSearchService {
         this.init();
     }
 
+    public ESSqlResponse searchBySql(String sql){
+        return searchEngine.sql(
+                new ESSqlRequest(
+                        sql,
+                        docPermService.buildDocFilter(NkDocPermService.MODE_READ, null,null,false)
+                )
+        );
+    }
+
     public <T extends AbstractESModel> ESPageList<T> queryList(
             Class<T> docType,
             QueryBuilder preQueryBuilder,
@@ -71,9 +81,10 @@ public class NkDocSearchService {
                     QueryBuilders.wrapperQuery(params.getString("preCondition"))
             );
         }
-        postQueryBuilder.must(
-            docPermService.buildDocFilter(NkDocPermService.MODE_READ, null,null,false)
-        );
+
+        BoolQueryBuilder permQuery = docPermService.buildDocFilter(NkDocPermService.MODE_READ, null, null, false);
+        if(permQuery!=null)
+            postQueryBuilder.must(permQuery);
 
         // 构造检索语句
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder()
