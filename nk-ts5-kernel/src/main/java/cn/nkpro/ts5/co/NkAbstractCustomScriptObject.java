@@ -1,6 +1,7 @@
 package cn.nkpro.ts5.co;
 
 import cn.nkpro.ts5.basic.NkProperties;
+import cn.nkpro.ts5.platform.dashboard.NkMeter;
 import cn.nkpro.ts5.utils.ClassUtils;
 import cn.nkpro.ts5.utils.GroovyUtils;
 import cn.nkpro.ts5.utils.ResourceUtils;
@@ -88,7 +89,13 @@ public abstract class NkAbstractCustomScriptObject implements NkCustomScriptObje
             Class<?> groovy = GroovyUtils.compileGroovy(className, scriptDefH.getGroovyMain());
             List interfaces = org.apache.commons.lang3.ClassUtils.getAllInterfaces(groovy);
 
-            scriptDefH.setScriptType(interfaces.contains(NkScriptCard.class) ? "Card" : "Service");
+            if(interfaces.contains(NkScriptCard.class)){
+                scriptDefH.setScriptType("Card");
+            }else if(interfaces.contains(NkMeter.class)){
+                scriptDefH.setScriptType("Meter");
+            }else{
+                scriptDefH.setScriptType("Service");
+            }
 
             NkNote annotation = groovy.getAnnotation(NkNote.class);
             scriptDefH.setScriptDesc(annotation != null ? annotation.value() : beanName);
