@@ -104,7 +104,7 @@
 
                     if(this.g){
                         this.g.update(gConfig);
-                    }else{
+                    }else if(this.$refs.container){
                         this.g = new Area(this.$refs.container,gConfig);
                         this.g.render();
                     }

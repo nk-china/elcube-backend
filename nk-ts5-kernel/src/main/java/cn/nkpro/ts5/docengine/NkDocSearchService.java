@@ -1,11 +1,11 @@
 package cn.nkpro.ts5.docengine;
 
+import cn.nkpro.ts5.data.elasticearch.annotation.ESDocument;
 import cn.nkpro.ts5.docengine.model.BpmTaskES;
-import cn.nkpro.ts5.docengine.model.es.CustomES;
+import cn.nkpro.ts5.docengine.model.es.DocExtES;
 import cn.nkpro.ts5.docengine.service.NkDocPermService;
 import cn.nkpro.ts5.data.elasticearch.*;
 import cn.nkpro.ts5.docengine.model.es.DocHES;
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.search.SearchResponse;
@@ -43,25 +43,30 @@ public class NkDocSearchService {
 
         searchEngine.createIndices(DocHES.class);
         searchEngine.createIndices(BpmTaskES.class);
-        searchEngine.createIndices(CustomES.class);
+        searchEngine.createIndices(DocExtES.class);
     }
 
     public void dropAndInit() throws IOException {
 
         searchEngine.deleteIndices(DocHES.class);
         searchEngine.deleteIndices(BpmTaskES.class);
-        searchEngine.deleteIndices(CustomES.class);
+        searchEngine.deleteIndices(DocExtES.class);
 
         this.init();
     }
 
     public ESSqlResponse searchBySql(String sql){
-        return searchEngine.sql(
-                new ESSqlRequest(
-                        sql,
-                        docPermService.buildDocFilter(NkDocPermService.MODE_READ, null,null,false)
-                )
-        );
+
+        String index = searchEngine.parseSqlIndex(sql);
+
+        QueryBuilder filter;
+        if(DocHES.class.getAnnotation(ESDocument.class).value().equals(index)){
+            filter = docPermService.buildDocFilter(NkDocPermService.MODE_READ, null, null, false);
+        }else{
+            filter = docPermService.buildIndexFilter(index);
+        }
+
+        return searchEngine.sql(new ESSqlRequest(sql,filter));
     }
 
     public <T extends AbstractESModel> ESPageList<T> queryList(

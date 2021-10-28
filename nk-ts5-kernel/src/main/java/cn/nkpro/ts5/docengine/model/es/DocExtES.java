@@ -12,8 +12,8 @@ import lombok.EqualsAndHashCode;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-@ESDocument("document-custom")
-public class CustomES extends AbstractBaseES {
+@ESDocument("doc-ext")
+public class DocExtES extends AbstractBaseES {
 
     @ESId
     @ESField(type= ESFieldType.Keyword)

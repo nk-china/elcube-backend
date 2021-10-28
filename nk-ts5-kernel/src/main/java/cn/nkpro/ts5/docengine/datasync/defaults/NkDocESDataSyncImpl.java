@@ -2,7 +2,7 @@ package cn.nkpro.ts5.docengine.datasync.defaults;
 
 import cn.nkpro.ts5.docengine.datasync.NkAbstractDocDataDiffedSyncAdapter;
 import cn.nkpro.ts5.docengine.gen.DocDefDataSync;
-import cn.nkpro.ts5.docengine.model.es.CustomES;
+import cn.nkpro.ts5.docengine.model.es.DocExtES;
 import cn.nkpro.ts5.data.elasticearch.SearchEngine;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
@@ -40,12 +40,12 @@ public class NkDocESDataSyncImpl extends NkAbstractDocDataDiffedSyncAdapter<Stri
 
     @Override
     public void onRemove(Map<String,Map<String,Object>> list, DocDefDataSync def) {
-        list.forEach((key,value)->searchEngine.deleteBeforeCommit(CustomES.class, key));
+        list.forEach((key,value)->searchEngine.deleteBeforeCommit(DocExtES.class, key));
     }
 
-    private CustomES buildCustomES(DocDefDataSync def, String customId, Map<String,Object> value){
+    private DocExtES buildCustomES(DocDefDataSync def, String customId, Map<String,Object> value){
         Assert.isTrue(StringUtils.isNotBlank(customId),"数据同步服务["+getBeanName() + "] 主键id值不能为空");
-        CustomES customES = new JSONObject(value).toJavaObject(CustomES.class);
+        DocExtES customES = new JSONObject(value).toJavaObject(DocExtES.class);
         customES.setCustomType(def.getTargetArgs());
         customES.setCustomId(customId);
         return customES;

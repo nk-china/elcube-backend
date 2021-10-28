@@ -2,6 +2,7 @@ package cn.nkpro.ts5.data.elasticearch;
 
 import cn.nkpro.ts5.basic.TransactionSync;
 import cn.nkpro.ts5.data.elasticearch.annotation.ESDocument;
+import cn.nkpro.ts5.exception.NkDefineException;
 import cn.nkpro.ts5.exception.NkSystemException;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
@@ -30,6 +31,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -39,7 +41,8 @@ import java.util.regex.Pattern;
 @Component
 public class SearchEngine extends ESContentBuilder{
 
-    private static Pattern p = Pattern.compile("\\s[Ff][Rf][Oo][Mn]\\s*[\"]?([^\\s\"]*)[\"]?");
+    private static Pattern p_repl = Pattern.compile("\\s[Ff][Rf][Oo][Mn]\\s*[\"]?([^\\s\"]*)[\"]?");
+    private static Pattern p_find = Pattern.compile("^[\\w\\W]*\\s[Ff][Rf][Oo][Mn]\\s*[\"]?([^\\s\"]*)[\"]?[\\w\\W]*$");
 
     @Autowired
     private RestHighLevelClient client;
@@ -53,10 +56,21 @@ public class SearchEngine extends ESContentBuilder{
         }
     }
 
+    public String parseSqlIndex(String query){
+
+        Matcher matcher = p_find.matcher(query);
+
+        if(matcher.matches()){
+            return matcher.group(1);
+        }
+
+        throw new NkDefineException("没有匹配到正确的索引名称");
+    }
+
     public ESSqlResponse sql(ESSqlRequest sqlRequest){
 
         sqlRequest.setQuery(
-            p.matcher(sqlRequest.getQuery()).replaceFirst(" FROM \""+getIndexPrefix()+"$1\"")
+            p_repl.matcher(sqlRequest.getQuery()).replaceFirst(" FROM \""+getIndexPrefix()+"$1\"")
         );
 
         Request request = new Request("GET","/_sql");

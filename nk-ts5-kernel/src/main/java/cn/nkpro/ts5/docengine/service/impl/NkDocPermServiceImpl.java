@@ -125,11 +125,11 @@ public class NkDocPermServiceImpl implements NkDocPermService {
     public boolean hasDocPerm(String mode, String docId, String docType) {
 
         if(log.isInfoEnabled())log.info("* 检测单据权限 docType = {}, docId = {}, mode = {}", docType, docId, mode);
-        if(SecurityUtilz.getAuthorities().stream()
-                .anyMatch(g-> g.getAuthority().equals("*:*"))){
-            if(log.isInfoEnabled())log.info("检测到 超级权限 pass");
-            return true;
-        }
+        //if(SecurityUtilz.getAuthorities().stream()
+        //        .anyMatch(g-> g.getAuthority().equals("*:*"))){
+        //    if(log.isInfoEnabled())log.info("检测到 超级权限 pass");
+        //    return true;
+        //}
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
 
         QueryBuilder permQuery = buildDocFilter(mode, docType, null, false);
@@ -147,6 +147,26 @@ public class NkDocPermServiceImpl implements NkDocPermService {
         }
     }
 
+
+    @Override
+    public LimitQueryBuilder buildIndexFilter(String index){
+        GrantedAuthority grantedAuthority = SecurityUtilz.getUser().getAuthorities()
+                .stream()
+                .filter(authority -> !authority.getDisabled())
+                .filter(authority ->
+                        authority.getPermResource().equals("*") ||
+                                authority.getPermResource().equals("#*") ||
+                                authority.getPermResource().startsWith("#" + index)
+                )
+                .filter(authority -> StringUtils.equalsAnyIgnoreCase(authority.getPermOperate(), "*", "READ"))
+                .findFirst()
+                .orElseThrow(()->new NkAccessDeniedException(String.format("没有索引[%s]的访问权限",index)));
+
+        if(StringUtils.isBlank(grantedAuthority.getLimitQuery())){
+            return null;
+        }
+        return new LimitQueryBuilder(grantedAuthority.getLimitQuery());
+    }
 
 
     /**

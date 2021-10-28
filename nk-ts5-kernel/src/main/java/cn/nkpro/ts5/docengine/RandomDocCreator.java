@@ -2,7 +2,7 @@ package cn.nkpro.ts5.docengine;
 
 import cn.nkpro.ts5.docengine.gen.DocHMapper;
 import cn.nkpro.ts5.docengine.gen.DocH;
-import cn.nkpro.ts5.docengine.model.es.CustomES;
+import cn.nkpro.ts5.docengine.model.es.DocExtES;
 import cn.nkpro.ts5.docengine.utils.RandomUtils;
 import cn.nkpro.ts5.data.elasticearch.SearchEngine;
 import com.apifan.common.random.constant.CompetitionType;
@@ -45,7 +45,7 @@ public class RandomDocCreator {
             taskExecutor.execute(() -> {
                 for (int i=0;i<count/thread;i++){
 
-                    CustomES c = new CustomES();
+                    DocExtES c = new DocExtES();
                     try{
                         DocH doc = hes.get(NumberSource.getInstance().randomInt(0, hes.size()));
 
