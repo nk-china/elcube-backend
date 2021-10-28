@@ -37,7 +37,7 @@ public class GrantedAuthority implements org.springframework.security.core.Grant
 
     private String level;
 
-    private Boolean disabled;
+    private Boolean disabled = false;
 
 
     public String getDocType(){
