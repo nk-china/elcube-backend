@@ -1,10 +1,12 @@
 package cn.nkpro.ts5.security.bo;
 
 import com.alibaba.fastjson.JSONObject;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class GrantedAuthority implements org.springframework.security.core.GrantedAuthority,Comparable<GrantedAuthority> {
 
     private static final long serialVersionUID  = 521L;
@@ -34,6 +36,8 @@ public class GrantedAuthority implements org.springframework.security.core.Grant
     private String fromGroupDesc;
 
     private String level;
+
+    private Boolean disabled;
 
 
     public String getDocType(){

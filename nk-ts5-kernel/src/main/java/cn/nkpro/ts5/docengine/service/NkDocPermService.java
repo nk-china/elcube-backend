@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.docengine.service;
 
 import cn.nkpro.ts5.docengine.model.DocHV;
-import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
 
 public interface NkDocPermService {
 
@@ -23,5 +23,5 @@ public interface NkDocPermService {
 
     boolean hasDocPerm(String mode, String docId, String docType);
 
-    BoolQueryBuilder buildDocFilter(String mode, String docType, String typeKey, boolean ignoreLimit);
+    QueryBuilder buildDocFilter(String mode, String docType, String typeKey, boolean ignoreLimit);
 }

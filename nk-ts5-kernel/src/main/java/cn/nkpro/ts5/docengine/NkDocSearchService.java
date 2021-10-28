@@ -82,7 +82,7 @@ public class NkDocSearchService {
             );
         }
 
-        BoolQueryBuilder permQuery = docPermService.buildDocFilter(NkDocPermService.MODE_READ, null, null, false);
+        QueryBuilder permQuery = docPermService.buildDocFilter(NkDocPermService.MODE_READ, null, null, false);
         if(permQuery!=null)
             postQueryBuilder.must(permQuery);
 

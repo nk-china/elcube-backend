@@ -22,7 +22,8 @@ public class ESSqlRequest {
 
     public String toString(){
         JSONObject sourceBuilder = (JSONObject) JSONObject.toJSON(this);
-        sourceBuilder.put("filter",JSON.parseObject(filter.toString()));
+        if(filter!=null)
+            sourceBuilder.put("filter",JSON.parseObject(filter.toString()));
         return sourceBuilder.toString();
     }
 }

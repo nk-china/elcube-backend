@@ -10,21 +10,24 @@ import cn.nkpro.ts5.data.elasticearch.SearchEngine;
 import cn.nkpro.ts5.exception.NkAccessDeniedException;
 import cn.nkpro.ts5.security.bo.GrantedAuthority;
 import cn.nkpro.ts5.security.SecurityUtilz;
+import com.alibaba.fastjson.JSON;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.QueryBuilders;
+import org.apache.lucene.search.Query;
+import org.elasticsearch.common.io.stream.StreamOutput;
+import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -132,7 +135,7 @@ public class NkDocPermServiceImpl implements NkDocPermService {
         }
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
 
-        BoolQueryBuilder permQuery = buildDocFilter(mode, docType, null, false);
+        QueryBuilder permQuery = buildDocFilter(mode, docType, null, false);
         if(permQuery!=null)
             sourceBuilder.postFilter(permQuery);
 
@@ -156,15 +159,12 @@ public class NkDocPermServiceImpl implements NkDocPermService {
      * @return BoolQueryBuilder
      */
     @Override
-    public BoolQueryBuilder buildDocFilter(String mode, String docType, String typeKey, boolean ignoreLimit){
+    public QueryBuilder buildDocFilter(String mode, String docType, String typeKey, boolean ignoreLimit){
         // 处理权限
         List<GrantedAuthority> authorities = getDocAuthorities(mode, docType);
 
-        BoolQueryBuilder filter = QueryBuilders.boolQuery();
-
         if(authorities.isEmpty()){
-            filter.must(QueryBuilders.idsQuery().addIds("NONE"));
-            return filter;
+            return QueryBuilders.boolQuery().must(QueryBuilders.idsQuery().addIds("NONE"));
         }
 
         // 这里优化了下，把相同limit的单据类型条件合并
@@ -176,29 +176,67 @@ public class NkDocPermServiceImpl implements NkDocPermService {
         distinct.forEach((type,authority)-> {
             String limit = ignoreLimit?null:authority.getLimitQuery();
             collectByLimit.putIfAbsent(limit,new ArrayList<>());
-            collectByLimit.get(limit).add(authority.getDocType());
+
+            List<String> docTypes = collectByLimit.get(limit);
+
+            // 理论上*肯定是最后一个，为了避免产生问题，先添加再移除
+            docTypes.add(authority.getDocType());
+
+            // 如果单据类型中包含*，那么移除非*
+            if(docTypes.contains("*")){
+                docTypes.removeIf(s->!StringUtils.equals(s,"*"));
+            }
         });
 
         /*
-         *  todo 注意，这里有个隐藏的bug
          *  如果用户的权限中包含*:*，或@*:*，且权限中还包含其他非*的单据类型权限，那么需要将*号解析为not exists docTypes
          *  否则的话，其他单据类型的limit在这个过滤条件中将失效，导致用户能查询到所有的单据数据
          */
-        collectByLimit.forEach((limit,docTypes)->{
-            BoolQueryBuilder builder = QueryBuilders.boolQuery();
+        List<QueryBuilder> queryBuilders = collectByLimit.entrySet()
+                .stream()
+                .map((entry) -> {
+                    BoolQueryBuilder builder = null;
 
-            if(!docTypes.contains("*")){// 如果单据类型包含*号，表示需要匹配所有单据类型，因此不需要增加terms条件
-                builder.must(QueryBuilders.termsQuery(StringUtils.defaultIfBlank(typeKey,"docType"), docTypes));
-            }
+                    if (entry.getValue().contains("*")) {
+                        // 如果单据类型是*，且包含用户权限中其他单据类型的权限，则需要把*解析为 not exists docTypes
 
-            if(StringUtils.isNotBlank(limit)){
-                builder.must(QueryBuilders.wrapperQuery(limit));
-            }
+                        List<String> notInDocTypes = new ArrayList<>();
+                        collectByLimit.forEach((l, dts) -> {
+                            if (!Objects.equals(l, entry.getKey())) {
+                                notInDocTypes.addAll(dts);
+                            }
+                        });
+                        if (!notInDocTypes.isEmpty()) {
+                            builder = QueryBuilders.boolQuery().mustNot(QueryBuilders.termsQuery(StringUtils.defaultIfBlank(typeKey, "docType"), notInDocTypes));
+                        }
+                    } else {
+                        builder = QueryBuilders.boolQuery().must(QueryBuilders.termsQuery(StringUtils.defaultIfBlank(typeKey, "docType"), entry.getValue()));
+                    }
 
-            filter.should(builder);
-        });
+                    if (StringUtils.isNotBlank(entry.getKey())) {
+                        builder = QueryBuilders.boolQuery().must(new LimitQueryBuilder(entry.getKey()));
+                        // 使用自定义的Builder，让查询条件看起来比Wrapper更清晰
+                        // builder.must(QueryBuilders.wrapperQuery(limit));
+                    }
 
-        log.trace("查询权限过滤:\n"+filter);
+                    return builder;
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        QueryBuilder filter = null;
+
+        if(queryBuilders.size()==1){
+            filter = queryBuilders.get(0);
+        }else if(queryBuilders.size()>1){
+            filter = QueryBuilders.boolQuery();
+            ((BoolQueryBuilder) filter).should().addAll(queryBuilders);
+        }
+
+        if(log.isDebugEnabled()){
+            String json = filter==null?null:filter.toString();
+            log.debug("单据数据权限Limit: "+JSON.parseObject(json));
+        }
 
         return filter;
     }
@@ -212,6 +250,7 @@ public class NkDocPermServiceImpl implements NkDocPermService {
     private List<GrantedAuthority> getDocAuthorities(String mode, String docType){
         return SecurityUtilz.getUser().getAuthorities()
                 .stream()
+                .filter(authority->!authority.getDisabled())
                 .filter(authority->
                         authority.getPermResource().equals("*")||
                                 authority.getPermResource().equals("@*")||
@@ -220,5 +259,47 @@ public class NkDocPermServiceImpl implements NkDocPermService {
                 )
                 .filter(authority-> StringUtils.equalsAnyIgnoreCase(authority.getPermOperate(),"*",mode))
                 .collect(Collectors.toList());
+    }
+
+    @AllArgsConstructor
+    private static class LimitQueryBuilder extends AbstractQueryBuilder<LimitQueryBuilder> {
+
+        private String source;
+
+        @Override
+        public XContentBuilder toXContent(XContentBuilder builder, Params params) throws IOException {
+            builder.map(JSON.parseObject(source));
+            return builder;
+        }
+
+        @Override
+        protected void doXContent(XContentBuilder xContentBuilder, Params params) {
+            throw new UnsupportedOperationException("不需要实现");
+        }
+
+        @Override
+        protected void doWriteTo(StreamOutput streamOutput) {
+            throw new UnsupportedOperationException("不知道干嘛用的");
+        }
+
+        @Override
+        protected Query doToQuery(QueryShardContext queryShardContext) {
+            throw new UnsupportedOperationException("不知道干嘛用的");
+        }
+
+        @Override
+        protected boolean doEquals(LimitQueryBuilder myQueryBuilder) {
+            return Objects.equals(myQueryBuilder.source,source);
+        }
+
+        @Override
+        protected int doHashCode() {
+            return source.hashCode();
+        }
+
+        @Override
+        public String getWriteableName() {
+            return StringUtils.EMPTY;
+        }
     }
 }

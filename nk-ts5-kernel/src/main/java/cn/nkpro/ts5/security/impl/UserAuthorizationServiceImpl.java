@@ -108,6 +108,12 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
             }
         });
 
+        permList.forEach(perm->
+            permList.stream().filter(e -> StringUtils.equals(e.getPermResource(), perm.getPermResource()))
+                    .findFirst()
+                    .ifPresent(first-> perm.setDisabled(perm!=first))
+        );
+
         return permList.stream()
                     .sorted()
                     .collect(Collectors.toList());

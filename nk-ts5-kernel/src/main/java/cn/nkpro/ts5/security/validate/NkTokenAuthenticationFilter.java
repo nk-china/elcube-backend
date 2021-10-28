@@ -52,7 +52,8 @@ public class NkTokenAuthenticationFilter extends GenericFilterBean {
                         Authentication responseAuthentication = authenticationManager.authenticate(nkAuthentication);
 
                         if (responseAuthentication != null && responseAuthentication.isAuthenticated()) {
-                            logger.info("User successfully authenticated");
+                            if(logger.isDebugEnabled())
+                                logger.debug("["+responseAuthentication.getPrincipal()+"] successfully authenticated");
                             SecurityContextHolder.getContext().setAuthentication(
                                     new NkTokenAuthentication(nkAuthentication, (UserDetails) responseAuthentication.getDetails()));
                         }
