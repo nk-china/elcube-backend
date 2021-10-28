@@ -64,6 +64,10 @@ public class SearchEngine extends ESContentBuilder{
 
         try {
 
+            if(log.isDebugEnabled()){
+                log.debug("ES._sql : " + sqlRequest.toString());
+            }
+
             Response response = client.getLowLevelClient()
                     .performRequest(request);
 
@@ -76,10 +80,20 @@ public class SearchEngine extends ESContentBuilder{
 
     public <T extends AbstractESModel> SearchResponse search(Class<T> docType, SearchSourceBuilder builder) {
         try {
-            return client.search(new SearchRequest()
+
+            SearchSourceBuilder sourceBuilder = builder.trackTotalHits(true).timeout(new TimeValue(10, TimeUnit.SECONDS));
+
+            if(log.isDebugEnabled()){
+                log.debug("ES._search : " + sourceBuilder);
+            }
+
+            SearchRequest searchRequest = new SearchRequest()
                     .indices(documentIndex(parseDocument(docType)))
                     //track_total_hits : true 解决查询列表最大total限制10000的问题
-                    .source(builder.trackTotalHits(true).timeout(new TimeValue(10, TimeUnit.SECONDS))), RequestOptions.DEFAULT);
+                    .source(sourceBuilder);
+
+
+            return client.search(searchRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
             throw new NkSystemException("搜索引擎发生错误："+e.getMessage(), e);
         }

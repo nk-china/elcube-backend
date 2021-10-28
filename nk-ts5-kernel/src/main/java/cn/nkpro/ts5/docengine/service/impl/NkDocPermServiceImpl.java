@@ -1,33 +1,30 @@
 package cn.nkpro.ts5.docengine.service.impl;
 
-import cn.nkpro.ts5.docengine.service.NkDocPermService;
-import cn.nkpro.ts5.exception.NkSystemException;
+import cn.nkpro.ts5.data.elasticearch.LimitQueryBuilder;
+import cn.nkpro.ts5.data.elasticearch.SearchEngine;
 import cn.nkpro.ts5.docengine.model.DocDefHV;
 import cn.nkpro.ts5.docengine.model.DocDefIV;
 import cn.nkpro.ts5.docengine.model.DocHV;
 import cn.nkpro.ts5.docengine.model.es.DocHES;
-import cn.nkpro.ts5.data.elasticearch.SearchEngine;
+import cn.nkpro.ts5.docengine.service.NkDocPermService;
 import cn.nkpro.ts5.exception.NkAccessDeniedException;
-import cn.nkpro.ts5.security.bo.GrantedAuthority;
+import cn.nkpro.ts5.exception.NkSystemException;
 import cn.nkpro.ts5.security.SecurityUtilz;
+import cn.nkpro.ts5.security.bo.GrantedAuthority;
 import com.alibaba.fastjson.JSON;
-import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.lucene.search.Query;
-import org.elasticsearch.common.io.stream.StreamOutput;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-import org.elasticsearch.index.query.*;
+import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.QueryBuilder;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.*;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Slf4j
 @Service
@@ -214,7 +211,8 @@ public class NkDocPermServiceImpl implements NkDocPermService {
                     }
 
                     if (StringUtils.isNotBlank(entry.getKey())) {
-                        builder = QueryBuilders.boolQuery().must(new LimitQueryBuilder(entry.getKey()));
+                        builder = builder == null ? QueryBuilders.boolQuery() : builder;
+                        builder.must(new LimitQueryBuilder(entry.getKey()));
                         // 使用自定义的Builder，让查询条件看起来比Wrapper更清晰
                         // builder.must(QueryBuilders.wrapperQuery(limit));
                     }
@@ -234,8 +232,7 @@ public class NkDocPermServiceImpl implements NkDocPermService {
         }
 
         if(log.isDebugEnabled()){
-            String json = filter==null?null:filter.toString();
-            log.debug("单据数据权限Limit: "+JSON.parseObject(json));
+            log.debug("单据数据权限Limit: "+(filter==null?"<Unlimited>":JSON.parseObject(filter.toString())));
         }
 
         return filter;
@@ -261,45 +258,5 @@ public class NkDocPermServiceImpl implements NkDocPermService {
                 .collect(Collectors.toList());
     }
 
-    @AllArgsConstructor
-    private static class LimitQueryBuilder extends AbstractQueryBuilder<LimitQueryBuilder> {
 
-        private String source;
-
-        @Override
-        public XContentBuilder toXContent(XContentBuilder builder, Params params) throws IOException {
-            builder.map(JSON.parseObject(source));
-            return builder;
-        }
-
-        @Override
-        protected void doXContent(XContentBuilder xContentBuilder, Params params) {
-            throw new UnsupportedOperationException("不需要实现");
-        }
-
-        @Override
-        protected void doWriteTo(StreamOutput streamOutput) {
-            throw new UnsupportedOperationException("不知道干嘛用的");
-        }
-
-        @Override
-        protected Query doToQuery(QueryShardContext queryShardContext) {
-            throw new UnsupportedOperationException("不知道干嘛用的");
-        }
-
-        @Override
-        protected boolean doEquals(LimitQueryBuilder myQueryBuilder) {
-            return Objects.equals(myQueryBuilder.source,source);
-        }
-
-        @Override
-        protected int doHashCode() {
-            return source.hashCode();
-        }
-
-        @Override
-        public String getWriteableName() {
-            return StringUtils.EMPTY;
-        }
-    }
 }

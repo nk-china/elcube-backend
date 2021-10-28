@@ -78,7 +78,8 @@ public class NkDocSearchService {
         // 功能前置条件
         if(params.containsKey("preCondition")) {
             postQueryBuilder.must(
-                    QueryBuilders.wrapperQuery(params.getString("preCondition"))
+                new LimitQueryBuilder(params.getString("preCondition"))
+                //QueryBuilders.wrapperQuery()
             );
         }
 
@@ -88,15 +89,17 @@ public class NkDocSearchService {
 
         // 构造检索语句
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder()
-                // 过滤权限
-                .postFilter(postQueryBuilder)
                 .from(params.getInteger("from"))
                 .size(params.getInteger("rows"));
+        // 过滤权限
+        if(!postQueryBuilder.must().isEmpty())
+            sourceBuilder.postFilter(postQueryBuilder);
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        if(params.containsKey("condition")) {
+        if(params.containsKey("condition") && StringUtils.isNotBlank((CharSequence) params.get("condition"))) {
             boolQueryBuilder.must(
-                    QueryBuilders.wrapperQuery(params.getString("condition"))
+                new LimitQueryBuilder(params.getString("condition"))
+                //QueryBuilders.wrapperQuery(params.getString("condition"))
             );
         }
         // 关键字
@@ -111,7 +114,8 @@ public class NkDocSearchService {
             );
         }
 
-        sourceBuilder.query(boolQueryBuilder);
+        if(!boolQueryBuilder.must().isEmpty())
+            sourceBuilder.query(boolQueryBuilder);
 
         // 高亮
         Set<String> highlightField = new HashSet<>();
