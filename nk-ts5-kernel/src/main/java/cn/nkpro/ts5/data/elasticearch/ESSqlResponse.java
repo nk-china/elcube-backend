@@ -14,7 +14,14 @@ public class ESSqlResponse {
 
     private List<Column> columns;
     private List<List<Object>> rows;
+    private List<Map<String,Object>> list;
     private String cursor;
+
+    public ESSqlResponse transform(){
+        this.list = toList();
+        this.rows.clear();
+        return this;
+    }
 
     public List<Map<String,Object>> toList(){
         Column column;

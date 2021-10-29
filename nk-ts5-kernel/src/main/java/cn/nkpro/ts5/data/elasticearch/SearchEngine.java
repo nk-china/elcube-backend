@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.http.util.EntityUtils;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.delete.DeleteRequest;
+import org.elasticsearch.action.fieldcaps.FieldCapabilitiesRequest;
+import org.elasticsearch.action.fieldcaps.FieldCapabilitiesResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
@@ -49,10 +51,22 @@ public class SearchEngine extends ESContentBuilder{
 
     @Scheduled(cron = "0 * * * * ?")
     public void heartbeat(){
+
         try {
             client.ping(RequestOptions.DEFAULT);
         } catch (IOException e) {
             log.error("indices heartbeat error",e);
+        }
+    }
+
+    public FieldCapabilitiesResponse getFieldCaps(String index){
+        try {
+            return client.fieldCaps(
+                    new FieldCapabilitiesRequest().indices(getIndexPrefix()+index).fields("*"),
+                    RequestOptions.DEFAULT
+            );
+        } catch (IOException e) {
+            throw new NkSystemException("搜索引擎发生错误："+e.getMessage(), e);
         }
     }
 

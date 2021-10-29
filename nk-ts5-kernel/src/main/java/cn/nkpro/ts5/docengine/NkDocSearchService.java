@@ -6,8 +6,11 @@ import cn.nkpro.ts5.docengine.model.es.DocExtES;
 import cn.nkpro.ts5.docengine.service.NkDocPermService;
 import cn.nkpro.ts5.data.elasticearch.*;
 import cn.nkpro.ts5.docengine.model.es.DocHES;
+import cn.nkpro.ts5.exception.NkAccessDeniedException;
+import cn.nkpro.ts5.security.SecurityUtilz;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.action.fieldcaps.FieldCapabilities;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -53,6 +56,15 @@ public class NkDocSearchService {
         searchEngine.deleteIndices(DocExtES.class);
 
         this.init();
+    }
+
+    public Map<String, Map<String, FieldCapabilities>> getFieldCaps(String index){
+
+        if(!SecurityUtilz.hasAnyAuthority("#"+index+":READ")){
+            throw new NkAccessDeniedException(String.format("没有索引[%s]的访问权限", index));
+        }
+
+        return searchEngine.getFieldCaps(index).get();
     }
 
     public ESSqlResponse searchBySql(String sql){
