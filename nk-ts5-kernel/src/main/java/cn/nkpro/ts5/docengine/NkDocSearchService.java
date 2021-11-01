@@ -73,21 +73,16 @@ public class NkDocSearchService {
     @Keep
     @Data
     public static class SqlSearchRequest{
-        private List<String> sql;
+        private List<String> sqls;
         private JSONObject conditions;
 
-        public void setSql(List<String> sql){
-            this.sql = sql;
-        }
-
         public void setSql(String sql){
-            this.sql = Collections.singletonList(sql);
+            this.sqls = Collections.singletonList(sql);
         }
-
 
         public static SqlSearchRequest fromSql(String sql){
             SqlSearchRequest sqlSearchRequest = new SqlSearchRequest();
-            sqlSearchRequest.setSql(sql);
+            sqlSearchRequest.setSqls(Collections.singletonList(sql));
             return sqlSearchRequest;
         }
     }
@@ -96,7 +91,7 @@ public class NkDocSearchService {
 
         ESSqlResponse response = null;
 
-        for(String sql : params.getSql()) {
+        for(String sql : params.getSqls()) {
 
             String index = searchEngine.parseSqlIndex(sql);
 
