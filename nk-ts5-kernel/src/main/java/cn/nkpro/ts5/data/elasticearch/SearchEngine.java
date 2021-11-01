@@ -3,7 +3,9 @@ package cn.nkpro.ts5.data.elasticearch;
 import cn.nkpro.ts5.basic.TransactionSync;
 import cn.nkpro.ts5.data.elasticearch.annotation.ESDocument;
 import cn.nkpro.ts5.exception.NkDefineException;
+import cn.nkpro.ts5.exception.NkInputFailedCaution;
 import cn.nkpro.ts5.exception.NkSystemException;
+import cn.nkpro.ts5.exception.abstracts.NkCaution;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.util.EntityUtils;
@@ -101,7 +103,7 @@ public class SearchEngine extends ESContentBuilder{
         } catch (IOException e) {
             if(e instanceof ResponseException){
                 try{
-                    throw new NkSystemException("搜索引擎发生错误："+EntityUtils.toString(((ResponseException) e).getResponse().getEntity()), e);
+                    throw new NkInputFailedCaution("检索错误："+EntityUtils.toString(((ResponseException) e).getResponse().getEntity()));
                 }catch (IOException ee){
                     throw new NkSystemException("搜索引擎发生错误："+e.getMessage(), e);
                 }
