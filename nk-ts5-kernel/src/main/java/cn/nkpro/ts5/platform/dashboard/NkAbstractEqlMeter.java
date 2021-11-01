@@ -27,7 +27,7 @@ public abstract class NkAbstractEqlMeter extends NkAbstractMeter<List>{
         }
 
         String key = SecurityUtilz.getUser().getId() +':'+ DigestUtils.md5DigestAsHex(sql.getBytes());
-        List list = redisSupport.getIfAbsent(key, () -> searchService.searchBySql(sql).toList());
+        List list = redisSupport.getIfAbsent(key, () -> searchService.searchBySql(NkDocSearchService.SqlSearchRequest.fromSql(sql)).toList());
 
         redisSupport.expire(key,60);
 

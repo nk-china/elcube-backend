@@ -47,9 +47,8 @@ public class DocController {
     
     @NkNote("1.拉取交易列表数据")
     @RequestMapping(value = "/list/{index}",method = RequestMethod.POST)
-    public ESPageList<? extends AbstractESModel> list(@RequestBody JSONObject params, @PathVariable String index) {
-        Class<? extends AbstractESModel> type = (StringUtils.equals(index,"custom")? DocExtES.class: DocHES.class);
-        return searchService.queryList(type, null, params);
+    public ESPageList<JSONObject> list(@RequestBody JSONObject params, @PathVariable String index) {
+        return searchService.queryList(index, null, params);
     }
 
     

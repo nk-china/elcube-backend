@@ -43,8 +43,8 @@ import java.util.regex.Pattern;
 @Component
 public class SearchEngine extends ESContentBuilder{
 
-    private static Pattern p_repl = Pattern.compile("\\s[Ff][Rf][Oo][Mn]\\s*[\"]?([^\\s\"]*)[\"]?");
-    private static Pattern p_find = Pattern.compile("^[\\w\\W]*\\s[Ff][Rf][Oo][Mn]\\s*[\"]?([^\\s\"]*)[\"]?[\\w\\W]*$");
+    private static Pattern p_repl = Pattern.compile("\\s[Ff][Rr][Oo][Mm]\\s*[\"]?([^\\s\"]*)[\"]?");
+    private static Pattern p_find = Pattern.compile("^[\\w\\W]*\\s[Ff][Rr][Oo][Mm]\\s*[\"]?([^\\s\"]*)[\"]?[\\w\\W]*$");
 
     @Autowired
     private RestHighLevelClient client;
@@ -106,7 +106,8 @@ public class SearchEngine extends ESContentBuilder{
         }
     }
 
-    public <T extends AbstractESModel> SearchResponse search(Class<T> docType, SearchSourceBuilder builder) {
+
+    public SearchResponse search(String indexName, SearchSourceBuilder builder) {
         try {
 
             SearchSourceBuilder sourceBuilder = builder.trackTotalHits(true).timeout(new TimeValue(10, TimeUnit.SECONDS));
@@ -116,15 +117,18 @@ public class SearchEngine extends ESContentBuilder{
             }
 
             SearchRequest searchRequest = new SearchRequest()
-                    .indices(documentIndex(parseDocument(docType)))
+                    .indices(documentIndex(indexName))
                     //track_total_hits : true 解决查询列表最大total限制10000的问题
                     .source(sourceBuilder);
-
 
             return client.search(searchRequest, RequestOptions.DEFAULT);
         } catch (IOException e) {
             throw new NkSystemException("搜索引擎发生错误："+e.getMessage(), e);
         }
+    }
+
+    public <T extends AbstractESModel> SearchResponse search(Class<T> docType, SearchSourceBuilder builder) {
+        return search(parseDocument(docType),builder);
     }
 
     public <T extends AbstractESModel> boolean exists(Class<T> docType, SearchSourceBuilder builder) throws IOException {
@@ -135,7 +139,7 @@ public class SearchEngine extends ESContentBuilder{
             }
 
             SearchRequest searchRequest = new SearchRequest()
-                    .indices(documentIndex(document))
+                    .indices(documentIndex(document.value()))
                     .source(
                             builder
                                     .timeout(new TimeValue(10, TimeUnit.SECONDS))
@@ -246,9 +250,8 @@ public class SearchEngine extends ESContentBuilder{
 
     private boolean existsIndices(Class<? extends AbstractESModel> docType) throws IOException {
         try{
-            ESDocument document = parseDocument(docType);
             return client.indices()
-                    .exists(new GetIndexRequest(documentIndex(document)), RequestOptions.DEFAULT);
+                    .exists(new GetIndexRequest(documentIndex(parseDocument(docType))), RequestOptions.DEFAULT);
         } catch (IOException e) {
             throw new NkSystemException("搜索引擎发生错误："+e.getMessage(), e);
         }
@@ -258,9 +261,8 @@ public class SearchEngine extends ESContentBuilder{
     public void deleteIndices(Class<? extends AbstractESModel> docType) throws IOException {
         if(existsIndices(docType)){
             try{
-                ESDocument document = parseDocument(docType);
                 client.indices()
-                        .delete(new DeleteIndexRequest(documentIndex(document)), RequestOptions.DEFAULT);
+                        .delete(new DeleteIndexRequest(documentIndex(parseDocument(docType))), RequestOptions.DEFAULT);
             } catch (IOException e) {
                 throw new NkSystemException("搜索引擎发生错误："+e.getMessage(), e);
             }
@@ -272,9 +274,8 @@ public class SearchEngine extends ESContentBuilder{
         if(existsIndices(docType))
             return;
 
-        ESDocument document = parseDocument(docType);
         try{
-            CreateIndexRequest request = new CreateIndexRequest(documentIndex(document));
+            CreateIndexRequest request = new CreateIndexRequest(documentIndex(parseDocument(docType)));
 
             request.settings(buildNgramTokenizer());
             request.mapping(buildMapping(docType));

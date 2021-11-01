@@ -45,7 +45,7 @@ public class SecurityUtilz {
                     Pattern pattern = Pattern.compile(
                             String.format("^%s$",
                                     authority.getAuthority()
-                                            .replaceAll("[*]","@?\\\\w+"))
+                                            .replaceAll("[*]","[@#]?[A-Za-z0-9_-]+"))
                     );
                     return Arrays.stream(targetAuthoritys)
                                 .anyMatch(targetAuthority->pattern.matcher(targetAuthority).matches());

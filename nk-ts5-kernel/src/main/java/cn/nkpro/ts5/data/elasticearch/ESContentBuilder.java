@@ -19,15 +19,14 @@ class ESContentBuilder {
     @Autowired
     private NkProperties properties;
 
-    ESDocument parseDocument(Class<? extends AbstractESModel> esType){
+    public String  parseDocument(Class<? extends AbstractESModel> esType){
         ESDocument document = esType.getAnnotation(ESDocument.class);
         Assert.notNull(document,String.format("类型 %s 的 ESDocument 注解不存在",esType.getName()));
-        return document;
+        return document.value();
     }
 
     String parseDocId(AbstractESModel doc){
         Class<? extends AbstractESModel> esType = doc.getClass();
-        ESDocument document = parseDocument(esType);
         // 获取ID的值，如果ID没有定义，则使用es默认的规则生成ID
         return Arrays.stream(esType.getDeclaredFields())
                 .filter(field -> field.getAnnotation(ESId.class) != null)
@@ -179,14 +178,14 @@ class ESContentBuilder {
         return builder;
     }
 
-    String documentIndex(ESDocument document){
+    String documentIndex(String indexName){
 
         String prefix = properties.getEnvKey();
         if(StringUtils.isNotBlank(prefix)){
-            return String.format("%s-%s",prefix,document.value());
+            return String.format("%s-%s",prefix,indexName);
         }
 
-        return document.value();
+        return indexName;
     }
 
     String getIndexPrefix(){

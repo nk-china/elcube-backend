@@ -3,6 +3,7 @@ package cn.nkpro.ts5.dataengine.controller;
 import cn.nkpro.ts5.annotation.NkNote;
 import cn.nkpro.ts5.data.elasticearch.ESSqlResponse;
 import cn.nkpro.ts5.docengine.NkDocSearchService;
+import com.alibaba.fastjson.JSONObject;
 import org.elasticsearch.action.fieldcaps.FieldCapabilities;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -29,7 +30,7 @@ public class DataAnalyseController {
     }
     @NkNote("2.执行sql")
     @RequestMapping(value = "/sql",method = RequestMethod.POST)
-    public ESSqlResponse sql(@RequestBody String sql) {
-        return searchService.searchBySql(sql).transform();
+    public ESSqlResponse sql(@RequestBody NkDocSearchService.SqlSearchRequest params) {
+        return searchService.searchBySql(params).transform();
     }
 }

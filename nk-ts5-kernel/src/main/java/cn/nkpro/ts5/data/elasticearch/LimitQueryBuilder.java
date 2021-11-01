@@ -1,6 +1,7 @@
 package cn.nkpro.ts5.data.elasticearch;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.common.io.stream.StreamOutput;
@@ -15,11 +16,15 @@ import java.util.Objects;
 @AllArgsConstructor
 public class LimitQueryBuilder extends AbstractQueryBuilder<LimitQueryBuilder> {
 
-    private String source;
+    private JSONObject source;
+
+    public LimitQueryBuilder(String str){
+        this.source = JSON.parseObject(str);
+    }
 
     @Override
     public XContentBuilder toXContent(XContentBuilder builder, Params params) throws IOException {
-        builder.map(JSON.parseObject(source));
+        builder.map(source);
         return builder;
     }
 

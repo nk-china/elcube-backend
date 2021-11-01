@@ -1,5 +1,6 @@
 package cn.nkpro.ts5.docengine;
 
+import cn.nkpro.ts5.basic.Keep;
 import cn.nkpro.ts5.data.elasticearch.annotation.ESDocument;
 import cn.nkpro.ts5.docengine.model.BpmTaskES;
 import cn.nkpro.ts5.docengine.model.es.DocExtES;
@@ -8,7 +9,9 @@ import cn.nkpro.ts5.data.elasticearch.*;
 import cn.nkpro.ts5.docengine.model.es.DocHES;
 import cn.nkpro.ts5.exception.NkAccessDeniedException;
 import cn.nkpro.ts5.security.SecurityUtilz;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.fieldcaps.FieldCapabilities;
 import org.elasticsearch.action.search.SearchResponse;
@@ -60,29 +63,68 @@ public class NkDocSearchService {
 
     public Map<String, Map<String, FieldCapabilities>> getFieldCaps(String index){
 
-        if(!SecurityUtilz.hasAnyAuthority("#"+index+":READ")){
+        if(!SecurityUtilz.hasAnyAuthority("*:*","#*:READ","#"+index+":READ")){
             throw new NkAccessDeniedException(String.format("没有索引[%s]的访问权限", index));
         }
 
         return searchEngine.getFieldCaps(index).get();
     }
 
-    public ESSqlResponse searchBySql(String sql){
+    @Keep
+    @Data
+    public static class SqlSearchRequest{
+        private List<String> sql;
+        private JSONObject conditions;
 
-        String index = searchEngine.parseSqlIndex(sql);
 
-        QueryBuilder filter;
-        if(DocHES.class.getAnnotation(ESDocument.class).value().equals(index)){
-            filter = docPermService.buildDocFilter(NkDocPermService.MODE_READ, null, null, false);
-        }else{
-            filter = docPermService.buildIndexFilter(index);
+        public static SqlSearchRequest fromSql(String sql){
+            SqlSearchRequest sqlSearchRequest = new SqlSearchRequest();
+            sqlSearchRequest.setSql(Collections.singletonList(sql));
+            return sqlSearchRequest;
         }
-
-        return searchEngine.sql(new ESSqlRequest(sql,filter));
     }
 
-    public <T extends AbstractESModel> ESPageList<T> queryList(
-            Class<T> docType,
+    public ESSqlResponse searchBySql(SqlSearchRequest params){
+
+        ESSqlResponse response = null;
+
+        for(String sql : params.getSql()) {
+
+            String index = searchEngine.parseSqlIndex(sql);
+
+            QueryBuilder filterBuilder;
+            if (DocHES.class.getAnnotation(ESDocument.class).value().equals(index)) {
+                filterBuilder = docPermService.buildDocFilter(NkDocPermService.MODE_READ, null, null, false);
+            } else {
+                filterBuilder = docPermService.buildIndexFilter(index);
+            }
+
+
+            if (params.getConditions() != null) {
+                BoolQueryBuilder conditionsFilter = QueryBuilders.boolQuery();
+                JSONObject filter = params.getConditions();
+                if (filter != null) {
+                    filter.forEach((k, v) -> conditionsFilter.must(new LimitQueryBuilder(filter.getJSONObject(k))));
+                }
+                if (filterBuilder != null)
+                    conditionsFilter.must(filterBuilder);
+
+                if (!conditionsFilter.must().isEmpty())
+                    filterBuilder = conditionsFilter;
+            }
+
+            if(response==null)
+                response = searchEngine.sql(new ESSqlRequest(sql, filterBuilder));
+            else{
+                response.getRows().addAll(searchEngine.sql(new ESSqlRequest(sql, filterBuilder)).getRows());
+            }
+        }
+
+        return response;
+    }
+
+    public ESPageList<JSONObject> queryList(
+            String indexName,
             QueryBuilder preQueryBuilder,
             JSONObject params
     ){
@@ -93,9 +135,9 @@ public class NkDocSearchService {
             postQueryBuilder.must(preQueryBuilder);
         }
         // 功能前置条件
-        if(params.containsKey("preCondition")) {
+        if(params.containsKey("postCondition")) {
             postQueryBuilder.must(
-                new LimitQueryBuilder(params.getString("preCondition"))
+                new LimitQueryBuilder(params.getJSONObject("postCondition"))
                 //QueryBuilders.wrapperQuery()
             );
         }
@@ -113,41 +155,25 @@ public class NkDocSearchService {
             sourceBuilder.postFilter(postQueryBuilder);
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
-        if(params.containsKey("condition") && StringUtils.isNotBlank((CharSequence) params.get("condition"))) {
-            boolQueryBuilder.must(
-                new LimitQueryBuilder(params.getString("condition"))
-                //QueryBuilders.wrapperQuery(params.getString("condition"))
-            );
-        }
-        // 关键字
-        String keyword = params.getString("keyword");
-        String keywordField = params.getString("_keywordField");
-        if(StringUtils.isNotBlank(keyword)){
-            boolQueryBuilder.must(
-                    QueryBuilders.multiMatchQuery(
-                            params.getString("keyword"),
-                            StringUtils.defaultIfBlank(keywordField,"$keyword").split("[,]")
-                    )
-            );
+
+        if(params.containsKey("conditions")){
+            JSONObject filter = params.getJSONObject("conditions");
+            if(filter!=null){
+                filter.forEach((k,v)-> boolQueryBuilder.must(new LimitQueryBuilder(filter.getJSONObject(k))));
+            }
         }
 
         if(!boolQueryBuilder.must().isEmpty())
             sourceBuilder.query(boolQueryBuilder);
 
         // 高亮
-        Set<String> highlightField = new HashSet<>();
-        if(StringUtils.isNoneBlank(keywordField,keyword))
-            highlightField.addAll(Arrays.asList(StringUtils.split(keywordField,",")));
-        String highlight = params.getString("_highlight");
-        if(StringUtils.isNotBlank(highlight))
-            highlightField.addAll(Arrays.asList(StringUtils.split(highlight,",")));
-
-        if(!highlightField.isEmpty()){
+        JSONArray highlightField = params.getJSONArray("_highlight");
+        if(highlightField!=null && !highlightField.isEmpty()){
             HighlightBuilder highlightBuilder = new HighlightBuilder();
             highlightBuilder.preTags("<span class='highlight'>");
             highlightBuilder.postTags("</span>");
-            for(String field : highlightField){
-                highlightBuilder.field(new HighlightBuilder.Field(field));
+            for(Object field : highlightField){
+                highlightBuilder.field(new HighlightBuilder.Field((String) field));
             }
             sourceBuilder.highlighter(highlightBuilder);
         }
@@ -187,14 +213,14 @@ public class NkDocSearchService {
             sourceBuilder.aggregation($aggs);
         }
 
-        return searchPage(docType,sourceBuilder);
+        return searchPage(indexName,sourceBuilder);
     }
 
-    private <T extends AbstractESModel> ESPageList<T> searchPage(Class<T> docType, SearchSourceBuilder builder) {
+    private ESPageList<JSONObject> searchPage(String indexName, SearchSourceBuilder builder) {
 
-        SearchResponse response = searchEngine.search(docType, builder);
+        SearchResponse response = searchEngine.search(indexName, builder);
 
-        List<T> collect = Arrays.stream(response.getHits().getHits())
+        List<JSONObject> collect = Arrays.stream(response.getHits().getHits())
                 .map(hit -> {
                     JSONObject jsonObject = new JSONObject(hit.getSourceAsMap());
 
@@ -204,7 +230,7 @@ public class NkDocSearchService {
                         }
                     });
 
-                    return jsonObject.toJavaObject(docType);
+                    return jsonObject;
                 })
                 .collect(Collectors.toList());
 
