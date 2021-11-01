@@ -15,10 +15,7 @@ import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.update.UpdateRequest;
-import org.elasticsearch.client.Request;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.Response;
-import org.elasticsearch.client.RestHighLevelClient;
+import org.elasticsearch.client.*;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.GetIndexRequest;
 import org.elasticsearch.common.unit.TimeValue;
@@ -102,6 +99,13 @@ public class SearchEngine extends ESContentBuilder{
             return JSONObject.parseObject(EntityUtils.toString(response.getEntity()),ESSqlResponse.class);
 
         } catch (IOException e) {
+            if(e instanceof ResponseException){
+                try{
+                    throw new NkSystemException("搜索引擎发生错误："+EntityUtils.toString(((ResponseException) e).getResponse().getEntity()), e);
+                }catch (IOException ee){
+                    throw new NkSystemException("搜索引擎发生错误："+e.getMessage(), e);
+                }
+            }
             throw new NkSystemException("搜索引擎发生错误："+e.getMessage(), e);
         }
     }
