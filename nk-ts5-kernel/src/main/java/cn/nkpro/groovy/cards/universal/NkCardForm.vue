@@ -292,7 +292,18 @@ export default {
         },
         hasError(){
             return this.$refs.form.hasError()
-        }
+        },
+        // onSubmit(){
+        //     return new Promise((resolve)=>{
+        //         this.$confirm({
+        //             title: '确认',
+        //             content: "确认提交吗",
+        //             onOk(){
+        //                 resolve();
+        //             }
+        //         });
+        //     });
+        // }
     }
 }
 </script>
