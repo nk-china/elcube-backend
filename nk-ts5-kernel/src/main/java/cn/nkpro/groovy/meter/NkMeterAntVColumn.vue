@@ -6,11 +6,14 @@
                 <nk-form-item title="标题" :width="80">
                     <a-input slot="edit" v-model="configEdit.title"></a-input>
                 </nk-form-item>
-                <nk-form-item title="查询语句" :width="80">
-                    <a-textarea slot="edit" v-model="configEdit.sql" rows="5"></a-textarea>
+                <nk-form-item title="数据" :width="80" v-if="!defaultData">
+                    <a-textarea slot="edit" v-model="configEdit.sql" rows="5" placeholder="ElasticSearch SQL OR JSON Data"></a-textarea>
                 </nk-form-item>
-                <nk-form-item title="静态数据" :width="80">
-                    <a-textarea slot="edit" v-model="configEdit.data" rows="5"></a-textarea>
+                <nk-form-item title="X轴字段" :width="80">
+                    <a-select v-model="configEdit.xField" :mode="columnDefs?'default':'tags'" :options="columnDefs"></a-select>
+                </nk-form-item>
+                <nk-form-item title="Y轴字段" :width="80">
+                    <a-select v-model="configEdit.yField" :mode="columnDefs?'default':'tags'" :options="columnDefs"></a-select>
                 </nk-form-item>
                 <nk-form-item title="柱形背景" :width="80">
                     <a-switch v-model="configEdit.columnBackground" size="small"></a-switch>
@@ -27,6 +30,8 @@
             editable:Boolean,
             title:String,
             config:Object,
+            defaultData:Array,
+            columnDefs:Array,
         },
         data(){
             return {
@@ -38,26 +43,34 @@
             this.configEdit = Object.assign({},this.config);
         },
         mounted(){
-
-            if(!this.config.data){
+            if(this.config.xField&&this.config.yField){
+                this.render(this.config);
+            }else{
                 this.$refs.meter.setSettingMode(true);
-                return;
             }
-
-            this.render(this.config);
         },
         methods:{
             load(config){
-                return config.sql ?
-                    this.$http.postJSON(`/api/dashboard/card/get/${this.$options._componentTag}`,config) :
+                if(this.defaultData){
+                    return Promise.resolve({data:this.defaultData});
+                }
+                if(config.sql){
+                    if(config.sql.trim().startsWith("[") && config.sql.trim().endsWith("]")){
+                        new Promise((r)=>{setTimeout(()=>{r({data:JSON.parse(config.data)});},100);});
+                    }
+                    return this.$http.postJSON(`/api/meter/card/get/${this.$options._componentTag}`,config);
+                }
+                if(config.data){
                     new Promise((r)=>{setTimeout(()=>{r({data:JSON.parse(config.data)});},100);});
+                }
+                return Promise.resolve({data:[]});
             },
             render(config){
                 this.load(config).then(res=>{
                     const gConfig = {
                         data : res.data,
-                        xField: 'label',
-                        yField: 'value',
+                        xField: config.xField,
+                        yField: config.yField,
                         label: {
                             // 可手动配置 label 数据标签位置
                             position: 'middle', // 'top', 'bottom', 'middle',
@@ -96,7 +109,7 @@
             update(){
                 try{
                     this.render(this.configEdit);
-                    this.$emit("update",Object.assign({},this.configEdit));
+                    this.$emit("update:config",Object.assign({},this.configEdit));
                 }catch (e) {
                     this.$refs.meter.setSettingMode(true);
                 }

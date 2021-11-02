@@ -1,15 +1,14 @@
 package cn.nkpro.ts5.platform.controller;
 
 import cn.nkpro.ts5.annotation.NkNote;
-import cn.nkpro.ts5.platform.service.DashboardService;
-import cn.nkpro.ts5.platform.model.SysUserDashboardBO;
 import cn.nkpro.ts5.platform.gen.SysUserDashboard;
 import cn.nkpro.ts5.platform.gen.SysUserDashboardRef;
+import cn.nkpro.ts5.platform.model.SysUserDashboardBO;
+import cn.nkpro.ts5.platform.service.DashboardService;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.ws.rs.Path;
 import java.util.List;
 
 /**
@@ -49,18 +48,4 @@ public class DashboardController {
     public void del(String dashboardId){
         dashboardService.doDel(dashboardId);
     }
-
-    @NkNote("5、卡片列表")
-    @RequestMapping("/card/list")
-    public List<JSONObject> cardList(){
-        return dashboardService.getCardList();
-    }
-
-    @NkNote("6、加载卡片数据")
-    @RequestMapping("/card/get/{meterName}")
-    public Object cardDataGet(@PathVariable(value = "meterName") String meterName,@RequestBody Object config){
-        return dashboardService.getCardData(meterName, config);
-    }
-
-
 }
