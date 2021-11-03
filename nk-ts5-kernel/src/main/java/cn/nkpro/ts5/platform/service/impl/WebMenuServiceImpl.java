@@ -107,6 +107,7 @@ public class WebMenuServiceImpl implements WebMenuService, TfmsDefDeployAble,Ini
     public void doUpdate(List<WebMenuBO> menus){
         Long updateTime = DateTimeUtilz.nowSeconds();
         menus.forEach(menu->{
+            menu.setParentId(null);
             menu.setOrderBy((menus.indexOf(menu)+1) * 10000);
             update(menu,updateTime);
             if(menu.getChildren()!=null){
@@ -130,7 +131,7 @@ public class WebMenuServiceImpl implements WebMenuService, TfmsDefDeployAble,Ini
         if(sysWebappMenuMapper.selectByPrimaryKey(menu.getMenuId())==null){
             sysWebappMenuMapper.insert(menu);
         }else if(menu.getMenuOptions()==null){
-            sysWebappMenuMapper.updateByPrimaryKeySelective(menu);
+            sysWebappMenuMapper.updateByPrimaryKey(menu);
         }else{
             sysWebappMenuMapper.updateByPrimaryKeyWithBLOBs(menu);
         }
