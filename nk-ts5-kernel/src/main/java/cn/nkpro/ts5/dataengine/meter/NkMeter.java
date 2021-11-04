@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.platform.dashboard;
+package cn.nkpro.ts5.dataengine.meter;
 
 import cn.nkpro.ts5.co.NkCustomObject;
 
@@ -11,7 +11,7 @@ public interface NkMeter<DT> extends NkCustomObject {
     DT getData(Object config);
 
     default int getW(){
-        return 4;
+        return 8;
     }
 
     default int getH(){

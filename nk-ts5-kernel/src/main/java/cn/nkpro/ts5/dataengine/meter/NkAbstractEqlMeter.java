@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.platform.dashboard;
+package cn.nkpro.ts5.dataengine.meter;
 
 import cn.nkpro.ts5.data.redis.RedisSupport;
 import cn.nkpro.ts5.docengine.NkDocSearchService;

@@ -1,12 +1,9 @@
-package cn.nkpro.ts5.platform.service;
+package cn.nkpro.ts5.dataengine.service;
 
-import cn.nkpro.ts5.co.NkCustomObjectManager;
-import cn.nkpro.ts5.platform.dashboard.NkMeter;
 import cn.nkpro.ts5.platform.gen.*;
 import cn.nkpro.ts5.platform.model.SysUserDashboardBO;
 import cn.nkpro.ts5.security.SecurityUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,7 +11,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 public class DashboardService {
@@ -23,8 +19,6 @@ public class DashboardService {
     private SysUserDashboardMapper userDashboardMapper;
     @Autowired
     private SysUserDashboardRefMapper userDashboardRefMapper;
-    @Autowired
-    private NkCustomObjectManager customObjectManager;
 
     public SysUserDashboardBO loadUserDashboards(String dashboardId){
 
@@ -108,23 +102,5 @@ public class DashboardService {
         userDashboardRefMapper.deleteByExample(example);
 
         userDashboardMapper.deleteByPrimaryKey(dashboardId);
-    }
-
-    public List<JSONObject> getCardList() {
-        return customObjectManager.getCustomObjects(NkMeter.class)
-                .entrySet()
-                .stream()
-                .map(entry->{
-                    JSONObject jsonObject = new JSONObject();
-                    jsonObject.put("component",entry.getKey());
-                    jsonObject.put("name",entry.getValue().getName());
-                    jsonObject.put("w",entry.getValue().getW());
-                    jsonObject.put("h",entry.getValue().getH());
-                    return jsonObject;
-                }).collect(Collectors.toList());
-    }
-
-    public Object getCardData(String meterName,Object config){
-        return customObjectManager.getCustomObject(meterName, NkMeter.class).getData(config);
     }
 }

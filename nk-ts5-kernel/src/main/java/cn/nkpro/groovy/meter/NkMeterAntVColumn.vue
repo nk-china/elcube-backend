@@ -56,7 +56,7 @@
                 }
                 if(config.sql){
                     if(config.sql.trim().startsWith("[") && config.sql.trim().endsWith("]")){
-                        new Promise((r)=>{setTimeout(()=>{r({data:JSON.parse(config.data)});},100);});
+                        return new Promise((r)=>{setTimeout(()=>{r({data:JSON.parse(config.sql)});},100);});
                     }
                     return this.$http.postJSON(`/api/meter/card/get/${this.$options._componentTag}`,config);
                 }

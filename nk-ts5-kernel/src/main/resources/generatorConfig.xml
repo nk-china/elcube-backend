@@ -141,6 +141,7 @@
 		<table tableName="sys_user_saved_query"			 	enableDeleteByExample="false"/>
 		<table tableName="sys_user_dashboard"			 	enableDeleteByExample="false"/>
 		<table tableName="sys_user_dashboard_ref"			enableDeleteByExample="true"/>
+		<table tableName="nk_data_view"				 		enableDeleteByExample="false"  domainObjectName="DataView"/>
 
 	</context>
 

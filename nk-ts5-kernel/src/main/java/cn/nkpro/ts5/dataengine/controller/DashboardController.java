@@ -1,11 +1,10 @@
-package cn.nkpro.ts5.platform.controller;
+package cn.nkpro.ts5.dataengine.controller;
 
 import cn.nkpro.ts5.annotation.NkNote;
 import cn.nkpro.ts5.platform.gen.SysUserDashboard;
 import cn.nkpro.ts5.platform.gen.SysUserDashboardRef;
 import cn.nkpro.ts5.platform.model.SysUserDashboardBO;
-import cn.nkpro.ts5.platform.service.DashboardService;
-import com.alibaba.fastjson.JSONObject;
+import cn.nkpro.ts5.dataengine.service.DashboardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
