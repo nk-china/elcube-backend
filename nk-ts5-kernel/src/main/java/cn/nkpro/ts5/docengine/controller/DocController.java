@@ -120,14 +120,14 @@ public class DocController {
     }
 
     @Data
-    static class CalcModel{
+    public static class CalcModel{
         String fromCard;
         Object options;
         DocHV doc;
     }
 
     @Data
-    static class CallModel{
+    public static class CallModel{
         String fromCard;
         String method;
         Object options;
