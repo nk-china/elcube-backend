@@ -51,6 +51,13 @@ public class DataViewController {
         return dataView;
     }
 
+    @NkNote("3、保存数据视图")
+    @ResponseBody
+    @RequestMapping("/update/order")
+    public void updateOrder(@RequestBody List<String> ids){
+        dataViewService.doUpdate(ids);
+    }
+
     @NkNote("4、删除数据视图")
     @ResponseBody
     @RequestMapping("/del")

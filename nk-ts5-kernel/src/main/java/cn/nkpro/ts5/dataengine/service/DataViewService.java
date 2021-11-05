@@ -61,6 +61,16 @@ public class DataViewService {
     }
 
     @Transactional
+    public void doUpdate(List<String> ids){
+        ids.forEach(id->{
+            DataViewWithBLOBs view = new DataViewWithBLOBs();
+            view.setId(id);
+            view.setOrderBy(ids.indexOf(id));
+            dataViewMapper.updateByPrimaryKeySelective(view);
+        });
+    }
+
+    @Transactional
     public void doDel(String viewId){
         dataViewMapper.deleteByPrimaryKey(viewId);
     }
