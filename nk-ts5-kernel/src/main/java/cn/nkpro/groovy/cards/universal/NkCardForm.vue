@@ -1,6 +1,5 @@
 <template>
     <nk-card>
-        <a-button @click="nk$calc('')">test</a-button>
         <nk-form ref="form" :col="def.col" :edit="editMode" >
             <template v-for="(item,index) in def.items" >
                 <nk-form-divider

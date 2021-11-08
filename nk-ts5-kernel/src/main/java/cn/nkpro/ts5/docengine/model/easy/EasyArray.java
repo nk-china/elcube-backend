@@ -1,6 +1,7 @@
 package cn.nkpro.ts5.docengine.model.easy;
 
 import cn.nkpro.ts5.exception.NkOperateNotAllowedCaution;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -27,7 +28,7 @@ public class EasyArray extends EasyList{
     }
 
     @Override
-    public boolean addAll(Collection<? extends EasySingle> c) {
+    public boolean addAll(@NotNull Collection<? extends EasySingle> c) {
         throw new NkOperateNotAllowedCaution("不支持的操作");
     }
 
@@ -37,12 +38,12 @@ public class EasyArray extends EasyList{
     }
 
     @Override
-    public boolean removeAll(Collection<?> c) {
+    public boolean removeAll(@NotNull Collection<?> c) {
         throw new NkOperateNotAllowedCaution("不支持的操作");
     }
 
     @Override
-    public boolean retainAll(Collection<?> c) {
+    public boolean retainAll(@NotNull Collection<?> c) {
         throw new NkOperateNotAllowedCaution("不支持的操作");
     }
 

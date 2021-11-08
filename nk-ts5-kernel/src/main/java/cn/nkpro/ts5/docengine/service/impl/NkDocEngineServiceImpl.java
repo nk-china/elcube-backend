@@ -33,6 +33,7 @@ import org.springframework.util.Assert;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -116,13 +117,22 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
                 log.info("{}获取单据视图", NkDocEngineContext.currLog());
             }
             // 获取原始数据
-            DocHPersistent docHPersistent = fetchDoc(docId);
-            Assert.notNull(docHPersistent,"单据不存在");
 
-            // 检查权限
-            docPermService.assertHasDocPerm(NkDocPermService.MODE_READ, docId, docHPersistent.getDocType());
+            AtomicReference<DocHPersistent> docHPersistent = new AtomicReference<>();
+            if(debugContextManager.isDebug()) {
+                docHPersistent.set(debugContextManager.getDebugResource("$" + docId));
+            }
 
-            DocHV docHV = NkDocEngineContext.getDoc(docId, (id)-> fetchDocProcess(docHPersistent));
+            if(docHPersistent.get()==null){
+
+                docHPersistent.set(fetchDoc(docId));
+                Assert.notNull(docHPersistent.get(),"单据不存在");
+
+                // 检查权限
+                docPermService.assertHasDocPerm(NkDocPermService.MODE_READ, docId, docHPersistent.get().getDocType());
+            }
+
+            DocHV docHV = NkDocEngineContext.getDoc(docId, (id)-> fetchDocProcess(docHPersistent.get()));
             Assert.notNull(docHV,"单据不存在");
 
             processView(docHV);
@@ -293,11 +303,16 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
         try {
             if(log.isInfoEnabled())log.info("{}开始保存单据视图",NkDocEngineContext.currLog());
 
-            docPermService.assertHasDocPerm(NkDocPermService.MODE_WRITE, docHV.getDocId(), docHV.getDocType());
+            docPermService.assertHasDocPerm(NkDocPermService.MODE_WRITE, docHV.getDocType());
 
             if(log.isInfoEnabled())log.info("{}准备获取原始单据 用于填充被权限过滤的数据", NkDocEngineContext.currLog());
             DocHV original = detail(docHV.getDocId());
             if(original!=null){
+
+                if(!debugContextManager.isDebug()){
+                    docPermService.assertHasDocPerm(NkDocPermService.MODE_WRITE, docHV.getDocId(), docHV.getDocType());
+                }
+
                 original.getData().forEach((k,v)-> docHV.getData().putIfAbsent(k,v));
             }
 
@@ -312,6 +327,31 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
             if(log.isInfoEnabled())log.info("{}保存单据视图 完成",NkDocEngineContext.currLog());
             NkDocEngineContext.endLog();
             docHV.clearItemContent();
+        }
+    }
+
+    @Override
+    @Transactional
+    public DocHV doUpdate(String docId, String optSource, Function function){
+        NkDocEngineContext.startLog("UPDATE Thread safety", docId);
+        DocHV docHV = null;
+        try{
+            String      lockId = UUID.randomUUID().toString();
+            boolean     lock = redisSupport.lock(docId, lockId, 10,10);
+            Assert.isTrue(lock,"单据被其他用户锁定，请稍后再试");
+            if(log.isInfoEnabled())log.info("{}锁定单据成功 redis", NkDocEngineContext.currLog());
+
+            NkDocEngineContext.clearDoc(docId);
+
+            docHV = detail(docId);
+            function.apply(docHV);
+            return execUpdate(docHV, optSource, lockId);
+
+        }finally {
+            NkDocEngineContext.endLog();
+            if(docHV != null){
+                docHV.clearItemContent();
+            }
         }
     }
 

@@ -70,7 +70,7 @@ public class SysScriptResController {
             if(scriptDef!=null){
                 return new BeanDescribe(
                         scriptDef.getScriptName(),
-                        true,
+                        customObject instanceof GroovyObject,
                         scriptDef.getVersion(),
                         scriptDef.getState(),
                         scriptDef.isDebug());

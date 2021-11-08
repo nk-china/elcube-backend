@@ -1,6 +1,7 @@
 package cn.nkpro.ts5.docengine.model.easy;
 
 import cn.nkpro.ts5.exception.NkOperateNotAllowedCaution;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Map;
@@ -55,7 +56,7 @@ public class EasyList implements EasyCollection<EasySingle> {
     }
 
     @Override
-    public boolean addAll(Collection<? extends EasySingle> c) {
+    public boolean addAll(@NotNull Collection<? extends EasySingle> c) {
         throw new NkOperateNotAllowedCaution("不支持的操作");
     }
 
@@ -69,7 +70,7 @@ public class EasyList implements EasyCollection<EasySingle> {
     }
 
     @Override
-    public boolean removeAll(Collection<?> c) {
+    public boolean removeAll(@NotNull Collection<?> c) {
         throw new NkOperateNotAllowedCaution("不支持的操作");
     }
 
@@ -88,11 +89,13 @@ public class EasyList implements EasyCollection<EasySingle> {
         return easies.contains(o);
     }
 
+    @NotNull
     @Override
     public Iterator<EasySingle> iterator() {
         return easies.iterator();
     }
 
+    @NotNull
     @Override
     public Object[] toArray() {
         return easies.toArray();
@@ -105,12 +108,12 @@ public class EasyList implements EasyCollection<EasySingle> {
     }
 
     @Override
-    public boolean containsAll(Collection<?> c) {
+    public boolean containsAll(@NotNull Collection<?> c) {
         return easies.containsAll(c);
     }
 
     @Override
-    public boolean retainAll(Collection<?> c) {
+    public boolean retainAll(@NotNull Collection<?> c) {
         throw new NkOperateNotAllowedCaution("不支持的操作");
     }
 

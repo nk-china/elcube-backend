@@ -55,7 +55,7 @@ public abstract class NkAbstractCustomScriptObject implements NkCustomScriptObje
             scriptDef.setGroovyMain(null);
             scriptDef.setVueMain(null);
             scriptDef.setVueDefs(null);
-            scriptDef.setState("Active");
+            scriptDef.setState("Native");
         }
     }
 

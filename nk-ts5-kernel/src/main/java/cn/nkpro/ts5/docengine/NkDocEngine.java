@@ -12,5 +12,12 @@ public interface NkDocEngine {
 
     DocHV doUpdate(DocHV doc, String optSource);
 
+    DocHV doUpdate(String docId, String optSource, Function function);
+
     DocHV random(DocHV doc);
+
+    @FunctionalInterface
+    interface Function{
+        void apply(DocHV doc);
+    }
 }

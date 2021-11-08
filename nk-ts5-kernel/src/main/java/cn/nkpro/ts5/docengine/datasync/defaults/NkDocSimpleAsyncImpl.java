@@ -8,10 +8,11 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component("NkDocSimpleAsync")
-public class NkDocSimpleAsyncImpl extends NkAbstractDocDataAsyncAdapter<String> {
+public class NkDocSimpleAsyncImpl extends NkAbstractDocDataAsyncAdapter {
 
     @Override
     protected void schedule(NkAsyncQueue asyncQueue) {
+
         log.info(asyncQueue.toString());
         if(Math.random()>0)
             throw new NkSystemException("自定义错误");

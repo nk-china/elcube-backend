@@ -25,6 +25,7 @@ public class EasyEntity implements EasySingle {
     public EasyEntity set(String key, Object value){
         Field field = ReflectionUtils.findField(target.getClass(), key);
         Assert.notNull(field,String.format("没有找到%s对象的%s字段",target, key));
+        field.setAccessible(true);
         ReflectionUtils.setField(field,target,value);
         return this;
     }
@@ -34,6 +35,7 @@ public class EasyEntity implements EasySingle {
     public <T> T get(String key){
         Field field = ReflectionUtils.findField(target.getClass(), key);
         Assert.notNull(field,String.format("没有找到%s对象的%s字段",target, key));
+        field.setAccessible(true);
         return (T) ReflectionUtils.getField(field,target);
     }
 
