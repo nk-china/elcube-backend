@@ -95,22 +95,22 @@ export default {
     }
 }
 </script>
-
-<style scoped>
+<style scoped lang="less">
     ::v-deep.uploader > .ant-upload {
         width: 100px;
         height: 100px;
         border: 1px dashed #d9d9d9;
         border-radius: 4px;
         text-align: center;
-    }
-    ::v-deep.uploader i{
-        font-size: 32px;
-        color: #999;
-    }
-    ::v-deep.uploader .text{
-        margin-top: 8px;
-        color: #666;
+
+        i{
+            font-size: 32px;
+            color: #999;
+        }
+        .text{
+            margin-top: 8px;
+            color: #666;
+        }
     }
 </style>
 

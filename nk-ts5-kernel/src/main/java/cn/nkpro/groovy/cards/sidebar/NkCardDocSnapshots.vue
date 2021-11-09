@@ -59,21 +59,26 @@ export default {
 }
 </script>
 
-<style scoped>
-    ::v-deep.nk-card-doc-snapshots .ant-list-item{
-        font-size:12px;
-    }
-    ::v-deep.nk-card-doc-snapshots .ant-list-item a{
-        color: rgba(0, 0, 0, 0.65);
-    }
-    ::v-deep.nk-card-doc-snapshots .ant-list-item:hover a{
-        color:#1890ff;
-    }
-    ::v-deep.nk-card-doc-snapshots .ant-list-footer{
-        padding: 10px 0 0 0;
-    }
-    ::v-deep.nk-card-doc-snapshots .ant-list-footer a{
-        font-size:10px;
-        color:#1890ff;
+<style scoped lang="less">
+    ::v-deep.nk-card-doc-snapshots{
+        .ant-list-item{
+            font-size:12px;
+
+            a{
+                color: rgba(0, 0, 0, 0.65);
+            }
+            &:hover{
+                a{
+                    color:#1890ff;
+                }
+            }
+        }
+        .ant-list-footer{
+            padding: 10px 0 0 0;
+            a{
+                font-size:10px;
+                color:#1890ff;
+            }
+        }
     }
 </style>
