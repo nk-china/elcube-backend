@@ -13,7 +13,7 @@ import java.util.List;
 /**
  * Created by bean on 2019/12/18.
  */
-@NkNote("2.仪表盘控制器")
+@NkNote("5.仪表盘控制器")
 @RequestMapping("/dashboard")
 @RestController
 public class DashboardController {

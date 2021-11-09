@@ -23,6 +23,14 @@ public interface BeanUtilz {
         );
     }
 
+    public static <T> T cloneWithFastjson(Object source, Type type){
+        if(source==null)return null;
+        return JSON.parseObject(
+                JSON.toJSONString(source),
+                type
+        );
+    }
+
     /**
      * 将source复制到target对象，并返回
      * @param source

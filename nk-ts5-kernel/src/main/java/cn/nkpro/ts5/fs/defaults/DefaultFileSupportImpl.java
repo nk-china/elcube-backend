@@ -40,7 +40,7 @@ public class DefaultFileSupportImpl implements FSSupport<Map<String, Object>> {
 
 
         Map<String, Object> response = new LinkedHashMap<>();
-        response.put("host","/api/file/upload");
+        response.put("host","/api/fs/upload");
         response.put("path","");
         response.put("filename","");
         response.put("header",header);
@@ -110,7 +110,7 @@ public class DefaultFileSupportImpl implements FSSupport<Map<String, Object>> {
 
     @Override
     public ResponseEntity download(String url) {
-        return ResponseEntity.ok("/api/file/d/"+url);
+        return ResponseEntity.ok("/api/fs/d/"+url);
     }
 
     public ResponseEntity downloadFile(String url) {

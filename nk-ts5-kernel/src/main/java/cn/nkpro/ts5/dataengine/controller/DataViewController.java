@@ -5,6 +5,7 @@ import cn.nkpro.ts5.dataengine.service.DataViewService;
 import cn.nkpro.ts5.platform.gen.DataView;
 import cn.nkpro.ts5.platform.gen.DataViewWithBLOBs;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -15,7 +16,8 @@ import java.util.List;
 /**
  * Created by bean on 2019/12/18.
  */
-@NkNote("2.数据可视化控制器")
+@PreAuthorize("authenticated")
+@NkNote("4.数据可视化")
 @RequestMapping("/dataView")
 @RestController
 public class DataViewController {

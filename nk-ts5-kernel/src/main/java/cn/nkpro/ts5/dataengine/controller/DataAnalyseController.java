@@ -15,7 +15,7 @@ import java.util.Map;
  * Created by bean on 2020/6/9.
  */
 @PreAuthorize("authenticated")
-@NkNote("3.数据分析")
+@NkNote("3.数据分析与发现")
 @RestController
 @RequestMapping("/data/analyse")
 public class DataAnalyseController {
