@@ -1,9 +1,9 @@
 package cn.nkpro.ts5.docengine.controller;
 
+import cn.nkpro.ts5.basic.Keep;
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.docengine.NkDocEngine;
 import cn.nkpro.ts5.docengine.model.DocDefHV;
-import cn.nkpro.ts5.docengine.model.DocHV;
 import cn.nkpro.ts5.docengine.service.NkDocDefService;
 import cn.nkpro.ts5.docengine.gen.DocDefH;
 import cn.nkpro.ts5.docengine.model.DocDefIV;
@@ -145,8 +145,9 @@ public class SysDocDefController {
         return ret;
     }
 
+    @Keep
     @Data
-    static class CallDefModel {
+    public static class CallDefModel {
         String fromCard;
         Object options;
         Object def;
