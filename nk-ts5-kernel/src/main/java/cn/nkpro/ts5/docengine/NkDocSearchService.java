@@ -8,10 +8,22 @@ import cn.nkpro.ts5.docengine.service.NkDocPermService;
 import cn.nkpro.ts5.data.elasticearch.*;
 import cn.nkpro.ts5.docengine.model.es.DocHES;
 import cn.nkpro.ts5.exception.NkAccessDeniedException;
+import cn.nkpro.ts5.exception.NkDefineException;
 import cn.nkpro.ts5.security.SecurityUtilz;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.expression.Alias;
+import net.sf.jsqlparser.expression.StringValue;
+import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
+import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.schema.Column;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.select.SelectExpressionItem;
+import net.sf.jsqlparser.statement.select.SelectItem;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.fieldcaps.FieldCapabilities;
 import org.elasticsearch.action.search.SearchResponse;
@@ -75,6 +87,7 @@ public class NkDocSearchService {
     public static class SqlSearchRequest{
         private List<String> sqls;
         private JSONObject conditions;
+        private SqlSearchRequestDrill drill;
 
         public void setSql(String sql){
             this.sqls = Collections.singletonList(sql);
@@ -87,11 +100,87 @@ public class NkDocSearchService {
         }
     }
 
+    @Keep
+    @Data
+    public static class SqlSearchRequestDrill{
+        private String from;
+        private Object fromValue;
+        private String to;
+    }
+
     public ESSqlResponse searchBySql(SqlSearchRequest params){
 
         ESSqlResponse response = null;
 
         for(String sql : params.getSqls()) {
+
+
+            if(params.getDrill()!=null&&StringUtils.isNotBlank(params.getDrill().getFrom())){
+                try {
+                    Select select = (Select) CCJSqlParserUtil.parse(sql);
+                    PlainSelect selectBody = (PlainSelect) select.getSelectBody();
+                    SelectExpressionItem selectItem = (SelectExpressionItem) selectBody.getSelectItems()
+                            .stream()
+                            .filter(s -> {
+                                if(s instanceof SelectExpressionItem){
+                                    SelectExpressionItem expressionItem = (SelectExpressionItem) s;
+                                    String alias =
+                                            expressionItem.getAlias() !=null ?
+                                                    expressionItem.getAlias().getName():
+                                                    expressionItem.getExpression().toString();
+
+                                    alias = alias.replaceAll("(^\")|(\"$)","");
+                                    return StringUtils.equals(alias,params.getDrill().getFrom());
+                                }
+                                return false;
+                            }).findFirst().orElse(null);
+
+                    if(selectItem==null){
+                        throw new NkDefineException(String.format("下钻列[%s]不存在",params.getDrill().getFrom()));
+                    }
+
+                    if(!(selectItem.getExpression() instanceof Column)){
+                        throw new NkDefineException(String.format("下钻列[%s]不支持",params.getDrill().getFrom()));
+                    }
+
+
+                    String alias =
+                            selectItem.getAlias() !=null ?
+                                    selectItem.getAlias().getName():
+                                    selectItem.getExpression().toString();
+
+                    // 移除select字段
+                    selectBody.getSelectItems().remove(selectItem);
+
+                    // 移除group by字段
+                    selectBody.getGroupBy().getGroupByExpressionList().getExpressions()
+                            .removeIf(expression -> expression instanceof Column &&
+                                    StringUtils.equals(((Column) expression).getColumnName(),alias));
+
+                    Column columnTo = new Column(params.getDrill().getTo());
+                    // 添加select字段
+                    selectBody.getSelectItems().add(new SelectExpressionItem(columnTo).withAlias(new Alias(alias)));
+
+                    // 添加group by字段
+                    selectBody.getGroupBy().addGroupByExpressions(columnTo);
+
+                    // 添加fromValue 条件
+                    EqualsTo equalsTo = new EqualsTo(selectItem.getExpression(), new StringValue((String) params.getDrill().getFromValue()));
+                    if(selectBody.getWhere()!=null){
+                        selectBody.setWhere(new AndExpression(equalsTo,selectBody.getWhere()));
+                    }else{
+                        selectBody.setWhere(equalsTo);
+                    }
+
+                    if(selectBody.getGroupBy().getGroupByExpressionList().getExpressions().isEmpty()){
+                        selectBody.setGroupByElement(null);
+                    }
+                    sql = selectBody.toString();
+
+                } catch (JSQLParserException e) {
+                    e.printStackTrace();
+                }
+            }
 
             String index = searchEngine.parseSqlIndex(sql);
 
@@ -121,6 +210,10 @@ public class NkDocSearchService {
             else{
                 response.getRows().addAll(searchEngine.sql(new ESSqlRequest(sql, filterBuilder)).getRows());
             }
+            if(response.getSqls()==null){
+                response.setSqls(new ArrayList<>());
+            }
+            response.getSqls().add(sql);
         }
 
         return response;
