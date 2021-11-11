@@ -39,9 +39,14 @@ public class ClickHouseService implements DataQueryService {
         return jdbcTemplate.query(
                 "select column as \"name\",type as \"type\" from system.parts_columns where table= ? ",
                 (resultSet, i) -> {
+
+                    String type = resultSet.getString("type");
+
                     DataFieldDesc desc = new DataFieldDesc();
                     desc.setName(resultSet.getString("name"));
-                    desc.setType(resultSet.getString("type"));
+                    desc.setType(type.replaceAll("\\(.*\\)$",""));
+                    desc.setAggregatable(true);
+                    desc.setSearchable(true);
                     return desc;
                 },
                 index);
@@ -62,7 +67,7 @@ public class ClickHouseService implements DataQueryService {
                 String.format("%s limit %s", sqlList.get(0).toString(), Math.min(request.getRows(), 1000)),
                 new RowMapper(columns));
 
-        return new DataQueryResponse<>(columns, list,request.getFrom(),request.getRows(), total == null ? 0 : total);
+        return new DataQueryResponse<>(request.getSqlList(), columns, list,request.getFrom(),request.getRows(), total == null ? 0 : total);
     }
 
 
@@ -82,7 +87,7 @@ public class ClickHouseService implements DataQueryService {
                 )
         ));
 
-        return new DataQueryResponse<>(columns, list, 0,null);
+        return new DataQueryResponse<>(request.getSqlList(), columns, list, 0,null);
     }
 
     static class RowMapper implements org.springframework.jdbc.core.RowMapper<Map<String, Object>>{

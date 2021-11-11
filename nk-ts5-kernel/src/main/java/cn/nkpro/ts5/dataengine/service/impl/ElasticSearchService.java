@@ -98,7 +98,7 @@ public class ElasticSearchService implements DataQueryService {
                 List<DataQueryResponse.Column> columns = sqlResponse.getColumns().stream()
                         .map(column -> BeanUtilz.copyFromObject(column, DataQueryResponse.Column.class))
                         .collect(Collectors.toList());
-                response = new DataQueryResponse<>(columns, sqlResponse.transform().getList(),100,sqlResponse.getCursor());
+                response = new DataQueryResponse<>(request.getSqlList(), columns, sqlResponse.transform().getList(),100,sqlResponse.getCursor());
             }else{
                 response.getList().addAll(sqlResponse.transform().getList());
             }

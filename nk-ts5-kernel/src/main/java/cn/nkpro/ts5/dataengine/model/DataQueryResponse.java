@@ -13,15 +13,20 @@ public class DataQueryResponse<T> extends PageList<T> {
     private List<Column> columns;
 
     @Getter@Setter
+    private List<String> sqlList;
+
+    @Getter@Setter
     private String cursor;
 
-    public DataQueryResponse(List<Column> columns, List<T> list, int from, int size, long total) {
+    public DataQueryResponse(List<String> sqlList, List<Column> columns, List<T> list, int from, int size, long total) {
         super(list, from, size, total);
+        this.sqlList = sqlList;
         this.columns = columns;
     }
-    public DataQueryResponse(List<Column> columns, List<T> list, int size, String cursor) {
+    public DataQueryResponse(List<String> sqlList, List<Column> columns, List<T> list, int size, String cursor) {
         super(list, 0, size, 0);
         this.cursor = cursor;
+        this.sqlList = sqlList;
         this.columns = columns;
     }
 

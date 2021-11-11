@@ -44,7 +44,7 @@ public class DataAnalyseController {
     }
 
     @NkNote("2.执行sql")
-    @RequestMapping(value = "/sql",method = RequestMethod.POST)
+    @RequestMapping(value = "/query",method = RequestMethod.POST)
     public DataQueryResponse sql(@RequestBody DataQueryRequest request) {
 
 
