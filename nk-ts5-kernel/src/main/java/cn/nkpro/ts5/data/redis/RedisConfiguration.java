@@ -2,8 +2,6 @@ package cn.nkpro.ts5.data.redis;
 
 import cn.nkpro.ts5.basic.NkProperties;
 import cn.nkpro.ts5.data.redis.defaults.DefaultRedisSupportImpl;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -21,8 +19,6 @@ public class RedisConfiguration {
      * @param factory
      * @return
      */
-    @ConditionalOnClass(NkProperties.class)
-    @ConditionalOnBean(NkProperties.class)
     @Bean
     public EnvRedisTemplate<?> redisTemplate(RedisConnectionFactory factory,NkProperties nkProperties) {
         return (EnvRedisTemplate<?>) new EnvRedisTemplate(factory,nkProperties.getEnvKey());
