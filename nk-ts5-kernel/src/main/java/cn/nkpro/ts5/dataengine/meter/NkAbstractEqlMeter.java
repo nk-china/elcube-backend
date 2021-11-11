@@ -1,7 +1,8 @@
 package cn.nkpro.ts5.dataengine.meter;
 
 import cn.nkpro.ts5.data.redis.RedisSupport;
-import cn.nkpro.ts5.docengine.NkDocSearchService;
+import cn.nkpro.ts5.dataengine.model.DataQueryRequest;
+import cn.nkpro.ts5.dataengine.service.impl.ElasticSearchService;
 import cn.nkpro.ts5.security.SecurityUtilz;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,7 @@ public abstract class NkAbstractEqlMeter extends NkAbstractMeter<List>{
     @Autowired
     private RedisSupport<List> redisSupport;
     @Autowired
-    private NkDocSearchService searchService;
+    private ElasticSearchService searchService;
 
     @Override
     public List getData(Object config) {
@@ -27,7 +28,7 @@ public abstract class NkAbstractEqlMeter extends NkAbstractMeter<List>{
         }
 
         String key = SecurityUtilz.getUser().getId() +':'+ DigestUtils.md5DigestAsHex(sql.getBytes());
-        List list = redisSupport.getIfAbsent(key, () -> searchService.searchBySql(NkDocSearchService.SqlSearchRequest.fromSql(sql)).toList());
+        List list = redisSupport.getIfAbsent(key, () -> searchService.queryList(DataQueryRequest.fromSql(sql)).getList());
 
         redisSupport.expire(key,60);
 

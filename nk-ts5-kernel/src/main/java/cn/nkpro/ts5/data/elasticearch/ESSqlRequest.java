@@ -13,7 +13,7 @@ import org.elasticsearch.index.query.QueryBuilder;
 public class ESSqlRequest {
     private String time_zone = "Asia/Shanghai";
     private Boolean field_multi_value_leniency = true;
-    private Integer fetch_size = 1000;
+    private Integer fetch_size = 100;
     private Boolean index_include_frozen = false;
     private String query;
     private QueryBuilder filter;

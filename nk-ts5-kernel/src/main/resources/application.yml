@@ -16,10 +16,6 @@ nk:
 # component-reload-class-path 如果为false，那么程序启动后，修改ide中的vue文件前端不会生效
   component-reload-class-path: true
   clickhouse:
-    driver-class-name: ru.yandex.clickhouse.ClickHouseDriver
-    url: jdbc:clickhouse://192.168.1.157:8123/tutorial
-    username: root
-    password: oo2zSP8J
     hikari:
       connection-timeout: 30000
       idle-timeout: 60000

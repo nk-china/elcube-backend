@@ -1,5 +1,3 @@
-package dmn;
-
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.StringValue;
@@ -30,6 +28,7 @@ public class SqlParserTest{
             );
 
             PlainSelect selectBody = (PlainSelect) select.getSelectBody();
+
 
             Expression expression = CCJSqlParserUtil.parseExpression("HISTOGRAM(dynamics.date1_date,INTERVAL    1 MONTH)");
             System.out.println(expression);

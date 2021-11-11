@@ -9,6 +9,11 @@ nk:
     - cn.nkpro.groovy
   component-disable-online-editing: true
   component-reload-class-path: true
+  clickhouse:
+    driver-class-name: ru.yandex.clickhouse.ClickHouseDriver
+    url: jdbc:clickhouse://192.168.1.157:8123/tutorial
+    username: root
+    password: oo2zSP8J
 spring:
   datasource:
     url: jdbc:mysql://192.168.1.149:3306/ts5_beebattle_dev

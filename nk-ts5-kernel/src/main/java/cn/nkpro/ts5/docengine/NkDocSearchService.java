@@ -1,30 +1,13 @@
 package cn.nkpro.ts5.docengine;
 
-import cn.nkpro.ts5.basic.Keep;
-import cn.nkpro.ts5.data.elasticearch.annotation.ESDocument;
+import cn.nkpro.ts5.data.elasticearch.*;
 import cn.nkpro.ts5.docengine.model.BpmTaskES;
 import cn.nkpro.ts5.docengine.model.es.DocExtES;
-import cn.nkpro.ts5.docengine.service.NkDocPermService;
-import cn.nkpro.ts5.data.elasticearch.*;
 import cn.nkpro.ts5.docengine.model.es.DocHES;
-import cn.nkpro.ts5.exception.NkAccessDeniedException;
-import cn.nkpro.ts5.exception.NkDefineException;
-import cn.nkpro.ts5.security.SecurityUtilz;
+import cn.nkpro.ts5.docengine.service.NkDocPermService;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import lombok.Data;
-import net.sf.jsqlparser.JSQLParserException;
-import net.sf.jsqlparser.expression.Alias;
-import net.sf.jsqlparser.expression.StringValue;
-import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
-import net.sf.jsqlparser.expression.operators.relational.EqualsTo;
-import net.sf.jsqlparser.parser.CCJSqlParserUtil;
-import net.sf.jsqlparser.schema.Column;
-import net.sf.jsqlparser.statement.select.PlainSelect;
-import net.sf.jsqlparser.statement.select.Select;
-import net.sf.jsqlparser.statement.select.SelectExpressionItem;
 import org.apache.commons.lang3.StringUtils;
-import org.elasticsearch.action.fieldcaps.FieldCapabilities;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -43,7 +26,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -70,152 +55,6 @@ public class NkDocSearchService {
         searchEngine.deleteIndices(DocExtES.class);
 
         this.init();
-    }
-
-    public Map<String, Map<String, FieldCapabilities>> getFieldCaps(String index){
-
-        if(!SecurityUtilz.hasAnyAuthority("*:*","#*:READ","#"+index+":READ")){
-            throw new NkAccessDeniedException(String.format("没有索引[%s]的访问权限", index));
-        }
-
-        return searchEngine.getFieldCaps(index).get();
-    }
-
-    @Keep
-    @Data
-    public static class SqlSearchRequest{
-        private List<String> sqlList;
-        private JSONObject conditions;
-        private SqlSearchRequestDrill drill;
-
-        public void setSql(String sql){
-            this.sqlList = Collections.singletonList(sql);
-        }
-
-        public static SqlSearchRequest fromSql(String sql){
-            SqlSearchRequest sqlSearchRequest = new SqlSearchRequest();
-            sqlSearchRequest.setSqlList(Collections.singletonList(sql));
-            return sqlSearchRequest;
-        }
-    }
-
-    @Keep
-    @Data
-    public static class SqlSearchRequestDrill{
-        private String from;
-        private Object fromValue;
-        private String to;
-    }
-
-    public ESSqlResponse searchBySql(SqlSearchRequest params){
-
-        ESSqlResponse response = null;
-
-        for(String sql : params.getSqlList()) {
-
-
-            if(params.getDrill()!=null&&StringUtils.isNotBlank(params.getDrill().getFrom())){
-                try {
-                    Select select = (Select) CCJSqlParserUtil.parse(sql);
-                    PlainSelect selectBody = (PlainSelect) select.getSelectBody();
-                    SelectExpressionItem selectItem = (SelectExpressionItem) selectBody.getSelectItems()
-                            .stream()
-                            .filter(s -> {
-                                if(s instanceof SelectExpressionItem){
-                                    SelectExpressionItem expressionItem = (SelectExpressionItem) s;
-                                    String alias =
-                                            expressionItem.getAlias() !=null ?
-                                                    expressionItem.getAlias().getName():
-                                                    expressionItem.getExpression().toString();
-
-                                    alias = alias.replaceAll("(^\")|(\"$)","");
-                                    return StringUtils.equals(alias,params.getDrill().getFrom());
-                                }
-                                return false;
-                            }).findFirst().orElse(null);
-
-                    if(selectItem==null){
-                        throw new NkDefineException(String.format("下钻列[%s]不存在",params.getDrill().getFrom()));
-                    }
-
-                    if(!(selectItem.getExpression() instanceof Column)){
-                        throw new NkDefineException(String.format("下钻列[%s]不支持",params.getDrill().getFrom()));
-                    }
-
-
-                    String alias =
-                            selectItem.getAlias() !=null ?
-                                    selectItem.getAlias().getName():
-                                    selectItem.getExpression().toString();
-
-                    // 移除select字段
-                    selectBody.getSelectItems().remove(selectItem);
-
-                    // 移除group by字段
-                    selectBody.getGroupBy().getGroupByExpressionList().getExpressions()
-                            .removeIf(expression -> expression instanceof Column &&
-                                    StringUtils.equals(((Column) expression).getColumnName(),alias));
-
-                    Column columnTo = new Column(params.getDrill().getTo());
-                    // 添加select字段
-                    selectBody.getSelectItems().add(new SelectExpressionItem(columnTo).withAlias(new Alias(alias)));
-
-                    // 添加group by字段
-                    selectBody.getGroupBy().addGroupByExpressions(columnTo);
-
-                    // 添加fromValue 条件
-                    EqualsTo equalsTo = new EqualsTo(selectItem.getExpression(), new StringValue((String) params.getDrill().getFromValue()));
-                    if(selectBody.getWhere()!=null){
-                        selectBody.setWhere(new AndExpression(equalsTo,selectBody.getWhere()));
-                    }else{
-                        selectBody.setWhere(equalsTo);
-                    }
-
-                    if(selectBody.getGroupBy().getGroupByExpressionList().getExpressions().isEmpty()){
-                        selectBody.setGroupByElement(null);
-                    }
-                    sql = selectBody.toString();
-
-                } catch (JSQLParserException e) {
-                    e.printStackTrace();
-                }
-            }
-
-            String index = searchEngine.parseSqlIndex(sql);
-
-            QueryBuilder filterBuilder;
-            if (DocHES.class.getAnnotation(ESDocument.class).value().equals(index)) {
-                filterBuilder = docPermService.buildDocFilter(NkDocPermService.MODE_READ, null, null, false);
-            } else {
-                filterBuilder = docPermService.buildIndexFilter(index);
-            }
-
-
-            if (params.getConditions() != null) {
-                BoolQueryBuilder conditionsFilter = QueryBuilders.boolQuery();
-                JSONObject filter = params.getConditions();
-                if (filter != null) {
-                    filter.forEach((k, v) -> conditionsFilter.must(new LimitQueryBuilder(filter.getJSONObject(k))));
-                }
-                if (filterBuilder != null)
-                    conditionsFilter.must(filterBuilder);
-
-                if (!conditionsFilter.must().isEmpty())
-                    filterBuilder = conditionsFilter;
-            }
-
-            if(response==null)
-                response = searchEngine.sql(new ESSqlRequest(sql, filterBuilder));
-            else{
-                response.getRows().addAll(searchEngine.sql(new ESSqlRequest(sql, filterBuilder)).getRows());
-            }
-            if(response.getSqlList()==null){
-                response.setSqlList(new ArrayList<>());
-            }
-            response.getSqlList().add(sql);
-        }
-
-        return response;
     }
 
     public ESPageList<JSONObject> queryList(
