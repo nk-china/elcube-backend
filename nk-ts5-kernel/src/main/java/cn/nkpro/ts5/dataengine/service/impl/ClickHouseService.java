@@ -12,6 +12,7 @@ import net.sf.jsqlparser.statement.select.Select;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import ru.yandex.clickhouse.ClickHouseArray;
@@ -26,6 +27,7 @@ import java.util.Map;
 
 @AutoConfigureAfter(ClickHouseConfiguration.class)
 @ConditionalOnBean(ClickHouseTemplate.class)
+@Import(ClickHouseConfiguration.class)
 @Service("ClickHouseService")
 public class ClickHouseService implements DataQueryService {
 
