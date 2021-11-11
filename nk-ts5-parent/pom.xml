@@ -48,11 +48,11 @@
     <distributionManagement>
         <repository>
             <id>nk-pro</id>
-            <url>http://ns.nkpro.cn/repository/maven-releases/</url>
+            <url>http://ns.nkpro.it/repository/maven-releases/</url>
         </repository>
         <snapshotRepository>
             <id>nk-pro</id>
-            <url>http://ns.nkpro.cn/repository/maven-snapshots/</url>
+            <url>http://ns.nkpro.it/repository/maven-snapshots/</url>
         </snapshotRepository>
     </distributionManagement>
 
