@@ -1,5 +1,6 @@
 package cn.nkpro.ts5.dataengine.service.impl;
 
+import cn.nkpro.ts5.data.clickhouse.ClickHouseConfiguration;
 import cn.nkpro.ts5.data.clickhouse.ClickHouseTemplate;
 import cn.nkpro.ts5.dataengine.model.DataFieldDesc;
 import cn.nkpro.ts5.dataengine.model.DataQueryRequest;
@@ -9,6 +10,7 @@ import cn.nkpro.ts5.exception.NkAccessDeniedException;
 import cn.nkpro.ts5.security.SecurityUtilz;
 import net.sf.jsqlparser.statement.select.Select;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
@@ -22,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@AutoConfigureAfter(ClickHouseConfiguration.class)
 @ConditionalOnBean(ClickHouseTemplate.class)
 @Service("ClickHouseService")
 public class ClickHouseService implements DataQueryService {
