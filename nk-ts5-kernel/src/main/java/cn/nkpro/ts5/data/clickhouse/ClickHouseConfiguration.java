@@ -5,6 +5,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -19,6 +20,7 @@ import javax.sql.DataSource;
 })
 public class ClickHouseConfiguration {
 
+    @ConditionalOnProperty("nk.clickhouse.url")
     @ConfigurationProperties(prefix = "nk.clickhouse.url")
     @Bean("clickHouseDataSource")
     public DataSource clickHouseDataSource(ClickHouseProperties properties){
