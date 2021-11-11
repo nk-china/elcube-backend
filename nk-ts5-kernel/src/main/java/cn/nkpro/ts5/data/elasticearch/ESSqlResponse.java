@@ -12,7 +12,7 @@ import java.util.Map;
 @Data
 public class ESSqlResponse {
 
-    private List<String> sqls;
+    private List<String> sqlList;
     private List<Column> columns;
     private List<List<Object>> rows;
     private List<Map<String,Object>> list;

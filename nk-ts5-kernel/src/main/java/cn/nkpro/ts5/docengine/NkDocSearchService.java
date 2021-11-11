@@ -23,7 +23,6 @@ import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.select.PlainSelect;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.statement.select.SelectExpressionItem;
-import net.sf.jsqlparser.statement.select.SelectItem;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.fieldcaps.FieldCapabilities;
 import org.elasticsearch.action.search.SearchResponse;
@@ -85,17 +84,17 @@ public class NkDocSearchService {
     @Keep
     @Data
     public static class SqlSearchRequest{
-        private List<String> sqls;
+        private List<String> sqlList;
         private JSONObject conditions;
         private SqlSearchRequestDrill drill;
 
         public void setSql(String sql){
-            this.sqls = Collections.singletonList(sql);
+            this.sqlList = Collections.singletonList(sql);
         }
 
         public static SqlSearchRequest fromSql(String sql){
             SqlSearchRequest sqlSearchRequest = new SqlSearchRequest();
-            sqlSearchRequest.setSqls(Collections.singletonList(sql));
+            sqlSearchRequest.setSqlList(Collections.singletonList(sql));
             return sqlSearchRequest;
         }
     }
@@ -112,7 +111,7 @@ public class NkDocSearchService {
 
         ESSqlResponse response = null;
 
-        for(String sql : params.getSqls()) {
+        for(String sql : params.getSqlList()) {
 
 
             if(params.getDrill()!=null&&StringUtils.isNotBlank(params.getDrill().getFrom())){
@@ -210,10 +209,10 @@ public class NkDocSearchService {
             else{
                 response.getRows().addAll(searchEngine.sql(new ESSqlRequest(sql, filterBuilder)).getRows());
             }
-            if(response.getSqls()==null){
-                response.setSqls(new ArrayList<>());
+            if(response.getSqlList()==null){
+                response.setSqlList(new ArrayList<>());
             }
-            response.getSqls().add(sql);
+            response.getSqlList().add(sql);
         }
 
         return response;
