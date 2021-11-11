@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -22,11 +21,11 @@ import javax.servlet.http.HttpServletResponse;
 @Configuration
 public class NkDocEngineAutoConfiguration implements ApplicationRunner, WebMvcConfigurer {
 
-    @Autowired@SuppressWarnings("all")
-    private NkDocSearchService searchService;
+    private final NkDocSearchService searchService;
 
-    @Autowired@SuppressWarnings("all")
-    private ApplicationContext applicationContext;
+    public NkDocEngineAutoConfiguration(@Autowired NkDocSearchService searchService) {
+        this.searchService = searchService;
+    }
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -34,7 +33,6 @@ public class NkDocEngineAutoConfiguration implements ApplicationRunner, WebMvcCo
     }
     /**
      * 单据编号序列配置
-     * @return
      */
     @ConditionalOnMissingBean
     @Bean

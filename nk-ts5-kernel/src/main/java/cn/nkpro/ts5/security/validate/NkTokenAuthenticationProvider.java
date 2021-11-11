@@ -1,8 +1,8 @@
 package cn.nkpro.ts5.security.validate;
 
 import cn.nkpro.ts5.security.JwtHelper;
-import cn.nkpro.ts5.security.bo.UserDetails;
 import cn.nkpro.ts5.security.UserAccountService;
+import cn.nkpro.ts5.security.bo.UserDetails;
 import io.jsonwebtoken.Claims;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -12,12 +12,9 @@ import org.springframework.security.core.AuthenticationException;
 
 public class NkTokenAuthenticationProvider implements AuthenticationProvider {
 
-    private JwtHelper jwt;
-
     private UserAccountService userDetailsService;
 
-    public NkTokenAuthenticationProvider(JwtHelper jwt, UserAccountService userDetailsService){
-        this.jwt = jwt;
+    public NkTokenAuthenticationProvider(UserAccountService userDetailsService){
         this.userDetailsService = userDetailsService;
     }
 
@@ -26,7 +23,7 @@ public class NkTokenAuthenticationProvider implements AuthenticationProvider {
 
         NkTokenAuthentication nkAuthentication = (NkTokenAuthentication) authentication;
 
-        Claims token = jwt.verifyJwt(nkAuthentication.getJwtStr());
+        Claims token = JwtHelper.verifyJwt(nkAuthentication.getJwtStr());
 
         if (token != null) {
             String username = token.get("username", String.class);

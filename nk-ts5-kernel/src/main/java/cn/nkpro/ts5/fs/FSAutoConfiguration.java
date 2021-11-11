@@ -21,7 +21,6 @@ public class FSAutoConfiguration {
 
     /**
      * 文件上传配置 华为OBS
-     * @return
      */
     @Order(0)
     @ConditionalOnMissingBean
@@ -33,7 +32,6 @@ public class FSAutoConfiguration {
 
     /**
      * 文件上传配置 阿里云OSS
-     * @return
      */
     @Order(1)
     @ConditionalOnMissingBean
@@ -45,7 +43,6 @@ public class FSAutoConfiguration {
 
     /***
      * 文件上传配置 本地服务
-     * @return
      */
     @Order
     @ConditionalOnMissingBean

@@ -29,9 +29,6 @@ import java.util.regex.Pattern;
 public class UserAccountServiceImpl implements UserAccountService {
 
     @Autowired
-    private JwtHelper jwt;
-
-    @Autowired
     private SysAccountMapper sysAccountMapper;
 
     @Autowired
@@ -143,7 +140,7 @@ public class UserAccountServiceImpl implements UserAccountService {
         long time   = 1000L * 60 * 45;             // 有效期默认为45分钟
         long expire = 1000L * 60 * 15;             // 过期时间设定为15分钟
 
-        String token = jwt.createJWT(map,time);
+        String token = JwtHelper.createJWT(map,time);
 
         Map<String,Object> tokenInfo = new HashMap<>();
         tokenInfo.put("accessToken",token);

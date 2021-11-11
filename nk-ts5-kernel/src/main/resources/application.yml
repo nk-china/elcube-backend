@@ -15,6 +15,18 @@ nk:
   component-disable-online-editing: true
 # component-reload-class-path 如果为false，那么程序启动后，修改ide中的vue文件前端不会生效
   component-reload-class-path: true
+  clickhouse:
+    driver-class-name: ru.yandex.clickhouse.ClickHouseDriver
+    url: jdbc:clickhouse://192.168.1.157:8123/tutorial
+    username: root
+    password: oo2zSP8J
+    hikari:
+      connection-timeout: 30000
+      idle-timeout: 60000
+      max-lifetime: 1800000
+      minimumIdle: 5
+      maximumPoolSize: 10
+
 #  aliyun:
 #    access-key-id: LTAI4G6YUdTBx8b9C8uR3gTU
 #    access-key-secret: zeqaRsOAOkwwTLK8E2QyR1aEcj6RAL
@@ -25,6 +37,7 @@ nk:
 #    access-key-secret: CdDHj5aM2w8kLT89NsLAjxGRzY9b7C0ZduzGvimf
 #    obs:
 #      bucket: tfms
+
 
 server:
   port: 9200

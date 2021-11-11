@@ -13,7 +13,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-@Component
 public class JwtHelper {
 
     /**
@@ -46,7 +45,7 @@ public class JwtHelper {
     /**
      * 创建JWT
      */
-    public String createJWT(Map<String, Object> claims, Long time) {
+    public static String createJWT(Map<String, Object> claims, Long time) {
         SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256; //指定签名的时候使用的签名算法，也就是header那部分，jwt已经将这部分内容封装好了。
         Date now = new Date(System.currentTimeMillis());
 
@@ -69,7 +68,7 @@ public class JwtHelper {
     /**
      * 验证jwt
      */
-    public Claims verifyJwt(String token) {
+    public static Claims verifyJwt(String token) {
         //签名秘钥，和生成的签名的秘钥一模一样
         SecretKey key = generalKey();
         Claims claims;
@@ -88,12 +87,12 @@ public class JwtHelper {
      *
      * @return
      */
-    private SecretKey generalKey() {
+    private static SecretKey generalKey() {
         byte[] encodedKey = Base64.getDecoder().decode(JWT_SECRET);
         return new SecretKeySpec(encodedKey, 0, encodedKey.length, "AES");
     }
 
-    private Map<String,Object> generateTokenData(String unionId, String userId,String phone,
+    private static Map<String,Object> generateTokenData(String unionId, String userId,String phone,
                                                         String systemId,String accountName,String deviceId,
                                                         Integer deviceType){
         Map<String, Object> map = new HashMap<>();

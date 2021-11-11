@@ -1,8 +1,8 @@
 package cn.nkpro.ts5.security;
 
+import cn.nkpro.ts5.security.validate.NkPasswordAuthenticationFilter;
 import cn.nkpro.ts5.security.validate.NkPasswordAuthenticationProvider;
 import cn.nkpro.ts5.security.validate.NkTokenAuthenticationFilter;
-import cn.nkpro.ts5.security.validate.NkPasswordAuthenticationFilter;
 import cn.nkpro.ts5.security.validate.NkTokenAuthenticationProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -15,7 +15,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
@@ -25,9 +24,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableGlobalMethodSecurity(securedEnabled=true,prePostEnabled = true)
 public class NkWebSecurityConfig extends WebSecurityConfigurerAdapter {
 
-    @Autowired
-    private JwtHelper jwt;
-
+    @SuppressWarnings("all")
     @Autowired
     private UserAccountService userDetailsService;
 
@@ -72,7 +69,7 @@ public class NkWebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    protected void  configure(AuthenticationManagerBuilder auth) throws Exception {
+    protected void  configure(AuthenticationManagerBuilder auth) {
         auth.authenticationProvider(tokenAuthenticationProvider());
         auth.authenticationProvider(passwordAuthenticationProvider());
     }
@@ -93,13 +90,13 @@ public class NkWebSecurityConfig extends WebSecurityConfigurerAdapter {
     @ConditionalOnMissingBean
     @Bean
     protected NkTokenAuthenticationProvider tokenAuthenticationProvider() {
-        return new NkTokenAuthenticationProvider(jwt, userDetailsService);
+        return new NkTokenAuthenticationProvider(userDetailsService);
     }
 
     @ConditionalOnMissingBean
     @Bean
     protected NkPasswordAuthenticationProvider passwordAuthenticationProvider() {
-        return new NkPasswordAuthenticationProvider((UserDetailsService) userDetailsService);
+        return new NkPasswordAuthenticationProvider(userDetailsService);
     }
 
     @ConditionalOnMissingBean

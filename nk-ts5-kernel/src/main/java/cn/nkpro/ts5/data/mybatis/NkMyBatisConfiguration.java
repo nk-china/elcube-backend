@@ -1,11 +1,12 @@
 package cn.nkpro.ts5.data.mybatis;
 
-import cn.nkpro.ts5.data.mybatis.pagination.dialect.Dialect;
 import cn.nkpro.ts5.data.mybatis.pagination.PaginationInterceptor;
+import cn.nkpro.ts5.data.mybatis.pagination.dialect.Dialect;
 import org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,11 +22,11 @@ import java.lang.reflect.InvocationTargetException;
 @Qualifier("MyBatisConfiguration")
 public class NkMyBatisConfiguration {
 
-    @Autowired
-    private NkMybatisProperties properties;
 
+    @ConditionalOnClass(NkMybatisProperties.class)
+    @ConditionalOnBean(NkMybatisProperties.class)
     @Bean
-    public PaginationInterceptor paginationInterceptor(){
+    public PaginationInterceptor paginationInterceptor(NkMybatisProperties properties){
         PaginationInterceptor interceptor = new PaginationInterceptor();
         try {
             interceptor.setDialect((Dialect) Class.forName(properties.getDialect()).getConstructor().newInstance());
