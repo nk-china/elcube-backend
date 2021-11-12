@@ -23,7 +23,7 @@ public class SecurityUtilz {
                 .orElseThrow(()->new NkAccessDeniedException("未登陆"));
     }
 
-    public static Collection<? extends GrantedAuthority> getAuthorities(){
+    private static Collection<? extends GrantedAuthority> getAuthorities(){
         return Optional.ofNullable(SecurityContextHolder.getContext().getAuthentication())
                 .map(Authentication::getAuthorities)
                 .orElse(Collections.emptyList());
@@ -31,7 +31,7 @@ public class SecurityUtilz {
 
     public static boolean hasAnyAuthority(String... targetAuthoritys){
 
-        /**
+        /*
          * *:*
          * RES:*
          * RES:OPT

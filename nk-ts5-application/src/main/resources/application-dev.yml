@@ -1,4 +1,6 @@
 nk:
+  secret-id: AEF1D52777444FDDBC354928D7D2BFD3
+  secret-key: UWLnyjGgg0NuRKNFLFZ3mmoNI8VoNqHlBy1B6ZFIom0fhVCEx8uQB7J/g0wnPFADOtyq2ZVuHuJJy0QCUAzDXeCu5j75hDRFtBKaV9DEE4912FmgNb+ekV6/gdemyVulibQs/J8izXoVkD5LTALKBQ==
   env-key: ts5-platform-beebattle-dev
   env-name: 研发环境 in BeeBattle
   file-root-path: /Users/bean/Downloads/tfms

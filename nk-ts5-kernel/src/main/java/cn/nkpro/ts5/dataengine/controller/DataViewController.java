@@ -1,9 +1,9 @@
 package cn.nkpro.ts5.dataengine.controller;
 
 import cn.nkpro.ts5.annotation.NkNote;
+import cn.nkpro.ts5.dataengine.gen.DataView;
+import cn.nkpro.ts5.dataengine.gen.DataViewWithBLOBs;
 import cn.nkpro.ts5.dataengine.service.DataViewService;
-import cn.nkpro.ts5.platform.gen.DataView;
-import cn.nkpro.ts5.platform.gen.DataViewWithBLOBs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;

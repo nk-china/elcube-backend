@@ -43,7 +43,7 @@ public class DesCbcUtil {
      * @param encryptText 加密文本
      * @return 解密后明文，失败返回null
      */
-    static String decode(String encryptText, String secretKey, String iv) {
+    public static String decode(String encryptText, String secretKey, String iv) {
         String result = null;
         try {
             DESedeKeySpec spec = new DESedeKeySpec(secretKey.getBytes());

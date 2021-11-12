@@ -1,9 +1,9 @@
 package cn.nkpro.ts5.docengine.datasync;
 
 import cn.nkpro.ts5.co.NkCustomObjectManager;
-import cn.nkpro.ts5.docengine.gen.NkAsyncQueue;
-import cn.nkpro.ts5.docengine.gen.NkAsyncQueueExample;
-import cn.nkpro.ts5.docengine.gen.NkAsyncQueueMapper;
+import cn.nkpro.ts5.docengine.gen.DocAsyncQueue;
+import cn.nkpro.ts5.docengine.gen.DocAsyncQueueExample;
+import cn.nkpro.ts5.docengine.gen.DocAsyncQueueMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -16,21 +16,21 @@ import java.util.List;
 @Service
 public class NkDocDataAsyncScheduled {
 
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private NkCustomObjectManager customObjectManager;
 
-    @Autowired
-    private NkAsyncQueueMapper asyncQueueMapper;
+    @Autowired@SuppressWarnings("all")
+    private DocAsyncQueueMapper asyncQueueMapper;
 
     @Scheduled(cron = "0 * * * * ?")
     public void cron(){
 
-        NkAsyncQueueExample example = new NkAsyncQueueExample();
+        DocAsyncQueueExample example = new DocAsyncQueueExample();
         example.createCriteria()
                 .andAsyncStateEqualTo("WAITING");
         example.setOrderByClause("UPDATED_TIME");
 
-        List<NkAsyncQueue> asyncQueues = asyncQueueMapper.selectByExample(example);
+        List<DocAsyncQueue> asyncQueues = asyncQueueMapper.selectByExample(example);
 
         if(log.isInfoEnabled())
             log.info("数据同步重试 任务数量：{}",asyncQueues.size());

@@ -1,14 +1,14 @@
 package cn.nkpro.ts5.platform.service.impl;
 
 import cn.nkpro.ts5.basic.Constants;
+import cn.nkpro.ts5.platform.gen.PlatformMenu;
+import cn.nkpro.ts5.platform.gen.PlatformMenuExample;
+import cn.nkpro.ts5.platform.gen.PlatformMenuMapper;
 import cn.nkpro.ts5.platform.model.WebMenuBO;
-import cn.nkpro.ts5.platform.gen.SysWebappMenuExample;
-import cn.nkpro.ts5.platform.gen.SysWebappMenuMapper;
 import cn.nkpro.ts5.data.redis.RedisSupport;
 import cn.nkpro.ts5.security.SecurityUtilz;
-import cn.nkpro.ts5.platform.TfmsDefDeployAble;
+import cn.nkpro.ts5.platform.DeployAble;
 import cn.nkpro.ts5.platform.service.WebMenuService;
-import cn.nkpro.ts5.platform.gen.SysWebappMenu;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
 import com.alibaba.fastjson.JSONArray;
@@ -31,10 +31,10 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Service
-public class WebMenuServiceImpl implements WebMenuService, TfmsDefDeployAble,InitializingBean {
+public class WebMenuServiceImpl implements WebMenuService, DeployAble,InitializingBean {
 
     @Autowired
-    private SysWebappMenuMapper sysWebappMenuMapper;
+    private PlatformMenuMapper sysWebappMenuMapper;
 
     @Autowired
     private RedisSupport<List<WebMenuBO>> redisSupport;
@@ -48,7 +48,7 @@ public class WebMenuServiceImpl implements WebMenuService, TfmsDefDeployAble,Ini
 
         List<WebMenuBO> menus = redisSupport.getIfAbsent(Constants.CACHE_NAV_MENUS,()-> {
 
-            SysWebappMenuExample example = new SysWebappMenuExample();
+            PlatformMenuExample example = new PlatformMenuExample();
             example.setOrderByClause("ORDER_BY");
 
             List<WebMenuBO> ret = sysWebappMenuMapper.selectByExample(example).stream()
@@ -98,7 +98,7 @@ public class WebMenuServiceImpl implements WebMenuService, TfmsDefDeployAble,Ini
     }
 
     @Override
-    public SysWebappMenu getDetail(String id){
+    public  PlatformMenu getDetail(String id){
         return sysWebappMenuMapper.selectByPrimaryKey(id);
     }
 
@@ -119,14 +119,14 @@ public class WebMenuServiceImpl implements WebMenuService, TfmsDefDeployAble,Ini
             }
         });
 
-        SysWebappMenuExample example = new SysWebappMenuExample();
+        PlatformMenuExample example = new PlatformMenuExample();
         example.createCriteria().andUpdatedTimeLessThan(updateTime);
         sysWebappMenuMapper.deleteByExample(example);
 
         redisSupport.delete(Constants.CACHE_NAV_MENUS);
     }
 
-    private void update(SysWebappMenu menu,Long updateTime){
+    private void update(PlatformMenu menu,Long updateTime){
         menu.setUpdatedTime(updateTime);
         if(sysWebappMenuMapper.selectByPrimaryKey(menu.getMenuId())==null){
             sysWebappMenuMapper.insert(menu);
@@ -148,13 +148,13 @@ public class WebMenuServiceImpl implements WebMenuService, TfmsDefDeployAble,Ini
     }
 
     @Override
-    public List<SysWebappMenu> deployExport(JSONObject config) {
+    public List<PlatformMenu> deployExport(JSONObject config) {
         if(config.containsKey("includeMenu")&&config.getBoolean("includeMenu")){
             return loadMenuOptions(getMenus(false));
         }
         return Collections.emptyList();
     }
-    private List<SysWebappMenu> loadMenuOptions(List<? extends SysWebappMenu> menus){
+    private List<PlatformMenu> loadMenuOptions(List<? extends PlatformMenu> menus){
         return menus.stream()
                 .map(sysWebappMenuBO -> {
                     if(StringUtils.startsWith(sysWebappMenuBO.getUrl(),"/apps/q")){

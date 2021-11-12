@@ -5,11 +5,9 @@ import cn.nkpro.ts5.docengine.model.DocHV;
 import cn.nkpro.ts5.exception.NkDefineException;
 import cn.nkpro.ts5.exception.NkSystemException;
 import cn.nkpro.ts5.annotation.NkNote;
-import cn.nkpro.ts5.basic.NkProperties;
 import cn.nkpro.ts5.co.NkAbstractCustomScriptObject;
-import cn.nkpro.ts5.docengine.NkCard;
 import cn.nkpro.ts5.docengine.model.DocDefIV;
-import cn.nkpro.ts5.co.ScriptDefHV;
+import cn.nkpro.ts5.co.PlatformScriptV;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -18,7 +16,6 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -63,7 +60,7 @@ public abstract class NkAbstractCard<DT,DDT> extends NkAbstractCustomScriptObjec
     @Override
     public final String[] getAutoDefComponentNames() {
 
-        ScriptDefHV scriptDef = scriptDefHV();
+        PlatformScriptV scriptDef = scriptDefHV();
 
         if(scriptDef!=null && StringUtils.isNotBlank(scriptDef.getVueDefs())){
             JSONArray array = JSON.parseArray(scriptDef.getVueDefs());
@@ -80,7 +77,7 @@ public abstract class NkAbstractCard<DT,DDT> extends NkAbstractCustomScriptObjec
     @Override
     public Map<String,String> getVueTemplate(){
 
-        ScriptDefHV scriptDef = scriptDefHV();
+        PlatformScriptV scriptDef = scriptDefHV();
 
         if(scriptDef!=null){
             Map<String,String> vueMap = new HashMap<>();

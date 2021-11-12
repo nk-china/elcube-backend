@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.dataengine.meter;
 
 import cn.nkpro.ts5.co.NkAbstractCustomScriptObject;
-import cn.nkpro.ts5.co.ScriptDefHV;
+import cn.nkpro.ts5.co.PlatformScriptV;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Collections;
@@ -13,7 +13,7 @@ public abstract class NkAbstractMeter<DT> extends NkAbstractCustomScriptObject i
     @Override
     public Map<String,String> getVueTemplate(){
 
-        ScriptDefHV scriptDef = scriptDefHV();
+        PlatformScriptV scriptDef = scriptDefHV();
 
         if(scriptDef!=null){
             Map<String,String> vueMap = new HashMap<>();

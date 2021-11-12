@@ -1,6 +1,6 @@
 nk:
-  env-key: ts5-platform-beebattle-dev
-  env-name: 研发环境 in BeeBattle
+  env-key: ts5-beebattle-rd
+  env-name: 研发环境2.0
   file-root-path: /Users/bean/Downloads/tfms
   compress:
     enabled: false

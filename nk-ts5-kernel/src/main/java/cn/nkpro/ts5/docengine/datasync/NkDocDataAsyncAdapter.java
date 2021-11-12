@@ -1,8 +1,8 @@
 package cn.nkpro.ts5.docengine.datasync;
 
-import cn.nkpro.ts5.docengine.gen.NkAsyncQueue;
+import cn.nkpro.ts5.docengine.gen.DocAsyncQueue;
 
 public interface NkDocDataAsyncAdapter extends NkDocDataAdapter {
 
-    void run(NkAsyncQueue asyncQueue);
+    void run(DocAsyncQueue asyncQueue);
 }

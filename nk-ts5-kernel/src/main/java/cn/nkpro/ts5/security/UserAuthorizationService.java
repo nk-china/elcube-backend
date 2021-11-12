@@ -1,11 +1,11 @@
 package cn.nkpro.ts5.security;
 
-import cn.nkpro.ts5.security.bo.UserGroupBO;
+import cn.nkpro.ts5.platform.gen.UserAccount;
 import cn.nkpro.ts5.security.bo.GrantedAuthority;
-import cn.nkpro.ts5.security.gen.SysAccount;
-import cn.nkpro.ts5.security.gen.SysAuthGroup;
-import cn.nkpro.ts5.security.gen.SysAuthLimit;
-import cn.nkpro.ts5.security.gen.SysAuthPermission;
+import cn.nkpro.ts5.security.bo.UserGroupBO;
+import cn.nkpro.ts5.security.gen.AuthGroup;
+import cn.nkpro.ts5.security.gen.AuthLimit;
+import cn.nkpro.ts5.security.gen.AuthPermission;
 
 import java.util.List;
 
@@ -19,23 +19,23 @@ public interface UserAuthorizationService {
 
     List<GrantedAuthority> buildGrantedPerms(String accountId, String partnerId);
 
-    List<SysAuthLimit> getLimits(String[] limitIds);
+    List<AuthLimit> getLimits(String[] limitIds);
 
-    SysAuthLimit getLimitDetail(String limitId);
+    AuthLimit getLimitDetail(String limitId);
 
-    void updateLimit(SysAuthLimit limit);
+    void updateLimit(AuthLimit limit);
 
     void removeLimit(String limitId);
 
-    List<SysAuthPermission> getPerms();
+    List<AuthPermission> getPerms();
 
-    SysAuthPermission getPermDetail(String permId);
+    AuthPermission getPermDetail(String permId);
 
-    void updatePerm(SysAuthPermission perm);
+    void updatePerm(AuthPermission perm);
 
     void removePerm(String permId);
 
-    List<SysAuthGroup> getGroups();
+    List<AuthGroup> getGroups();
 
     UserGroupBO getGroupDetail(String groupId);
 
@@ -47,5 +47,5 @@ public interface UserAuthorizationService {
 
     void addAccountFromGroup(String groupId, String accountId);
 
-    List<SysAccount> accounts(String keyword);
+    List<UserAccount> accounts(String keyword);
 }

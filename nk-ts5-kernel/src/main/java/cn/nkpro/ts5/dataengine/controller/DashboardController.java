@@ -1,8 +1,8 @@
 package cn.nkpro.ts5.dataengine.controller;
 
 import cn.nkpro.ts5.annotation.NkNote;
-import cn.nkpro.ts5.platform.gen.SysUserDashboard;
-import cn.nkpro.ts5.platform.gen.SysUserDashboardRef;
+import cn.nkpro.ts5.platform.gen.UserDashboard;
+import cn.nkpro.ts5.platform.gen.UserDashboardRef;
 import cn.nkpro.ts5.platform.model.SysUserDashboardBO;
 import cn.nkpro.ts5.dataengine.service.DashboardService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,14 +30,14 @@ public class DashboardController {
     @NkNote("2、保存仪表盘列表")
     @ResponseBody
     @RequestMapping("/updateRefs")
-    public void update(@RequestBody List<SysUserDashboardRef> refs){
+    public void update(@RequestBody List<UserDashboardRef> refs){
         dashboardService.doUpdateRefs(refs);
     }
 
     @NkNote("3、保存仪表盘布局")
     @ResponseBody
     @RequestMapping("/update")
-    public void update(@RequestBody SysUserDashboard dashboard){
+    public void update(@RequestBody UserDashboard dashboard){
         dashboardService.doUpdate(dashboard);
     }
 

@@ -16,15 +16,15 @@ import java.util.UUID;
 public class DashboardService {
 
     @Autowired
-    private SysUserDashboardMapper userDashboardMapper;
+    private UserDashboardMapper userDashboardMapper;
     @Autowired
-    private SysUserDashboardRefMapper userDashboardRefMapper;
+    private UserDashboardRefMapper userDashboardRefMapper;
 
     public SysUserDashboardBO loadUserDashboards(String dashboardId){
 
         SysUserDashboardBO board = new SysUserDashboardBO();
 
-        SysUserDashboardRefExample example = new SysUserDashboardRefExample();
+        UserDashboardRefExample example = new UserDashboardRefExample();
         example.createCriteria()
                 .andAccountIdEqualTo(SecurityUtilz.getUser().getId());
         example.setOrderByClause("ORDER_BY");
@@ -39,11 +39,11 @@ public class DashboardService {
     }
 
     @Transactional
-    public void doUpdateRefs(List<SysUserDashboardRef> refs) {
+    public void doUpdateRefs(List<UserDashboardRef> refs) {
 
-        SysUserDashboardRefExample example = new SysUserDashboardRefExample();
+        UserDashboardRefExample example = new UserDashboardRefExample();
         example.createCriteria().andAccountIdEqualTo(SecurityUtilz.getUser().getId());
-        List<SysUserDashboardRef> exists = userDashboardRefMapper.selectByExample(example);
+        List<UserDashboardRef> exists = userDashboardRefMapper.selectByExample(example);
 
         refs.forEach(item->{
 
@@ -53,7 +53,7 @@ public class DashboardService {
                 item.setAccountId(SecurityUtilz.getUser().getId());
                 userDashboardRefMapper.insert(item);
 
-                SysUserDashboard dashboard = new SysUserDashboard();
+                UserDashboard dashboard = new UserDashboard();
                 dashboard.setId(item.getId());
                 dashboard.setName(item.getName());
                 dashboard.setAccountId(SecurityUtilz.getUser().getId());
@@ -76,13 +76,13 @@ public class DashboardService {
     }
 
     @Transactional
-    public void doUpdate(SysUserDashboard dashboard){
+    public void doUpdate(UserDashboard dashboard){
         if(StringUtils.isBlank(dashboard.getId())){
             dashboard.setId(UUID.randomUUID().toString());
             dashboard.setAccountId(SecurityUtilz.getUser().getId());
             userDashboardMapper.insert(dashboard);
 
-            SysUserDashboardRef ref = new SysUserDashboardRef();
+            UserDashboardRef ref = new UserDashboardRef();
             ref.setAccountId(SecurityUtilz.getUser().getId());
             ref.setId(dashboard.getId());
             ref.setOrderBy(0);
@@ -96,7 +96,7 @@ public class DashboardService {
     @Transactional
     public void doDel(String dashboardId){
 
-        SysUserDashboardRefExample example = new SysUserDashboardRefExample();
+        UserDashboardRefExample example = new UserDashboardRefExample();
         example.createCriteria()
                 .andIdEqualTo(dashboardId);
         userDashboardRefMapper.deleteByExample(example);

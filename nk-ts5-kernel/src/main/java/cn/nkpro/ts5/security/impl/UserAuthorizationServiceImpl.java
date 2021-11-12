@@ -3,6 +3,9 @@ package cn.nkpro.ts5.security.impl;
 import cn.nkpro.ts5.basic.Constants;
 import cn.nkpro.ts5.basic.GUID;
 import cn.nkpro.ts5.data.redis.RedisSupport;
+import cn.nkpro.ts5.platform.gen.UserAccount;
+import cn.nkpro.ts5.platform.gen.UserAccountExample;
+import cn.nkpro.ts5.platform.gen.UserAccountMapper;
 import cn.nkpro.ts5.security.UserAuthorizationService;
 import cn.nkpro.ts5.security.UserBusinessAdapter;
 import cn.nkpro.ts5.security.bo.GrantedAuthority;
@@ -29,23 +32,23 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
     @Autowired@SuppressWarnings("all")
     private GUID guid;
     @Autowired@SuppressWarnings("all")
-    private SysAuthGroupMapper authGroupMapper;
+    private AuthGroupMapper authGroupMapper;
     @Autowired@SuppressWarnings("all")
-    private SysAuthGroupRefMapper authGroupRefMapper;
+    private AuthGroupRefMapper authGroupRefMapper;
     @Autowired@SuppressWarnings("all")
-    private SysAuthPermissionMapper authPermissionMapper;
+    private AuthPermissionMapper authPermissionMapper;
     @Autowired@SuppressWarnings("all")
-    private SysAuthLimitMapper authLimitMapper;
+    private AuthLimitMapper authLimitMapper;
     @Autowired@SuppressWarnings("all")
-    private SysAccountMapper accountMapper;
+    private UserAccountMapper accountMapper;
 
     @Autowired@SuppressWarnings("all")
     private RedisSupport<UserGroupBO> redisSupport;
     @Autowired@SuppressWarnings("all")
-    private RedisSupport<SysAuthLimit> redisSupportLimit;
+    private RedisSupport<AuthLimit> redisSupportLimit;
     @Autowired@SuppressWarnings("all")
     private NkSpELManager spELManager;
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private UserBusinessAdapter userBusinessAdapter;
 
 
@@ -62,7 +65,7 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
         // 构造权限列表
         List<GrantedAuthority> permList = new ArrayList<>();
 
-        SysAuthGroupRefExample authGroupRefExample = new SysAuthGroupRefExample();
+        AuthGroupRefExample authGroupRefExample = new AuthGroupRefExample();
         authGroupRefExample.createCriteria()
                 .andRefIdEqualTo(accountId)
                 .andRefTypeEqualTo(GROUP_TO_ACCOUNT);
@@ -77,33 +80,33 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
 
         // 处理limit
         Set<String> limitIds = new HashSet<>();
-        permList.forEach(tfmsGrantedAuthority -> {
-            if(tfmsGrantedAuthority.getLimitIds()!=null){
-                limitIds.addAll(Arrays.asList(tfmsGrantedAuthority.getLimitIds()));
+        permList.forEach(grantedAuthority -> {
+            if(grantedAuthority.getLimitIds()!=null){
+                limitIds.addAll(Arrays.asList(grantedAuthority.getLimitIds()));
             }
         });
 
-        Map<String,SysAuthLimit> limits = limitIds.stream()
+        Map<String,AuthLimit> limits = limitIds.stream()
                 .map(limitId->
                     redisSupportLimit.getIfAbsent(Constants.CACHE_AUTH_LIMIT,limitId,
                             ()-> authLimitMapper.selectByPrimaryKey(limitId))
-                ).collect(Collectors.toMap(SysAuthLimit::getLimitId,v->v));
+                ).collect(Collectors.toMap(AuthLimit::getLimitId,v->v));
 
         permList.forEach(authority -> {
             if(authority.getLimitIds()!=null){
-                List<String> querys = Arrays.stream(authority.getLimitIds())
+                List<String> query = Arrays.stream(authority.getLimitIds())
                         .map(limits::get)
                         .filter(limit->limit!=null && limit.getContent()!=null)
-                        .map(SysAuthLimit::getContent)
+                        .map(AuthLimit::getContent)
                         .map(limit->spELManager.convert(limit,user))
                         .collect(Collectors.toList());
-                if(querys.size()>1){
+                if(query.size()>1){
                     authority.setLimitQuery(
-                            querys.stream()
+                            query.stream()
                                     .collect(Collectors.joining(",", "{\"bool\":{\"must\":[", "]}}"))
                     );
-                }else if(querys.size()==1){
-                    authority.setLimitQuery(querys.get(0));
+                }else if(query.size()==1){
+                    authority.setLimitQuery(query.get(0));
                 }
             }
         });
@@ -128,26 +131,26 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
 
         return redisSupport.getIfAbsent(Constants.CACHE_AUTH_GROUP,groupId,()->{
 
-            SysAuthGroup sysAuthGroup = authGroupMapper.selectByPrimaryKey(groupId);
+            AuthGroup sysAuthGroup = authGroupMapper.selectByPrimaryKey(groupId);
 
             if(sysAuthGroup!=null){
 
                 UserGroupBO g = BeanUtilz.copyFromObject(sysAuthGroup, UserGroupBO.class);
 
-                SysAuthGroupRefExample authGroupRefExample = new SysAuthGroupRefExample();
+                AuthGroupRefExample authGroupRefExample = new AuthGroupRefExample();
                 authGroupRefExample.createCriteria()
                         .andGroupIdEqualTo(groupId)
                         .andRefTypeEqualTo(GROUP_TO_PERM);
 
                 List<String> permIds = authGroupRefMapper.selectByExample(authGroupRefExample)
                         .stream()
-                        .map(SysAuthGroupRefKey::getRefId)
+                        .map(AuthGroupRefKey::getRefId)
                         .collect(Collectors.toList());
 
                 if(!permIds.isEmpty()){
 
                     // 查询Group下的权限定义
-                    SysAuthPermissionExample authPermissionExample = new SysAuthPermissionExample();
+                    AuthPermissionExample authPermissionExample = new AuthPermissionExample();
                     authPermissionExample.createCriteria()
                             .andPermIdIn(permIds);
                     authPermissionExample.setOrderByClause("PERM_DESC");
@@ -193,7 +196,7 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
      * @param group group
      * @return NkGrantedAuthority
      */
-    private GrantedAuthority buildAuthority(String resource, SysAuthPermission perm, SysAuthGroup group){
+    private GrantedAuthority buildAuthority(String resource, AuthPermission perm, AuthGroup group){
         GrantedAuthority authority = new GrantedAuthority();
         authority.setPermResource(resource);
         authority.setPermOperate(perm.getPermOperate());
@@ -211,8 +214,8 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
     //// 以下为管理代码
 
     @Override
-    public List<SysAuthLimit> getLimits(String[] limitIds){
-        SysAuthLimitExample example = new SysAuthLimitExample();
+    public List<AuthLimit> getLimits(String[] limitIds){
+        AuthLimitExample example = new AuthLimitExample();
         if(ArrayUtils.isNotEmpty(limitIds))
             example.createCriteria().andLimitIdIn(Arrays.asList(limitIds));
         example.setOrderByClause("LIMIT_DESC");
@@ -220,7 +223,7 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
     }
 
     @Override
-    public SysAuthLimit getLimitDetail(String limitId){
+    public AuthLimit getLimitDetail(String limitId){
         if(StringUtils.isNotBlank(limitId)){
             return redisSupportLimit.getIfAbsent(Constants.CACHE_AUTH_LIMIT,limitId,
                 ()-> authLimitMapper.selectByPrimaryKey(limitId));
@@ -228,13 +231,13 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
         return null;
     }
     @Override
-    public void updateLimit(SysAuthLimit limit){
+    public void updateLimit(AuthLimit limit){
         Assert.hasText(limit.getLimitDesc(),"限制描述不能为空");
 
         QueryBuilders.wrapperQuery(limit.getContent());
 
         if(StringUtils.isBlank(limit.getLimitId())){
-            limit.setLimitId(guid.nextId(SysAuthLimit.class));
+            limit.setLimitId(guid.nextId(AuthLimit.class));
             authLimitMapper.insert(limit);
         }else{
             authLimitMapper.updateByPrimaryKeyWithBLOBs(limit);
@@ -249,18 +252,18 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
 
 
     @Override
-    public List<SysAuthPermission> getPerms(){
-        SysAuthPermissionExample example = new SysAuthPermissionExample();
+    public List<AuthPermission> getPerms(){
+        AuthPermissionExample example = new AuthPermissionExample();
         example.setOrderByClause("PERM_DESC");
         return authPermissionMapper.selectByExample(example);
     }
 
     @Override
-    public SysAuthPermission getPermDetail(String permId){
+    public AuthPermission getPermDetail(String permId){
         return authPermissionMapper.selectByPrimaryKey(permId);
     }
     @Override
-    public void updatePerm(SysAuthPermission perm){
+    public void updatePerm(AuthPermission perm){
         Assert.hasText(perm.getPermDesc(),"权限描述不能为空");
         Assert.hasText(perm.getPermResource(),"权限资源不能为空");
         Assert.hasText(perm.getPermOperate(),"权限操作不能为空");
@@ -274,7 +277,7 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
         }
 
         if(StringUtils.isBlank(perm.getPermId())){
-            perm.setPermId(guid.nextId(SysAuthPermission.class));
+            perm.setPermId(guid.nextId(AuthPermission.class));
             authPermissionMapper.insert(perm);
         }else{
             authPermissionMapper.updateByPrimaryKeyWithBLOBs(perm);
@@ -292,14 +295,14 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
 
     private void clearGroupByPerm(String permId){
 
-        SysAuthGroupRefExample authGroupRefExample = new SysAuthGroupRefExample();
+        AuthGroupRefExample authGroupRefExample = new AuthGroupRefExample();
         authGroupRefExample.createCriteria()
                 .andRefIdEqualTo(permId)
                 .andRefTypeEqualTo(GROUP_TO_PERM);
 
         Object[] groupIds = authGroupRefMapper.selectByExample(authGroupRefExample)
                 .stream()
-                .map(SysAuthGroupRefKey::getGroupId)
+                .map(AuthGroupRefKey::getGroupId)
                 .distinct()
                 .toArray(String[]::new);
 
@@ -312,8 +315,8 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
 
 
     @Override
-    public List<SysAuthGroup> getGroups(){
-        SysAuthGroupExample example = new SysAuthGroupExample();
+    public List<AuthGroup> getGroups(){
+        AuthGroupExample example = new AuthGroupExample();
         example.setOrderByClause("GROUP_DESC");
         return authGroupMapper.selectByExample(example);
     }
@@ -324,19 +327,19 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
         UserGroupBO group = buildUserGroup(groupId);
 
         // 查询用户组下的账号
-        SysAuthGroupRefExample authGroupRefExample = new SysAuthGroupRefExample();
+        AuthGroupRefExample authGroupRefExample = new AuthGroupRefExample();
         authGroupRefExample.createCriteria()
                 .andGroupIdEqualTo(groupId)
                 .andRefTypeEqualTo(GROUP_TO_ACCOUNT);
 
         List<String> accountIds = authGroupRefMapper.selectByExample(authGroupRefExample)
                 .stream()
-                .map(SysAuthGroupRefKey::getRefId)
+                .map(AuthGroupRefKey::getRefId)
                 .collect(Collectors.toList());
 
         if(!accountIds.isEmpty()){
 
-            SysAccountExample accountExample = new SysAccountExample();
+            UserAccountExample accountExample = new UserAccountExample();
             accountExample.createCriteria()
                     .andIdIn(accountIds);
             accountExample.setOrderByClause("USERNAME");
@@ -358,12 +361,12 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
         Assert.hasText(group.getGroupDesc(),"权限描述不能为空");
 
         if(StringUtils.isBlank(group.getGroupId())){
-            group.setGroupId(guid.nextId(SysAuthGroup.class));
+            group.setGroupId(guid.nextId(AuthGroup.class));
             authGroupMapper.insert(group);
         }else{
             authGroupMapper.updateByPrimaryKey(group);
 
-            SysAuthGroupRefExample example = new SysAuthGroupRefExample();
+            AuthGroupRefExample example = new AuthGroupRefExample();
             example.createCriteria()
                     .andGroupIdEqualTo(group.getGroupId())
                     .andRefTypeEqualTo(GROUP_TO_PERM);
@@ -373,7 +376,7 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
         if(group.getPermissions()!=null){
             group.getPermissions()
                     .forEach(perm->{
-                        SysAuthGroupRefKey ref = new SysAuthGroupRefKey();
+                        AuthGroupRefKey ref = new AuthGroupRefKey();
                         ref.setGroupId(group.getGroupId());
                         ref.setRefId(perm.getPermId());
                         ref.setRefType(GROUP_TO_PERM);
@@ -389,7 +392,7 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
 
         Assert.isTrue(!groupId.startsWith("nk-default-"),"系统用户组不可删除");
 
-        SysAuthGroupRefExample example = new SysAuthGroupRefExample();
+        AuthGroupRefExample example = new AuthGroupRefExample();
         example.createCriteria().andGroupIdEqualTo(groupId);
         authGroupRefMapper.deleteByExample(example);
 
@@ -403,7 +406,7 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
 
         Assert.isTrue(!(groupId.startsWith("nk-default-") && accountId.startsWith("nk-default-")),"系统用户不可移除");
 
-        SysAuthGroupRefExample example = new SysAuthGroupRefExample();
+        AuthGroupRefExample example = new AuthGroupRefExample();
         example.createCriteria()
                 .andGroupIdEqualTo(groupId)
                 .andRefIdEqualTo(accountId)
@@ -415,7 +418,7 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
     public void addAccountFromGroup(String groupId, String accountId){
         removeAccountFromGroup(groupId,accountId);
 
-        SysAuthGroupRefKey ref = new SysAuthGroupRefKey();
+        AuthGroupRefKey ref = new AuthGroupRefKey();
         ref.setGroupId(groupId);
         ref.setRefId(accountId);
         ref.setRefType(GROUP_TO_ACCOUNT);
@@ -423,8 +426,8 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
     }
 
     @Override
-    public List<SysAccount> accounts(String keyword){
-        SysAccountExample example = new SysAccountExample();
+    public List<UserAccount> accounts(String keyword){
+        UserAccountExample example = new UserAccountExample();
         example.createCriteria()
                 .andUsernameLike(String.format("%%%s%%",keyword));
 

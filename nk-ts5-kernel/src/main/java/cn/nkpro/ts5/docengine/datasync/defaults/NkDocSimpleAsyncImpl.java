@@ -1,8 +1,8 @@
 package cn.nkpro.ts5.docengine.datasync.defaults;
 
-import cn.nkpro.ts5.exception.NkSystemException;
 import cn.nkpro.ts5.docengine.datasync.NkAbstractDocDataAsyncAdapter;
-import cn.nkpro.ts5.docengine.gen.NkAsyncQueue;
+import cn.nkpro.ts5.docengine.gen.DocAsyncQueue;
+import cn.nkpro.ts5.exception.NkSystemException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 public class NkDocSimpleAsyncImpl extends NkAbstractDocDataAsyncAdapter {
 
     @Override
-    protected void schedule(NkAsyncQueue asyncQueue) {
+    protected void schedule(DocAsyncQueue asyncQueue) {
 
         log.info(asyncQueue.toString());
         if(Math.random()>0)

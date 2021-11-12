@@ -1,12 +1,12 @@
 package cn.nkpro.ts5.platform.service.impl;
 
 import cn.nkpro.ts5.basic.GUID;
-import cn.nkpro.ts5.platform.gen.SysUserSavedQuery;
-import cn.nkpro.ts5.platform.gen.SysUserSavedQueryExample;
-import cn.nkpro.ts5.platform.gen.SysUserSavedQueryMapper;
+import cn.nkpro.ts5.platform.gen.UserSavedQuery;
+import cn.nkpro.ts5.platform.gen.UserSavedQueryExample;
+import cn.nkpro.ts5.platform.gen.UserSavedQueryMapper;
+import cn.nkpro.ts5.platform.service.UserQueryService;
 import cn.nkpro.ts5.security.SecurityUtilz;
 import cn.nkpro.ts5.security.bo.UserDetails;
-import cn.nkpro.ts5.platform.service.UserQueryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -18,16 +18,16 @@ import java.util.List;
 @Service
 public class UserQueryServiceImpl implements UserQueryService {
 
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private GUID guid;
 
-    @Autowired
-    private SysUserSavedQueryMapper queryMapper;
+    @Autowired@SuppressWarnings("all")
+    private UserSavedQueryMapper queryMapper;
 
     @Override
-    public List<SysUserSavedQuery> getList(String source){
+    public List<UserSavedQuery> getList(String source){
         UserDetails user = SecurityUtilz.getUser();
-        SysUserSavedQueryExample example = new SysUserSavedQueryExample();
+        UserSavedQueryExample example = new UserSavedQueryExample();
         example.createCriteria().andSourceEqualTo(source)
                 .andUserIdEqualTo(user.getId());
         example.setOrderByClause("NAME");
@@ -35,9 +35,9 @@ public class UserQueryServiceImpl implements UserQueryService {
     }
 
     @Override
-    public void create(SysUserSavedQuery query){
+    public void create(UserSavedQuery query){
         UserDetails user = SecurityUtilz.getUser();
-        query.setId(guid.nextId(SysUserSavedQuery.class));
+        query.setId(guid.nextId(UserSavedQuery.class));
         query.setUserId(user.getId());
         queryMapper.insertSelective(query);
     }

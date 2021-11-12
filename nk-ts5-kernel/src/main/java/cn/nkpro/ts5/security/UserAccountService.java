@@ -1,8 +1,8 @@
 package cn.nkpro.ts5.security;
 
+import cn.nkpro.ts5.platform.gen.UserAccount;
 import cn.nkpro.ts5.security.bo.UserAccountBO;
 import cn.nkpro.ts5.security.bo.UserDetails;
-import cn.nkpro.ts5.security.gen.SysAccount;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -14,15 +14,15 @@ import java.util.Map;
  */
 public interface UserAccountService extends UserDetailsService {
 
-    SysAccount getAccountById(String id);
+    UserAccount getAccountById(String id);
 
-    List<SysAccount> getAccountsByObjectId(List<String> docIds);
+    List<UserAccount> getAccountsByObjectId(List<String> docIds);
 
     UserAccountBO getAccount(String username, boolean preClear);
 
     void clear();
 
-    void checkPasswordStrategyAndSha1(SysAccount account);
+    void checkPasswordStrategyAndSha1(UserAccount account);
 
     void doChangePassword(String accountId, String oldPassword, String newPassword);
 

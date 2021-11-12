@@ -1,9 +1,9 @@
 package cn.nkpro.ts5.dataengine.service;
 
-import cn.nkpro.ts5.platform.gen.DataView;
-import cn.nkpro.ts5.platform.gen.DataViewExample;
-import cn.nkpro.ts5.platform.gen.DataViewMapper;
-import cn.nkpro.ts5.platform.gen.DataViewWithBLOBs;
+import cn.nkpro.ts5.dataengine.gen.DataView;
+import cn.nkpro.ts5.dataengine.gen.DataViewExample;
+import cn.nkpro.ts5.dataengine.gen.DataViewMapper;
+import cn.nkpro.ts5.dataengine.gen.DataViewWithBLOBs;
 import cn.nkpro.ts5.security.SecurityUtilz;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -19,6 +19,7 @@ import java.util.UUID;
 @Service
 public class DataViewService {
 
+    @SuppressWarnings("all")
     @Autowired
     private DataViewMapper dataViewMapper;
 

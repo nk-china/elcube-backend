@@ -9,6 +9,10 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Data
 @ConfigurationProperties(prefix = "nk")
 public class NkProperties {
+
+    private String secretId;
+    private String secretKey;
+
     private String envKey;
     private String envName;
 

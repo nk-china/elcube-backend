@@ -1,16 +1,19 @@
 package cn.nkpro.ts5.platform.controller;
 
+import cn.nkpro.ts5.annotation.NkNote;
 import cn.nkpro.ts5.security.SecurityUtilz;
-import cn.nkpro.ts5.security.bo.UserDetails;
 import cn.nkpro.ts5.security.UserAccountService;
 import cn.nkpro.ts5.security.UserAuthorizationService;
-import cn.nkpro.ts5.security.gen.SysAuthLimit;
-import cn.nkpro.ts5.annotation.NkNote;
+import cn.nkpro.ts5.security.bo.UserDetails;
+import cn.nkpro.ts5.security.gen.AuthLimit;
 import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Collections;
 import java.util.List;
@@ -62,7 +65,7 @@ public class UserAuthController {
 
     @NkNote("5.获取用户授权限制")
     @RequestMapping("/info/limits")
-    public List<SysAuthLimit> limits(@RequestBody String[] limitIds){
+    public List<AuthLimit> limits(@RequestBody String[] limitIds){
         if(ArrayUtils.isEmpty(limitIds)){
             return Collections.emptyList();
         }

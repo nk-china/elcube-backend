@@ -1,9 +1,9 @@
 package cn.nkpro.ts5.docengine.service.impl;
 
 import cn.nkpro.ts5.basic.GUID;
-import cn.nkpro.ts5.docengine.gen.SysLogDocRecord;
-import cn.nkpro.ts5.docengine.gen.SysLogDocRecordExample;
-import cn.nkpro.ts5.docengine.gen.SysLogDocRecordMapper;
+import cn.nkpro.ts5.docengine.gen.DocRecord;
+import cn.nkpro.ts5.docengine.gen.DocRecordExample;
+import cn.nkpro.ts5.docengine.gen.DocRecordMapper;
 import cn.nkpro.ts5.docengine.model.DocDefHV;
 import cn.nkpro.ts5.docengine.model.DocHHistory;
 import cn.nkpro.ts5.docengine.model.DocHV;
@@ -25,20 +25,20 @@ import java.util.List;
 @Service
 public class NkDocHistoryServiceImpl implements NkDocHistoryService {
 
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private GUID guid;
-    @Autowired
-    private SysLogDocRecordMapper logDocRecordMapper;
+    @Autowired@SuppressWarnings("all")
+    private DocRecordMapper logDocRecordMapper;
 
     @Transactional
     @Override
     public void doAddVersion(DocHV doc, DocHV original, List<String> changedCard, String source){
 
-        SysLogDocRecordExample example = new SysLogDocRecordExample();
+        DocRecordExample example = new DocRecordExample();
         example.createCriteria().andDocIdEqualTo(doc.getDocId());
 
-        SysLogDocRecord record = new SysLogDocRecord();
-        record.setId(guid.nextId(SysLogDocRecord.class));
+        DocRecord record = new DocRecord();
+        record.setId(guid.nextId(DocRecord.class));
         record.setDocId(doc.getDocId());
         record.setState(doc.getDocState());
         record.setStateOriginal(original==null?null:original.getDocState());
@@ -53,8 +53,8 @@ public class NkDocHistoryServiceImpl implements NkDocHistoryService {
     }
 
     @Override
-    public List<SysLogDocRecord> getHistories(String docId, int offset) {
-        SysLogDocRecordExample example = new SysLogDocRecordExample();
+    public List<DocRecord> getHistories(String docId, int offset) {
+        DocRecordExample example = new DocRecordExample();
         example.createCriteria().andDocIdEqualTo(docId);
         example.setOrderByClause("UPDATED_TIME DESC");
 
@@ -63,7 +63,7 @@ public class NkDocHistoryServiceImpl implements NkDocHistoryService {
 
     @Override
     public DocHHistory getDetail(String historyId) {
-        SysLogDocRecord record = logDocRecordMapper.selectByPrimaryKey(historyId);
+        DocRecord record = logDocRecordMapper.selectByPrimaryKey(historyId);
         Assert.notNull(record,"没有找到对应的历史记录");
 
         DocHHistory doc = JSONObject.parseObject(TextUtils.uncompress(record.getData()), DocHHistory.class);

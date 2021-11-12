@@ -1,11 +1,11 @@
 package cn.nkpro.ts5.platform.controller;
 
+import cn.nkpro.ts5.platform.gen.UserAccount;
 import cn.nkpro.ts5.security.UserAuthorizationService;
 import cn.nkpro.ts5.security.bo.UserGroupBO;
-import cn.nkpro.ts5.security.gen.SysAccount;
-import cn.nkpro.ts5.security.gen.SysAuthGroup;
-import cn.nkpro.ts5.security.gen.SysAuthLimit;
-import cn.nkpro.ts5.security.gen.SysAuthPermission;
+import cn.nkpro.ts5.security.gen.AuthGroup;
+import cn.nkpro.ts5.security.gen.AuthLimit;
+import cn.nkpro.ts5.security.gen.AuthPermission;
 import cn.nkpro.ts5.annotation.NkNote;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,21 +21,21 @@ import java.util.List;
 @PreAuthorize("hasAnyAuthority('*:*','SETTINGS:*','SETTINGS:AUTH')")
 public class SettingsAuthController {
 
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private UserAuthorizationService permService;
     
     @RequestMapping("/limit/list")
-    public List<SysAuthLimit> limits(){
+    public List<AuthLimit> limits(){
         return permService.getLimits(null);
     }
     
     @RequestMapping("/limit/detail")
-    public SysAuthLimit limitDetail(String limitId){
+    public AuthLimit limitDetail(String limitId){
         return permService.getLimitDetail(limitId);
     }
 
     @RequestMapping("/limit/update")
-    public SysAuthLimit limitUpdate(@RequestBody SysAuthLimit limit){
+    public AuthLimit limitUpdate(@RequestBody AuthLimit limit){
         permService.updateLimit(limit);
         return limit;
     }
@@ -47,17 +47,17 @@ public class SettingsAuthController {
 
     
     @RequestMapping("/perm/list")
-    public List<SysAuthPermission> perms(){
+    public List<AuthPermission> perms(){
         return permService.getPerms();
     }
     
     @RequestMapping("/perm/detail")
-    public SysAuthPermission permDetail(String permId){
+    public AuthPermission permDetail(String permId){
         return permService.getPermDetail(permId);
     }
     
     @RequestMapping("/perm/update")
-    public SysAuthPermission permUpdate(@RequestBody SysAuthPermission perm){
+    public AuthPermission permUpdate(@RequestBody AuthPermission perm){
         permService.updatePerm(perm);
         return perm;
     }
@@ -69,13 +69,13 @@ public class SettingsAuthController {
 
     
     @RequestMapping("/group/list")
-    public List<SysAuthGroup> groups(){
+    public List<AuthGroup> groups(){
         return permService.getGroups();
     }
 
     
     @RequestMapping("/group/detail")
-    public SysAuthGroup groupDetail(String groupId){
+    public AuthGroup groupDetail(String groupId){
         return permService.getGroupDetail(groupId);
     }
     
@@ -91,19 +91,19 @@ public class SettingsAuthController {
     }
 
     @RequestMapping("/group/remove/account")
-    public SysAuthGroup groupRemoveAccount(String groupId,String accountId){
+    public AuthGroup groupRemoveAccount(String groupId,String accountId){
         permService.removeAccountFromGroup(groupId,accountId);
         return permService.getGroupDetail(groupId);
     }
 
     @RequestMapping("/group/add/account")
-    public SysAuthGroup groupAddAccount(String groupId, String accountId){
+    public AuthGroup groupAddAccount(String groupId, String accountId){
         permService.addAccountFromGroup(groupId,accountId);
         return permService.getGroupDetail(groupId);
     }
     
     @RequestMapping("/accounts")
-    public List<SysAccount> accounts(String keyword){
+    public List<UserAccount> accounts(String keyword){
         return permService.accounts(keyword);
     }
 }

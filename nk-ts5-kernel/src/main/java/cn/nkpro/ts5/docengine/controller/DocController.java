@@ -1,24 +1,20 @@
 package cn.nkpro.ts5.docengine.controller;
 
+import cn.nkpro.ts5.annotation.NkNote;
+import cn.nkpro.ts5.data.elasticearch.ESPageList;
+import cn.nkpro.ts5.docengine.NkDocSearchService;
+import cn.nkpro.ts5.docengine.gen.DocRecord;
 import cn.nkpro.ts5.docengine.model.DocDefFlowV;
 import cn.nkpro.ts5.docengine.model.DocHHistory;
 import cn.nkpro.ts5.docengine.model.DocHV;
 import cn.nkpro.ts5.docengine.service.NkDocDefService;
 import cn.nkpro.ts5.docengine.service.NkDocEngineFrontService;
 import cn.nkpro.ts5.docengine.service.NkDocHistoryService;
-import cn.nkpro.ts5.docengine.NkDocSearchService;
-import cn.nkpro.ts5.docengine.gen.SysLogDocRecord;
-import cn.nkpro.ts5.docengine.model.es.DocExtES;
-import cn.nkpro.ts5.docengine.model.es.DocHES;
-import cn.nkpro.ts5.data.elasticearch.AbstractESModel;
-import cn.nkpro.ts5.data.elasticearch.ESPageList;
-import cn.nkpro.ts5.annotation.NkNote;
 import com.alibaba.fastjson.JSONObject;
 import eu.bitwalker.useragentutils.Browser;
 import eu.bitwalker.useragentutils.UserAgent;
 import eu.bitwalker.useragentutils.Version;
 import lombok.Data;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -67,7 +63,7 @@ public class DocController {
 
     @NkNote("4、拉取交易历史版本")
     @RequestMapping(value = "/detail/snapshots/{docId}/{offset}",method = RequestMethod.GET)
-    public List<SysLogDocRecord> getHistories(@PathVariable("docId") String docId, @PathVariable("offset") Integer offset) {
+    public List<DocRecord> getHistories(@PathVariable("docId") String docId, @PathVariable("offset") Integer offset) {
         return docHistoryService.getHistories(docId,offset);
     }
 

@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.platform.model;
 
-import cn.nkpro.ts5.platform.gen.SysUserDashboard;
-import cn.nkpro.ts5.platform.gen.SysUserDashboardRef;
+import cn.nkpro.ts5.platform.gen.UserDashboard;
+import cn.nkpro.ts5.platform.gen.UserDashboardRef;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,9 +10,9 @@ import java.util.List;
 public class SysUserDashboardBO {
 
     @Getter@Setter
-    private List<SysUserDashboardRef> refs;
+    private List<UserDashboardRef> refs;
 
     @Getter@Setter
-    private SysUserDashboard activeDashboard;
+    private UserDashboard activeDashboard;
 
 }

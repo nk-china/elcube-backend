@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.platform.service;
 
+import cn.nkpro.ts5.platform.gen.PlatformMenu;
 import cn.nkpro.ts5.platform.model.WebMenuBO;
-import cn.nkpro.ts5.platform.gen.SysWebappMenu;
 
 import java.util.List;
 
@@ -11,7 +11,7 @@ import java.util.List;
 public interface WebMenuService {
     List<WebMenuBO> getMenus(boolean filterAuth);
 
-    SysWebappMenu getDetail(String id);
+    PlatformMenu getDetail(String id);
 
     void doUpdate(List<WebMenuBO> menus);
 }

@@ -1,7 +1,7 @@
 package cn.nkpro.groovy.cards.sidebar
 
 import cn.nkpro.ts5.docengine.NkAbstractCard
-import cn.nkpro.ts5.docengine.gen.SysLogDocRecord
+import cn.nkpro.ts5.docengine.gen.DocRecord
 import cn.nkpro.ts5.docengine.model.DocDefIV
 import cn.nkpro.ts5.docengine.model.DocHV
 import cn.nkpro.ts5.docengine.service.NkDocHistoryService
@@ -11,10 +11,10 @@ import org.springframework.stereotype.Component
 
 @NkNote("变更历史")
 @Component("NkCardDocSnapshots")
-class NkCardDocSnapshots extends NkAbstractCard<List<SysLogDocRecord>,Map> {
+class NkCardDocSnapshots extends NkAbstractCard<List<DocRecord>,Map> {
 
-    @Autowired
-    NkDocHistoryService docHistoryService;
+    @Autowired@SuppressWarnings("all")
+    private NkDocHistoryService docHistoryService
 
     @Override
     String getPosition() {
@@ -26,14 +26,14 @@ class NkCardDocSnapshots extends NkAbstractCard<List<SysLogDocRecord>,Map> {
         return false
     }
 /**
-     * 打开单据时，自定义获取数据
-     * @param doc
-     * @param data
-     * @param map
-     * @return
-     */
+ * 打开单据时，自定义获取数据
+ * @param doc
+ * @param data
+ * @param map
+ * @return
+ */
     @Override
-    List<SysLogDocRecord> afterGetData(DocHV doc, List<SysLogDocRecord> data, DocDefIV defIV, Map map) {
+    List<DocRecord> afterGetData(DocHV doc, List<DocRecord> data, DocDefIV defIV, Map map) {
         return docHistoryService.getHistories(doc.getDocId(), 0)
     }
 
@@ -46,7 +46,7 @@ class NkCardDocSnapshots extends NkAbstractCard<List<SysLogDocRecord>,Map> {
      * @return
      */
     @Override
-    List<SysLogDocRecord> beforeUpdate(DocHV doc, List<SysLogDocRecord> data, List<SysLogDocRecord> original, DocDefIV defIV, Map map) {
+    List<DocRecord> beforeUpdate(DocHV doc, List<DocRecord> data, List<DocRecord> original, DocDefIV defIV, Map map) {
         return Collections.emptyList()
     }
 
@@ -59,12 +59,12 @@ class NkCardDocSnapshots extends NkAbstractCard<List<SysLogDocRecord>,Map> {
      * @param map
      */
     @Override
-    void updateCommitted(DocHV doc, List<SysLogDocRecord> data, DocDefIV defIV, Map map) {
+    void updateCommitted(DocHV doc, List<DocRecord> data, DocDefIV defIV, Map map) {
         doc.getData().put(defIV.getCardKey(), docHistoryService.getHistories(doc.getDocId(), 0))
     }
 
     @Override
-    List<SysLogDocRecord> call(DocHV doc, List<SysLogDocRecord> data, DocDefIV defIV, Map map, Object options) {
+    List<DocRecord> call(DocHV doc, List<DocRecord> data, DocDefIV defIV, Map map, Object options) {
         return docHistoryService.getHistories(doc.getDocId(), options as int)
     }
 }

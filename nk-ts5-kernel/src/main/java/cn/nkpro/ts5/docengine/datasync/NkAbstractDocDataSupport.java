@@ -16,6 +16,7 @@ public abstract class NkAbstractDocDataSupport extends NkAbstractCustomScriptObj
     @Autowired
     protected NkSpELManager spELManager;
 
+    @SuppressWarnings({"unused"})
     public final void sync(DocHV doc, DocHV original, EvaluationContext context, EvaluationContext contextOriginal, DocDefDataSync config) {
 
         // data1 新数据

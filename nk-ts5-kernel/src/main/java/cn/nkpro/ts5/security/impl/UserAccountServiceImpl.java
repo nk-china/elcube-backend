@@ -3,12 +3,15 @@ package cn.nkpro.ts5.security.impl;
 import cn.nkpro.ts5.basic.Constants;
 import cn.nkpro.ts5.basic.NkProperties;
 import cn.nkpro.ts5.data.redis.RedisSupport;
-import cn.nkpro.ts5.security.*;
+import cn.nkpro.ts5.platform.gen.UserAccount;
+import cn.nkpro.ts5.platform.gen.UserAccountExample;
+import cn.nkpro.ts5.platform.gen.UserAccountMapper;
+import cn.nkpro.ts5.security.HashUtil;
+import cn.nkpro.ts5.security.JwtHelper;
+import cn.nkpro.ts5.security.UserAccountService;
+import cn.nkpro.ts5.security.UserAuthorizationService;
 import cn.nkpro.ts5.security.bo.UserAccountBO;
 import cn.nkpro.ts5.security.bo.UserDetails;
-import cn.nkpro.ts5.security.gen.SysAccount;
-import cn.nkpro.ts5.security.gen.SysAccountExample;
-import cn.nkpro.ts5.security.gen.SysAccountMapper;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
 import org.apache.commons.lang3.StringUtils;
@@ -28,35 +31,35 @@ import java.util.regex.Pattern;
 @Component("NkSysAccountService")
 public class UserAccountServiceImpl implements UserAccountService {
 
-    @Autowired
-    private SysAccountMapper sysAccountMapper;
+    @Autowired@SuppressWarnings("all")
+    private UserAccountMapper userAccountMapper;
 
-    @Autowired
-    private RedisSupport<SysAccount> redisTemplateAccount;
+    @Autowired@SuppressWarnings("all")
+    private RedisSupport<UserAccount> redisTemplateAccount;
 
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private RedisSupport<UserAccountBO> redisTemplate;
-    @Autowired
-    private NkProperties tfmsPlatformProperties;
+    @Autowired@SuppressWarnings("all")
+    private NkProperties nkProperties;
 
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private UserAuthorizationService authorizationService;
 
     @Override
-    public SysAccount getAccountById(String id){
-        return StringUtils.isBlank(id)?null:redisTemplateAccount.getIfAbsent(Constants.CACHE_USERS,id,()-> sysAccountMapper.selectByPrimaryKey(id));
+    public UserAccount getAccountById(String id){
+        return StringUtils.isBlank(id)?null:redisTemplateAccount.getIfAbsent(Constants.CACHE_USERS,id,()-> userAccountMapper.selectByPrimaryKey(id));
     }
 
-    public List<SysAccount> getAccountsByObjectId(List<String> docIds) {
+    public List<UserAccount> getAccountsByObjectId(List<String> docIds) {
 
         if(CollectionUtils.isEmpty(docIds)){
             return Collections.emptyList();
         }
 
-        SysAccountExample example = new SysAccountExample();
+        UserAccountExample example = new UserAccountExample();
         example.createCriteria()
                 .andObjectIdIn(docIds);
-        return sysAccountMapper.selectByExample(example);
+        return userAccountMapper.selectByExample(example);
     }
 
     @Override
@@ -69,10 +72,10 @@ public class UserAccountServiceImpl implements UserAccountService {
 
     private UserAccountBO getAccount(String username){
 
-        SysAccountExample example = new SysAccountExample();
+        UserAccountExample example = new UserAccountExample();
         example.createCriteria().andUsernameEqualTo(username);
 
-        return sysAccountMapper.selectByExample(example)
+        return userAccountMapper.selectByExample(example)
                 .stream()
                 .findAny()
                 .map(sysAccount -> {
@@ -89,10 +92,10 @@ public class UserAccountServiceImpl implements UserAccountService {
     }
 
     @Override
-    public void checkPasswordStrategyAndSha1(SysAccount account){
+    public void checkPasswordStrategyAndSha1(UserAccount account){
         // 检查密码是否健壮
-        if(StringUtils.isNotBlank(tfmsPlatformProperties.getPasswordStrategy())){
-            Assert.isTrue(Pattern.matches(tfmsPlatformProperties.getPasswordStrategy(),account.getPassword()),"密码强度不符合要求");
+        if(StringUtils.isNotBlank(nkProperties.getPasswordStrategy())){
+            Assert.isTrue(Pattern.matches(nkProperties.getPasswordStrategy(),account.getPassword()),"密码强度不符合要求");
         }
         // 加密密码 sha1两次
         String password = account.getPassword();
@@ -104,21 +107,21 @@ public class UserAccountServiceImpl implements UserAccountService {
     @Override
     public void doChangePassword(String accountId, String oldPassword, String newPassword){
 
-        SysAccount exists = sysAccountMapper.selectByPrimaryKey(accountId);
+        UserAccount exists = userAccountMapper.selectByPrimaryKey(accountId);
 
         oldPassword = HashUtil.hash(oldPassword,"SHA1");
         oldPassword = HashUtil.hash(oldPassword,"SHA1");
 
         Assert.isTrue(StringUtils.equals(exists.getPassword(),oldPassword),"原始密码错误");
 
-        SysAccount account = new SysAccount();
+        UserAccount account = new UserAccount();
         account.setId(accountId);
         account.setPassword(newPassword);
 
         checkPasswordStrategyAndSha1(account);
 
         account.setUpdatedTime(DateTimeUtilz.nowSeconds());
-        sysAccountMapper.updateByPrimaryKeySelective(account);
+        userAccountMapper.updateByPrimaryKeySelective(account);
         redisTemplate.deleteHash(Constants.CACHE_USERS, exists.getUsername());
     }
 

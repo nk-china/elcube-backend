@@ -36,7 +36,7 @@ public abstract class NkAbstractCustomScriptObject implements NkCustomScriptObje
     protected String beanName;
 
     @Setter@Getter
-    protected ScriptDefHV scriptDef;
+    protected PlatformScriptV scriptDef;
 
     public NkAbstractCustomScriptObject() {
         this.beanName = parseComponentName();
@@ -48,7 +48,7 @@ public abstract class NkAbstractCustomScriptObject implements NkCustomScriptObje
             this.scriptDef = loadScriptFromClassPath();
         }
         if(this.scriptDef==null){
-            scriptDef = new ScriptDefHV();
+            scriptDef = new PlatformScriptV();
             scriptDef.setScriptType("Unknown");
             scriptDef.setScriptName(beanName);
             scriptDef.setVersion("@");
@@ -60,9 +60,9 @@ public abstract class NkAbstractCustomScriptObject implements NkCustomScriptObje
     }
 
 
-    protected ScriptDefHV scriptDefHV(){
+    protected PlatformScriptV scriptDefHV(){
         if(!scriptDef.isDebug() && properties.isComponentReloadClassPath()){
-            ScriptDefHV defHV = loadScriptFromClassPath();
+            PlatformScriptV defHV = loadScriptFromClassPath();
             if(defHV!=null){
                 return defHV;
             }
@@ -70,7 +70,7 @@ public abstract class NkAbstractCustomScriptObject implements NkCustomScriptObje
         return this.scriptDef;
     }
 
-    protected ScriptDefHV loadScriptFromClassPath() {
+    protected PlatformScriptV loadScriptFromClassPath() {
 
         String className = getClass().getSimpleName();
 
@@ -78,7 +78,7 @@ public abstract class NkAbstractCustomScriptObject implements NkCustomScriptObje
         if (!groovyCode.isEmpty()) {
             List<String> vueMainCode = findResource(className + ".vue");
             List<String> vueDefsCode = findResource(className + "Def*.vue");
-            ScriptDefHV scriptDefH = new ScriptDefHV();
+            PlatformScriptV scriptDefH = new PlatformScriptV();
             scriptDefH.setScriptName(beanName);
             scriptDefH.setVersion("@");
             scriptDefH.setGroovyMain(groovyCode.stream().findFirst().orElse(null));

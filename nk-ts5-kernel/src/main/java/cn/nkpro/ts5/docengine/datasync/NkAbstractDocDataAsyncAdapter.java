@@ -1,13 +1,13 @@
 package cn.nkpro.ts5.docengine.datasync;
 
 import cn.nkpro.ts5.basic.Keep;
-import cn.nkpro.ts5.data.redis.RedisSupport;
 import cn.nkpro.ts5.basic.TransactionSync;
-import cn.nkpro.ts5.spel.NkSpELManager;
+import cn.nkpro.ts5.data.redis.RedisSupport;
+import cn.nkpro.ts5.docengine.gen.DocAsyncQueue;
+import cn.nkpro.ts5.docengine.gen.DocAsyncQueueMapper;
+import cn.nkpro.ts5.docengine.gen.DocAsyncQueueWithBLOBs;
 import cn.nkpro.ts5.docengine.gen.DocDefDataSync;
-import cn.nkpro.ts5.docengine.gen.NkAsyncQueue;
-import cn.nkpro.ts5.docengine.gen.NkAsyncQueueMapper;
-import cn.nkpro.ts5.docengine.gen.NkAsyncQueueWithBLOBs;
+import cn.nkpro.ts5.spel.NkSpELManager;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
 import com.alibaba.fastjson.JSON;
 import lombok.Data;
@@ -24,8 +24,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@SuppressWarnings({"all"})
 @Slf4j
+@SuppressWarnings({"all"})
 public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocDataSupport implements NkDocDataAsyncAdapter {
 
 
@@ -34,11 +34,12 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
     @Autowired
     protected NkSpELManager spELManager;
     @Autowired
-    private NkAsyncQueueMapper asyncQueueMapper;
+    private DocAsyncQueueMapper asyncQueueMapper;
     @Autowired
     @Qualifier("nkTaskExecutor")
     private TaskExecutor taskExecutor;
 
+    @SuppressWarnings({"all"})
     protected void doSync(Object dataUnmapping, Object dataOriginalUnmapping, EvaluationContext context1, EvaluationContext context2, DocDefDataSync def){
 
         NkAsyncData asyncData = new NkAsyncData();
@@ -67,7 +68,7 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
             }
         }
 
-        NkAsyncQueueWithBLOBs queue = new NkAsyncQueueWithBLOBs();
+        DocAsyncQueueWithBLOBs queue = new DocAsyncQueueWithBLOBs();
         queue.setAsyncId(UUID.randomUUID().toString());
         queue.setAsyncObjectRef(this.getBeanName());
         queue.setAsyncJson(JSON.toJSONString(asyncData));
@@ -86,9 +87,9 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
 
     class RunInner extends Thread{
 
-        private NkAsyncQueue asyncQueue;
+        private DocAsyncQueue asyncQueue;
 
-        private RunInner(NkAsyncQueue asyncQueue){
+        private RunInner(DocAsyncQueue asyncQueue){
             this.asyncQueue = asyncQueue;
         }
 
@@ -100,7 +101,7 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
 
     @Async("nkTaskExecutor")
     @Override
-    public void run(NkAsyncQueue asyncQueue) {
+    public void run(DocAsyncQueue asyncQueue) {
 
         long now = DateTimeUtilz.nowSeconds();
 
@@ -137,12 +138,12 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
 
     }
 
-    private void lockRun(NkAsyncQueue asyncQueue, long time){
+    private void lockRun(DocAsyncQueue asyncQueue, long time){
         // 锁定任务
         if(redisSupport.lock(asyncQueue.getAsyncId(),Thread.currentThread().getName(),60)){
             if(log.isDebugEnabled())
                 log.debug("锁定任务 {}",asyncQueue.getAsyncId());
-            NkAsyncQueueWithBLOBs asyncQueueWithBLOBs = asyncQueueMapper.selectByPrimaryKey(asyncQueue.getAsyncId());
+            DocAsyncQueueWithBLOBs asyncQueueWithBLOBs = asyncQueueMapper.selectByPrimaryKey(asyncQueue.getAsyncId());
             try{
                 this.schedule(asyncQueueWithBLOBs);
                 asyncQueueMapper.deleteByPrimaryKey(asyncQueueWithBLOBs.getAsyncId());
@@ -187,28 +188,31 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
     }
 
 
-    private void markFaild(NkAsyncQueue asyncQueue, long time){
+    private void markFaild(DocAsyncQueue asyncQueue, long time){
         asyncQueue.setUpdatedTime(time);
         asyncQueue.setAsyncState("FAILD");
         asyncQueueMapper.updateByPrimaryKey(asyncQueue);
     }
-    private void markFaild(NkAsyncQueueWithBLOBs asyncQueue, long time, String[] causeStackTrace){
+    private void markFaild(DocAsyncQueueWithBLOBs asyncQueue, long time, String[] causeStackTrace){
         asyncQueue.setUpdatedTime(time);
         asyncQueue.setAsyncState("FAILD");
         asyncQueue.setAsyncCauseStackTrace(causeStackTrace!=null?JSON.toJSONString(causeStackTrace):null);
         asyncQueueMapper.updateByPrimaryKeySelective(asyncQueue);
     }
 
-    protected abstract void schedule(NkAsyncQueue asyncQueue);
+    @SuppressWarnings({"all"})
+    protected abstract void schedule(DocAsyncQueue asyncQueue);
     protected int limit(){
         return 10;
     };
+    @SuppressWarnings({"all"})
     protected String rule(){
         return "1 1 1 2 2 5 10 30 60 120";
     };
 
     @Keep
     @Data
+    @SuppressWarnings({"all"})
     public static class NkAsyncData{
         private DocDefDataSync def;
         private boolean single;
