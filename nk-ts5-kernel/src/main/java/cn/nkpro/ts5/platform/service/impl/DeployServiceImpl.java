@@ -3,18 +3,27 @@ package cn.nkpro.ts5.platform.service.impl;
 import cn.nkpro.ts5.basic.secret.DesCbcUtil;
 import cn.nkpro.ts5.co.NkCustomObjectManager;
 import cn.nkpro.ts5.co.NkCustomScriptObject;
+import cn.nkpro.ts5.co.PlatformScriptV;
+import cn.nkpro.ts5.co.service.NkScriptManager;
+import cn.nkpro.ts5.docengine.model.DocDefHV;
 import cn.nkpro.ts5.docengine.service.NkDocDefService;
+import cn.nkpro.ts5.platform.gen.PlatformRegistry;
+import cn.nkpro.ts5.platform.model.WebMenuBO;
 import cn.nkpro.ts5.platform.service.DeployService;
 import cn.nkpro.ts5.platform.service.PlatformRegistryService;
 import cn.nkpro.ts5.platform.service.WebMenuService;
 import cn.nkpro.ts5.security.UserAuthorizationService;
+import cn.nkpro.ts5.security.bo.UserGroupBO;
+import cn.nkpro.ts5.security.gen.AuthLimit;
+import cn.nkpro.ts5.security.gen.AuthPermission;
 import cn.nkpro.ts5.task.NkBpmDefService;
+import cn.nkpro.ts5.task.model.ResourceDefinition;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -24,18 +33,20 @@ public class DeployServiceImpl implements DeployService {
     private String secretKey = "AEF1D52777444FDDBC354928D7D2BFD3";
     private String iv = "20201218";
 
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private PlatformRegistryService registryService;
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private WebMenuService menuService;
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private UserAuthorizationService authorizationService;
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private NkCustomObjectManager customObjectManager;
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private NkDocDefService docDefService;
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private NkBpmDefService bpmDefService;
+    @Autowired@SuppressWarnings("all")
+    private NkScriptManager scriptManager;
 
     @Override
     public String export(JSONObject config){
@@ -71,7 +82,6 @@ public class DeployServiceImpl implements DeployService {
             export.put("bpmDefs",
                     config.getJSONArray("bpmDefs").stream().map(definitionId->
                             bpmDefService.getProcessDefinition((String) definitionId)
-                                .getXml()
                     ).collect(Collectors.toList())
             );
         }
@@ -84,10 +94,41 @@ public class DeployServiceImpl implements DeployService {
     }
 
     @Override
+    @Transactional
     public void imports(String pointsTxt) {
         String uncompress = pointsTxt.startsWith("{")?pointsTxt:DesCbcUtil.decode(pointsTxt,secretKey,iv);
-        HashMap data = JSON.parseObject(uncompress,HashMap.class);
+        JSONObject data = JSON.parseObject(uncompress);
 
-        System.out.println(data);
+
+        if(data.containsKey("registries")){
+            registryService.doUpdate(data.getJSONArray("registries").toJavaList(PlatformRegistry.class));
+        }
+        if(data.containsKey("menus")){
+            menuService.doUpdate(data.getJSONArray("menus").toJavaList(WebMenuBO.class));
+        }
+        if(data.containsKey("limits")){
+            data.getJSONArray("limits").toJavaList(AuthLimit.class)
+                    .forEach(limit -> authorizationService.updateLimit(limit));
+        }
+        if(data.containsKey("perms")){
+            data.getJSONArray("perms").toJavaList(AuthPermission.class)
+                    .forEach(perm -> authorizationService.updatePerm(perm));
+        }
+        if(data.containsKey("groups")){
+            data.getJSONArray("groups").toJavaList(UserGroupBO.class)
+                    .forEach(group -> authorizationService.updateGroup(group));
+        }
+        if(data.containsKey("scripts")){
+            data.getJSONArray("scripts").toJavaList(PlatformScriptV.class)
+                    .forEach(scriptV -> scriptManager.doActive(scriptV));
+        }
+        if(data.containsKey("bpmDefs")){
+            data.getJSONArray("bpmDefs").toJavaList(ResourceDefinition.class)
+                    .forEach(definition -> bpmDefService.deploy(definition));
+        }
+        if(data.containsKey("docTypes")){
+            data.getJSONArray("docTypes").toJavaList(DocDefHV.class)
+                    .forEach(docDefHV -> docDefService.doActive(docDefHV));
+        }
     }
 }

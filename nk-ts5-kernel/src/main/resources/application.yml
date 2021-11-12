@@ -15,6 +15,7 @@ nk:
   component-disable-online-editing: true
 # component-reload-class-path 如果为false，那么程序启动后，修改ide中的vue文件前端不会生效
   component-reload-class-path: true
+
   clickhouse:
     hikari:
       connection-timeout: 30000
@@ -22,6 +23,9 @@ nk:
       max-lifetime: 1800000
       minimumIdle: 5
       maximumPoolSize: 10
+  doc:
+    indices:
+      document-custom: cn.nkpro.ts5.docengine.model.es.DocExtES
 
 #  aliyun:
 #    access-key-id: LTAI4G6YUdTBx8b9C8uR3gTU

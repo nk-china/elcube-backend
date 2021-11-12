@@ -39,13 +39,20 @@ public class NkDocSearchService {
     private SearchEngine searchEngine;
     @Autowired@SuppressWarnings("all")
     protected NkDocPermService docPermService;
+    @Autowired@SuppressWarnings("all")
+    private NkDocProperties docProperties;
 
 
+    @SuppressWarnings("all")
     void init() throws IOException {
 
         searchEngine.createIndices(DocHES.class);
         searchEngine.createIndices(BpmTaskES.class);
         searchEngine.createIndices(DocExtES.class);
+
+        for(Map.Entry<String, Class> e : docProperties.getIndices().entrySet()){
+            searchEngine.createIndices(e.getValue(),e.getKey());
+        }
     }
 
     public void dropAndInit() throws IOException {
