@@ -24,6 +24,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -60,9 +62,14 @@ public class DeployServiceImpl implements DeployService {
             export.put("menus",menuService.getMenus(false));
         }
         if(config.getBooleanValue("includeAuth")){
-            export.put("groups",authorizationService.getGroupBOs());
+            export.put("groups",authorizationService.getGroupBOs()
+                    .stream()
+                    .filter(group->!group.getGroupId().startsWith("nk-default-"))
+                    .collect(Collectors.toList()));
             export.put("perms",authorizationService.getPerms());
-            export.put("limits",authorizationService.getLimits(null));
+            export.put("limits",authorizationService.getLimits(null)
+                    .stream().map(limit->authorizationService.getLimitDetail(limit.getLimitId()))
+                    .collect(Collectors.toList()));
         }
         if(config.getJSONArray("scripts")!=null){
             export.put("scripts",
@@ -94,8 +101,11 @@ public class DeployServiceImpl implements DeployService {
     }
 
     @Override
-    @Transactional
-    public void imports(String pointsTxt) {
+    @Transactional(noRollbackFor = {Exception.class})
+    public List<String> imports(String pointsTxt) {
+
+        List<String> exceptions = new ArrayList<>();
+
         String uncompress = pointsTxt.startsWith("{")?pointsTxt:DesCbcUtil.decode(pointsTxt,secretKey,iv);
         JSONObject data = JSON.parseObject(uncompress);
 
@@ -116,11 +126,13 @@ public class DeployServiceImpl implements DeployService {
         }
         if(data.containsKey("groups")){
             data.getJSONArray("groups").toJavaList(UserGroupBO.class)
+                    .stream()
+                    .filter(group->!group.getGroupId().startsWith("nk-default-"))
                     .forEach(group -> authorizationService.updateGroup(group));
         }
         if(data.containsKey("scripts")){
             data.getJSONArray("scripts").toJavaList(PlatformScriptV.class)
-                    .forEach(scriptV -> scriptManager.doActive(scriptV));
+                    .forEach(scriptV -> scriptManager.doActive(scriptV, true));
         }
         if(data.containsKey("bpmDefs")){
             data.getJSONArray("bpmDefs").toJavaList(ResourceDefinition.class)
@@ -130,5 +142,7 @@ public class DeployServiceImpl implements DeployService {
             data.getJSONArray("docTypes").toJavaList(DocDefHV.class)
                     .forEach(docDefHV -> docDefService.doActive(docDefHV));
         }
+
+        return exceptions;
     }
 }

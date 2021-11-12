@@ -2,8 +2,10 @@ package cn.nkpro.ts5.platform.service;
 
 import com.alibaba.fastjson.JSONObject;
 
+import java.util.List;
+
 public interface DeployService {
     String export(JSONObject config);
 
-    void imports(String pointsTxt);
+    List<String> imports(String pointsTxt);
 }

@@ -1,7 +1,6 @@
 package cn.nkpro.ts5.platform.controller;
 
 import cn.nkpro.ts5.annotation.NkNote;
-import cn.nkpro.ts5.data.redis.RedisSupport;
 import cn.nkpro.ts5.platform.service.DeployService;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by bean on 2020/7/17.
@@ -57,7 +57,7 @@ public class DevOpsDeployController {
     @NkNote("3、导入")
     @ResponseBody
     @RequestMapping("/import")
-    public void defImport(@RequestBody String pointsTxt){
-        deployService.imports(pointsTxt);
+    public List<String> defImport(@RequestBody String pointsTxt){
+        return deployService.imports(pointsTxt);
     }
 }

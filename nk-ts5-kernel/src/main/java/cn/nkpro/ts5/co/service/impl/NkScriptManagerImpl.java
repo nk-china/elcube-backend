@@ -167,10 +167,12 @@ public class NkScriptManagerImpl implements NkScriptManager {
 
     @Override
     @Transactional
-    public PlatformScript doActive(PlatformScriptV scriptDefH){
+    public PlatformScript doActive(PlatformScriptV scriptDefH, boolean force){
 
-        Assert.isTrue(!StringUtils.equals(scriptDefH.getVersion(),"@"),"IDE版本不能激活");
-        Assert.isTrue(!StringUtils.equals(scriptDefH.getState(),"Active"),"已激活的版本不能激活");
+        if(!force){
+            Assert.isTrue(!StringUtils.equals(scriptDefH.getVersion(),"@"),"IDE版本不能激活");
+            Assert.isTrue(!StringUtils.equals(scriptDefH.getState(),"Active"),"已激活的版本不能激活");
+        }
 
         // 清理已激活版本
         PlatformScriptWithBLOBs record = new PlatformScriptWithBLOBs();
@@ -183,7 +185,7 @@ public class NkScriptManagerImpl implements NkScriptManager {
 
         // 激活版本
         scriptDefH.setState("Active");
-        doUpdate(scriptDefH,false);
+        doUpdate(scriptDefH,force);
         debugContextManager.addActiveResource("#"+scriptDefH.getScriptName(), scriptDefH);
 
         redisSupport.delete(Constants.CACHE_DEF_SCRIPT);

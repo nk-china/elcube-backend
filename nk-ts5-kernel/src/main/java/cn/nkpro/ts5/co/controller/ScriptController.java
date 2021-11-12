@@ -74,7 +74,7 @@ public class ScriptController {
     @RequestMapping("/active")
     public PlatformScript active(
             @NkNote("脚本对象")@RequestBody PlatformScriptV script){
-        return scriptService.doActive(script);
+        return scriptService.doActive(script, false);
     }
 
     @NkNote("7.删除")

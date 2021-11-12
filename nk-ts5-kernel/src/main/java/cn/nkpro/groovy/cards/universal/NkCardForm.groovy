@@ -1,7 +1,7 @@
 package cn.nkpro.groovy.cards.universal
 
-import cn.nkpro.groovy.cards.universal.ref.NkCardFormDefI
-import cn.nkpro.groovy.cards.universal.ref.NkFormCardHelper
+import cn.nkpro.ts5.docengine.model.NkCardFormDefI
+import cn.nkpro.ts5.docengine.utils.NkFormCardHelper
 import cn.nkpro.ts5.docengine.NkAbstractCard
 import cn.nkpro.ts5.docengine.model.DocDefIV
 import cn.nkpro.ts5.docengine.model.DocHV

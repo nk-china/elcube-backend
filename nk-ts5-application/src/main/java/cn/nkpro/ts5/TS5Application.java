@@ -10,7 +10,10 @@ import org.springframework.context.annotation.FullyQualifiedAnnotationBeanNameGe
  */
 @SpringBootApplication
 @ComponentScan(nameGenerator = FullyQualifiedAnnotationBeanNameGenerator.class,
-                basePackages = {"cn.nkpro.ts5","cn.nkpro.groovy"})
+                basePackages = {
+                    "cn.nkpro.ts5",
+                    "cn.nkpro.groovy"
+})
 public class TS5Application {
     public static void main(String[] args) {
         SpringApplication.run(TS5Application.class, args);

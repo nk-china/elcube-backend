@@ -1,4 +1,4 @@
-package cn.nkpro.groovy.cards.universal.ref;
+package cn.nkpro.ts5.docengine.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;

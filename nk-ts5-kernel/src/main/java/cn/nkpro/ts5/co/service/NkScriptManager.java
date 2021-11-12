@@ -37,7 +37,7 @@ public interface NkScriptManager extends ApplicationListener<ContextRefreshedEve
     void doDelete(PlatformScriptV scriptDefH);
 
     @Transactional
-    PlatformScript doActive(PlatformScriptV scriptDefH);
+    PlatformScript doActive(PlatformScriptV scriptDefH, boolean force);
 
     @Transactional
     PlatformScript doBreach(PlatformScriptV scriptDefH);
