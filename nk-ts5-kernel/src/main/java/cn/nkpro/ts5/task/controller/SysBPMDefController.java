@@ -9,10 +9,17 @@ import cn.nkpro.ts5.utils.BeanUtilz;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.repository.DeploymentQuery;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by bean on 2020/7/17.
@@ -98,6 +105,37 @@ public class SysBPMDefController {
                 from,
                 rows,
                 query.count());
+    }
+
+    @NkNote("5.拉取所有部署记录")
+    @RequestMapping(value = "/deployments/all/latest")
+    public List<Object> deployments(){
+
+        ProcessDefinitionQuery query = processEngine.getRepositoryService()
+                .createProcessDefinitionQuery()
+                .latestVersion();
+
+        List<ProcessDefinition> definitions = new ArrayList<>();
+        long count = query.count();
+        int from = 0;
+        int rows = 1000;
+        do{
+            definitions.addAll(query.listPage(from,rows));
+            from+=rows;
+        }while(from < count);
+        return definitions.stream()
+                .map(definition -> {
+                    Map<String,Object> map = new HashMap<>();
+
+                    map.put("key",definition.getKey());
+                    map.put("name",definition.getName());
+                    map.put("definitionId",definition.getId());
+                    map.put("deploymentId",definition.getDeploymentId());
+                    map.put("resourceName",definition.getResourceName());
+
+                    return map;
+                })
+                .collect(Collectors.toList());
     }
 
 //

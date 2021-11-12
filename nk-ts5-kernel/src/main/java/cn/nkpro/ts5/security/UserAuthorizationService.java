@@ -37,6 +37,8 @@ public interface UserAuthorizationService {
 
     List<AuthGroup> getGroups();
 
+    List<UserGroupBO> getGroupBOs();
+
     UserGroupBO getGroupDetail(String groupId);
 
     void updateGroup(UserGroupBO group);

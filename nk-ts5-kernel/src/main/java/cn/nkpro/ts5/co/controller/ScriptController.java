@@ -2,13 +2,16 @@ package cn.nkpro.ts5.co.controller;
 
 import cn.nkpro.ts5.basic.NkProperties;
 import cn.nkpro.ts5.basic.PageList;
-import cn.nkpro.ts5.co.PlatformScriptV;
+import cn.nkpro.ts5.co.*;
 import cn.nkpro.ts5.platform.gen.PlatformScript;
 import cn.nkpro.ts5.co.service.NkScriptManager;
 import cn.nkpro.ts5.annotation.NkNote;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * Created by bean on 2020/7/17.
@@ -19,6 +22,9 @@ import org.springframework.web.bind.annotation.*;
 @PreAuthorize("hasAnyAuthority('*:*','DEF:*','DEF:SCRIPT')")
 public class ScriptController {
 
+
+    @Autowired@SuppressWarnings("all")
+    private NkCustomObjectManager customObjectManager;
     @Autowired@SuppressWarnings("all")
     private NkScriptManager scriptService;
     @Autowired@SuppressWarnings("all")
@@ -89,5 +95,17 @@ public class ScriptController {
     @RequestMapping("/online/editing")
     public boolean isComponentDisableOnlineEditing(){
         return properties.isComponentDisableOnlineEditing();
+    }
+
+
+
+    @NkNote("21.获取所有的脚本清单")
+    @RequestMapping("/names")
+    public List<NkCustomObjectDesc> names() {
+        return customObjectManager
+                .getCustomObjectDescriptionList(NkCustomScriptObject.class,false,(entry)->{
+                    NkCustomScriptObject value = (NkCustomScriptObject) entry.getValue();
+                    return value.getScriptDef() != null && !StringUtils.equals(value.getScriptDef().getState(), "Native");
+                });
     }
 }

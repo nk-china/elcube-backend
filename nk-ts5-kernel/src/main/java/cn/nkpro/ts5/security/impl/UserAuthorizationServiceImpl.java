@@ -322,6 +322,13 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
     }
 
     @Override
+    public List<UserGroupBO> getGroupBOs(){
+        AuthGroupExample example = new AuthGroupExample();
+        example.setOrderByClause("GROUP_DESC");
+        return authGroupMapper.selectByExample(example).stream().map(g->buildUserGroup(g.getGroupId())).collect(Collectors.toList());
+    }
+
+    @Override
     public UserGroupBO getGroupDetail(String groupId){
 
         UserGroupBO group = buildUserGroup(groupId);

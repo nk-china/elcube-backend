@@ -51,6 +51,8 @@ public interface NkDocDefService {
 
     void runLoopCards(String docId, DocDefHV docDefHV, boolean ignoreError, Function function);
 
+    DocDefHV getDocDefLatestActive(String docType);
+
     @FunctionalInterface
     interface Function {
         void run(NkCard card, DocDefIV docDefIV) throws Exception;

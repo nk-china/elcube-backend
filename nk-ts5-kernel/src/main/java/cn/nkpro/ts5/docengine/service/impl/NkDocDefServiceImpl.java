@@ -573,7 +573,7 @@ public class NkDocDefServiceImpl implements NkDocDefService {
         DocDefHV defHV = Optional.ofNullable(
             (DocDefHV)(debugContextManager.getDebugResource(String.format("@%s", docType)))
         ).orElse(
-            redisSupport.getIfAbsent(Constants.CACHE_DEF_DOC_TYPES,docType,()-> getLastActiveVersion(docType))
+            redisSupport.getIfAbsent(Constants.CACHE_DEF_DOC_TYPES,docType,()-> getLatestActiveVersion(docType))
         );
         Assert.notNull(defHV,String.format("单据类型[%s]版本的配置没有找到或尚未激活",docType));
 
@@ -694,6 +694,7 @@ public class NkDocDefServiceImpl implements NkDocDefService {
     public DocDefHV deserializeDef(DocDefHV docDefHV) {
 
         runLoopCards(docDefHV,true, (nkCard,item)->{
+
             log.info("{}\tdeserializeDef docType = {} cardKey = {}",NkDocEngineContext.currLog(), docDefHV.getDocType(), item.getCardKey());
             item.setPosition(nkCard.getPosition());
             item.setDataComponentName(nkCard.getDataComponentName());
@@ -708,6 +709,7 @@ public class NkDocDefServiceImpl implements NkDocDefService {
     private DocDefHV deserializeDefFromContent(DocDefHV docDefHV) {
 
         runLoopCards(docDefHV,true, (nkCard,item)->{
+
             log.info("{}\tdeserializeDef docType = {} cardKey = {}",NkDocEngineContext.currLog(), docDefHV.getDocType(), item.getCardKey());
             item.setPosition(nkCard.getPosition());
             item.setDataComponentName(nkCard.getDataComponentName());
@@ -736,9 +738,17 @@ public class NkDocDefServiceImpl implements NkDocDefService {
         for(DocDefIV docDefI : docDefHV.getCards()){
             // 找到对应的组件实现类
             NkCard nkCard = customObjectManager.getCustomObjectIfExists(docDefI.getBeanName(), NkCard.class);
+
             if(nkCard==null && !ignoreError){
                 throw new NkDefineException(String.format("自定义对象[%s]不存在",docDefI.getBeanName()));
             }
+
+            if(nkCard==null){
+                log.warn("{}\tdeserializeDef error docType = {} beanName = {} not found",
+                        NkDocEngineContext.currLog(), docDefHV.getDocType(), docDefI.getBeanName());
+                return;
+            }
+
             try {
                 function.run(nkCard, docDefI);
             }catch (Exception e){
@@ -788,7 +798,22 @@ public class NkDocDefServiceImpl implements NkDocDefService {
                 .findFirst()
                 .orElse(null);
     }
-    private DocDefHV getLastActiveVersion(String docType){
+
+    /**
+     * 获取单据配置
+     * @param docType docType
+     * @return DocDefHV
+     */
+    @Override
+    public DocDefHV getDocDefLatestActive(String docType){
+        DocDefHV defHV = getLatestActiveVersion(docType);
+        if(defHV!=null){
+            return deserializeDefFromContent(defHV);
+        }
+        return null;
+    }
+
+    private DocDefHV getLatestActiveVersion(String docType){
 
         DocDefHExample example = new DocDefHExample();
         example.createCriteria()
