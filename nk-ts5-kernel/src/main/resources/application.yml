@@ -84,8 +84,8 @@ spring:
     change-log: classpath:cn/nkpro/ts5/liquibase/master.xml
     database-change-log-table: SYS_DATABASECHANGEDLOG
     database-change-log-lock-table: SYS_DATABASECHANGEDLOGLOCK
-    drop-first: true
-    contexts: default1
+    drop-first: false
+    contexts: default
   devtools:
     restart:
       enabled: true
