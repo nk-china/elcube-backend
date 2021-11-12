@@ -1,0 +1,323 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <!--
+    -->
+
+
+    <changeSet id="NK_DOC_ASYNC_QUEUE-01" author="bean" context="default">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="NK_DOC_ASYNC_QUEUE" />
+            </not>
+        </preConditions>
+        <comment />
+        <createTable tableName="NK_DOC_ASYNC_QUEUE" remarks="">
+            <column name="ASYNC_ID" type="${type.uuid}" remarks="" />
+            <column name="ASYNC_OBJECT_REF" type="${type.var}" remarks="" />
+            <column name="ASYNC_JSON" type="${type.clob}" remarks="" />
+            <column name="ASYNC_RETRY" type="${type.int}" remarks="" />
+            <column name="ASYNC_LIMIT" type="${type.int}" remarks="" />
+            <column name="ASYNC_RULE" type="${type.desc}" remarks="" />
+            <column name="ASYNC_STATE" type="${type.desc}" remarks="" />
+            <column name="ASYNC_NEXT" type="${type.uuid}" remarks="" />
+            <column name="ASYNC_CAUSE_STACK_TRACE" type="${type.clob}" remarks="" />
+            <column name="CREATED_TIME" type="${type.long}" remarks="" />
+            <column name="UPDATED_TIME" type="${type.long}" remarks="" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="NK_DOC_DEF_BPM-01" author="bean" context="default">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="NK_DOC_DEF_BPM" />
+            </not>
+        </preConditions>
+        <comment />
+        <createTable tableName="NK_DOC_DEF_BPM" remarks="">
+            <column name="DOC_TYPE" type="${type.cond}" remarks="" />
+            <column name="PROCESS_KEY" type="${type.uuid}" remarks="" />
+            <column name="VERSION" type="${type.uuid}" remarks="" />
+            <column name="START_BY" type="${type.desc}" remarks="" />
+            <column name="ROLLBACK_TO" type="${type.desc}" remarks="" />
+            <column name="UPDATED_TIME" type="${type.long}" remarks="" />
+            <column name="ORDER_BY" type="${type.int}" remarks="" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="NK_DOC_DEF_CYCLE-01" author="bean" context="default">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="NK_DOC_DEF_CYCLE" />
+            </not>
+        </preConditions>
+        <comment />
+        <createTable tableName="NK_DOC_DEF_CYCLE" remarks="">
+            <column name="DOC_TYPE" type="${type.uuid}" remarks="" />
+            <column name="DOC_CYCLE" type="${type.uuid}" remarks="" />
+            <column name="VERSION" type="${type.uuid}" remarks="" />
+            <column name="ORDER_BY" type="${type.int}" remarks="" />
+            <column name="REF_OBJECT_TYPE" type="${type.var}" remarks="" />
+            <column name="UPDATED_TIME" type="${type.long}" remarks="" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="NK_DOC_DEF_DATA_SYNC-01" author="bean" context="default">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="NK_DOC_DEF_DATA_SYNC" />
+            </not>
+        </preConditions>
+        <comment />
+        <createTable tableName="NK_DOC_DEF_DATA_SYNC" remarks="">
+            <column name="DOC_TYPE" type="${type.desc}" remarks="" />
+            <column name="VERSION" type="${type.uuid}" remarks="" />
+            <column name="TARGET_SVR" type="${type.desc}" remarks="" />
+            <column name="TARGET_ARGS" type="${type.var1}" remarks="" />
+            <column name="RE_EXECUTE" type="${type.int}" remarks="" />
+            <column name="CONDITION_SP_E_L" type="${type.var1}" remarks="" />
+            <column name="DATA_SP_E_L" type="${type.var1}" remarks="" />
+            <column name="KEY_SP_E_L" type="${type.var1}" remarks="" />
+            <column name="MAPPING_SP_E_L" type="${type.var2}" remarks="" />
+            <column name="UPDATED_TIME" type="${type.long}" remarks="" />
+            <column name="ORDER_BY" type="${type.int}" remarks="" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="NK_DOC_DEF_FLOW-01" author="bean" context="default">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="NK_DOC_DEF_FLOW" />
+            </not>
+        </preConditions>
+        <comment />
+        <createTable tableName="NK_DOC_DEF_FLOW" remarks="">
+            <column name="DOC_TYPE" type="${type.uuid}" remarks="" />
+            <column name="PRE_DOC_TYPE" type="${type.uuid}" remarks="" />
+            <column name="PRE_DOC_STATE" type="${type.desc}" remarks="前置单据状态条件" />
+            <column name="VERSION" type="${type.uuid}" remarks="" />
+            <column name="REF_OBJECT_TYPE" type="${type.var}" remarks="" />
+            <column name="STATE" type="${type.desc}" remarks="" />
+            <column name="UPDATED_TIME" type="${type.long}" remarks="" />
+            <column name="ORDER_BY" type="${type.int}" remarks="" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="NK_DOC_DEF_H-01" author="bean" context="default">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="NK_DOC_DEF_H" />
+            </not>
+        </preConditions>
+        <comment />
+        <createTable tableName="NK_DOC_DEF_H" remarks="">
+            <column name="DOC_TYPE" type="${type.desc}" remarks="" />
+            <column name="VERSION" type="${type.uuid}" remarks="" />
+            <column name="VERSION_HEAD" type="${type.int}" remarks="暂时不启用" />
+            <column name="DOC_CLASSIFY" type="${type.uuid}" remarks="" />
+            <column name="DOC_NAME" type="${type.uuid}" remarks="单据名称" />
+            <column name="REF_OBJECT_TYPE" type="${type.desc}" remarks="" />
+            <column name="BUSINESS_KEY_SP_E_L" type="${type.var}" remarks="" />
+            <column name="DOC_ENTRANCE" type="${type.int}" remarks="" />
+            <column name="VALID_FROM" type="${type.desc}" remarks="暂时不启用" />
+            <column name="VALID_TO" type="${type.desc}" remarks="暂时不启用" />
+            <column name="STATE" type="${type.desc}" remarks="" />
+            <column name="MARKDOWN_FLAG" type="${type.int}" remarks="" />
+            <column name="MARKDOWN" type="${type.clob}" remarks="" />
+            <column name="UPDATED_TIME" type="${type.long}" remarks="最后修改时间秒数" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="NK_DOC_DEF_H_PARTNER-01" author="bean" context="default">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="NK_DOC_DEF_H_PARTNER" />
+            </not>
+        </preConditions>
+        <comment />
+        <createTable tableName="NK_DOC_DEF_H_PARTNER" remarks="">
+            <column name="PARTNER_ID" type="${type.uuid}" remarks="" />
+            <column name="PARTNER_TYPE" type="${type.desc}" remarks="1 自然人 2 法人 3 组织机构" />
+            <column name="PARTNER_NAME" type="${type.desc}" remarks="" />
+            <column name="REMARK" type="${type.var}" remarks="" />
+            <column name="CREATED_TIME" type="${type.long}" remarks="" />
+            <column name="UPDATED_TIME" type="${type.long}" remarks="" />
+            <column name="PARTNER_TAGS" type="${type.var}" remarks="" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="NK_DOC_DEF_I-01" author="bean" context="default">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="NK_DOC_DEF_I" />
+            </not>
+        </preConditions>
+        <comment />
+        <createTable tableName="NK_DOC_DEF_I" remarks="">
+            <column name="DOC_TYPE" type="${type.cond}" remarks="" />
+            <column name="VERSION" type="${type.uuid}" remarks="" />
+            <column name="CARD_KEY" type="${type.uuid}" remarks="" />
+            <column name="BEAN_NAME" type="${type.uuid}" remarks="" />
+            <column name="CARD_NAME" type="${type.uuid}" remarks="" />
+            <column name="CARD_CONTENT" type="${type.clob}" remarks="" />
+            <column name="ORDER_BY" type="${type.int}" remarks="" />
+            <column name="CALC_ORDER" type="${type.int}" remarks="" />
+            <column name="CALC_TIMES" type="${type.int}" remarks="" />
+            <column name="EDITABLE_SP_E_L" type="${type.var}" remarks="" />
+            <column name="MARKDOWN_FLAG" type="${type.int}" remarks="" />
+            <column name="MARKDOWN" type="${type.clob}" remarks="" />
+            <column name="UPDATED_TIME" type="${type.long}" remarks="" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="NK_DOC_DEF_INDEX_CUSTOM-01" author="bean" context="default">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="NK_DOC_DEF_INDEX_CUSTOM" />
+            </not>
+        </preConditions>
+        <comment />
+        <createTable tableName="NK_DOC_DEF_INDEX_CUSTOM" remarks="">
+            <column name="DOC_TYPE" type="${type.desc}" remarks="" />
+            <column name="VERSION" type="${type.uuid}" remarks="" />
+            <column name="CUSTOM_TYPE" type="${type.desc}" remarks="" />
+            <column name="CONDITION_SP_E_L" type="${type.var1}" remarks="" />
+            <column name="DATA_SP_E_L" type="${type.var1}" remarks="" />
+            <column name="KEY_SP_E_L" type="${type.var1}" remarks="" />
+            <column name="MAPPING_SP_E_L" type="${type.var2}" remarks="" />
+            <column name="UPDATED_TIME" type="${type.long}" remarks="" />
+            <column name="ORDER_BY" type="${type.int}" remarks="" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="NK_DOC_DEF_INDEX_RULE-01" author="bean" context="default">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="NK_DOC_DEF_INDEX_RULE" />
+            </not>
+        </preConditions>
+        <comment />
+        <createTable tableName="NK_DOC_DEF_INDEX_RULE" remarks="">
+            <column name="DOC_TYPE" type="${type.desc}" remarks="" />
+            <column name="VERSION" type="${type.uuid}" remarks="" />
+            <column name="INDEX_NAME" type="${type.desc}" remarks="" />
+            <column name="INDEX_TYPE" type="${type.uuid}" remarks="" />
+            <column name="RULE_SP_E_L" type="${type.var1}" remarks="" />
+            <column name="UPDATED_TIME" type="${type.long}" remarks="" />
+            <column name="ORDER_BY" type="${type.int}" remarks="" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="NK_DOC_DEF_STATE-01" author="bean" context="default">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="NK_DOC_DEF_STATE" />
+            </not>
+        </preConditions>
+        <comment />
+        <createTable tableName="NK_DOC_DEF_STATE" remarks="">
+            <column name="DOC_TYPE" type="${type.desc}" remarks="" />
+            <column name="DOC_STATE" type="${type.desc}" remarks="" />
+            <column name="PRE_DOC_STATE" type="${type.desc}" remarks="" />
+            <column name="VERSION" type="${type.uuid}" remarks="" />
+            <column name="DOC_STATE_DESC" type="${type.desc}" remarks="" />
+            <column name="SYS_STATE" type="${type.desc}" remarks="" />
+            <column name="REF_OBJECT_TYPE" type="${type.var}" remarks="业务逻辑处理类" />
+            <column name="EDIT_PERM" type="${type.int}" remarks="0 不可编辑，1 可编辑，2 流程中可编辑" />
+            <column name="DISPLAY_PRIMARY" type="${type.int}" remarks="" />
+            <column name="UPDATED_TIME" type="${type.long}" remarks="" />
+            <column name="ACTION" type="${type.desc}" remarks="ACTIVATE, CANCEL" />
+            <column name="ORDER_BY" type="${type.int}" remarks="" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="NK_DOC_H-01" author="bean" context="default">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="NK_DOC_H" />
+            </not>
+        </preConditions>
+        <comment />
+        <createTable tableName="NK_DOC_H" remarks="">
+            <column name="DOC_ID" type="${type.uuid}" remarks="" />
+            <column name="CLASSIFY" type="${type.desc}" remarks="" />
+            <column name="DEF_VERSION" type="${type.uuid}" remarks="" />
+            <column name="DOC_TYPE" type="${type.cond}" remarks="" />
+            <column name="DOC_NAME" type="${type.desc}" remarks="" />
+            <column name="DOC_DESC" type="${type.var}" remarks="" />
+            <column name="DOC_NUMBER" type="${type.desc}" remarks="" />
+            <column name="DOC_STATE" type="${type.desc}" remarks="" />
+            <column name="DOC_TAGS" type="${type.desc}" remarks="" />
+            <column name="PRE_DOC_ID" type="${type.uuid}" remarks="" />
+            <column name="PARTNER_ID" type="${type.uuid}" remarks="交易伙伴ID（注意是roleID）" />
+            <column name="IDENTIFICATION" type="${type.uuid}" remarks="" />
+            <column name="REF_OBJECT_ID" type="${type.uuid}" remarks="" />
+            <column name="BUSINESS_KEY" type="${type.var}" remarks="" />
+            <column name="PROCESS_INSTANCE_ID" type="${type.uuid}" remarks="" />
+            <column name="CREATED_TIME" type="${type.long}" remarks="" />
+            <column name="UPDATED_TIME" type="${type.long}" remarks="" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="NK_DOC_I-01" author="bean" context="default">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="NK_DOC_I" />
+            </not>
+        </preConditions>
+        <comment />
+        <createTable tableName="NK_DOC_I" remarks="">
+            <column name="DOC_ID" type="${type.uuid}" remarks="" />
+            <column name="CARD_KEY" type="${type.uuid}" remarks="" />
+            <column name="CARD_CONTENT" type="${type.clob}" remarks="" />
+            <column name="CREATED_TIME" type="${type.long}" remarks="" />
+            <column name="UPDATED_TIME" type="${type.long}" remarks="" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="NK_DOC_I_INDEX-01" author="bean" context="default">
+    <preConditions onFail="MARK_RAN">
+        <not>
+            <tableExists tableName="NK_DOC_I_INDEX" />
+        </not>
+    </preConditions>
+    <comment />
+    <createTable tableName="NK_DOC_I_INDEX" remarks="">
+        <column name="DOC_ID" type="${type.desc}" remarks="" />
+        <column name="NAME" type="${type.desc}" remarks="" />
+        <column name="VALUE" type="${type.uuid}" remarks="" />
+        <column name="DATA_TYPE" type="${type.desc}" remarks="" />
+        <column name="ORDER_BY" type="${type.int}" remarks="" />
+        <column name="UPDATED_TIME" type="${type.long}" remarks="" />
+    </createTable>
+    </changeSet>
+
+    <changeSet id="NK_DOC_RECORD-01" author="bean" context="default">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="NK_DOC_RECORD" />
+            </not>
+        </preConditions>
+        <comment />
+        <createTable tableName="NK_DOC_RECORD" remarks="">
+            <column name="ID" type="${type.uuid}" remarks="" />
+            <column name="DOC_ID" type="${type.uuid}" remarks="" />
+            <column name="VERSION" type="${type.int}" remarks="" />
+            <column name="STATE_ORIGINAL" type="${type.uuid}" remarks="" />
+            <column name="STATE_ORIGINAL_DESC" type="${type.uuid}" remarks="" />
+            <column name="STATE" type="${type.uuid}" remarks="" />
+            <column name="STATE_DESC" type="${type.uuid}" remarks="" />
+            <column name="CARD_NAMES" type="${type.var2}" remarks="" />
+            <column name="DATA" type="${type.clob}" remarks="" />
+            <column name="USER_ID" type="${type.uuid}" remarks="" />
+            <column name="USER_REALNAME" type="${type.uuid}" remarks="" />
+            <column name="SOURCE" type="${type.desc}" remarks="" />
+            <column name="LOG_GROUP_ID" type="${type.uuid}" remarks="" />
+            <column name="UPDATED_TIME" type="${type.long}" remarks="" />
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

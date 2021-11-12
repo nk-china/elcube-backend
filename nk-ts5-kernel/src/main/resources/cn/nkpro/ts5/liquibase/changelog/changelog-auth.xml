@@ -1,0 +1,103 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <!--
+    -->
+
+    <changeSet id="NK_AUTH_GROUP-01" author="bean" context="default">
+        <preConditions onFail="MARK_RAN"><not><tableExists tableName="NK_AUTH_GROUP" /></not></preConditions>
+        <comment />
+        <createTable tableName="NK_AUTH_GROUP" remarks="">
+            <column name="GROUP_ID" type="${type.uuid}" remarks="" />
+            <column name="GROUP_DESC" type="${type.desc}" remarks="" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="NK_AUTH_GROUP_REF-01" author="bean" context="default">
+        <preConditions onFail="MARK_RAN"><not><tableExists tableName="NK_AUTH_GROUP_REF" /></not></preConditions>
+        <comment />
+        <createTable tableName="NK_AUTH_GROUP_REF" remarks="">
+            <column name="GROUP_ID" type="${type.uuid}" remarks="" />
+            <column name="REF_ID" type="${type.uuid}" remarks="" />
+            <column name="REF_TYPE" type="${type.int}" remarks="" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="NK_AUTH_LIMIT-01" author="bean" context="default">
+        <preConditions onFail="MARK_RAN"><not><tableExists tableName="NK_AUTH_LIMIT" /></not></preConditions>
+        <comment />
+        <createTable tableName="NK_AUTH_LIMIT" remarks="">
+            <column name="LIMIT_ID" type="${type.uuid}" remarks="" />
+            <column name="LIMIT_DESC" type="${type.desc}" remarks="" />
+            <column name="CONTENT" type="${type.clob}" remarks="" />
+            <column name="LIMIT_LEVEL" type="${type.uuid}" remarks="" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="NK_AUTH_PERMISSION-01" author="bean" context="default">
+        <preConditions onFail="MARK_RAN"><not><tableExists tableName="NK_AUTH_PERMISSION" /></not></preConditions>
+        <comment />
+        <createTable tableName="NK_AUTH_PERMISSION" remarks="">
+            <column name="PERM_ID" type="${type.uuid}" remarks="" />
+            <column name="PERM_DESC" type="${type.desc}" remarks="" />
+            <column name="PERM_RESOURCE" type="${type.var1}" remarks="资源，如单据 D:ZR01 " />
+            <column name="PERM_OPERATE" type="${type.desc}" remarks="操作 CRUD" />
+            <column name="SUB_RESOURCE" type="${type.clob}" remarks="子资源，如卡片" />
+            <column name="LIMIT_ID" type="${type.var2}" remarks="限制，主要针对数据权限控制" />
+            <column name="PERM_LEVEL" type="${type.uuid}" remarks="" />
+        </createTable>
+    </changeSet>
+
+
+
+    <changeSet id="NK_AUTH$INSERT-01" author="bean" context="default">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(1) FROM NK_AUTH_GROUP WHERE GROUP_ID = 'nk-default-group';
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            INSERT INTO NK_AUTH_GROUP(GROUP_ID , GROUP_DESC) VALUES( 'nk-default-group' , 'ROOT');
+        </sql>
+    </changeSet>
+
+    <changeSet id="NK_AUTH$INSERT-02" author="bean" context="default">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(1) FROM NK_AUTH_PERMISSION WHERE PERM_ID = 'nk-default-permission';
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            INSERT INTO NK_AUTH_PERMISSION( PERM_ID , PERM_DESC , PERM_RESOURCE , PERM_OPERATE , SUB_RESOURCE , LIMIT_ID , PERM_LEVEL)
+            VALUES( 'nk-default-permission' , '* ALL' , '*' , '*' , NULL , '' , 'FFFFFFF');
+        </sql>
+    </changeSet>
+
+    <changeSet id="NK_AUTH$INSERT-03" author="bean" context="default">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(1) FROM NK_AUTH_GROUP_REF
+                WHERE GROUP_ID = 'nk-default-group' AND REF_ID = 'nk-default-permission' AND REF_TYPE = '1';
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            INSERT INTO NK_AUTH_GROUP_REF(GROUP_ID , REF_ID , REF_TYPE) VALUES( 'nk-default-group' , 'nk-default-permission' , '1');
+        </sql>
+    </changeSet>
+
+    <changeSet id="NK_AUTH$INSERT-04" author="bean" context="default">
+        <preConditions onFail="MARK_RAN">
+            <sqlCheck expectedResult="0">
+                SELECT COUNT(1) FROM NK_AUTH_GROUP_REF
+                WHERE GROUP_ID = 'nk-default-group' AND REF_ID = 'nk-default-admin' AND REF_TYPE = '0';
+            </sqlCheck>
+        </preConditions>
+        <sql>
+            INSERT INTO NK_AUTH_GROUP_REF(GROUP_ID , REF_ID , REF_TYPE) VALUES( 'nk-default-group' , 'nk-default-admin' , '0');
+        </sql>
+    </changeSet>
+
+</databaseChangeLog>

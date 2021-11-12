@@ -1,0 +1,79 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                            http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd"
+>
+    <!--
+    1：includeAll 标签可以把一个文件夹下的所有 changelog 都加载进来。如果单个加载可以用 include。
+    2：includeAll 标签里有两个属性：path 和 relativeToChangelogFile。
+        2.1：path （在 include 标签里是 file）：指定要加载的文件或文件夹位置
+        2.2：relativeToChangelogFile ：文件位置的路径是否相对于 root changelog 是相对路径，默认 false，即相对于 classpath 是相对路径。
+    -->
+
+    <!--
+    参考资料
+    https://zhuanlan.zhihu.com/p/66187627
+    -->
+
+    <!-- varchar -->
+    <property name="type.uuid" dbms="oracle" value="nvarchar2(40)"/>
+    <property name="type.uuid" dbms="mysql"  value="varchar(40)"/>
+
+    <property name="type.cond" dbms="oracle" value="nvarchar2(4)"/>
+    <property name="type.cond" dbms="mysql"  value="varchar(4)"/>
+
+    <property name="type.desc" dbms="oracle" value="nvarchar2(100)"/>
+    <property name="type.desc" dbms="mysql"  value="varchar(100)"/>
+
+    <property name="type.var" dbms="oracle" value="nvarchar2(200)"/>
+    <property name="type.var" dbms="mysql"  value="varchar(200)"/>
+
+    <property name="type.var1" dbms="oracle" value="nvarchar2(1000)"/>
+    <property name="type.var1" dbms="mysql"  value="varchar(1000)"/>
+
+    <property name="type.var2" dbms="oracle" value="nvarchar2(2000)"/>
+    <property name="type.var2" dbms="mysql"  value="varchar(2000)"/>
+
+    <!-- double -->
+    <property name="type.curr" dbms="oracle" value="number(16,6)"/>
+    <property name="type.curr" dbms="mysql"  value="double(16,6)"/>
+
+    <property name="type.num"  dbms="oracle" value="number(16,6)"/>
+    <property name="type.num"  dbms="mysql"  value="double(16,6)"/>
+
+    <!-- bigint -->
+    <property name="type.date" dbms="oracle" value="number(10)"/>
+    <property name="type.date" dbms="mysql"  value="bigint(10)"/>
+
+    <property name="type.long" dbms="oracle" value="number(20)"/>
+    <property name="type.long" dbms="mysql"  value="bigint(20)"/>
+
+    <!-- int -->
+    <property name="type.int4" dbms="oracle" value="number(1)"/>
+    <property name="type.int4" dbms="mysql"  value="int(1)"/>
+
+    <property name="type.int6" dbms="oracle" value="number(6)"/>
+    <property name="type.int6" dbms="mysql"  value="int(6)"/>
+
+    <property name="type.int"  dbms="oracle" value="number(11)"/>
+    <property name="type.int"  dbms="mysql"  value="int(11)"/>
+
+    <property name="type.int1"  dbms="oracle" value="number(1)"/>
+    <property name="type.int1"  dbms="mysql"  value="int(1)"/>
+
+    <property name="type.boolean"  dbms="oracle" value="char(1)"/>
+    <property name="type.boolean"  dbms="mysql"  value="tinyint(1)"/>
+
+    <!-- clob -->
+    <property name="type.clob" dbms="oracle" value="clob"/>
+    <property name="type.clob" dbms="mysql"  value="longtext"/>
+
+    <!--普通-->
+    <includeAll path="changelog/" relativeToChangelogFile="true" />
+    <!--分表-->
+    <includeAll path="breaches/"  relativeToChangelogFile="true" />
+    <!--模块-->
+    <includeAll path="classpath*:/db/changelog/"/>
+
+</databaseChangeLog>
