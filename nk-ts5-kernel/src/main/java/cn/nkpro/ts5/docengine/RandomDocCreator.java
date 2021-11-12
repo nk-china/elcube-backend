@@ -127,7 +127,7 @@ public class RandomDocCreator {
                         c.getDynamics().put("phone2_serial",    AreaSource.getInstance().randomPhoneNumber(AreaSource.getInstance().randomProvince(), "-"));
 
                     }catch (Exception ignored){}
-                    searchEngine.indexBeforeCommit(c);
+                    searchEngine.indexBeforeCommit("document-custom",c);
                 }
             });
         }

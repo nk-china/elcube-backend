@@ -8,6 +8,7 @@ import cn.nkpro.ts5.exception.NkSystemException;
 import cn.nkpro.ts5.exception.abstracts.NkCaution;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.util.EntityUtils;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.delete.DeleteRequest;
@@ -222,7 +223,15 @@ public class SearchEngine extends ESContentBuilder{
         indexBeforeCommit(Arrays.asList(docs));
     }
 
+    public void indexBeforeCommit(String indexName, AbstractESModel... docs){
+        indexBeforeCommit(indexName, Arrays.asList(docs));
+    }
+
     public void indexBeforeCommit(Collection<AbstractESModel> docs){
+        indexBeforeCommit(null,docs);
+    }
+
+    public void indexBeforeCommit(String indexName, Collection<AbstractESModel> docs){
 
         TransactionSync.runBeforeCommit(()-> {
 
@@ -234,8 +243,9 @@ public class SearchEngine extends ESContentBuilder{
             }
             try{
                 for(AbstractESModel doc : docs){
+                    String name = StringUtils.defaultIfBlank(indexName,parseDocument(doc.getClass()));
                     client.index(
-                            new IndexRequest(documentIndex(parseDocument(doc.getClass())))
+                            new IndexRequest(documentIndex(name))
                                     .id(parseDocId(doc))
                                     .source(doc.toSource()),
                             RequestOptions.DEFAULT);
@@ -254,34 +264,37 @@ public class SearchEngine extends ESContentBuilder{
         });
     }
 
-    private boolean existsIndices(Class<? extends AbstractESModel> docType) throws IOException {
+    private boolean existsIndices(String indexName) throws IOException {
         try{
             return client.indices()
-                    .exists(new GetIndexRequest(documentIndex(parseDocument(docType))), RequestOptions.DEFAULT);
+                    .exists(new GetIndexRequest(documentIndex(indexName)), RequestOptions.DEFAULT);
         } catch (IOException e) {
             throw new NkSystemException("搜索引擎发生错误："+e.getMessage(), e);
         }
     }
 
-
-    public void deleteIndices(Class<? extends AbstractESModel> docType) throws IOException {
-        if(existsIndices(docType)){
+    public void deleteIndices(String indexName) throws IOException {
+        if(existsIndices(documentIndex(indexName))){
             try{
                 client.indices()
-                        .delete(new DeleteIndexRequest(documentIndex(parseDocument(docType))), RequestOptions.DEFAULT);
+                        .delete(new DeleteIndexRequest(documentIndex(indexName)), RequestOptions.DEFAULT);
             } catch (IOException e) {
                 throw new NkSystemException("搜索引擎发生错误："+e.getMessage(), e);
             }
         }
     }
 
-    public void createIndices(Class<? extends AbstractESModel> docType) throws IOException {
+    public void deleteIndices(Class<? extends AbstractESModel> docType) throws IOException {
+        deleteIndices(parseDocument(docType));
+    }
 
-        if(existsIndices(docType))
+    public void createIndices(Class<? extends AbstractESModel> docType, String indexName) throws IOException {
+
+        if(existsIndices(indexName))
             return;
 
         try{
-            CreateIndexRequest request = new CreateIndexRequest(documentIndex(parseDocument(docType)));
+            CreateIndexRequest request = new CreateIndexRequest(documentIndex(indexName));
 
             request.settings(buildNgramTokenizer());
             request.mapping(buildMapping(docType));
@@ -291,5 +304,9 @@ public class SearchEngine extends ESContentBuilder{
         } catch (IOException e) {
             throw new NkSystemException("搜索引擎发生错误："+e.getMessage(), e);
         }
+    }
+
+    public void createIndices(Class<? extends AbstractESModel> docType) throws IOException {
+        createIndices(docType, parseDocument(docType));
     }
 }

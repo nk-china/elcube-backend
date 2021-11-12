@@ -91,6 +91,6 @@ public class SysDebugController {
     @NkNote("13.随机生成单据")
     @RequestMapping(value = "/random")
     public void random() {
-        randomDocCreator.random(100000000);
+        randomDocCreator.random(1000);
     }
 }
