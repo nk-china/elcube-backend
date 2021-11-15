@@ -45,9 +45,7 @@
                 <constraints primaryKey="true" />
             </column>
             <column name="VERSION" type="${type.uuid}" remarks="" />
-            <column name="ORDER_BY" type="${type.int}" remarks="" >
-                <constraints primaryKey="true" />
-            </column>
+            <column name="ORDER_BY" type="${type.int}" remarks="" />
 
             <column name="TITLE" type="${type.desc}" remarks="VALUE" />
             <column name="CONTENT" type="${type.clob}" remarks="VALUE" />
