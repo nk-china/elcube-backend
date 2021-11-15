@@ -15,7 +15,9 @@
         </preConditions>
         <comment />
         <createTable tableName="NK_PLATFORM_MENU" remarks="">
-            <column name="MENU_ID" type="${type.uuid}" remarks="" />
+            <column name="MENU_ID" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
             <column name="TITLE" type="${type.desc}" remarks="" />
             <column name="SUB_TITLE" type="${type.desc}" remarks="" />
             <column name="PARENT_ID" type="${type.uuid}" remarks="" />
@@ -36,8 +38,22 @@
         </preConditions>
         <comment />
         <createTable tableName="NK_PLATFORM_REGISTRY" remarks="">
-            <column name="CONSTANT_KEY" type="${type.uuid}" remarks="" />
-            <column name="CONSTANT_VALUE" type="${type.clob}" remarks="VALUE" />
+            <column name="REG_TYPE" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="REG_KEY" type="${type.desc}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="VERSION" type="${type.uuid}" remarks="" />
+            <column name="ORDER_BY" type="${type.int}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
+
+            <column name="TITLE" type="${type.desc}" remarks="VALUE" />
+            <column name="CONTENT" type="${type.clob}" remarks="VALUE" />
+
+            <column name="UPDATED_TIME" type="${type.long}" remarks="" />
+            <column name="UPDATED_ACCOUNT" type="${type.uuid}" remarks="" />
         </createTable>
     </changeSet>
 
@@ -49,9 +65,13 @@
         </preConditions>
         <comment />
         <createTable tableName="NK_PLATFORM_SCRIPT" remarks="">
-            <column name="SCRIPT_NAME" type="${type.desc}" remarks="" />
+            <column name="SCRIPT_NAME" type="${type.desc}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
             <column name="SCRIPT_TYPE" type="${type.desc}" remarks="" />
-            <column name="VERSION" type="${type.uuid}" remarks="" />
+            <column name="VERSION" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
             <column name="SCRIPT_DESC" type="${type.var}" remarks="" />
             <column name="SCRIPT_DOC" type="${type.var2}" remarks="组件描述" />
             <column name="STATE" type="${type.uuid}" remarks="Active Version, boolean Value, 1 or 0" />

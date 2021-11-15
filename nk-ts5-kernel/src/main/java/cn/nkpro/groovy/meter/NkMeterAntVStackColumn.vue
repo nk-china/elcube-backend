@@ -1,5 +1,5 @@
 <template>
-    <nk-meter ref="meter" :title="config.title||title" :editable="editable" :enable-setting="true" @setting-submit="update">
+    <nk-meter ref="meter" :title="configEdit.title||title" :editable="editable" :enable-setting="true" @setting-submit="update">
         <div ref="container" style="height: 100%;width: 100%;"></div>
         <div slot="setting">
             <nk-form :col="1" :edit="true">
@@ -35,7 +35,7 @@
         props:{
             editable:Boolean,
             title:String,
-            config:Object,
+            value:Object,
             defaultData:Array,
             columnDefs:Array,
         },
@@ -46,11 +46,11 @@
             }
         },
         created(){
-            this.configEdit = Object.assign({},this.config);
+            this.configEdit = Object.assign({},this.value);
         },
         mounted(){
-            if(this.config.xField&&this.config.yFields){
-                this.render(this.config);
+            if(this.configEdit.xField&&this.configEdit.yFields){
+                this.render(this.configEdit);
             }else{
                 this.$refs.meter.setSettingMode(true);
             }
@@ -132,7 +132,9 @@
             update(){
                 try{
                     this.render(this.configEdit);
-                    this.$emit("update:config",Object.assign({},this.configEdit));
+                    const event = Object.assign({},this.configEdit);
+                    this.$emit("update:config",event);
+                    this.$emit("input",event);
                 }catch (e) {
                     console.log(e);
                     this.$refs.meter.setSettingMode(true);

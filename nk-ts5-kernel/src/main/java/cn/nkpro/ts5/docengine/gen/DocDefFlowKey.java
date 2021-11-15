@@ -5,11 +5,6 @@ import java.io.Serializable;
 public class DocDefFlowKey implements Serializable {
     private String docType;
 
-    /**
-     * 前置单据状态条件
-     *
-     * @mbggenerated
-     */
     private String preDocState;
 
     private String preDocType;
@@ -33,25 +28,11 @@ public class DocDefFlowKey implements Serializable {
         this.docType = docType;
     }
 
-    /**
-     * 获取 前置单据状态条件
-     *
-     * @return 前置单据状态条件
-     *
-     * @mbggenerated
-     */
-    @cn.nkpro.ts5.annotation.CodeFieldNotes("前置单据状态条件")
+    @cn.nkpro.ts5.annotation.CodeFieldNotes("")
     public String getPreDocState() {
         return preDocState;
     }
 
-    /**
-     * 设置 前置单据状态条件
-     *
-     * @return 前置单据状态条件
-     *
-     * @mbggenerated
-     */
     public void setPreDocState(String preDocState) {
         this.preDocState = preDocState;
     }

@@ -11,7 +11,9 @@
         <preConditions onFail="MARK_RAN"><not><tableExists tableName="NK_AUTH_GROUP" /></not></preConditions>
         <comment />
         <createTable tableName="NK_AUTH_GROUP" remarks="">
-            <column name="GROUP_ID" type="${type.uuid}" remarks="" />
+            <column name="GROUP_ID" type="${type.uuid}" remarks=""  >
+                <constraints primaryKey="true" />
+            </column>
             <column name="GROUP_DESC" type="${type.desc}" remarks="" />
         </createTable>
     </changeSet>
@@ -20,9 +22,15 @@
         <preConditions onFail="MARK_RAN"><not><tableExists tableName="NK_AUTH_GROUP_REF" /></not></preConditions>
         <comment />
         <createTable tableName="NK_AUTH_GROUP_REF" remarks="">
-            <column name="GROUP_ID" type="${type.uuid}" remarks="" />
-            <column name="REF_ID" type="${type.uuid}" remarks="" />
-            <column name="REF_TYPE" type="${type.int}" remarks="" />
+            <column name="GROUP_ID" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="REF_ID" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="REF_TYPE" type="${type.int}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
         </createTable>
     </changeSet>
 
@@ -30,7 +38,9 @@
         <preConditions onFail="MARK_RAN"><not><tableExists tableName="NK_AUTH_LIMIT" /></not></preConditions>
         <comment />
         <createTable tableName="NK_AUTH_LIMIT" remarks="">
-            <column name="LIMIT_ID" type="${type.uuid}" remarks="" />
+            <column name="LIMIT_ID" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
             <column name="LIMIT_DESC" type="${type.desc}" remarks="" />
             <column name="CONTENT" type="${type.clob}" remarks="" />
             <column name="LIMIT_LEVEL" type="${type.uuid}" remarks="" />
@@ -41,7 +51,9 @@
         <preConditions onFail="MARK_RAN"><not><tableExists tableName="NK_AUTH_PERMISSION" /></not></preConditions>
         <comment />
         <createTable tableName="NK_AUTH_PERMISSION" remarks="">
-            <column name="PERM_ID" type="${type.uuid}" remarks="" />
+            <column name="PERM_ID" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
             <column name="PERM_DESC" type="${type.desc}" remarks="" />
             <column name="PERM_RESOURCE" type="${type.var1}" remarks="资源，如单据 D:ZR01 " />
             <column name="PERM_OPERATE" type="${type.desc}" remarks="操作 CRUD" />

@@ -16,7 +16,9 @@
         </preConditions>
         <comment />
         <createTable tableName="NK_DOC_ASYNC_QUEUE" remarks="">
-            <column name="ASYNC_ID" type="${type.uuid}" remarks="" />
+            <column name="ASYNC_ID" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
             <column name="ASYNC_OBJECT_REF" type="${type.var}" remarks="" />
             <column name="ASYNC_JSON" type="${type.clob}" remarks="" />
             <column name="ASYNC_RETRY" type="${type.int}" remarks="" />
@@ -38,9 +40,15 @@
         </preConditions>
         <comment />
         <createTable tableName="NK_DOC_DEF_BPM" remarks="">
-            <column name="DOC_TYPE" type="${type.cond}" remarks="" />
-            <column name="PROCESS_KEY" type="${type.uuid}" remarks="" />
-            <column name="VERSION" type="${type.uuid}" remarks="" />
+            <column name="DOC_TYPE" type="${type.cond}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="PROCESS_KEY" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="VERSION" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
             <column name="START_BY" type="${type.desc}" remarks="" />
             <column name="ROLLBACK_TO" type="${type.desc}" remarks="" />
             <column name="UPDATED_TIME" type="${type.long}" remarks="" />
@@ -56,9 +64,15 @@
         </preConditions>
         <comment />
         <createTable tableName="NK_DOC_DEF_CYCLE" remarks="">
-            <column name="DOC_TYPE" type="${type.uuid}" remarks="" />
-            <column name="DOC_CYCLE" type="${type.uuid}" remarks="" />
-            <column name="VERSION" type="${type.uuid}" remarks="" />
+            <column name="DOC_TYPE" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="DOC_CYCLE" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="VERSION" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
             <column name="ORDER_BY" type="${type.int}" remarks="" />
             <column name="REF_OBJECT_TYPE" type="${type.var}" remarks="" />
             <column name="UPDATED_TIME" type="${type.long}" remarks="" />
@@ -73,9 +87,15 @@
         </preConditions>
         <comment />
         <createTable tableName="NK_DOC_DEF_DATA_SYNC" remarks="">
-            <column name="DOC_TYPE" type="${type.desc}" remarks="" />
-            <column name="VERSION" type="${type.uuid}" remarks="" />
-            <column name="TARGET_SVR" type="${type.desc}" remarks="" />
+            <column name="DOC_TYPE" type="${type.desc}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="VERSION" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="TARGET_SVR" type="${type.desc}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
             <column name="TARGET_ARGS" type="${type.var1}" remarks="" />
             <column name="RE_EXECUTE" type="${type.int}" remarks="" />
             <column name="CONDITION_SP_E_L" type="${type.var1}" remarks="" />
@@ -83,7 +103,9 @@
             <column name="KEY_SP_E_L" type="${type.var1}" remarks="" />
             <column name="MAPPING_SP_E_L" type="${type.var2}" remarks="" />
             <column name="UPDATED_TIME" type="${type.long}" remarks="" />
-            <column name="ORDER_BY" type="${type.int}" remarks="" />
+            <column name="ORDER_BY" type="${type.int}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
         </createTable>
     </changeSet>
 
@@ -95,10 +117,18 @@
         </preConditions>
         <comment />
         <createTable tableName="NK_DOC_DEF_FLOW" remarks="">
-            <column name="DOC_TYPE" type="${type.uuid}" remarks="" />
-            <column name="PRE_DOC_TYPE" type="${type.uuid}" remarks="" />
-            <column name="PRE_DOC_STATE" type="${type.desc}" remarks="前置单据状态条件" />
-            <column name="VERSION" type="${type.uuid}" remarks="" />
+            <column name="DOC_TYPE" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="PRE_DOC_TYPE" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="PRE_DOC_STATE" type="${type.desc}" remarks="前置单据状态条件" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="VERSION" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
             <column name="REF_OBJECT_TYPE" type="${type.var}" remarks="" />
             <column name="STATE" type="${type.desc}" remarks="" />
             <column name="UPDATED_TIME" type="${type.long}" remarks="" />
@@ -114,8 +144,12 @@
         </preConditions>
         <comment />
         <createTable tableName="NK_DOC_DEF_H" remarks="">
-            <column name="DOC_TYPE" type="${type.desc}" remarks="" />
-            <column name="VERSION" type="${type.uuid}" remarks="" />
+            <column name="DOC_TYPE" type="${type.desc}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="VERSION" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
             <column name="VERSION_HEAD" type="${type.int}" remarks="暂时不启用" />
             <column name="DOC_CLASSIFY" type="${type.uuid}" remarks="" />
             <column name="DOC_NAME" type="${type.uuid}" remarks="单据名称" />
@@ -139,7 +173,9 @@
         </preConditions>
         <comment />
         <createTable tableName="NK_DOC_DEF_H_PARTNER" remarks="">
-            <column name="PARTNER_ID" type="${type.uuid}" remarks="" />
+            <column name="PARTNER_ID" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
             <column name="PARTNER_TYPE" type="${type.desc}" remarks="1 自然人 2 法人 3 组织机构" />
             <column name="PARTNER_NAME" type="${type.desc}" remarks="" />
             <column name="REMARK" type="${type.var}" remarks="" />
@@ -157,9 +193,15 @@
         </preConditions>
         <comment />
         <createTable tableName="NK_DOC_DEF_I" remarks="">
-            <column name="DOC_TYPE" type="${type.cond}" remarks="" />
-            <column name="VERSION" type="${type.uuid}" remarks="" />
-            <column name="CARD_KEY" type="${type.uuid}" remarks="" />
+            <column name="DOC_TYPE" type="${type.cond}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="VERSION" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="CARD_KEY" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
             <column name="BEAN_NAME" type="${type.uuid}" remarks="" />
             <column name="CARD_NAME" type="${type.uuid}" remarks="" />
             <column name="CARD_CONTENT" type="${type.clob}" remarks="" />
@@ -181,9 +223,15 @@
         </preConditions>
         <comment />
         <createTable tableName="NK_DOC_DEF_INDEX_CUSTOM" remarks="">
-            <column name="DOC_TYPE" type="${type.desc}" remarks="" />
-            <column name="VERSION" type="${type.uuid}" remarks="" />
-            <column name="CUSTOM_TYPE" type="${type.desc}" remarks="" />
+            <column name="DOC_TYPE" type="${type.desc}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="VERSION" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="CUSTOM_TYPE" type="${type.desc}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
             <column name="CONDITION_SP_E_L" type="${type.var1}" remarks="" />
             <column name="DATA_SP_E_L" type="${type.var1}" remarks="" />
             <column name="KEY_SP_E_L" type="${type.var1}" remarks="" />
@@ -201,9 +249,15 @@
         </preConditions>
         <comment />
         <createTable tableName="NK_DOC_DEF_INDEX_RULE" remarks="">
-            <column name="DOC_TYPE" type="${type.desc}" remarks="" />
-            <column name="VERSION" type="${type.uuid}" remarks="" />
-            <column name="INDEX_NAME" type="${type.desc}" remarks="" />
+            <column name="DOC_TYPE" type="${type.desc}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="VERSION" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="INDEX_NAME" type="${type.desc}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
             <column name="INDEX_TYPE" type="${type.uuid}" remarks="" />
             <column name="RULE_SP_E_L" type="${type.var1}" remarks="" />
             <column name="UPDATED_TIME" type="${type.long}" remarks="" />
@@ -219,10 +273,18 @@
         </preConditions>
         <comment />
         <createTable tableName="NK_DOC_DEF_STATE" remarks="">
-            <column name="DOC_TYPE" type="${type.desc}" remarks="" />
-            <column name="DOC_STATE" type="${type.desc}" remarks="" />
-            <column name="PRE_DOC_STATE" type="${type.desc}" remarks="" />
-            <column name="VERSION" type="${type.uuid}" remarks="" />
+            <column name="DOC_TYPE" type="${type.desc}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="DOC_STATE" type="${type.desc}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="PRE_DOC_STATE" type="${type.desc}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="VERSION" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
             <column name="DOC_STATE_DESC" type="${type.desc}" remarks="" />
             <column name="SYS_STATE" type="${type.desc}" remarks="" />
             <column name="REF_OBJECT_TYPE" type="${type.var}" remarks="业务逻辑处理类" />
@@ -242,7 +304,9 @@
         </preConditions>
         <comment />
         <createTable tableName="NK_DOC_H" remarks="">
-            <column name="DOC_ID" type="${type.uuid}" remarks="" />
+            <column name="DOC_ID" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
             <column name="CLASSIFY" type="${type.desc}" remarks="" />
             <column name="DEF_VERSION" type="${type.uuid}" remarks="" />
             <column name="DOC_TYPE" type="${type.cond}" remarks="" />
@@ -270,8 +334,12 @@
         </preConditions>
         <comment />
         <createTable tableName="NK_DOC_I" remarks="">
-            <column name="DOC_ID" type="${type.uuid}" remarks="" />
-            <column name="CARD_KEY" type="${type.uuid}" remarks="" />
+            <column name="DOC_ID" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="CARD_KEY" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
             <column name="CARD_CONTENT" type="${type.clob}" remarks="" />
             <column name="CREATED_TIME" type="${type.long}" remarks="" />
             <column name="UPDATED_TIME" type="${type.long}" remarks="" />
@@ -286,8 +354,12 @@
     </preConditions>
     <comment />
     <createTable tableName="NK_DOC_I_INDEX" remarks="">
-        <column name="DOC_ID" type="${type.desc}" remarks="" />
-        <column name="NAME" type="${type.desc}" remarks="" />
+        <column name="DOC_ID" type="${type.desc}" remarks="" >
+            <constraints primaryKey="true" />
+        </column>
+        <column name="NAME" type="${type.desc}" remarks="" >
+            <constraints primaryKey="true" />
+        </column>
         <column name="VALUE" type="${type.uuid}" remarks="" />
         <column name="DATA_TYPE" type="${type.desc}" remarks="" />
         <column name="ORDER_BY" type="${type.int}" remarks="" />
@@ -303,7 +375,9 @@
         </preConditions>
         <comment />
         <createTable tableName="NK_DOC_RECORD" remarks="">
-            <column name="ID" type="${type.uuid}" remarks="" />
+            <column name="ID" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
             <column name="DOC_ID" type="${type.uuid}" remarks="" />
             <column name="VERSION" type="${type.int}" remarks="" />
             <column name="STATE_ORIGINAL" type="${type.uuid}" remarks="" />

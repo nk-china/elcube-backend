@@ -7,7 +7,7 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DocDefCycle extends DocDefCycleKey implements Serializable {
-    private String docCycle;
+    private Integer orderBy;
 
     private String refObjectType;
 
@@ -22,12 +22,12 @@ public class DocDefCycle extends DocDefCycleKey implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @cn.nkpro.ts5.annotation.CodeFieldNotes("")
-    public String getDocCycle() {
-        return docCycle;
+    public Integer getOrderBy() {
+        return orderBy;
     }
 
-    public void setDocCycle(String docCycle) {
-        this.docCycle = docCycle;
+    public void setOrderBy(Integer orderBy) {
+        this.orderBy = orderBy;
     }
 
     @cn.nkpro.ts5.annotation.CodeFieldNotes("")

@@ -15,7 +15,9 @@
         </preConditions>
         <comment />
         <createTable tableName="NK_USER_ACCOUNT" remarks="">
-            <column name="ID" type="${type.uuid}" remarks="" />
+            <column name="ID" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
             <column name="USERNAME" type="${type.uuid}" remarks="" />
             <column name="PASSWORD" type="${type.uuid}" remarks="" />
             <column name="LOCKED" type="${type.int}" remarks="" />
@@ -37,7 +39,9 @@
         </preConditions>
         <comment />
         <createTable tableName="NK_USER_DASHBOARD" remarks="">
-            <column name="ID" type="${type.uuid}" remarks="" />
+            <column name="ID" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
             <column name="NAME" type="${type.desc}" remarks="" />
             <column name="CONFIG" type="${type.clob}" remarks="" />
             <column name="ACCOUNT_ID" type="${type.uuid}" remarks="" />
@@ -54,8 +58,12 @@
         </preConditions>
         <comment />
         <createTable tableName="NK_USER_DASHBOARD_REF" remarks="">
-            <column name="ID" type="${type.uuid}" remarks="" />
-            <column name="ACCOUNT_ID" type="${type.uuid}" remarks="" />
+            <column name="ID" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="ACCOUNT_ID" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
             <column name="NAME" type="${type.desc}" remarks="" />
             <column name="ORDER_BY" type="${type.int}" remarks="" />
         </createTable>
@@ -69,7 +77,9 @@
         </preConditions>
         <comment />
         <createTable tableName="NK_USER_SAVED_QUERY" remarks="">
-            <column name="ID" type="${type.uuid}" remarks="" />
+            <column name="ID" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
             <column name="NAME" type="${type.desc}" remarks="" />
             <column name="JSON" type="${type.clob}" remarks="" />
             <column name="USER_ID" type="${type.uuid}" remarks="" />

@@ -194,6 +194,76 @@ public class DocDefCycleExample {
             criteria.add(new Criterion(condition, value1, value2));
         }
 
+        public Criteria andDocCycleIsNull() {
+            addCriterion("DOC_CYCLE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDocCycleIsNotNull() {
+            addCriterion("DOC_CYCLE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andDocCycleEqualTo(String value) {
+            addCriterion("DOC_CYCLE =", value, "docCycle");
+            return (Criteria) this;
+        }
+
+        public Criteria andDocCycleNotEqualTo(String value) {
+            addCriterion("DOC_CYCLE <>", value, "docCycle");
+            return (Criteria) this;
+        }
+
+        public Criteria andDocCycleGreaterThan(String value) {
+            addCriterion("DOC_CYCLE >", value, "docCycle");
+            return (Criteria) this;
+        }
+
+        public Criteria andDocCycleGreaterThanOrEqualTo(String value) {
+            addCriterion("DOC_CYCLE >=", value, "docCycle");
+            return (Criteria) this;
+        }
+
+        public Criteria andDocCycleLessThan(String value) {
+            addCriterion("DOC_CYCLE <", value, "docCycle");
+            return (Criteria) this;
+        }
+
+        public Criteria andDocCycleLessThanOrEqualTo(String value) {
+            addCriterion("DOC_CYCLE <=", value, "docCycle");
+            return (Criteria) this;
+        }
+
+        public Criteria andDocCycleLike(String value) {
+            addCriterion("DOC_CYCLE like", value, "docCycle");
+            return (Criteria) this;
+        }
+
+        public Criteria andDocCycleNotLike(String value) {
+            addCriterion("DOC_CYCLE not like", value, "docCycle");
+            return (Criteria) this;
+        }
+
+        public Criteria andDocCycleIn(List<String> values) {
+            addCriterion("DOC_CYCLE in", values, "docCycle");
+            return (Criteria) this;
+        }
+
+        public Criteria andDocCycleNotIn(List<String> values) {
+            addCriterion("DOC_CYCLE not in", values, "docCycle");
+            return (Criteria) this;
+        }
+
+        public Criteria andDocCycleBetween(String value1, String value2) {
+            addCriterion("DOC_CYCLE between", value1, value2, "docCycle");
+            return (Criteria) this;
+        }
+
+        public Criteria andDocCycleNotBetween(String value1, String value2) {
+            addCriterion("DOC_CYCLE not between", value1, value2, "docCycle");
+            return (Criteria) this;
+        }
+
         public Criteria andDocTypeIsNull() {
             addCriterion("DOC_TYPE is null");
             return (Criteria) this;
@@ -261,66 +331,6 @@ public class DocDefCycleExample {
 
         public Criteria andDocTypeNotBetween(String value1, String value2) {
             addCriterion("DOC_TYPE not between", value1, value2, "docType");
-            return (Criteria) this;
-        }
-
-        public Criteria andOrderByIsNull() {
-            addCriterion("ORDER_BY is null");
-            return (Criteria) this;
-        }
-
-        public Criteria andOrderByIsNotNull() {
-            addCriterion("ORDER_BY is not null");
-            return (Criteria) this;
-        }
-
-        public Criteria andOrderByEqualTo(Integer value) {
-            addCriterion("ORDER_BY =", value, "orderBy");
-            return (Criteria) this;
-        }
-
-        public Criteria andOrderByNotEqualTo(Integer value) {
-            addCriterion("ORDER_BY <>", value, "orderBy");
-            return (Criteria) this;
-        }
-
-        public Criteria andOrderByGreaterThan(Integer value) {
-            addCriterion("ORDER_BY >", value, "orderBy");
-            return (Criteria) this;
-        }
-
-        public Criteria andOrderByGreaterThanOrEqualTo(Integer value) {
-            addCriterion("ORDER_BY >=", value, "orderBy");
-            return (Criteria) this;
-        }
-
-        public Criteria andOrderByLessThan(Integer value) {
-            addCriterion("ORDER_BY <", value, "orderBy");
-            return (Criteria) this;
-        }
-
-        public Criteria andOrderByLessThanOrEqualTo(Integer value) {
-            addCriterion("ORDER_BY <=", value, "orderBy");
-            return (Criteria) this;
-        }
-
-        public Criteria andOrderByIn(List<Integer> values) {
-            addCriterion("ORDER_BY in", values, "orderBy");
-            return (Criteria) this;
-        }
-
-        public Criteria andOrderByNotIn(List<Integer> values) {
-            addCriterion("ORDER_BY not in", values, "orderBy");
-            return (Criteria) this;
-        }
-
-        public Criteria andOrderByBetween(Integer value1, Integer value2) {
-            addCriterion("ORDER_BY between", value1, value2, "orderBy");
-            return (Criteria) this;
-        }
-
-        public Criteria andOrderByNotBetween(Integer value1, Integer value2) {
-            addCriterion("ORDER_BY not between", value1, value2, "orderBy");
             return (Criteria) this;
         }
 
@@ -394,73 +404,63 @@ public class DocDefCycleExample {
             return (Criteria) this;
         }
 
-        public Criteria andDocCycleIsNull() {
-            addCriterion("DOC_CYCLE is null");
+        public Criteria andOrderByIsNull() {
+            addCriterion("ORDER_BY is null");
             return (Criteria) this;
         }
 
-        public Criteria andDocCycleIsNotNull() {
-            addCriterion("DOC_CYCLE is not null");
+        public Criteria andOrderByIsNotNull() {
+            addCriterion("ORDER_BY is not null");
             return (Criteria) this;
         }
 
-        public Criteria andDocCycleEqualTo(String value) {
-            addCriterion("DOC_CYCLE =", value, "docCycle");
+        public Criteria andOrderByEqualTo(Integer value) {
+            addCriterion("ORDER_BY =", value, "orderBy");
             return (Criteria) this;
         }
 
-        public Criteria andDocCycleNotEqualTo(String value) {
-            addCriterion("DOC_CYCLE <>", value, "docCycle");
+        public Criteria andOrderByNotEqualTo(Integer value) {
+            addCriterion("ORDER_BY <>", value, "orderBy");
             return (Criteria) this;
         }
 
-        public Criteria andDocCycleGreaterThan(String value) {
-            addCriterion("DOC_CYCLE >", value, "docCycle");
+        public Criteria andOrderByGreaterThan(Integer value) {
+            addCriterion("ORDER_BY >", value, "orderBy");
             return (Criteria) this;
         }
 
-        public Criteria andDocCycleGreaterThanOrEqualTo(String value) {
-            addCriterion("DOC_CYCLE >=", value, "docCycle");
+        public Criteria andOrderByGreaterThanOrEqualTo(Integer value) {
+            addCriterion("ORDER_BY >=", value, "orderBy");
             return (Criteria) this;
         }
 
-        public Criteria andDocCycleLessThan(String value) {
-            addCriterion("DOC_CYCLE <", value, "docCycle");
+        public Criteria andOrderByLessThan(Integer value) {
+            addCriterion("ORDER_BY <", value, "orderBy");
             return (Criteria) this;
         }
 
-        public Criteria andDocCycleLessThanOrEqualTo(String value) {
-            addCriterion("DOC_CYCLE <=", value, "docCycle");
+        public Criteria andOrderByLessThanOrEqualTo(Integer value) {
+            addCriterion("ORDER_BY <=", value, "orderBy");
             return (Criteria) this;
         }
 
-        public Criteria andDocCycleLike(String value) {
-            addCriterion("DOC_CYCLE like", value, "docCycle");
+        public Criteria andOrderByIn(List<Integer> values) {
+            addCriterion("ORDER_BY in", values, "orderBy");
             return (Criteria) this;
         }
 
-        public Criteria andDocCycleNotLike(String value) {
-            addCriterion("DOC_CYCLE not like", value, "docCycle");
+        public Criteria andOrderByNotIn(List<Integer> values) {
+            addCriterion("ORDER_BY not in", values, "orderBy");
             return (Criteria) this;
         }
 
-        public Criteria andDocCycleIn(List<String> values) {
-            addCriterion("DOC_CYCLE in", values, "docCycle");
+        public Criteria andOrderByBetween(Integer value1, Integer value2) {
+            addCriterion("ORDER_BY between", value1, value2, "orderBy");
             return (Criteria) this;
         }
 
-        public Criteria andDocCycleNotIn(List<String> values) {
-            addCriterion("DOC_CYCLE not in", values, "docCycle");
-            return (Criteria) this;
-        }
-
-        public Criteria andDocCycleBetween(String value1, String value2) {
-            addCriterion("DOC_CYCLE between", value1, value2, "docCycle");
-            return (Criteria) this;
-        }
-
-        public Criteria andDocCycleNotBetween(String value1, String value2) {
-            addCriterion("DOC_CYCLE not between", value1, value2, "docCycle");
+        public Criteria andOrderByNotBetween(Integer value1, Integer value2) {
+            addCriterion("ORDER_BY not between", value1, value2, "orderBy");
             return (Criteria) this;
         }
 

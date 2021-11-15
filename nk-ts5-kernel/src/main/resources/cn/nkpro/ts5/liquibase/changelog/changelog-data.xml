@@ -15,7 +15,9 @@
         </preConditions>
         <comment />
         <createTable tableName="NK_DATA_VIEW" remarks="">
-            <column name="ID" type="${type.uuid}" remarks="" />
+            <column name="ID" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
             <column name="NAME" type="${type.desc}" remarks="" />
             <column name="WIDTH" type="${type.int}" remarks="" />
             <column name="HEIGHT" type="${type.int}" remarks="" />
