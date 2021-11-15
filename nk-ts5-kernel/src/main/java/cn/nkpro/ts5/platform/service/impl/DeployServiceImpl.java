@@ -56,7 +56,7 @@ public class DeployServiceImpl implements DeployService {
         JSONObject export = new JSONObject();
 
         if(config.getBooleanValue("includeRegistry")){
-            export.put("registries",registryService.getAll());
+            export.put("registries",registryService.getAllByType(null));
         }
         if(config.getBooleanValue("includeMenu")){
             export.put("menus",menuService.getMenus(false));

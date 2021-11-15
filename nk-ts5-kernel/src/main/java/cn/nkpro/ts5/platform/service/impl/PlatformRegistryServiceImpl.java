@@ -9,6 +9,7 @@ import cn.nkpro.ts5.platform.gen.PlatformRegistry;
 import cn.nkpro.ts5.platform.gen.PlatformRegistryExample;
 import cn.nkpro.ts5.platform.gen.PlatformRegistryMapper;
 import cn.nkpro.ts5.utils.BeanUtilz;
+import com.alibaba.fastjson.JSON;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +30,15 @@ public class PlatformRegistryServiceImpl implements PlatformRegistryService {
 
 
     @Override
+    public List<PlatformRegistry> getAllByType(String type){
+        PlatformRegistryExample example = new PlatformRegistryExample();
+        if(StringUtils.isNotBlank(type))
+            example.createCriteria().andRegTypeEqualTo(type);
+        example.setOrderByClause("REG_TYPE,ORDER_BY");
+        return constantMapper.selectByExampleWithBLOBs(example);
+    }
+
+    @Override
     public Object getJSON(String regType, String regKey){
 
         PlatformRegistryKey pk = new PlatformRegistryKey();
@@ -37,9 +47,28 @@ public class PlatformRegistryServiceImpl implements PlatformRegistryService {
         PlatformRegistry registry = constantMapper.selectByPrimaryKey(pk);
 
         if(registry!=null){
-            return registry.getContent();
+            return JSON.parse(registry.getContent());
         }
         return null;
+    }
+
+
+    @Override
+    public List<Object> getList(String regType, String regKeyPrefix){
+
+        PlatformRegistryExample example = new PlatformRegistryExample();
+        PlatformRegistryExample.Criteria criteria = example.createCriteria()
+                .andRegTypeEqualTo(regType);
+
+        if(!StringUtils.equals(regKeyPrefix,"@")){
+            criteria.andRegKeyLike(regKeyPrefix+"%");
+        }
+
+        example.setOrderByClause("ORDER_BY");
+        return constantMapper.selectByExampleWithBLOBs(example)
+            .stream()
+            .map(item-> JSON.parse(item.getContent()))
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -67,13 +96,6 @@ public class PlatformRegistryServiceImpl implements PlatformRegistryService {
     @Override
     public void deleteValue(PlatformRegistry registry){
         constantMapper.deleteByPrimaryKey(registry);
-    }
-
-    @Override
-    public List<PlatformRegistry> getAll(){
-        PlatformRegistryExample example = new PlatformRegistryExample();
-        example.setOrderByClause("CONSTANT_KEY");
-        return constantMapper.selectByExampleWithBLOBs(example);
     }
 
     @Override
@@ -118,7 +140,7 @@ public class PlatformRegistryServiceImpl implements PlatformRegistryService {
         String key =  Arrays.stream(splitKeys)
                 .limit(level)
                 .collect(Collectors.joining("."));
-        String parentKey = type + (StringUtils.isBlank(key)?StringUtils.EMPTY:".") + key;;
+        String parentKey = type + (StringUtils.isBlank(key)?StringUtils.EMPTY:".") + key;
 
         TreeNode parentNode = cache.computeIfAbsent(parentKey, (k) -> {
             TreeNode node = new TreeNode(type, key, null);
@@ -149,14 +171,14 @@ public class PlatformRegistryServiceImpl implements PlatformRegistryService {
         private Boolean isLeaf;
         private List<TreeNode> children;
 
-        public TreeNode(String type,String key,String title){
+        TreeNode(String type, String key, String title){
             this.key = type+(StringUtils.isBlank(key)?StringUtils.EMPTY:".")+StringUtils.defaultString(key);
             this.setRegType(type);
             this.setRegKey(key);
             this.title = StringUtils.defaultString(title,StringUtils.substringAfterLast(this.key,"."));
         }
 
-        public TreeNode(PlatformRegistry registry){
+        TreeNode(PlatformRegistry registry){
             this.key = registry.getRegType()+'.'+registry.getRegKey();
             this.title = registry.getTitle();
             this.isLeaf = true;

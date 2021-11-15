@@ -26,6 +26,12 @@ public class MeterController {
         return meterService.getCardList();
     }
 
+    @NkNote("1.卡片列表")
+    @RequestMapping("/card/defs")
+    public List<JSONObject> cardListDefs(){
+        return meterService.getCardDefs();
+    }
+
     @NkNote("2.加载卡片数据")
     @RequestMapping("/card/get/{meterName}")
     public Object cardDataGet(@PathVariable(value = "meterName") String meterName,@RequestBody Object config){

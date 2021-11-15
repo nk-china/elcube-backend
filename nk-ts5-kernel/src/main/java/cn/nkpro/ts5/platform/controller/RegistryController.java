@@ -22,4 +22,8 @@ public class RegistryController {
         return constantService.getJSON(type,key);
     }
 
+    @RequestMapping(value = "/value/list/{type}/{keyPrefix}", method = RequestMethod.GET)
+    public Object getList(@PathVariable String type, @PathVariable String keyPrefix){
+        return constantService.getList(type,keyPrefix);
+    }
 }
