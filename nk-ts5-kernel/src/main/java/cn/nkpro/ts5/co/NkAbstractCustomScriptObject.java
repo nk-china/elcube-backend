@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.co;
 
 import cn.nkpro.ts5.basic.NkProperties;
-import cn.nkpro.ts5.dataengine.meter.NkMeter;
+import cn.nkpro.ts5.platform.meter.NkMeter;
 import cn.nkpro.ts5.utils.ClassUtils;
 import cn.nkpro.ts5.utils.GroovyUtils;
 import cn.nkpro.ts5.utils.ResourceUtils;

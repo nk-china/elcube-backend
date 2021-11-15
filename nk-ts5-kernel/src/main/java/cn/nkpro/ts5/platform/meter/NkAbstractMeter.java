@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.dataengine.meter;
+package cn.nkpro.ts5.platform.meter;
 
 import cn.nkpro.ts5.co.NkAbstractCustomScriptObject;
 import cn.nkpro.ts5.co.PlatformScriptV;

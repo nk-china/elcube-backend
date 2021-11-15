@@ -15,7 +15,6 @@ import cn.nkpro.ts5.exception.NkAccessDeniedException;
 import cn.nkpro.ts5.security.SecurityUtilz;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import com.alibaba.fastjson.JSONObject;
-import org.elasticsearch.action.fieldcaps.FieldCapabilities;
 import org.elasticsearch.action.fieldcaps.FieldCapabilitiesResponse;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;

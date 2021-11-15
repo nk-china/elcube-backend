@@ -1,8 +1,7 @@
-package cn.nkpro.ts5.dataengine.service;
+package cn.nkpro.ts5.platform.service;
 
 import cn.nkpro.ts5.co.NkCustomObjectManager;
-import cn.nkpro.ts5.dataengine.meter.NkMeter;
-import cn.nkpro.ts5.platform.gen.PlatformRegistry;
+import cn.nkpro.ts5.platform.meter.NkMeter;
 import cn.nkpro.ts5.platform.service.PlatformRegistryService;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;

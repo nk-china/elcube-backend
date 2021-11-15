@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.dataengine.meter;
+package cn.nkpro.ts5.platform.meter;
 
 import cn.nkpro.ts5.data.redis.RedisSupport;
 import cn.nkpro.ts5.dataengine.model.DataQueryRequest;

@@ -8,7 +8,7 @@ import cn.nkpro.ts5.co.PlatformScriptV;
 import cn.nkpro.ts5.docengine.NkCard;
 import cn.nkpro.ts5.exception.NkSystemException;
 import cn.nkpro.ts5.annotation.NkNote;
-import cn.nkpro.ts5.dataengine.meter.NkMeter;
+import cn.nkpro.ts5.platform.meter.NkMeter;
 import groovy.lang.GroovyObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;

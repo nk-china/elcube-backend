@@ -1,8 +1,7 @@
-package cn.nkpro.ts5.dataengine.controller;
+package cn.nkpro.ts5.platform.controller;
 
 import cn.nkpro.ts5.annotation.NkNote;
-import cn.nkpro.ts5.dataengine.service.DashboardService;
-import cn.nkpro.ts5.dataengine.service.MeterService;
+import cn.nkpro.ts5.platform.service.MeterService;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
