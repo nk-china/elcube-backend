@@ -1,10 +1,10 @@
 package cn.nkpro.ts5.platform.controller;
 
 import cn.nkpro.ts5.annotation.NkNote;
-import cn.nkpro.ts5.fs.FSConfig;
-import cn.nkpro.ts5.fs.FSSupport;
-import cn.nkpro.ts5.fs.FileUploadStatus;
-import cn.nkpro.ts5.fs.defaults.DefaultFileSupportImpl;
+import cn.nkpro.ts5.co.fs.FSConfig;
+import cn.nkpro.ts5.co.fs.FSSupport;
+import cn.nkpro.ts5.co.fs.FileUploadStatus;
+import cn.nkpro.ts5.co.fs.defaults.DefaultFileSupportImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;

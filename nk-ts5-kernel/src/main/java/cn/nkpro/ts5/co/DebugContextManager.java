@@ -125,7 +125,7 @@ public class DebugContextManager implements ApplicationContextAware {
                                 .stream()
                                 .filter(e->e.getKey().startsWith("#"))
                                 .map(Map.Entry::getValue)
-                                .forEach(e->registerScriptObject((PlatformScriptV) e,debugApplicationContext))
+                                .forEach(e->registerScriptObject((NkScriptV) e,debugApplicationContext))
                     );
         }
 
@@ -151,9 +151,9 @@ public class DebugContextManager implements ApplicationContextAware {
                 .map(debugApplications::get)
                 .orElseThrow(()->new NkSystemException("没有找到调试上下文"));
 
-        if(resource instanceof PlatformScriptV){
-            ((PlatformScriptV) resource).setDebug(true);
-            registerScriptObject((PlatformScriptV) resource,debugApplicationContext);
+        if(resource instanceof NkScriptV){
+            ((NkScriptV) resource).setDebug(true);
+            registerScriptObject((NkScriptV) resource,debugApplicationContext);
         }else if(resource instanceof DebugAble){
             ((DebugAble) resource).setDebug(true);
         }else{
@@ -163,19 +163,19 @@ public class DebugContextManager implements ApplicationContextAware {
         redisForResoure.set(String.format("DEBUG:%s", localDebugId.get()), key, resource);
     }
 
-    public void addActiveResource(String key, PlatformScriptV scriptDef){
+    public void addActiveResource(String key, NkScriptV scriptDef){
         scriptDef.setDebug(false);
         registerScriptObject(scriptDef, rootApplicationContext);
         removeDebugResource(key, scriptDef);
     }
 
     public void removeDebugResource(String key, Object resource){
-        if(resource instanceof PlatformScriptV){
-            ((PlatformScriptV) resource).setDebug(false);
+        if(resource instanceof NkScriptV){
+            ((NkScriptV) resource).setDebug(false);
             Optional.ofNullable(localDebugId.get())
                     .map(debugApplications::get)
                     .ifPresent(debugApplicationContext->{
-                        String scriptName = ((PlatformScriptV) resource).getScriptName();
+                        String scriptName = ((NkScriptV) resource).getScriptName();
                         BeanDefinitionRegistry definitionRegistry = (BeanDefinitionRegistry)
                                 debugApplicationContext.getAutowireCapableBeanFactory();
                         if(definitionRegistry.containsBeanDefinition(scriptName))
@@ -187,7 +187,7 @@ public class DebugContextManager implements ApplicationContextAware {
         redisForResoure.deleteHash(String.format("DEBUG:%s", localDebugId.get()), key);
     }
 
-    private void registerScriptObject(PlatformScriptV scriptDef, ApplicationContext context){
+    private void registerScriptObject(NkScriptV scriptDef, ApplicationContext context){
 
         Class<?> clazz = GroovyUtils.compileGroovy(scriptDef.getScriptName(), scriptDef.getGroovyMain());
 

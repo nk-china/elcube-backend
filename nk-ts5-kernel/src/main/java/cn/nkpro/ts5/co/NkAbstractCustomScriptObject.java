@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.co;
 
 import cn.nkpro.ts5.basic.NkProperties;
-import cn.nkpro.ts5.platform.meter.NkMeter;
+import cn.nkpro.ts5.co.meter.NkMeter;
 import cn.nkpro.ts5.utils.ClassUtils;
 import cn.nkpro.ts5.utils.GroovyUtils;
 import cn.nkpro.ts5.utils.ResourceUtils;
@@ -36,7 +36,7 @@ public abstract class NkAbstractCustomScriptObject implements NkCustomScriptObje
     protected String beanName;
 
     @Setter@Getter
-    protected PlatformScriptV scriptDef;
+    protected NkScriptV scriptDef;
 
     public NkAbstractCustomScriptObject() {
         this.beanName = parseComponentName();
@@ -48,7 +48,7 @@ public abstract class NkAbstractCustomScriptObject implements NkCustomScriptObje
             this.scriptDef = loadScriptFromClassPath();
         }
         if(this.scriptDef==null){
-            scriptDef = new PlatformScriptV();
+            scriptDef = new NkScriptV();
             scriptDef.setScriptType("Unknown");
             scriptDef.setScriptName(beanName);
             scriptDef.setVersion("@");
@@ -60,9 +60,9 @@ public abstract class NkAbstractCustomScriptObject implements NkCustomScriptObje
     }
 
 
-    protected PlatformScriptV scriptDefHV(){
+    protected NkScriptV scriptDefHV(){
         if(!scriptDef.isDebug() && properties.isComponentReloadClassPath()){
-            PlatformScriptV defHV = loadScriptFromClassPath();
+            NkScriptV defHV = loadScriptFromClassPath();
             if(defHV!=null){
                 return defHV;
             }
@@ -70,7 +70,7 @@ public abstract class NkAbstractCustomScriptObject implements NkCustomScriptObje
         return this.scriptDef;
     }
 
-    protected PlatformScriptV loadScriptFromClassPath() {
+    protected NkScriptV loadScriptFromClassPath() {
 
         String className = getClass().getSimpleName();
 
@@ -78,7 +78,7 @@ public abstract class NkAbstractCustomScriptObject implements NkCustomScriptObje
         if (!groovyCode.isEmpty()) {
             List<String> vueMainCode = findResource(className + ".vue");
             List<String> vueDefsCode = findResource(className + "Def*.vue");
-            PlatformScriptV scriptDefH = new PlatformScriptV();
+            NkScriptV scriptDefH = new NkScriptV();
             scriptDefH.setScriptName(beanName);
             scriptDefH.setVersion("@");
             scriptDefH.setGroovyMain(groovyCode.stream().findFirst().orElse(null));

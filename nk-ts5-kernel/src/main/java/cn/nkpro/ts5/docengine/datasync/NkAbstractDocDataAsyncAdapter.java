@@ -7,7 +7,7 @@ import cn.nkpro.ts5.docengine.gen.DocAsyncQueue;
 import cn.nkpro.ts5.docengine.gen.DocAsyncQueueMapper;
 import cn.nkpro.ts5.docengine.gen.DocAsyncQueueWithBLOBs;
 import cn.nkpro.ts5.docengine.gen.DocDefDataSync;
-import cn.nkpro.ts5.spel.NkSpELManager;
+import cn.nkpro.ts5.co.spel.NkSpELManager;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
 import com.alibaba.fastjson.JSON;
 import lombok.Data;

@@ -4,7 +4,7 @@ import cn.nkpro.ts5.co.DebugContextManager;
 import cn.nkpro.ts5.docengine.NkDocEngine;
 import cn.nkpro.ts5.docengine.RandomDocCreator;
 import cn.nkpro.ts5.security.SecurityUtilz;
-import cn.nkpro.ts5.spel.NkSpELManager;
+import cn.nkpro.ts5.co.spel.NkSpELManager;
 import cn.nkpro.ts5.annotation.NkNote;
 import lombok.AllArgsConstructor;
 import lombok.Data;

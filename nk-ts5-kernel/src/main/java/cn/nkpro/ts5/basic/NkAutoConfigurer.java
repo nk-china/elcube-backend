@@ -1,5 +1,7 @@
 package cn.nkpro.ts5.basic;
 
+import cn.nkpro.ts5.basic.GUID;
+import cn.nkpro.ts5.basic.NkProperties;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.mybatis.spring.annotation.MapperScan;
@@ -30,7 +32,6 @@ import java.util.concurrent.ThreadPoolExecutor;
         "cn.nkpro.ts5.platform.gen",
         "cn.nkpro.ts5.security.gen",
         "cn.nkpro.ts5.docengine.gen",
-        "cn.nkpro.ts5.dataengine.gen",
 })
 @EnableConfigurationProperties(NkProperties.class)
 public class NkAutoConfigurer implements ApplicationRunner {

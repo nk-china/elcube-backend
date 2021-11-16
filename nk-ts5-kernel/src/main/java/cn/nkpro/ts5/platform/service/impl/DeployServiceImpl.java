@@ -3,8 +3,8 @@ package cn.nkpro.ts5.platform.service.impl;
 import cn.nkpro.ts5.basic.secret.DesCbcUtil;
 import cn.nkpro.ts5.co.NkCustomObjectManager;
 import cn.nkpro.ts5.co.NkCustomScriptObject;
-import cn.nkpro.ts5.co.PlatformScriptV;
-import cn.nkpro.ts5.co.service.NkScriptManager;
+import cn.nkpro.ts5.co.NkScriptV;
+import cn.nkpro.ts5.platform.service.NkScriptManager;
 import cn.nkpro.ts5.docengine.model.DocDefHV;
 import cn.nkpro.ts5.docengine.service.NkDocDefService;
 import cn.nkpro.ts5.platform.gen.PlatformRegistry;
@@ -131,7 +131,7 @@ public class DeployServiceImpl implements DeployService {
                     .forEach(group -> authorizationService.updateGroup(group));
         }
         if(data.containsKey("scripts")){
-            data.getJSONArray("scripts").toJavaList(PlatformScriptV.class)
+            data.getJSONArray("scripts").toJavaList(NkScriptV.class)
                     .forEach(scriptV -> scriptManager.doActive(scriptV, true));
         }
         if(data.containsKey("bpmDefs")){

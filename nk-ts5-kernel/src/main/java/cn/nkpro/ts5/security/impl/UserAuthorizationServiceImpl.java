@@ -11,7 +11,7 @@ import cn.nkpro.ts5.security.UserBusinessAdapter;
 import cn.nkpro.ts5.security.bo.GrantedAuthority;
 import cn.nkpro.ts5.security.bo.UserGroupBO;
 import cn.nkpro.ts5.security.gen.*;
-import cn.nkpro.ts5.spel.NkSpELManager;
+import cn.nkpro.ts5.co.spel.NkSpELManager;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
