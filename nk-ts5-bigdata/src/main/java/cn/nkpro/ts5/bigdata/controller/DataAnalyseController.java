@@ -5,6 +5,7 @@ import cn.nkpro.ts5.co.query.model.DataFieldDesc;
 import cn.nkpro.ts5.co.query.model.DataQueryRequest;
 import cn.nkpro.ts5.co.query.model.DataQueryResponse;
 import cn.nkpro.ts5.co.query.DataSourceManager;
+import cn.nkpro.ts5.co.query.model.DataSourceDef;
 import cn.nkpro.ts5.exception.NkDefineException;
 import net.sf.jsqlparser.statement.select.Select;
 import net.sf.jsqlparser.util.TablesNamesFinder;
@@ -33,7 +34,7 @@ public class DataAnalyseController {
 
     @NkNote("1.数据源列表")
     @RequestMapping(value = "/dataSources",method = RequestMethod.GET)
-    public Collection<DataSourceManager.DataSourceDef> getDataSources(){
+    public Collection<DataSourceDef> getDataSources(){
         return dataSourceManager.getDataSources();
     }
 
