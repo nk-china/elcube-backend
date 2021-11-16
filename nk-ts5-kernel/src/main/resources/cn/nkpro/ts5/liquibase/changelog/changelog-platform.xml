@@ -48,6 +48,7 @@
             <column name="ORDER_BY" type="${type.int}" remarks="" />
 
             <column name="TITLE" type="${type.desc}" remarks="VALUE" />
+            <column name="DATA_TYPE" type="${type.desc}" remarks="VALUE" />
             <column name="CONTENT" type="${type.clob}" remarks="VALUE" />
 
             <column name="UPDATED_TIME" type="${type.long}" remarks="" />
