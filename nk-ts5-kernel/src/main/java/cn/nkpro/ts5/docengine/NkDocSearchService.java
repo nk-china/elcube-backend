@@ -66,6 +66,12 @@ public class NkDocSearchService {
         this.init();
     }
 
+    public boolean exists(String docId) throws IOException {
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder();
+        sourceBuilder.query(QueryBuilders.termQuery("docId",docId));
+        return searchEngine.exists(DocHES.class,sourceBuilder);
+    }
+
     public ESPageList<JSONObject> queryList(
             String indexName,
             QueryBuilder preQueryBuilder,

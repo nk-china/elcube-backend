@@ -20,6 +20,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -113,6 +114,12 @@ public class DocController {
             }) : "Unknown Browser";
 
         return docEngine.doUpdateView(doc, info);
+    }
+
+    @NkNote("B、新建单据后，检查单据索引的情况")
+    @RequestMapping(value = "/exists/{docId}",method = RequestMethod.GET)
+    public boolean exists(@PathVariable String docId) throws IOException {
+        return searchService.exists(docId);
     }
 
     @Data
