@@ -9,6 +9,7 @@ import cn.nkpro.ts5.data.clickhouse.ClickHouseTemplate;
 import cn.nkpro.ts5.exception.NkAccessDeniedException;
 import cn.nkpro.ts5.security.SecurityUtilz;
 import net.sf.jsqlparser.statement.select.Select;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
@@ -64,12 +65,21 @@ public class ClickHouseService implements DataQueryService {
 
         Assert.isTrue(sqlList.size()==1,"分页查询不支持多条语句");
 
-
         Long total = jdbcTemplate.queryForObject(String.format("select count(1) from ( %s )", sqlList.get(0).toString()), Long.class);
+
+        String orderBy = StringUtils.isNotBlank(request.getOrderField())?
+                String.format("ORDER BY %s %s",request.getOrderField(),StringUtils.defaultString(request.getOrder(),"ASC"))
+                :StringUtils.EMPTY;
 
         List<DataQueryResponse.Column> columns = new ArrayList<>();
         List<Map<String, Object>> list = jdbcTemplate.query(
-                String.format("%s limit %s", sqlList.get(0).toString(), Math.min(request.getRows(), 1000)),
+                String.format(
+                        "%s %s limit %s,%s",
+                        sqlList.get(0).toString(),
+                        orderBy,
+                        request.getFrom(),
+                        Math.min(request.getRows(), 1000)
+                ),
                 new RowMapper(columns));
 
         return new DataQueryResponse<>(request.getSqlList(), columns, list,request.getFrom(),request.getRows(), total == null ? 0 : total);

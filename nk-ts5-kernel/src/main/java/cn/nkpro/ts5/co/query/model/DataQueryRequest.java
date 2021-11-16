@@ -29,6 +29,8 @@ public class DataQueryRequest {
     private Integer from = 0;
     private Integer rows = 100;
     private JSONObject conditions;
+    private String order;
+    private String orderField;
     private DataQueryDrill drill;
 
     public void setSql(String sql){
