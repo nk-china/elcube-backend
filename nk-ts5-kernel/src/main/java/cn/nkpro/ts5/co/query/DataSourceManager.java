@@ -1,16 +1,16 @@
 package cn.nkpro.ts5.co.query;
 
 import cn.nkpro.ts5.co.NkCustomObjectManager;
+import cn.nkpro.ts5.co.query.model.DataSourceDef;
 import cn.nkpro.ts5.exception.NkDefineException;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import cn.nkpro.ts5.platform.service.PlatformRegistryService;
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -20,38 +20,35 @@ public class DataSourceManager {
     @Autowired
     private NkCustomObjectManager customObjectManager;
 
-    private Map<String,DataSourceDef> dataSourceDefs;
+    @SuppressWarnings("all")
+    @Autowired
+    private PlatformRegistryService registryService;
 
-    @AllArgsConstructor
-    @Data
-    public static
-    class DataSourceDef{
-        private String name;
-        private String type;
-        private String service;
-    }
+    private static final String REG_KEY = "@DATASET";
 
-    public DataSourceManager(){
-        dataSourceDefs = new HashMap<>();
-        dataSourceDefs.put(null, new DataSourceDef(null, "ElasticSearch", "ElasticSearchService"));
-        dataSourceDefs.put("document", new DataSourceDef("document", "ElasticSearch", "ElasticSearchService"));
-        dataSourceDefs.put("doc-ext", new DataSourceDef("doc-ext", "ElasticSearch", "ElasticSearchService"));
-        dataSourceDefs.put("document-custom", new DataSourceDef("document-custom", "ElasticSearch", "ElasticSearchService"));
-        dataSourceDefs.put("hits_v1", new DataSourceDef("hits_v1", "ClickHouse", "ClickHouseService"));
-    }
+
 
     public Collection<DataSourceDef> getDataSources(){
-        return dataSourceDefs.values().stream().filter(e->e.getName()!=null).sorted(Comparator.comparing(DataSourceDef::getName)).collect(Collectors.toList());
+        return registryService.getAllByType(REG_KEY).stream()
+                .map(registry -> {
+                    DataSourceDef def = JSON.parseObject(registry.getContent(),DataSourceDef.class);
+                    def.setName(registry.getRegKey());
+                    return def;
+                })
+                .sorted(Comparator.comparing(DataSourceDef::getName))
+                .collect(Collectors.toList());
     }
 
     public DataQueryService getService(String datasourceName){
 
         datasourceName = datasourceName.replaceAll("(^\")|(\"$)","");
-        DataSourceDef def = dataSourceDefs.get(datasourceName);
+
+        JSONObject def = (JSONObject) registryService.getJSON(REG_KEY, datasourceName);
+
         if(def==null){
             throw new NkDefineException("数据源没有找到");
         }
 
-        return customObjectManager.getCustomObject(def.getService(), DataQueryService.class);
+        return customObjectManager.getCustomObject(def.getString("service"), DataQueryService.class);
     }
 }
