@@ -96,7 +96,6 @@ public abstract class NkAbstractCard<DT,DDT> extends NkAbstractCustomScriptObjec
         return Collections.emptyMap();
     }
 
-    @SuppressWarnings("all")
     protected String[] getDefComponentNames() {
         return ArrayUtils.EMPTY_STRING_ARRAY;
     }
