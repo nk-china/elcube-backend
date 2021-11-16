@@ -50,8 +50,10 @@ public class NkDocSearchService {
         searchEngine.createIndices(BpmTaskES.class);
         searchEngine.createIndices(DocExtES.class);
 
-        for(Map.Entry<String, Class> e : docProperties.getIndices().entrySet()){
-            searchEngine.createIndices(e.getValue(),e.getKey());
+        if(docProperties.getIndices()!=null){
+            for(Map.Entry<String, Class> e : docProperties.getIndices().entrySet()){
+                searchEngine.createIndices(e.getValue(),e.getKey());
+            }
         }
     }
 
