@@ -18,7 +18,7 @@ nk:
     password: oo2zSP8J
   doc:
     indices:
-      document-custom: cn.nkpro.ts5.docengine.model.es.DocExtES
+      demo-index: cn.nkpro.ts5.docengine.model.es.DocExtES
 spring:
   datasource:
     url: jdbc:mysql://192.168.1.149:3306/ts5_bb_rd
