@@ -16,6 +16,9 @@ nk:
     url: jdbc:clickhouse://192.168.1.157:8123/tutorial
     username: root
     password: oo2zSP8J
+  doc:
+    indices:
+      document-custom: cn.nkpro.ts5.docengine.model.es.DocExtES
 spring:
   datasource:
     url: jdbc:mysql://192.168.1.149:3306/ts5_bb_rd

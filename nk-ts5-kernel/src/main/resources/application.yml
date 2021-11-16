@@ -23,9 +23,6 @@ nk:
       max-lifetime: 1800000
       minimumIdle: 5
       maximumPoolSize: 10
-  doc:
-    indices:
-      document-custom: cn.nkpro.ts5.docengine.model.es.DocExtES
 
 #  aliyun:
 #    access-key-id: LTAI4G6YUdTBx8b9C8uR3gTU
