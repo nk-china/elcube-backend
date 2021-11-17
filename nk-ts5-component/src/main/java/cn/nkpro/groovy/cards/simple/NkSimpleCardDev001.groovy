@@ -9,7 +9,6 @@ import cn.nkpro.ts5.docengine.NkDocEngine
 import cn.nkpro.ts5.docengine.model.DocDefHV
 import cn.nkpro.ts5.docengine.model.DocDefIV
 import cn.nkpro.ts5.docengine.model.DocHV
-import cn.nkpro.ts5.docengine.model.easy.EasyEntity
 import cn.nkpro.ts5.docengine.model.easy.EasySingle
 import cn.nkpro.ts5.docengine.service.NkDocEngineContext
 import cn.nkpro.ts5.exception.NkDefineException
@@ -60,7 +59,7 @@ class NkSimpleCardDev001 extends NkAbstractCard<NkCardSimpleData,NkCardSimpleDef
     @Override
     NkCardSimpleData afterCreate(DocHV doc, DocHV preDoc, NkCardSimpleData data, DocDefIV defIV, NkCardSimpleDef d) {
 
-        this.runSpEL(EasyEntity.create(data), doc, d.getFields(), defIV.getCardKey(), true)
+        this.runSpEL(EasySingle.from(data), doc, d.getFields(), defIV.getCardKey(), true)
 
         return super.afterCreate(doc, preDoc, data, defIV, d)
     }

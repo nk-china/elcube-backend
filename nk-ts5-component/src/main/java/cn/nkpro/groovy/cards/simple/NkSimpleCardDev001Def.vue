@@ -1,5 +1,5 @@
 <template>
-    <a-card :title="`${card.cardName}配置`">
+    <nk-def-card :title="`${card.cardName}配置`">
         <nk-form :col="1" :edit="editMode">
             <nk-form-item title="服务">
                 {{def.remoteAdapter}}
@@ -75,7 +75,7 @@
             </vxe-table-column>
             <vxe-table-column />
         </vxe-table>
-    </a-card>
+    </nk-def-card>
 </template>
 
 <script>
