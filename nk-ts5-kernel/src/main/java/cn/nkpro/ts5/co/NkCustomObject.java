@@ -1,5 +1,7 @@
 package cn.nkpro.ts5.co;
 
+import cn.nkpro.ts5.annotation.NkNote;
+
 /**
  * Created by bean on 2020/7/16.
  */
@@ -12,6 +14,11 @@ public interface NkCustomObject {
     }
 
     default String desc() {
+
+        NkNote nkNote = this.getClass().getAnnotation(NkNote.class);
+        if(nkNote!=null)
+            return nkNote.value();
+
         return getBeanName();
     }
 }

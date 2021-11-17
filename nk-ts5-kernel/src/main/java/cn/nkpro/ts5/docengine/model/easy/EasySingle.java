@@ -16,7 +16,7 @@ public interface EasySingle {
 
     int keySize();
 
-    static EasySingle from(Object target){
+    public static EasySingle from(Object target){
         Assert.notNull(target,"目标数据不能为null");
         Assert.isTrue(!(target instanceof Collection || target.getClass().isArray()),"目标数据必须是 Entity 或 Map 子集");
 

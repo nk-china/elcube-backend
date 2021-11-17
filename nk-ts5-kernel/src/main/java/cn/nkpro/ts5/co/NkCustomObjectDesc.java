@@ -15,4 +15,12 @@ public class NkCustomObjectDesc {
         this.key = key;
         this.name = StringUtils.defaultIfBlank(name,key);
     }
+
+    public String getValue(){
+        return this.key;
+    }
+
+    public String getLabel(){
+        return this.name;
+    }
 }

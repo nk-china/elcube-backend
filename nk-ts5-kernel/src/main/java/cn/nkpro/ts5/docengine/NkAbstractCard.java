@@ -153,7 +153,7 @@ public abstract class NkAbstractCard<DT,DDT> extends NkAbstractCustomScriptObjec
     }
 
     @Override
-    public DT call(DocHV doc, DT data, DocDefIV defIV, DDT d, Object options) {
+    public Object call(DocHV doc, DT data, DocDefIV defIV, DDT d, Object options) {
         return null;
     }
 

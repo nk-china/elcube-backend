@@ -49,7 +49,7 @@ public interface NkCard<DT,DDT> extends NkScriptCard {
     DT calculate(DocHV doc, DT data, DocDefIV defIV, DDT def, boolean isTrigger, Object options);
 
     // 调用方法
-    DT call(DocHV doc, DT data, DocDefIV defIV, DDT def, Object options);
+    Object call(DocHV doc, DT data, DocDefIV defIV, DDT def, Object options);
 
     // 更新方法
     DT beforeUpdate(DocHV doc, DT data, DT original, DocDefIV defIV, DDT def);
