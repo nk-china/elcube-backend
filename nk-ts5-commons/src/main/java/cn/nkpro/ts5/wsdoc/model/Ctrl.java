@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.basic.wsdoc.model;
+package cn.nkpro.ts5.wsdoc.model;
 
 import org.apache.commons.lang3.math.NumberUtils;
 

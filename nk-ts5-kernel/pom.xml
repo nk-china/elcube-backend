@@ -44,6 +44,12 @@
 
     <dependencies>
 
+        <dependency>
+            <groupId>cn.nkpro</groupId>
+            <artifactId>nk-ts5-commons</artifactId>
+            <version>2.0-SNAPSHOT</version>
+        </dependency>
+
         <!--SpringBoot 基础库-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -406,7 +412,7 @@
 <!--                        <option>-keepnames class cn.nkpro.ts5.**.bo.** { *; }</option>-->
 <!--                        <option>-keepnames class cn.nkpro.ts5.**.model.** { *; }</option>-->
 <!--                        <option>-keepnames class cn.nkpro.ts5.config.mybatis.pagination.dialect.** { public *; }</option>-->
-<!--                        <option>-keepnames @cn.nkpro.ts5.basic.Keep class cn.nkpro.ts5.** { *; }</option> &lt;!&ndash; @Keep注解 &ndash;&gt;-->
+<!--                        <option>-keepnames @cn.nkpro.ts5.annotation.Keep class cn.nkpro.ts5.** { *; }</option> &lt;!&ndash; @Keep注解 &ndash;&gt;-->
 <!--                        <option>-keep @org.springframework.stereotype.Controller class cn.nkpro.ts5.** { *; }</option>-->
 <!--                        <option>-keep @org.springframework.web.bind.annotation.RestController class cn.nkpro.ts5.** { *; }</option>-->
 

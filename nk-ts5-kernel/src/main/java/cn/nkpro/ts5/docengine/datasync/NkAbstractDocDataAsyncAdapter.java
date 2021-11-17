@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.docengine.datasync;
 
-import cn.nkpro.ts5.basic.Keep;
+import cn.nkpro.ts5.annotation.Keep;
 import cn.nkpro.ts5.basic.TransactionSync;
 import cn.nkpro.ts5.data.redis.RedisSupport;
 import cn.nkpro.ts5.docengine.gen.DocAsyncQueue;

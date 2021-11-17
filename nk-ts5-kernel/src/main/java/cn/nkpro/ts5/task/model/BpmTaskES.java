@@ -1,5 +1,6 @@
-package cn.nkpro.ts5.docengine.model;
+package cn.nkpro.ts5.task.model;
 
+import cn.nkpro.ts5.docengine.model.DocHV;
 import cn.nkpro.ts5.docengine.model.es.AbstractBaseES;
 import cn.nkpro.ts5.data.elasticearch.ESFieldType;
 import cn.nkpro.ts5.data.elasticearch.annotation.ESDocument;

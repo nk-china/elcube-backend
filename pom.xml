@@ -13,10 +13,11 @@
 
     <modules>
         <module>nk-ts5-parent</module>
+        <module>nk-ts5-commons</module>
         <module>nk-ts5-kernel</module>
-        <module>nk-ts5-application</module>
         <module>nk-ts5-bigdata</module>
         <module>nk-ts5-component</module>
+        <module>nk-ts5-application</module>
     </modules>
 
     <build>

@@ -4,7 +4,7 @@ import cn.nkpro.ts5.annotation.NkNote;
 import cn.nkpro.ts5.data.elasticearch.ESPageList;
 import cn.nkpro.ts5.data.elasticearch.SearchEngine;
 import cn.nkpro.ts5.docengine.NkDocSearchService;
-import cn.nkpro.ts5.docengine.model.BpmTaskES;
+import cn.nkpro.ts5.task.model.BpmTaskES;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

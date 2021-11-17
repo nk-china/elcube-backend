@@ -1,8 +1,8 @@
-package cn.nkpro.ts5.basic.wsdoc;
+package cn.nkpro.ts5.wsdoc;
 
 import cn.nkpro.ts5.annotation.NkNote;
-import cn.nkpro.ts5.basic.wsdoc.model.Ctrl;
-import cn.nkpro.ts5.basic.wsdoc.model.Fun;
+import cn.nkpro.ts5.wsdoc.model.Ctrl;
+import cn.nkpro.ts5.wsdoc.model.Fun;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;

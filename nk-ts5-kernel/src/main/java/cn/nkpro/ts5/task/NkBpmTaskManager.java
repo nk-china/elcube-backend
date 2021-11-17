@@ -1,7 +1,7 @@
-package cn.nkpro.ts5.docengine.service;
+package cn.nkpro.ts5.task;
 
 import cn.nkpro.ts5.basic.PageList;
-import cn.nkpro.ts5.docengine.model.BpmInstance;
+import cn.nkpro.ts5.task.model.BpmInstance;
 import cn.nkpro.ts5.docengine.model.DocHV;
 
 public interface NkBpmTaskManager {

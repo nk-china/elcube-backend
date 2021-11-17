@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.docengine;
 
 import cn.nkpro.ts5.data.elasticearch.*;
-import cn.nkpro.ts5.docengine.model.BpmTaskES;
+import cn.nkpro.ts5.task.model.BpmTaskES;
 import cn.nkpro.ts5.docengine.model.es.DocExtES;
 import cn.nkpro.ts5.docengine.model.es.DocHES;
 import cn.nkpro.ts5.docengine.service.NkDocPermService;

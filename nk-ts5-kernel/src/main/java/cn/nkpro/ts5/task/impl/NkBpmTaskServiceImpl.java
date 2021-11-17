@@ -1,8 +1,8 @@
 package cn.nkpro.ts5.task.impl;
 
-import cn.nkpro.ts5.docengine.model.BpmTask;
-import cn.nkpro.ts5.docengine.model.BpmTaskComplete;
-import cn.nkpro.ts5.docengine.service.NkBpmTaskService;
+import cn.nkpro.ts5.task.model.BpmTask;
+import cn.nkpro.ts5.task.model.BpmTaskComplete;
+import cn.nkpro.ts5.task.NkBpmTaskService;
 import cn.nkpro.ts5.security.SecurityUtilz;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import org.apache.commons.lang3.StringUtils;

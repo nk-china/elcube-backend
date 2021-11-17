@@ -16,6 +16,7 @@ import cn.nkpro.ts5.docengine.model.es.DocHES;
 import cn.nkpro.ts5.docengine.service.*;
 import cn.nkpro.ts5.exception.NkDefineException;
 import cn.nkpro.ts5.security.SecurityUtilz;
+import cn.nkpro.ts5.task.NkBpmTaskService;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;

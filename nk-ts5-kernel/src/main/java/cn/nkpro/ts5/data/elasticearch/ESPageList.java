@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.data.elasticearch;
 
-import cn.nkpro.ts5.basic.Keep;
+import cn.nkpro.ts5.annotation.Keep;
 import cn.nkpro.ts5.basic.PageList;
 import lombok.Getter;
 

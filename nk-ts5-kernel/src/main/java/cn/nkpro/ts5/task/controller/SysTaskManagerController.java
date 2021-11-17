@@ -1,10 +1,10 @@
 package cn.nkpro.ts5.task.controller;
 
 import cn.nkpro.ts5.basic.PageList;
-import cn.nkpro.ts5.docengine.model.BpmTaskComplete;
-import cn.nkpro.ts5.docengine.service.NkBpmTaskService;
-import cn.nkpro.ts5.docengine.service.NkBpmTaskManager;
-import cn.nkpro.ts5.docengine.model.BpmInstance;
+import cn.nkpro.ts5.task.model.BpmTaskComplete;
+import cn.nkpro.ts5.task.NkBpmTaskService;
+import cn.nkpro.ts5.task.NkBpmTaskManager;
+import cn.nkpro.ts5.task.model.BpmInstance;
 import cn.nkpro.ts5.annotation.NkNote;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;

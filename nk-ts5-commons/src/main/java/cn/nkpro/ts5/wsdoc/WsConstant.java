@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.basic.wsdoc;
+package cn.nkpro.ts5.wsdoc;
 
 public interface WsConstant<T,V> {
 	T getCode();

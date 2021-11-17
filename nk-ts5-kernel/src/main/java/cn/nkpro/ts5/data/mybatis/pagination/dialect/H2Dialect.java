@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.data.mybatis.pagination.dialect;
 
 
-import cn.nkpro.ts5.basic.Keep;
+import cn.nkpro.ts5.annotation.Keep;
 
 /**
  * A dialect compatible with the H2 database.

@@ -3,6 +3,7 @@ package cn.nkpro.ts5.docengine.model;
 import cn.nkpro.ts5.docengine.gen.DocI;
 import cn.nkpro.ts5.docengine.model.easy.EasyCollection;
 import cn.nkpro.ts5.docengine.model.easy.EasySingle;
+import cn.nkpro.ts5.task.model.BpmTask;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;

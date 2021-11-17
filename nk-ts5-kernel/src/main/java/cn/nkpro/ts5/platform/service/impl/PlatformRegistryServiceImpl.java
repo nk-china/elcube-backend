@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.platform.service.impl;
 
 import cn.nkpro.ts5.basic.Constants;
-import cn.nkpro.ts5.basic.Keep;
+import cn.nkpro.ts5.annotation.Keep;
 import cn.nkpro.ts5.data.redis.RedisSupport;
 import cn.nkpro.ts5.platform.gen.PlatformRegistryKey;
 import cn.nkpro.ts5.platform.service.PlatformRegistryService;

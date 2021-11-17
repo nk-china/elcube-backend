@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.data.mybatis.pagination.dialect;
 
-import cn.nkpro.ts5.basic.Keep;
+import cn.nkpro.ts5.annotation.Keep;
 
 @Keep
 public class SybaseDialect extends Dialect{

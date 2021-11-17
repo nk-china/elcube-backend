@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.co.query.model;
 
-import cn.nkpro.ts5.basic.Keep;
+import cn.nkpro.ts5.annotation.Keep;
 import cn.nkpro.ts5.exception.NkDefineException;
 import com.alibaba.fastjson.JSONObject;
 import lombok.Data;

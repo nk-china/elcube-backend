@@ -4,7 +4,7 @@ import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.docengine.NkDocSearchService;
 import cn.nkpro.ts5.docengine.gen.DocH;
 import cn.nkpro.ts5.docengine.model.DocHV;
-import cn.nkpro.ts5.docengine.service.NkBpmTaskManager;
+import cn.nkpro.ts5.task.NkBpmTaskManager;
 import cn.nkpro.ts5.docengine.service.NkDocEngineFrontService;
 import cn.nkpro.ts5.data.redis.RedisSupport;
 import lombok.AllArgsConstructor;

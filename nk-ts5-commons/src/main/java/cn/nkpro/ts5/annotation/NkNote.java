@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.annotation;
 
-import cn.nkpro.ts5.basic.wsdoc.WsConstant;
+import cn.nkpro.ts5.wsdoc.WsConstant;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

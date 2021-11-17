@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.platform.controller;
 
-import cn.nkpro.ts5.basic.Keep;
+import cn.nkpro.ts5.annotation.Keep;
 import cn.nkpro.ts5.co.NkCustomObject;
 import cn.nkpro.ts5.co.NkCustomObjectManager;
 import cn.nkpro.ts5.co.NkCustomScriptObject;

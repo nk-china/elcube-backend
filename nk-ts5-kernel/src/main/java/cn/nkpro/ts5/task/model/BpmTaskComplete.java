@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.docengine.model;
+package cn.nkpro.ts5.task.model;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.Data;

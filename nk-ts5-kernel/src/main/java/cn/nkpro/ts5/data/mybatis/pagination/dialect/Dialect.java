@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.data.mybatis.pagination.dialect;
 
-import cn.nkpro.ts5.basic.Keep;
+import cn.nkpro.ts5.annotation.Keep;
 
 /**
  * 类似hibernate的Dialect,但只精简出分页部分

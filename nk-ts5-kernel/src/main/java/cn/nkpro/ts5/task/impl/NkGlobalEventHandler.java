@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.task.impl;
 
 import cn.nkpro.ts5.docengine.model.DocHV;
-import cn.nkpro.ts5.docengine.model.BpmTaskES;
+import cn.nkpro.ts5.task.model.BpmTaskES;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;

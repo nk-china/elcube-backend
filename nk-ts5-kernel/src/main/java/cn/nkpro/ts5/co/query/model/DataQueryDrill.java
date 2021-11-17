@@ -1,6 +1,6 @@
 package cn.nkpro.ts5.co.query.model;
 
-import cn.nkpro.ts5.basic.Keep;
+import cn.nkpro.ts5.annotation.Keep;
 import lombok.Data;
 
 @Keep

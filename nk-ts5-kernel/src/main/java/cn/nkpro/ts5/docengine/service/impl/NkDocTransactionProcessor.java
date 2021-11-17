@@ -14,6 +14,7 @@ import cn.nkpro.ts5.docengine.service.*;
 import cn.nkpro.ts5.docengine.utils.RandomUtils;
 import cn.nkpro.ts5.exception.NkDefineException;
 import cn.nkpro.ts5.co.spel.NkSpELManager;
+import cn.nkpro.ts5.task.NkBpmTaskService;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
 import com.alibaba.fastjson.JSON;
