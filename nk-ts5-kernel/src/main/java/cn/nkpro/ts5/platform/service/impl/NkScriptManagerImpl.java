@@ -190,6 +190,9 @@ public class NkScriptManagerImpl implements NkScriptManager {
         // 激活版本
         scriptDefH.setState("Active");
         doUpdate(scriptDefH,force);
+
+        Assert.isTrue(!nkProperties.isComponentReloadClassPath(),"IDE模式不能激活脚本");
+
         debugContextManager.addActiveResource("#"+scriptDefH.getScriptName(), scriptDefH, true);
 
         redisSupport.delete(Constants.CACHE_DEF_SCRIPT);
