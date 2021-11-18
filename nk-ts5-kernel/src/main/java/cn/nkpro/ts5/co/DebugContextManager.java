@@ -1,9 +1,9 @@
 package cn.nkpro.ts5.co;
 
 import cn.nkpro.ts5.annotation.Keep;
-import cn.nkpro.ts5.exception.NkSystemException;
 import cn.nkpro.ts5.basic.Constants;
 import cn.nkpro.ts5.data.redis.RedisSupport;
+import cn.nkpro.ts5.exception.NkSystemException;
 import cn.nkpro.ts5.utils.GroovyUtils;
 import cn.nkpro.ts5.utils.OsUtils;
 import groovy.lang.GroovyObject;
@@ -125,7 +125,7 @@ public class DebugContextManager implements ApplicationContextAware {
                                 .stream()
                                 .filter(e->e.getKey().startsWith("#"))
                                 .map(Map.Entry::getValue)
-                                .forEach(e->registerScriptObject((NkScriptV) e,debugApplicationContext))
+                                .forEach(e->registerScriptObject((NkScriptV) e,debugApplicationContext, true))
                     );
         }
 
@@ -153,7 +153,7 @@ public class DebugContextManager implements ApplicationContextAware {
 
         if(resource instanceof NkScriptV){
             ((NkScriptV) resource).setDebug(true);
-            registerScriptObject((NkScriptV) resource,debugApplicationContext);
+            registerScriptObject((NkScriptV) resource,debugApplicationContext,true);
         }else if(resource instanceof DebugAble){
             ((DebugAble) resource).setDebug(true);
         }else{
@@ -163,9 +163,9 @@ public class DebugContextManager implements ApplicationContextAware {
         redisForResoure.set(String.format("DEBUG:%s", localDebugId.get()), key, resource);
     }
 
-    public void addActiveResource(String key, NkScriptV scriptDef){
+    public void addActiveResource(String key, NkScriptV scriptDef, boolean rewrite){
         scriptDef.setDebug(false);
-        registerScriptObject(scriptDef, rootApplicationContext);
+        registerScriptObject(scriptDef, rootApplicationContext,rewrite);
         removeDebugResource(key, scriptDef);
     }
 
@@ -187,7 +187,7 @@ public class DebugContextManager implements ApplicationContextAware {
         redisForResoure.deleteHash(String.format("DEBUG:%s", localDebugId.get()), key);
     }
 
-    private void registerScriptObject(NkScriptV scriptDef, ApplicationContext context){
+    private void registerScriptObject(NkScriptV scriptDef, ApplicationContext context, boolean rewrite){
 
         Class<?> clazz = GroovyUtils.compileGroovy(scriptDef.getScriptName(), scriptDef.getGroovyMain());
 
@@ -201,6 +201,10 @@ public class DebugContextManager implements ApplicationContextAware {
 
         // 避免非法重写spring的类
         if(context.containsBean(beanName)){
+
+            if(!rewrite){
+                return;
+            }
 
             Object exists = context.getBean(beanName);
 

@@ -1,6 +1,7 @@
 package cn.nkpro.ts5.platform.service.impl;
 
 import cn.nkpro.ts5.basic.Constants;
+import cn.nkpro.ts5.basic.NkProperties;
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.co.*;
 import cn.nkpro.ts5.platform.service.NkScriptManager;
@@ -15,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -40,6 +42,8 @@ public class NkScriptManagerImpl implements NkScriptManager {
     private NkCustomObjectManager customObjectManager;
     @Autowired@SuppressWarnings("all")
     private DebugContextManager debugContextManager;
+    @Autowired
+    private NkProperties nkProperties;
 
     @Override
     public PageList<PlatformScript> getPage(String keyword,
@@ -186,7 +190,7 @@ public class NkScriptManagerImpl implements NkScriptManager {
         // 激活版本
         scriptDefH.setState("Active");
         doUpdate(scriptDefH,force);
-        debugContextManager.addActiveResource("#"+scriptDefH.getScriptName(), scriptDefH);
+        debugContextManager.addActiveResource("#"+scriptDefH.getScriptName(), scriptDefH, true);
 
         redisSupport.delete(Constants.CACHE_DEF_SCRIPT);
 
@@ -331,10 +335,13 @@ public class NkScriptManagerImpl implements NkScriptManager {
     @SneakyThrows
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
-        if(contextRefreshedEvent.getApplicationContext()== debugContextManager.getApplicationContext()){
+        if(contextRefreshedEvent.getApplicationContext() == debugContextManager.getApplicationContext()){
             getActiveResources().forEach((scriptDef)-> {
                 try {
-                    debugContextManager.addActiveResource("#"+scriptDef.getScriptName(), BeanUtilz.copyFromObject(scriptDef, NkScriptV.class));
+                    debugContextManager.addActiveResource(
+                            "#"+scriptDef.getScriptName(),
+                            BeanUtilz.copyFromObject(scriptDef, NkScriptV.class),
+                            !nkProperties.isComponentReloadClassPath());
                 }catch (RuntimeException e){
                     log.error(e.getMessage(),e);
                 }
