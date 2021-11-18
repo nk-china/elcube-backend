@@ -12,6 +12,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -23,7 +24,7 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.util.Assert;
 
-import java.io.Serializable;
+import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -33,6 +34,7 @@ public class DebugContextManager implements ApplicationContextAware {
 
     private final static Map<String, ApplicationContext> debugApplications = new ConcurrentHashMap<>();
     private final static ThreadLocal<String>                  localDebugId = new ThreadLocal<>();
+    private final static ThreadLocal<ByteArrayOutputStream>    localOutput = new ThreadLocal<>();
 
     private ApplicationContext                  rootApplicationContext;
 
@@ -131,13 +133,31 @@ public class DebugContextManager implements ApplicationContextAware {
 
         // 设置本地线程
         localDebugId.set(debugId);
+        localOutput.set(new ByteArrayOutputStream());
     }
 
     /**
      * 请求结束后，清理本地线程
      */
-    void exitThreadLocal(){
-        localDebugId.remove();
+    String exitThreadLocal(){
+        ByteArrayOutputStream output = null;
+        try{
+            output = localOutput.get();
+            if(output!=null){
+                return new String(output.toByteArray());
+            }
+            return null;
+        }finally {
+            localOutput.remove();
+            localDebugId.remove();
+            if(output!=null) {
+                try {
+                    output.flush();
+                    output.close();
+                } catch (IOException ignored) {
+                }
+            }
+        }
     }
 
     /**
@@ -269,8 +289,21 @@ public class DebugContextManager implements ApplicationContextAware {
     }
 
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    public void setApplicationContext(@NotNull ApplicationContext applicationContext) throws BeansException {
         this.rootApplicationContext = applicationContext;
+        PrintStream systemOut = System.out;
+        System.setOut(
+                new PrintStream(
+                        new OutputStream() {
+                            @Override
+                            public void write(int b) {
+                                if (localOutput.get() != null)
+                                    localOutput.get().write(b);
+                                systemOut.write(b);
+                            }
+                        }
+                )
+        );
     }
 
     @NoArgsConstructor

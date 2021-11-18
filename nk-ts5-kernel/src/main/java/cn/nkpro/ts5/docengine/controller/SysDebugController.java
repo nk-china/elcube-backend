@@ -1,6 +1,7 @@
 package cn.nkpro.ts5.docengine.controller;
 
 import cn.nkpro.ts5.co.DebugContextManager;
+import cn.nkpro.ts5.data.redis.RedisSupport;
 import cn.nkpro.ts5.docengine.NkDocEngine;
 import cn.nkpro.ts5.docengine.RandomDocCreator;
 import cn.nkpro.ts5.security.SecurityUtilz;
@@ -34,6 +35,9 @@ public class SysDebugController {
     private NkSpELManager spELManager;
     @Autowired
     private NkDocEngine docEngine;
+
+    @Autowired
+    private RedisSupport<String> redis;
 
     @NkNote("1.获取正在调试的上下文列表")
     @RequestMapping("/contexts")
@@ -76,6 +80,12 @@ public class SysDebugController {
         }catch (Exception e){
             return new R(null, e.getMessage(), ExceptionUtils.getRootCauseStackTrace(e));
         }
+    }
+
+    @NkNote("6.获取调试过程中的日志")
+    @RequestMapping("/log/{id}")
+    public String resources(@PathVariable String id){
+        return redis.get(id);
     }
 
     @Data
