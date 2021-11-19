@@ -501,6 +501,7 @@ public class NkDocDefServiceImpl implements NkDocDefService {
         return getDocTypeFlows("@")
                 .stream()
                 .filter(flowV->StringUtils.isBlank(classify) || StringUtils.equals(flowV.getClassify(),classify))
+                .sorted(Comparator.comparing(DocDefFlowV::getDocType))
                 .collect(Collectors.toList());
     }
 
