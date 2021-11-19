@@ -3,6 +3,7 @@ package cn.nkpro.ts5.platform.service.impl;
 import cn.nkpro.ts5.basic.Constants;
 import cn.nkpro.ts5.annotation.Keep;
 import cn.nkpro.ts5.data.redis.RedisSupport;
+import cn.nkpro.ts5.platform.DeployAble;
 import cn.nkpro.ts5.platform.gen.PlatformRegistryKey;
 import cn.nkpro.ts5.platform.service.PlatformRegistryService;
 import cn.nkpro.ts5.platform.gen.PlatformRegistry;
@@ -10,17 +11,21 @@ import cn.nkpro.ts5.platform.gen.PlatformRegistryExample;
 import cn.nkpro.ts5.platform.gen.PlatformRegistryMapper;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Order(0)
 @Service
-public class PlatformRegistryServiceImpl implements PlatformRegistryService {
+public class PlatformRegistryServiceImpl implements PlatformRegistryService , DeployAble {
 
     @Autowired@SuppressWarnings("all")
     private PlatformRegistryMapper constantMapper;
@@ -160,6 +165,28 @@ public class PlatformRegistryServiceImpl implements PlatformRegistryService {
         }
 
         return parentNode;
+    }
+
+    @Override
+    public void loadExport(JSONArray exports) {
+        JSONObject export = new JSONObject();
+        export.put("key","includeRegistry");
+        export.put("name","基础配置");
+        exports.add(export);
+    }
+
+    @Override
+    public void exportConfig(JSONObject config, JSONObject export) {
+        if(config.getBooleanValue("includeRegistry")){
+            export.put("registries",getAllByType(null));
+        }
+    }
+
+    @Override
+    public void importConfig(JSONObject data) {
+        if(data.containsKey("registries")){
+            doUpdate(data.getJSONArray("registries").toJavaList(PlatformRegistry.class));
+        }
     }
 
     @EqualsAndHashCode(callSuper = true)

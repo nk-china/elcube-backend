@@ -97,15 +97,4 @@ public class ScriptController {
         return properties.isComponentDisableOnlineEditing();
     }
 
-
-
-    @NkNote("21.获取所有的脚本清单")
-    @RequestMapping("/names")
-    public List<NkCustomObjectDesc> names() {
-        return customObjectManager
-                .getCustomObjectDescriptionList(NkCustomScriptObject.class,false,(entry)->{
-                    NkCustomScriptObject value = (NkCustomScriptObject) entry.getValue();
-                    return value.getScriptDef() != null && !StringUtils.equals(value.getScriptDef().getState(), "Native");
-                });
-    }
 }

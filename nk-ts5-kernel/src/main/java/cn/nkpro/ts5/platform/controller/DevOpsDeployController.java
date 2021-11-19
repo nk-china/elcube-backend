@@ -2,6 +2,7 @@ package cn.nkpro.ts5.platform.controller;
 
 import cn.nkpro.ts5.annotation.NkNote;
 import cn.nkpro.ts5.platform.service.DeployService;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -31,8 +32,16 @@ public class DevOpsDeployController {
     @Autowired@SuppressWarnings("all")
     private DeployService deployService;
 
+
+    @NkNote("1.加载导出配置")
     @ResponseBody
-    @NkNote("1、导出")
+    @RequestMapping("/load")
+    public JSONArray load(){
+        return deployService.load();
+    }
+
+    @ResponseBody
+    @NkNote("2.导出")
     @RequestMapping("/export")
     public ResponseEntity<ByteArrayResource> buildExportKey(@RequestBody JSONObject config){
 
@@ -54,7 +63,7 @@ public class DevOpsDeployController {
                 .body(new ByteArrayResource(export));
 
     }
-    @NkNote("3、导入")
+    @NkNote("3.导入")
     @ResponseBody
     @RequestMapping("/import")
     public List<String> defImport(@RequestBody String pointsTxt){

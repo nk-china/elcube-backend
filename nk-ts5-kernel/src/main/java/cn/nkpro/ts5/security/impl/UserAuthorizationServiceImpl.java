@@ -3,6 +3,7 @@ package cn.nkpro.ts5.security.impl;
 import cn.nkpro.ts5.basic.Constants;
 import cn.nkpro.ts5.basic.GUID;
 import cn.nkpro.ts5.data.redis.RedisSupport;
+import cn.nkpro.ts5.platform.DeployAble;
 import cn.nkpro.ts5.platform.gen.UserAccount;
 import cn.nkpro.ts5.platform.gen.UserAccountExample;
 import cn.nkpro.ts5.platform.gen.UserAccountMapper;
@@ -13,21 +14,25 @@ import cn.nkpro.ts5.security.bo.UserGroupBO;
 import cn.nkpro.ts5.security.gen.*;
 import cn.nkpro.ts5.co.spel.NkSpELManager;
 import cn.nkpro.ts5.utils.BeanUtilz;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Order(20)
 @Slf4j
 @Service
-public class UserAuthorizationServiceImpl implements UserAuthorizationService {
+public class UserAuthorizationServiceImpl implements UserAuthorizationService, DeployAble {
 
     @Autowired@SuppressWarnings("all")
     private GUID guid;
@@ -442,5 +447,47 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService {
                 .stream()
                 .peek(a -> a.setPassword(null))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void loadExport(JSONArray exports) {
+        JSONObject export = new JSONObject();
+        export.put("key","includeAuth");
+        export.put("name","用户组与权限");
+        exports.add(export);
+    }
+
+    @Override
+    public void exportConfig(JSONObject config, JSONObject export) {
+
+        if(config.getBooleanValue("includeAuth")){
+            export.put("groups",getGroupBOs()
+                    .stream()
+                    .filter(group->!group.getGroupId().startsWith("nk-default-"))
+                    .collect(Collectors.toList()));
+            export.put("perms",getPerms());
+            export.put("limits",getLimits(null)
+                    .stream().map(limit->getLimitDetail(limit.getLimitId()))
+                    .collect(Collectors.toList()));
+        }
+    }
+
+    @Override
+    public void importConfig(JSONObject data) {
+
+        if(data.containsKey("limits")){
+            data.getJSONArray("limits").toJavaList(AuthLimit.class)
+                    .forEach(this::updateLimit);
+        }
+        if(data.containsKey("perms")){
+            data.getJSONArray("perms").toJavaList(AuthPermission.class)
+                    .forEach(this::updatePerm);
+        }
+        if(data.containsKey("groups")){
+            data.getJSONArray("groups").toJavaList(UserGroupBO.class)
+                    .stream()
+                    .filter(group->!group.getGroupId().startsWith("nk-default-"))
+                    .forEach(this::updateGroup);
+        }
     }
 }

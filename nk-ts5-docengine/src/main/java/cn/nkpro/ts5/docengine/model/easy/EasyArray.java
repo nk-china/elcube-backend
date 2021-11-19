@@ -1,8 +1,8 @@
 package cn.nkpro.ts5.docengine.model.easy;
 
 import cn.nkpro.ts5.exception.NkOperateNotAllowedCaution;
-import org.jetbrains.annotations.NotNull;
 
+import javax.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;

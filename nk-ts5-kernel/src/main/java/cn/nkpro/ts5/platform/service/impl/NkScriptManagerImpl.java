@@ -4,20 +4,23 @@ import cn.nkpro.ts5.basic.Constants;
 import cn.nkpro.ts5.basic.NkProperties;
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.co.*;
-import cn.nkpro.ts5.platform.service.NkScriptManager;
 import cn.nkpro.ts5.data.mybatis.pagination.PaginationContext;
 import cn.nkpro.ts5.data.redis.RedisSupport;
 import cn.nkpro.ts5.exception.NkDefineException;
+import cn.nkpro.ts5.platform.DeployAble;
 import cn.nkpro.ts5.platform.gen.*;
+import cn.nkpro.ts5.platform.service.NkScriptManager;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
@@ -25,13 +28,15 @@ import org.springframework.util.Assert;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Created by bean on 2020/7/17.
  */
+@Order(30)
 @Slf4j
 @Service
-public class NkScriptManagerImpl implements NkScriptManager {
+public class NkScriptManagerImpl implements NkScriptManager, DeployAble {
 
 
     @Autowired@SuppressWarnings("all")
@@ -208,133 +213,6 @@ public class NkScriptManagerImpl implements NkScriptManager {
         debugContextManager.removeDebugResource("#"+scriptDefH.getScriptName(),scriptDefH);
     }
 
-//    /**
-//     * 获取同一个Major版本的最后一次更新
-//     * @param scriptName scriptName
-//     * @param versionPrefix versionPrefix
-//     * @return ScriptDefH
-//     */
-//    private PlatformScript getLastUpdatedVersion(String scriptName,String versionPrefix){
-//
-//        String major = StringUtils.isBlank(versionPrefix)?"%":(versionPrefix + ".%");
-//
-//        PlatformScriptExample example = new PlatformScriptExample();
-//        example.createCriteria()
-//                .andScriptNameEqualTo(scriptName)
-//                .andVersionLike(major);
-//        example.setOrderByClause("VERSION desc");
-//
-//        return scriptDefHMapper.selectByExample(example, new RowBounds(0, 1))
-//                .stream()
-//                .findFirst()
-//                .orElse(null);
-//    }
-
-
-
-
-
-
-
-
-
-
-//
-//    @Override
-//    public DefScript getScriptByName(String scriptName) {
-//        DefScriptExample example = new DefScriptExample();
-//        example.createCriteria().andScriptNameEqualTo(scriptName);
-//        return scriptMapper.selectByExampleWithBLOBs(example)
-//                .stream()
-//                .findFirst().orElse(null);
-//    }
-//
-//    @Override
-//    public DefScript update(DefScript script) {
-//
-//        try {
-//
-//            ScriptDefinition definition = compileGroovy(script);
-//
-//            DefScriptExample example = new DefScriptExample();
-//            example.createCriteria()
-//                    .andScriptNameEqualTo(script.getScriptName());
-//
-//            scriptMapper.selectByExample(example)
-//                .stream()
-//                .findAny()
-//                .ifPresent(find->{
-//                    if(!StringUtils.equals(find.getScriptId(),script.getScriptId())){
-//                        throw new TfmsIllegalContentException(String.format("%s 已经存在",script.getScriptName()));
-//                    }
-//                });
-//
-//            script.setUpdatedTime(DateTimeUtilz.nowSeconds());
-//            if(StringUtils.isBlank(script.getScriptId())){
-//                script.setScriptId(guid.nextId(DefScript.class));
-//                scriptMapper.insertSelective(script);
-//            }else{
-//                scriptMapper.updateByPrimaryKeyWithBLOBs(script);
-//            }
-//
-//            LocalSyncUtilz.runAfterCommit(()-> registerBean(definition));
-//
-//        } catch (ScriptException e) {
-//            throw new TfmsIllegalContentException(e.getMessage(),e);
-//        }
-//
-//        return script;
-//    }
-//
-//    @Override
-//    public String getClassName(String beanName) {
-//        if(beanFactory.containsBean(beanName)){
-//            Object bean = beanFactory.getBean(beanName);
-//            if(bean instanceof GroovyObject) {
-//                return bean.getClass().getName();
-//            }
-//            return "0";
-//        }
-//        return null;
-//    }
-
-
-//    @Override
-//    public int deployOrder() {
-//        return Integer.MIN_VALUE;
-//    }
-//
-//    @Override
-//    public Object deployExport(JSONObject config) {
-//        if(config.containsKey("includeScript")&&config.getBoolean("includeScript")) {
-//            return getAll()
-//                    .stream()
-//                    .map(defScript -> getScript(defScript.getScriptId()))
-//                    .collect(Collectors.toList());
-//        }
-//        return Collections.emptyList();
-//    }
-//
-//    @Override
-//    public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
-//        if(contextRefreshedEvent.getApplicationContext()==beanFactory){
-//            try{
-//                for(DefScript defScript : scriptMapper.selectByExampleWithBLOBs(null)){
-//                    registerBean(compileGroovy(defScript));
-//                }
-//            }catch (ScriptException e){
-//                throw new RuntimeException(e);
-//            }
-//        }
-//    }
-//
-//    @Override
-//    public void deployImport(Object data) {
-//        if(data!=null)
-//            ((JSONArray)data).toJavaList(DefScript.class)
-//                .forEach(this::update);
-//    }
-
     @SneakyThrows
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
@@ -349,6 +227,41 @@ public class NkScriptManagerImpl implements NkScriptManager {
                     log.error(e.getMessage(),e);
                 }
             });
+        }
+    }
+
+    @Override
+    public void loadExport(JSONArray exports) {
+
+        JSONObject export = new JSONObject();
+        export.put("key","scripts");
+        export.put("name","组件对象");
+        export.put("list",customObjectManager
+                .getCustomObjectDescriptionList(NkCustomScriptObject.class,false,(entry)->{
+                    NkCustomScriptObject value = (NkCustomScriptObject) entry.getValue();
+                    return value.getScriptDef() != null && !StringUtils.equals(value.getScriptDef().getState(), "Native");
+                }));
+        exports.add(export);
+    }
+
+    @Override
+    public void exportConfig(JSONObject config, JSONObject export) {
+
+        if(config.getJSONArray("scripts")!=null){
+            export.put("scripts",
+                    config.getJSONArray("scripts").stream().map(beanName->
+                            customObjectManager.getCustomObject((String) beanName, NkCustomScriptObject.class).getScriptDef()
+                    ).collect(Collectors.toList())
+            );
+        }
+    }
+
+    @Override
+    public void importConfig(JSONObject data) {
+
+        if(data.containsKey("scripts")){
+            data.getJSONArray("scripts").toJavaList(NkScriptV.class)
+                    .forEach(scriptV -> doActive(scriptV, true));
         }
     }
 }

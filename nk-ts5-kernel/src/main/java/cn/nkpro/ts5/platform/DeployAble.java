@@ -1,9 +1,10 @@
 package cn.nkpro.ts5.platform;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 
 public interface DeployAble {
-    int deployOrder();
-    Object deployExport(JSONObject config);
-    void deployImport(Object data);
+    void loadExport(JSONArray exports);
+    void exportConfig(JSONObject config,JSONObject export);
+    void importConfig(JSONObject data);
 }

@@ -24,11 +24,8 @@ import javax.servlet.http.HttpServletResponse;
 @Configuration
 public class NkDocEngineAutoConfiguration implements ApplicationRunner, WebMvcConfigurer {
 
-    private final NkDocSearchService searchService;
-
-    public NkDocEngineAutoConfiguration(@Autowired NkDocSearchService searchService) {
-        this.searchService = searchService;
-    }
+    @Autowired
+    private NkDocSearchService searchService;
 
     @Override
     public void run(ApplicationArguments args) throws Exception {

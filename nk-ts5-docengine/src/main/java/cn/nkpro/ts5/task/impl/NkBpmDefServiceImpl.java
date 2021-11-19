@@ -1,14 +1,19 @@
 package cn.nkpro.ts5.task.impl;
 
 import cn.nkpro.ts5.exception.NkDefineException;
+import cn.nkpro.ts5.platform.DeployAble;
 import cn.nkpro.ts5.task.NkBpmDefService;
 import cn.nkpro.ts5.task.model.ResourceDefinition;
 import cn.nkpro.ts5.task.model.ResourceDeployment;
 import cn.nkpro.ts5.utils.BeanUtilz;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -16,11 +21,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+@Order(40)
 @Service
-public class NkBpmDefServiceImpl implements NkBpmDefService {
+public class NkBpmDefServiceImpl implements NkBpmDefService, DeployAble {
 
-    @Autowired@SuppressWarnings("all")
+    @Autowired
     private ProcessEngine processEngine;
 
     @Override
@@ -99,40 +110,56 @@ public class NkBpmDefServiceImpl implements NkBpmDefService {
         }
     }
 
-//    @Override
-//    public int deployOrder() {
-//        return 0;
-//    }
-//
-//    @Override
-//    public Object deployExport(JSONObject config) {
-//
-//        JSONArray array = config.getJSONArray("bpmDefs");
-//
-//        if(array!=null && array.size()>0){
-//            return array.stream()
-//                    .map(item->{
-//                        JSONObject jsonObject = (JSONObject) item;
-//                        try {
-//                            jsonObject.put("bpmnXml",getBpmnXml(jsonObject.getString("deploymentId"),jsonObject.getString("resourceName")));
-//                            return jsonObject;
-//                        } catch (IOException e) {
-//                            return null;
-//                        }
-//                    })
-//                    .filter(Objects::nonNull)
-//                    .collect(Collectors.toList());
-//        }
-//
-//        return Collections.emptyList();
-//    }
-//
-//    @Override
-//    public void deployImport(Object data) {
-//        if(data!=null)
-//            ((JSONArray)data).forEach(item->{
-//                JSONObject jsonObject = (JSONObject) item;
-//                deploy(jsonObject.getString("key")+":"+jsonObject.getString("deploymentId"),jsonObject.getString("key"),jsonObject.getString("resourceName"),jsonObject.getString("bpmnXml"));
-//            });
-//    }
+    @Override
+    public void loadExport(JSONArray exports) {
+
+        JSONObject export = new JSONObject();
+        export.put("key","bpmDefs");
+        export.put("name","工作流");
+        exports.add(export);
+
+        ProcessDefinitionQuery query = processEngine.getRepositoryService()
+                .createProcessDefinitionQuery()
+                .latestVersion();
+
+        List<ProcessDefinition> definitions = new ArrayList<>();
+        long count = query.count();
+        int from = 0;
+        int rows = 1000;
+        do{
+            definitions.addAll(query.listPage(from,rows));
+            from+=rows;
+        }while(from < count);
+
+        export.put("list",definitions.stream()
+                .map(definition -> {
+                    Map<String,Object> map = new HashMap<>();
+
+                    map.put("key",definition.getId());
+                    map.put("name",definition.getName());
+
+                    return map;
+                })
+                .collect(Collectors.toList()));
+    }
+
+    @Override
+    public void exportConfig(JSONObject config, JSONObject export) {
+        if(config.getJSONArray("bpmDefs")!=null){
+            export.put("bpmDefs",
+                    config.getJSONArray("bpmDefs").stream().map(definitionId->
+                            getProcessDefinition((String) definitionId)
+                    ).collect(Collectors.toList())
+            );
+        }
+    }
+
+    @Override
+    public void importConfig(JSONObject data) {
+        if(data.containsKey("bpmDefs")){
+            data.getJSONArray("bpmDefs").toJavaList(ResourceDefinition.class)
+                    .forEach(this::deploy);
+        }
+    }
+
 }

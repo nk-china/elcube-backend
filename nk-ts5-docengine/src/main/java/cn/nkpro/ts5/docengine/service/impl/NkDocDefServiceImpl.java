@@ -3,13 +3,10 @@ package cn.nkpro.ts5.docengine.service.impl;
 import cn.nkpro.ts5.basic.Constants;
 import cn.nkpro.ts5.basic.PageList;
 import cn.nkpro.ts5.basic.TransactionSync;
-import cn.nkpro.ts5.co.DebugContextManager;
-import cn.nkpro.ts5.co.NkCustomObject;
-import cn.nkpro.ts5.co.NkCustomObjectManager;
+import cn.nkpro.ts5.co.*;
 import cn.nkpro.ts5.data.mybatis.pagination.PaginationContext;
 import cn.nkpro.ts5.data.redis.RedisSupport;
 import cn.nkpro.ts5.docengine.NkCard;
-import cn.nkpro.ts5.co.NkComponentException;
 import cn.nkpro.ts5.docengine.NkDocProcessor;
 import cn.nkpro.ts5.docengine.datasync.NkDocDataAdapter;
 import cn.nkpro.ts5.docengine.gen.*;
@@ -23,13 +20,16 @@ import cn.nkpro.ts5.docengine.model.DocDefStateV;
 import cn.nkpro.ts5.docengine.service.NkDocDefService;
 import cn.nkpro.ts5.docengine.service.NkDocEngineContext;
 import cn.nkpro.ts5.exception.NkDefineException;
+import cn.nkpro.ts5.platform.DeployAble;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import cn.nkpro.ts5.utils.DateTimeUtilz;
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -43,36 +43,37 @@ import java.util.stream.Collectors;
 /**
  * Created by bean on 2020/6/10.
  */
+@Order(50)
 @Slf4j
 @Service
-public class NkDocDefServiceImpl implements NkDocDefService {
+public class NkDocDefServiceImpl implements NkDocDefService, DeployAble {
 
-    @Autowired@SuppressWarnings("all")
+    @Autowired
     private RedisSupport<DocDefHV> redisSupport;
-    @Autowired@SuppressWarnings("all")
+    @Autowired
     private RedisSupport<List<DocDefFlowV>> redisSupportFlows;
-    @Autowired@SuppressWarnings("all")
+    @Autowired
     private DebugContextManager debugContextManager;
-    @Autowired@SuppressWarnings("all")
+    @Autowired
     private NkCustomObjectManager customObjectManager;
 
-    @Autowired@SuppressWarnings("all")
+    @Autowired
     private DocDefHMapper docDefHMapper;
-    @Autowired@SuppressWarnings("all")
+    @Autowired
     private DocDefIMapper docDefIMapper;
-    @Autowired@SuppressWarnings("all")
+    @Autowired
     private DocDefStateMapper docDefStateMapper;
-    @Autowired@SuppressWarnings("all")
+    @Autowired
     private DocDefFlowMapper docDefFlowMapper;
-    @Autowired@SuppressWarnings("all")
+    @Autowired
     private DocDefCycleMapper docDefCycleMapper;
-    @Autowired@SuppressWarnings("all")
+    @Autowired
     private DocDefIndexRuleMapper docDefIndexRuleMapper;
-    @Autowired@SuppressWarnings("all")
+    @Autowired
     private DocDefIndexCustomMapper docDefIndexCustomMapper;
-    @Autowired@SuppressWarnings("all")
+    @Autowired
     private DocDefDataSyncMapper docDefDataSyncMapper;
-    @Autowired@SuppressWarnings("all")
+    @Autowired
     private DocDefBpmMapper docDefBpmMapper;
 
     @Override
@@ -832,5 +833,38 @@ public class NkDocDefServiceImpl implements NkDocDefService {
                 .findFirst()
                 .map(item-> fetchDocDefFromDB(docType,item.getVersion()))
                 .orElse(null);
+    }
+
+    @Override
+    public void loadExport(JSONArray exports) {
+
+        JSONObject export = new JSONObject();
+        export.put("key","docTypes");
+        export.put("name","单据类型");
+        export.put("list",getAllDocTypes()
+                                .stream()
+                                .map(docDefH -> new NkCustomObjectDesc(docDefH.getDocType(),docDefH.getDocName()))
+        );
+        exports.add(export);
+    }
+
+    @Override
+    public void exportConfig(JSONObject config, JSONObject export) {
+
+        if(config.getJSONArray("docTypes")!=null){
+            export.put("docTypes",
+                    config.getJSONArray("docTypes").stream().map(docType->
+                            getDocDefLatestActive((String) docType)
+                    ).filter(Objects::nonNull).collect(Collectors.toList())
+            );
+        }
+    }
+
+    @Override
+    public void importConfig(JSONObject data) {
+        if(data.containsKey("docTypes")){
+            data.getJSONArray("docTypes").toJavaList(DocDefHV.class)
+                    .forEach(this::doActive);
+        }
     }
 }

@@ -17,6 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -29,6 +30,7 @@ import java.util.stream.Collectors;
 /**
  * Created by bean on 2020/1/3.
  */
+@Order(10)
 @Slf4j
 @Service
 public class WebMenuServiceImpl implements WebMenuService, DeployAble,InitializingBean {
@@ -138,38 +140,29 @@ public class WebMenuServiceImpl implements WebMenuService, DeployAble,Initializi
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
         redisSupport.delete(Constants.CACHE_NAV_MENUS);
     }
 
     @Override
-    public int deployOrder() {
-        return Integer.MAX_VALUE;
+    public void loadExport(JSONArray exports) {
+        JSONObject export = new JSONObject();
+        export.put("key","includeMenu");
+        export.put("name","主菜单");
+        exports.add(export);
     }
 
     @Override
-    public List<PlatformMenu> deployExport(JSONObject config) {
-        if(config.containsKey("includeMenu")&&config.getBoolean("includeMenu")){
-            return loadMenuOptions(getMenus(false));
+    public void exportConfig(JSONObject config, JSONObject export) {
+        if(config.getBooleanValue("includeMenu")){
+            export.put("menus",getMenus(false));
         }
-        return Collections.emptyList();
-    }
-    private List<PlatformMenu> loadMenuOptions(List<? extends PlatformMenu> menus){
-        return menus.stream()
-                .map(sysWebappMenuBO -> {
-                    if(StringUtils.startsWith(sysWebappMenuBO.getUrl(),"/apps/q")){
-                        return getDetail(sysWebappMenuBO.getMenuId());
-                    }
-                    if(sysWebappMenuBO instanceof WebMenuBO && !CollectionUtils.isEmpty(((WebMenuBO) sysWebappMenuBO).getChildren())){
-                        ((WebMenuBO) sysWebappMenuBO).setChildren(loadMenuOptions(((WebMenuBO) sysWebappMenuBO).getChildren()));
-                    }
-                    return sysWebappMenuBO;
-                }).collect(Collectors.toList());
     }
 
     @Override
-    public void deployImport(Object data) {
-        if(data!=null)
-            doUpdate(((JSONArray)data).toJavaList(WebMenuBO.class));
+    public void importConfig(JSONObject data) {
+        if(data.containsKey("menus")){
+            doUpdate(data.getJSONArray("menus").toJavaList(WebMenuBO.class));
+        }
     }
 }
