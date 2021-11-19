@@ -94,7 +94,7 @@ public class NkDocSearchService {
             postQueryBuilder.must(preQueryBuilder);
         }
         // 功能前置条件
-        if(StringUtils.isNotBlank(params.getPostCondition())) {
+        if(params.getPostCondition()!=null) {
             postQueryBuilder.must(
                 new LimitQueryBuilder(params.getPostCondition())
                 //QueryBuilders.wrapperQuery()

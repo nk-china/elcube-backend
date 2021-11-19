@@ -18,7 +18,7 @@ public class SearchParams {
         return params;
     }
 
-    private String postCondition;
+    private JSONObject postCondition;
     private Integer from = 0;
     private Integer rows = 10;
 

@@ -13,13 +13,16 @@ import org.apache.lucene.search.Query;
 import java.io.IOException;
 import java.util.Objects;
 
-@AllArgsConstructor
 public class LimitQueryBuilder extends AbstractQueryBuilder<LimitQueryBuilder> {
 
     private JSONObject source;
 
     public LimitQueryBuilder(String str){
         this.source = JSON.parseObject(str);
+    }
+
+    public LimitQueryBuilder(JSONObject str){
+        this.source = str;
     }
 
     @Override
