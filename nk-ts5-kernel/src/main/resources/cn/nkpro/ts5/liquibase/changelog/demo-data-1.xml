@@ -21,7 +21,7 @@
         </sql>
     </changeSet>
 
-    <changeSet id="DEMO-DATA-NK_REGISITRY$INSERT-03" author="bean" context="demo-data">
+    <changeSet id="DEMO-DATA-NK_REGISITRY$INSERT-04" author="bean" context="demo-data">
         <preConditions>
             <sqlCheck expectedResult="0">
                 SELECT COUNT(1) FROM nk_platform_registry
