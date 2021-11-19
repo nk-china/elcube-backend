@@ -274,7 +274,7 @@ public class SearchEngine extends ESContentBuilder{
     }
 
     public void deleteIndices(String indexName) throws IOException {
-        if(existsIndices(documentIndex(indexName))){
+        if(existsIndices(indexName)){
             try{
                 client.indices()
                         .delete(new DeleteIndexRequest(documentIndex(indexName)), RequestOptions.DEFAULT);
