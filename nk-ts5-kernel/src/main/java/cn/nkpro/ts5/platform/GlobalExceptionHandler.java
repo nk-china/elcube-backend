@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.platform;
 
 
-import cn.nkpro.ts5.docengine.NkComponentException;
+import cn.nkpro.ts5.co.NkComponentException;
 import cn.nkpro.ts5.exception.NkAccessDeniedException;
 import cn.nkpro.ts5.exception.NkDefineException;
 import cn.nkpro.ts5.exception.abstracts.NkCaution;

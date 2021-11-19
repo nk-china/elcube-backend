@@ -1,12 +1,11 @@
 package cn.nkpro.ts5.co.meter;
 
+import cn.nkpro.ts5.co.NkComponent;
 import cn.nkpro.ts5.co.NkCustomObject;
 
 import java.util.Map;
 
-public interface NkMeter<DT> extends NkCustomObject {
-
-    String getName();
+public interface NkMeter<DT> extends NkComponent {
 
     DT getData(Object config);
 
@@ -17,6 +16,4 @@ public interface NkMeter<DT> extends NkCustomObject {
     default int getH(){
         return 6;
     }
-
-    Map<?,?> getVueTemplate();
 }

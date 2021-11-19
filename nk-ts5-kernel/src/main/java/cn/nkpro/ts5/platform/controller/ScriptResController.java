@@ -1,14 +1,9 @@
 package cn.nkpro.ts5.platform.controller;
 
 import cn.nkpro.ts5.annotation.Keep;
-import cn.nkpro.ts5.co.NkCustomObject;
-import cn.nkpro.ts5.co.NkCustomObjectManager;
-import cn.nkpro.ts5.co.NkCustomScriptObject;
-import cn.nkpro.ts5.co.NkScriptV;
-import cn.nkpro.ts5.docengine.NkCard;
-import cn.nkpro.ts5.exception.NkSystemException;
 import cn.nkpro.ts5.annotation.NkNote;
-import cn.nkpro.ts5.co.meter.NkMeter;
+import cn.nkpro.ts5.co.*;
+import cn.nkpro.ts5.exception.NkSystemException;
 import groovy.lang.GroovyObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -38,14 +33,9 @@ public class ScriptResController {
     public Map<Object, Object> vueTemplates() {
 
         Map<Object, Object> vueMap = new HashMap<>();
-        customObjectManager.getCustomObjects(NkCard.class)
+        customObjectManager.getCustomObjects(NkComponent.class)
                 .values()
                 .forEach(nkCard -> vueMap.putAll(nkCard.getVueTemplate()));
-
-        customObjectManager.getCustomObjects(NkMeter.class)
-                .values()
-                .forEach(nkMeter -> vueMap.putAll(nkMeter.getVueTemplate()));
-
 
         return vueMap;
     }
