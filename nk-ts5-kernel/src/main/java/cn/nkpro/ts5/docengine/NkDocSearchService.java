@@ -1,11 +1,11 @@
 package cn.nkpro.ts5.docengine;
 
 import cn.nkpro.ts5.data.elasticearch.*;
-import cn.nkpro.ts5.task.model.BpmTaskES;
+import cn.nkpro.ts5.docengine.model.SearchParams;
 import cn.nkpro.ts5.docengine.model.es.DocExtES;
 import cn.nkpro.ts5.docengine.model.es.DocHES;
 import cn.nkpro.ts5.docengine.service.NkDocPermService;
-import com.alibaba.fastjson.JSONArray;
+import cn.nkpro.ts5.task.model.BpmTaskES;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.action.search.SearchResponse;
@@ -25,6 +25,8 @@ import org.elasticsearch.search.sort.SortOrder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -72,10 +74,18 @@ public class NkDocSearchService {
         return searchEngine.exists(DocHES.class,sourceBuilder);
     }
 
+
+    public ESPageList<JSONObject> queryList(
+            QueryBuilder preQueryBuilder,
+            SearchParams params
+    ){
+        return this.queryList("document", preQueryBuilder, params);
+    }
+
     public ESPageList<JSONObject> queryList(
             String indexName,
             QueryBuilder preQueryBuilder,
-            JSONObject params
+            SearchParams params
     ){
 
         BoolQueryBuilder postQueryBuilder = QueryBuilders.boolQuery();
@@ -84,9 +94,9 @@ public class NkDocSearchService {
             postQueryBuilder.must(preQueryBuilder);
         }
         // 功能前置条件
-        if(params.containsKey("postCondition")) {
+        if(StringUtils.isNotBlank(params.getPostCondition())) {
             postQueryBuilder.must(
-                new LimitQueryBuilder(params.getJSONObject("postCondition"))
+                new LimitQueryBuilder(params.getPostCondition())
                 //QueryBuilders.wrapperQuery()
             );
         }
@@ -97,16 +107,16 @@ public class NkDocSearchService {
 
         // 构造检索语句
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder()
-                .from(params.getInteger("from"))
-                .size(params.getInteger("rows"));
+                .from(params.getFrom())
+                .size(params.getRows());
         // 过滤权限
         if(!postQueryBuilder.must().isEmpty())
             sourceBuilder.postFilter(postQueryBuilder);
 
         BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
 
-        if(params.containsKey("conditions")){
-            JSONObject filter = params.getJSONObject("conditions");
+        if(params.getConditions()!=null){
+            JSONObject filter = params.getConditions();
             if(filter!=null){
                 filter.forEach((k,v)-> boolQueryBuilder.must(new LimitQueryBuilder(filter.getJSONObject(k))));
             }
@@ -116,22 +126,22 @@ public class NkDocSearchService {
             sourceBuilder.query(boolQueryBuilder);
 
         // 高亮
-        JSONArray highlightField = params.getJSONArray("_highlight");
+        List<String> highlightField = params.getHighlight();
         if(highlightField!=null && !highlightField.isEmpty()){
             HighlightBuilder highlightBuilder = new HighlightBuilder();
             highlightBuilder.preTags("<span class='highlight'>");
             highlightBuilder.postTags("</span>");
-            for(Object field : highlightField){
-                highlightBuilder.field(new HighlightBuilder.Field((String) field));
+            for(String field : highlightField){
+                highlightBuilder.field(new HighlightBuilder.Field(field));
             }
             sourceBuilder.highlighter(highlightBuilder);
         }
 
         // 排序
-        if(StringUtils.isNotBlank(params.getString("orderField"))){
+        if(StringUtils.isNotBlank(params.getOrderField())){
             sourceBuilder.sort(SortBuilders
-                .fieldSort(params.getString("orderField"))
-                .order(SortOrder.fromString(StringUtils.defaultIfBlank(params.getString("order"),"desc")))
+                .fieldSort(params.getOrderField())
+                .order(SortOrder.fromString(StringUtils.defaultIfBlank(params.getOrder(),"desc")))
             );
             sourceBuilder.sort(SortBuilders.scoreSort());
         }else{
@@ -140,25 +150,23 @@ public class NkDocSearchService {
         }
 
         // 过滤字段
-        if(params.containsKey("_source")){
-            @SuppressWarnings("all")
-            String[] fields = params.getJSONArray("_source").toArray(new String[0]);
-            sourceBuilder.fetchSource(fields,null);
+        if(params.getSource()!=null){
+            sourceBuilder.fetchSource(params.getSource(),null);
         }
 
         // 汇总数据
-        if(params.containsKey("$aggs")) {
+        if(params.getAggs()!=null) {
             FilterAggregationBuilder $aggs = AggregationBuilders
                     .filter("$aggs", postQueryBuilder);
-            params.getJSONArray("$aggs")
-                    .forEach(agg ->
-                            $aggs.subAggregation(
-                                    AggregationBuilders.terms((String) agg)
-                                            .field((String) agg)
-                                            .order(BucketOrder.key(true))
-                                            .size(100)
-                            )
-                    );
+            params.getAggs()
+                .forEach(agg ->
+                    $aggs.subAggregation(
+                        AggregationBuilders.terms(agg)
+                            .field(agg)
+                            .order(BucketOrder.key(true))
+                            .size(100)
+                    )
+                );
             sourceBuilder.aggregation($aggs);
         }
 

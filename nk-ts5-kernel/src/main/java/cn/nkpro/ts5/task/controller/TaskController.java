@@ -4,6 +4,7 @@ import cn.nkpro.ts5.annotation.NkNote;
 import cn.nkpro.ts5.data.elasticearch.ESPageList;
 import cn.nkpro.ts5.data.elasticearch.SearchEngine;
 import cn.nkpro.ts5.docengine.NkDocSearchService;
+import cn.nkpro.ts5.docengine.model.SearchParams;
 import cn.nkpro.ts5.task.model.BpmTaskES;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
@@ -29,9 +30,9 @@ public class TaskController {
 
     @NkNote("1、拉取交易列表数据")
     @RequestMapping(value = "/tasks",method = RequestMethod.POST)
-    public ESPageList<JSONObject> list(@RequestBody JSONObject params) {
+    public ESPageList<JSONObject> list(@RequestBody SearchParams params) {
 
-        params.put("orderField",StringUtils.defaultIfBlank(params.getString("orderField"),"updatedTime"));
+        params.setOrderField(StringUtils.defaultIfBlank(params.getOrderField(),"updatedTime"));
         return searchService.queryList(
                 searchEngine.parseDocument(BpmTaskES.class),
                 null,//QueryBuilders.termQuery("assignee",SecurityUtilz.getUser().getId())

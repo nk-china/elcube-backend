@@ -9,7 +9,7 @@ nk:
   component-base-packages:
     - cn.nkpro.ts5.cards
     - cn.nkpro.groovy
-  component-disable-online-editing: false
+  component-disable-online-editing: true
   component-reload-class-path: true
   clickhouse:
     driver-class-name: ru.yandex.clickhouse.ClickHouseDriver
@@ -38,4 +38,5 @@ spring:
   liquibase:
     contexts: default,demo-data
     drop-first: false
+    enabled: false
 

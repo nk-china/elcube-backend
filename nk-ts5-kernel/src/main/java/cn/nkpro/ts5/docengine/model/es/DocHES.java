@@ -22,6 +22,9 @@ public class DocHES extends AbstractBaseES {
     @ESField(type= ESFieldType.Keyword)
     private String docId;
 
+    @ESField(type= ESFieldType.Keyword)
+    private String refObjectId;
+
     @ESField(type= ESFieldType.Text,analyzer = ESAnalyzerType.ik_max_word)
     private String docDesc;
 

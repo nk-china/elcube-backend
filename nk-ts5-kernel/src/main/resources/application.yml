@@ -81,7 +81,7 @@ spring:
       connection-timeout: 1s
       read-timeout: 30s
   liquibase:
-    enabled: true
+    enabled: false
     change-log: classpath:cn/nkpro/ts5/liquibase/master.xml
     database-change-log-table: SYS_DATABASECHANGEDLOG
     database-change-log-lock-table: SYS_DATABASECHANGEDLOGLOCK

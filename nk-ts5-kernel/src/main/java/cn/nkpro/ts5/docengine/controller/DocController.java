@@ -7,6 +7,7 @@ import cn.nkpro.ts5.docengine.gen.DocRecord;
 import cn.nkpro.ts5.docengine.model.DocDefFlowV;
 import cn.nkpro.ts5.docengine.model.DocHHistory;
 import cn.nkpro.ts5.docengine.model.DocHV;
+import cn.nkpro.ts5.docengine.model.SearchParams;
 import cn.nkpro.ts5.docengine.service.NkDocDefService;
 import cn.nkpro.ts5.docengine.service.NkDocEngineFrontService;
 import cn.nkpro.ts5.docengine.service.NkDocHistoryService;
@@ -44,7 +45,7 @@ public class DocController {
     
     @NkNote("1.拉取交易列表数据")
     @RequestMapping(value = "/list/{index}",method = RequestMethod.POST)
-    public ESPageList<JSONObject> list(@RequestBody JSONObject params, @PathVariable String index) {
+    public ESPageList<JSONObject> list(@RequestBody SearchParams params, @PathVariable String index) {
         return searchService.queryList(index, null, params);
     }
 

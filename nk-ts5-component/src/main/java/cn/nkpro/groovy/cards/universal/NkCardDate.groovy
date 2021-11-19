@@ -1,4 +1,4 @@
-package cn.nkpro.groovy.cards.simple
+package cn.nkpro.groovy.cards.universal
 
 import cn.nkpro.ts5.annotation.NkNote
 import cn.nkpro.ts5.docengine.NkAbstractCard
