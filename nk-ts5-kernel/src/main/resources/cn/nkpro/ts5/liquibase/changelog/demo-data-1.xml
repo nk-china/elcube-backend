@@ -22,7 +22,7 @@
     </changeSet>
 
     <changeSet id="DEMO-DATA-NK_REGISITRY$INSERT-04" author="bean" context="demo-data">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(1) FROM nk_platform_registry
             </sqlCheck>
