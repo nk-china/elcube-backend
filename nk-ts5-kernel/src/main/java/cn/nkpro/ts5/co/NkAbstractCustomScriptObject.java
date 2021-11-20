@@ -70,7 +70,7 @@ public abstract class NkAbstractCustomScriptObject implements NkCustomScriptObje
         return this.scriptDef;
     }
 
-    protected NkScriptV loadScriptFromClassPath() {
+    private NkScriptV loadScriptFromClassPath() {
 
         String className = getClass().getSimpleName();
 

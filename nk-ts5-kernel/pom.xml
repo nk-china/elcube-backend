@@ -110,12 +110,6 @@
             <optional>true</optional>
         </dependency>
 
-        <!--        <dependency>-->
-        <!--            <groupId>org.quartz-scheduler</groupId>-->
-        <!--            <artifactId>quartz</artifactId>-->
-        <!--            <version>2.2.1</version>-->
-        <!--        </dependency>-->
-
         <!-- 数据库类库 mybatis -->
         <dependency>
             <groupId>org.mybatis.spring.boot</groupId>
@@ -185,6 +179,12 @@
             <artifactId>commons-math3</artifactId>
             <version>3.6.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>4.1</version>
+        </dependency>
+
 
 
         <!-- 其他工具包 -->
@@ -283,39 +283,11 @@
             <version>0.1.4</version>
         </dependency>
 
-        <!--        <dependency>-->
-        <!--            <groupId>me.moocar</groupId>-->
-        <!--            <artifactId>logback-gelf</artifactId>-->
-        <!--            <version>0.3</version>-->
-        <!--        </dependency>-->
         <dependency>
             <groupId>de.siegmar</groupId>
             <artifactId>logback-gelf</artifactId>
             <version>2.0.0</version>
         </dependency>
-
-        <!-- Word 文件模版工具 -->
-        <dependency>
-            <groupId>fr.opensagres.xdocreport</groupId>
-            <artifactId>fr.opensagres.xdocreport.document.docx</artifactId>
-            <version>2.0.2</version>
-        </dependency>
-        <dependency>
-            <groupId>fr.opensagres.xdocreport</groupId>
-            <artifactId>fr.opensagres.xdocreport.template.velocity</artifactId>
-            <version>2.0.2</version>
-        </dependency>
-        <dependency>
-            <groupId>fr.opensagres.xdocreport</groupId>
-            <artifactId>fr.opensagres.xdocreport.converter.docx.xwpf</artifactId>
-            <version>2.0.2</version>
-        </dependency>
-
-        <!--        <dependency>-->
-        <!--            <groupId>fr.opensagres.xdocreport</groupId>-->
-        <!--            <artifactId>org.apache.poi.xwpf.converter.pdf</artifactId>-->
-        <!--            <version>2.0.2</version>-->
-        <!--        </dependency>-->
 
         <dependency>
             <groupId>com.github.axet</groupId>
@@ -323,34 +295,7 @@
             <version>0.0.9</version>
         </dependency>
 
-
-        <dependency>
-            <groupId>com.apifan.common</groupId>
-            <artifactId>common-random</artifactId>
-            <version>1.0.7</version>
-        </dependency>
-
     </dependencies>
-
-
-    <profiles>
-        <profile>
-            <id>ts5-proguard-local</id>
-            <properties>
-                <rt-lib>/Library/Java/JavaVirtualMachines/jdk-11.0.8.jdk/Contents/Home/lib/jrt-fs.jar</rt-lib>
-            </properties>
-        </profile>
-        <profile>
-            <id>ts5-proguard-rt</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
-            <properties>
-                <!--suppress UnresolvedMavenProperty -->
-                <rt-lib>${JAVA_HOME}/jre/lib/rt.jar</rt-lib>
-            </properties>
-        </profile>
-    </profiles>
 
     <build>
         <defaultGoal>clean compile package</defaultGoal>
@@ -375,70 +320,6 @@
                     </excludes>
                 </configuration>
             </plugin>
-<!--            <plugin>-->
-<!--                <groupId>com.github.wvengen</groupId>-->
-<!--                <artifactId>proguard-maven-plugin</artifactId>-->
-<!--                <version>2.4.0</version>-->
-<!--                <executions>-->
-<!--                    <execution>-->
-<!--                        <phase>package</phase>-->
-<!--                        <goals>-->
-<!--                            <goal>proguard</goal>-->
-<!--                        </goals>-->
-<!--                    </execution>-->
-<!--                </executions>-->
-<!--                <configuration>-->
-<!--                    <injar>${project.build.finalName}.jar</injar>-->
-<!--                    <outjar>${project.build.finalName}.jar</outjar>-->
-<!--                    <obfuscate>true</obfuscate>-->
-<!--                    <options>-->
-<!--                        <option>-dontshrink</option>&lt;!&ndash;  ##默认是开启的，这里关闭shrink，即不删除没有使用的类/成员&ndash;&gt;-->
-<!--                        <option>-keepdirectories</option>-->
-<!--                        <option>-dontoptimize</option>&lt;!&ndash; ##默认是开启的，这里关闭字节码级别的优化&ndash;&gt;-->
-<!--                        <option>-useuniqueclassmembernames</option>-->
-<!--                        <option>-adaptclassstrings </option>-->
-<!--                        <option>-ignorewarnings</option>-->
-<!--                        <option>-keepparameternames</option>-->
-<!--                        &lt;!&ndash;<option>-dontusemixedcaseclassnames</option>&ndash;&gt; 混淆时不生成大小写混合的类名，默认是可以大小写混合-->
-<!--                        <option>-keepattributes Exceptions,InnerClasses,Signature,Deprecated,SourceFile,LineNumberTable,*Annotation*,EnclosingMethod</option>-->
-<!--                        <option>-keepnames interface **</option>-->
-<!--                        <option>-keep class !cn.nkpro.ts5.** { *; }</option>-->
-<!--                        <option>-keep enum * { *; }</option>-->
-<!--                        <option>-keep interface * extends * { *; }</option>-->
-<!--                        <option>-keepnames abstract class cn.nkpro.ts5.** { *; }</option>-->
-<!--                        <option>-keepnames class cn.nkpro.ts5.** extends cn.nkpro.ts5.exception.abstracts.NkCaution { *; }</option>-->
-<!--                        <option>-keepnames class cn.nkpro.ts5.** extends cn.nkpro.ts5.exception.abstracts.NkRuntimeException { *; }</option>-->
-<!--                        <option>-keepnames class cn.nkpro.ts5.**.gen.** { *; }</option>-->
-<!--                        <option>-keepnames class cn.nkpro.ts5.**.bo.** { *; }</option>-->
-<!--                        <option>-keepnames class cn.nkpro.ts5.**.model.** { *; }</option>-->
-<!--                        <option>-keepnames class cn.nkpro.ts5.config.mybatis.pagination.dialect.** { public *; }</option>-->
-<!--                        <option>-keepnames @cn.nkpro.ts5.annotation.Keep class cn.nkpro.ts5.** { *; }</option> &lt;!&ndash; @Keep注解 &ndash;&gt;-->
-<!--                        <option>-keep @org.springframework.stereotype.Controller class cn.nkpro.ts5.** { *; }</option>-->
-<!--                        <option>-keep @org.springframework.web.bind.annotation.RestController class cn.nkpro.ts5.** { *; }</option>-->
-
-<!--                        <option>-keepnames @org.springframework.context.annotation.Configuration class cn.nkpro.ts5.** { *; }</option>-->
-<!--                        <option>-keepclassmembernames @org.springframework.boot.context.properties.ConfigurationProperties class cn.nkpro.ts5.** { public *; }</option>-->
-
-<!--                        &lt;!&ndash;<option>-keep class ** { *; }</option>&ndash;&gt;-->
-<!--                        &lt;!&ndash;<option>-keep class cn.nkpro.ts5.** { *; }</option>&ndash;&gt;-->
-<!--                        &lt;!&ndash;<option>-keepnames @org.springframework.stereotype.Component class cn.nkpro.ts5.** { public *; }</option>&ndash;&gt;-->
-<!--                        &lt;!&ndash;<option>-keepnames @org.springframework.stereotype.Service class cn.nkpro.ts5.** { public *; }</option>&ndash;&gt;-->
-
-<!--                    </options>-->
-<!--                    <libs>-->
-<!--                        &lt;!&ndash;suppress UnresolvedMavenProperty &ndash;&gt;-->
-<!--                        <lib>${rt-lib}</lib>-->
-<!--                    </libs>-->
-<!--                    <proguardVersion>6.2.2</proguardVersion>-->
-<!--                </configuration>-->
-<!--                <dependencies>-->
-<!--                    <dependency>-->
-<!--                        <groupId>net.sf.proguard</groupId>-->
-<!--                        <artifactId>proguard-base</artifactId>-->
-<!--                        <version>6.2.2</version>-->
-<!--                    </dependency>-->
-<!--                </dependencies>-->
-<!--            </plugin>-->
         </plugins>
     </build>
 
