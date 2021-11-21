@@ -47,29 +47,35 @@ public class NkDynamicForm extends NkAbstractCard<Map, NkDynamicFormDef> {
 
     @Override
     public Map afterCreate(DocHV doc, DocHV preDoc, Map data, DocDefIV defIV, NkDynamicFormDef d) {
-        this.execSpEL(EasySingle.from(data), doc, d.getItems(), defIV.getCardKey(), true);
+        this.execSpEL(EasySingle.from(data), doc, d.getItems(), defIV.getCardKey(), true, false);
         return super.afterCreate(doc, preDoc, data, defIV, d);
     }
 
     @Override
     public Map afterGetData(DocHV doc, Map data, DocDefIV defIV, NkDynamicFormDef d) {
-        this.execSpEL(EasySingle.from(data), doc, d.getItems(), defIV.getCardKey(), false);
+        this.execSpEL(EasySingle.from(data), doc, d.getItems(), defIV.getCardKey(), false, false);
         return super.afterGetData(doc, data, defIV, d);
     }
 
     @Override
     public Map calculate(DocHV doc, Map data, DocDefIV defIV, NkDynamicFormDef d, boolean isTrigger, Object options) {
-        this.execSpEL(EasySingle.from(data), doc, d.getItems(), defIV.getCardKey(), false);
+        this.execSpEL(EasySingle.from(data), doc, d.getItems(), defIV.getCardKey(), false, true);
         return super.calculate(doc, data, defIV, d, isTrigger, options);
     }
 
-    private void execSpEL(EasySingle data, DocHV doc, List<NkDynamicFormDefI> fields, String cardKey, boolean isNewCreate){
+    private void execSpEL(EasySingle data, DocHV doc, List<NkDynamicFormDefI> fields, String cardKey, boolean isNewCreate, boolean calculate){
 
         EvaluationContext context = spELManager.createContext(doc);
 
         fields.stream()
                 .sorted(Comparator.comparing(NkDynamicFormDefI::getCalcOrder))
                 .filter(field-> !StringUtils.equals(field.getInputType(),"divider"))
+                .peek( field -> {
+                    if(calculate){
+                        NkField nkField = customObjectManager.getCustomObject(field.getInputType(), NkField.class);
+                        nkField.beforeCalculate(field, context, doc, data);
+                    }
+                })
                 .peek( field -> {
 
                     if(StringUtils.isNotBlank(field.getSpELControl())){
@@ -131,12 +137,11 @@ public class NkDynamicForm extends NkAbstractCard<Map, NkDynamicFormDef> {
                     context.setVariable(field.getKey(), data.get(field.getKey()));
                 }).forEach(field->{
                     NkField nkField = customObjectManager.getCustomObject(field.getInputType(), NkField.class);
+                    nkField.processOptions(field, context, doc, data);
 
-                    Object oldVal = data.get(field.getKey());
-                    Object newVal = nkField.process(data.get(field.getKey()),field.getInputOptions(), context);
-
-                    if(oldVal!=newVal)
-                        data.set(field.getKey(), newVal);
+                    if(calculate){
+                        nkField.afterCalculate(field, context, doc, data);
+                    }
                 });
     }
 

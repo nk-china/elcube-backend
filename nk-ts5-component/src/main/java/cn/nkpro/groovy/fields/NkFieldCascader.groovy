@@ -3,6 +3,9 @@ package cn.nkpro.groovy.fields
 import cn.nkpro.ts5.annotation.NkNote
 import cn.nkpro.ts5.co.spel.NkSpELManager
 import cn.nkpro.ts5.docengine.NkAbstractField
+import cn.nkpro.ts5.docengine.cards.NkDynamicFormDefI
+import cn.nkpro.ts5.docengine.model.DocHV
+import cn.nkpro.ts5.docengine.model.easy.EasySingle
 import com.alibaba.fastjson.JSON
 import com.alibaba.fastjson.JSONArray
 import org.springframework.beans.factory.annotation.Autowired
@@ -17,15 +20,15 @@ class NkFieldCascader extends NkAbstractField {
     private NkSpELManager spELManager
 
     @Override
-    Object process(Object value, Map<String, Object> inputOptions, EvaluationContext context) {
+    void processOptions(NkDynamicFormDefI field, EvaluationContext context, DocHV doc, EasySingle card) {
 
-        def options = inputOptions.get("options")
+        def options = field.getInputOptions().get("options")
 
         if(options){
 
             JSONArray array = JSON.parseArray(spELManager.convert(options as String, context))
 
-            inputOptions.put( "optionsObject",array)
+            field.getInputOptions().put( "optionsObject",array)
 
             // todo 递归判断值是否合法
 //            def a = array.stream()
@@ -35,7 +38,5 @@ class NkFieldCascader extends NkAbstractField {
 //                value = null
 //            }
         }
-
-        return super.process(value, inputOptions, context)
     }
 }
