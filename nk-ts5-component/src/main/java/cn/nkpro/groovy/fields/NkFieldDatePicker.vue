@@ -1,6 +1,6 @@
 <template>
     <span v-if="!editMode">{{value | nkDatetime}}</span>
-    <a-date-picker v-else v-model="val" @change="change"></a-date-picker>
+    <a-date-picker size="small" v-else v-model="val" @change="change"></a-date-picker>
 </template>
 
 <script>

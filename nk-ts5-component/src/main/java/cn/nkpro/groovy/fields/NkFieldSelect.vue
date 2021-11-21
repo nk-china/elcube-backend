@@ -1,9 +1,10 @@
 <template>
-    <span v-if="!editMode">{{value | nkFromList(inputOptions.optionsJSON)}}</span>
-    <a-select v-else
+    <span v-if="!editMode">{{value | nkFromList(inputOptions.optionsObject)}}</span>
+    <a-select size="small"
+              v-else
               v-model="val"
               :mode="inputOptions.selectMode||'default'"
-              :options="inputOptions.optionsJSON"
+              :options="inputOptions.optionsObject"
               @change="change">
     </a-select>
 </template>

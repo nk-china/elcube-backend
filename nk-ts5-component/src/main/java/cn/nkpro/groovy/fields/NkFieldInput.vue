@@ -1,8 +1,6 @@
 <template>
-    <div>
-        <a-input v-if="editMode" v-model="val" @change="change" @blur="blur"></a-input>
-        <span v-else>{{value}}</span>
-    </div>
+    <span v-if="!editMode">{{value}}</span>
+    <a-input size="small" v-else v-model="val" @change="change" @blur="blur"></a-input>
 </template>
 
 <script>
@@ -11,7 +9,7 @@ export default {
         value: {},
         editMode: {
             type: Boolean,
-            default:true
+            default:false
         }
     },
     computed:{

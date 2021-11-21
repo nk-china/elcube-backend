@@ -1,6 +1,6 @@
 <template>
     <span v-if="!editMode">{{value}}</span>
-    <a-input-number v-else  v-model="val" @change="change" @blur="blur"></a-input-number>
+    <a-input-number size="small" v-else  v-model="val" @change="change" @blur="blur"></a-input-number>
 </template>
 
 <script>

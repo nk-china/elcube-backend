@@ -26,7 +26,7 @@ class NkFieldSelect extends NkAbstractField {
 
             JSONArray array = JSON.parseArray(spELManager.convert(options as String, context))
 
-            inputOptions.put( "optionsJSON",array)
+            inputOptions.put( "optionsObject",array)
 
             def a = array.stream()
                     .find {i-> Objects.equals(value, i["value"])}
