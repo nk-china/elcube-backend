@@ -4,7 +4,7 @@ import cn.nkpro.ts5.annotation.NkNote
 import cn.nkpro.ts5.docengine.NkAbstractField
 import org.springframework.stereotype.Component
 
-@NkNote("日期选择框")
+@NkNote("日期")
 @Component("NkFieldDatePicker")
 class NkFieldDatePicker extends NkAbstractField {
 

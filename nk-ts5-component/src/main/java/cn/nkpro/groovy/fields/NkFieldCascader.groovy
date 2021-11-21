@@ -5,14 +5,13 @@ import cn.nkpro.ts5.co.spel.NkSpELManager
 import cn.nkpro.ts5.docengine.NkAbstractField
 import com.alibaba.fastjson.JSON
 import com.alibaba.fastjson.JSONArray
-import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.expression.EvaluationContext
 import org.springframework.stereotype.Component
 
-@NkNote("选择")
-@Component("NkFieldSelect")
-class NkFieldSelect extends NkAbstractField {
+@NkNote("级联选择")
+@Component("NkFieldCascader")
+class NkFieldCascader extends NkAbstractField {
 
     @Autowired
     private NkSpELManager spELManager
@@ -28,12 +27,13 @@ class NkFieldSelect extends NkAbstractField {
 
             inputOptions.put( "optionsObject",array)
 
-            def a = array.stream()
-                    .find {i-> Objects.equals(value, i["value"])}
-
-            if(!a){
-                value = null
-            }
+            // todo 递归判断值是否合法
+//            def a = array.stream()
+//                    .find {i-> Objects.equals(value, i["value"])}
+//
+//            if(!a){
+//                value = null
+//            }
         }
 
         return super.process(value, inputOptions, context)

@@ -4,7 +4,7 @@ import cn.nkpro.ts5.annotation.NkNote;
 import cn.nkpro.ts5.docengine.NkAbstractField;
 import org.springframework.stereotype.Component;
 
-@NkNote("文本输入框")
+@NkNote("文本")
 @Component("NkFieldInput")
 class NkFieldInput extends NkAbstractField {
 
