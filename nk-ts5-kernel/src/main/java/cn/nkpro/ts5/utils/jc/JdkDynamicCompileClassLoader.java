@@ -1,19 +1,18 @@
 package cn.nkpro.ts5.utils.jc;
 
-import com.google.common.collect.Maps;
-
 import javax.tools.JavaFileObject;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 public class JdkDynamicCompileClassLoader extends ClassLoader {
 
     private static final String CLASS_EXTENSION = ".class";
 
-    private final Map<String, JavaFileObject> javaFileObjectMap = Maps.newConcurrentMap();
+    private final Map<String, JavaFileObject> javaFileObjectMap = new HashMap<>();
 
     public JdkDynamicCompileClassLoader(ClassLoader parentClassLoader) {
         super(parentClassLoader);

@@ -1,20 +1,15 @@
 package cn.nkpro.ts5.utils.jc;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-
 import javax.tools.*;
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class JdkDynamicCompileJavaFileManager extends ForwardingJavaFileManager<JavaFileManager> {
 
     private final JdkDynamicCompileClassLoader classLoader;
-    private final Map<URI, JavaFileObject> javaFileObjectMap = Maps.newConcurrentMap();
+    private final Map<URI, JavaFileObject> javaFileObjectMap = new HashMap<>();
 
     public JdkDynamicCompileJavaFileManager(JavaFileManager fileManager, JdkDynamicCompileClassLoader classLoader) {
         super(fileManager);
@@ -67,7 +62,7 @@ public class JdkDynamicCompileJavaFileManager extends ForwardingJavaFileManager<
     @Override
     public Iterable<JavaFileObject> list(Location location, String packageName, Set<JavaFileObject.Kind> kinds, boolean recurse) throws IOException {
         Iterable<JavaFileObject> superResult = super.list(location, packageName, kinds, recurse);
-        List<JavaFileObject> result = Lists.newArrayList();
+        List<JavaFileObject> result = new ArrayList<>();
         // 这里要区分编译的Location以及编译的Kind
         if (location == StandardLocation.CLASS_PATH && kinds.contains(JavaFileObject.Kind.CLASS)) {
             // .class文件以及classPath下
