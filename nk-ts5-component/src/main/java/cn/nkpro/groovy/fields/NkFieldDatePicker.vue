@@ -1,6 +1,6 @@
 <template>
     <span v-if="!editMode">{{value | nkDatetime}}</span>
-    <a-date-picker v-else :defaultValue="value?moment(value*1000):undefined" @change="change"></a-date-picker>
+    <a-date-picker v-else v-model="val" @change="change"></a-date-picker>
 </template>
 
 <script>
@@ -10,11 +10,21 @@
             value: Number,
             editMode: Boolean
         },
+        computed:{
+            val:{
+                get(){
+                    return this.value?moment(this.value*1000):undefined;
+                },
+                set(value){
+                    value = value && value.startOf('day').unix();
+                    this.$emit('input',value);
+                }
+            }
+        },
         methods:{
             moment,
             change(value){
-                value = value && value.startOf('day').unix();
-                this.$emit('input',value);
+                this.$emit('change',value);
             }
         }
     }

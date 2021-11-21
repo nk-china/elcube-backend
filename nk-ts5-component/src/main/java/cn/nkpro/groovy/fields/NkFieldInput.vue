@@ -1,22 +1,34 @@
 <template>
-    <span v-if="!editMode">{{value}}</span>
-    <a-input v-else :defaultValue="value" v-model="val" @change="change"></a-input>
+    <div>
+        <a-input v-if="editMode" v-model="val" @change="change" @blur="blur"></a-input>
+        <span v-else>{{value}}</span>
+    </div>
 </template>
 
 <script>
 export default {
     props:{
         value: {},
-        editMode: Boolean
+        editMode: {
+            type: Boolean,
+            default:true
+        }
     },
-    data(){
-        return {
-            val:undefined
+    computed:{
+        val:{
+            get(){
+                return this.value;
+            },
+            set(value){
+                this.$emit('input',value);
+            }
         }
     },
     methods:{
         change(e){
-            this.$emit('input',this.val);
+            //this.$emit('change',e);
+        },
+        blur(e){
             this.$emit('change',e);
         }
     }

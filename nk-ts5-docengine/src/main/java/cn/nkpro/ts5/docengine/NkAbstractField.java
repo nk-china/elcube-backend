@@ -7,6 +7,7 @@ import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.expression.EvaluationContext;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -47,7 +48,7 @@ public abstract class NkAbstractField extends NkAbstractCustomScriptObject imple
     }
 
     @Override
-    public void afterGetDef(Map<String, Object> inputOptions) {
-
+    public Object process(Object value, Map<String, Object> inputOptions, EvaluationContext context) {
+        return value;
     }
 }

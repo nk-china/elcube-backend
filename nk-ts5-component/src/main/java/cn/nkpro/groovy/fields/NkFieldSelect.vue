@@ -1,8 +1,9 @@
 <template>
-    <span v-if="!editMode">{{value}}</span>
+    <span v-if="!editMode">{{value | nkFromList(inputOptions.optionsJSON)}}</span>
     <a-select v-else
-              :defaultValue="value"
-              :options="inputOptions.options"
+              v-model="val"
+              :mode="inputOptions.selectMode||'default'"
+              :options="inputOptions.optionsJSON"
               @change="change">
     </a-select>
 </template>
@@ -19,12 +20,18 @@ export default {
             }
         }
     },
-    data(){
-        return {}
+    computed:{
+        val:{
+            get(){
+                return this.value;
+            },
+            set(value){
+                this.$emit('input',value);
+            }
+        }
     },
     methods:{
         change(e){
-            this.$emit('input',e);
             this.$emit('change',e);
         }
     }

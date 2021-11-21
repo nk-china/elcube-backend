@@ -10,14 +10,18 @@ public class NkDynamicFormDefI {
     private String key;
     private String name;
     private String inputType;
-    private String calcTrigger;
-    private Integer calcOrder;
     private Integer col;
-    private Boolean required;
+    private Boolean calcTrigger;
+
     private Integer control;
     private String spELControl;
-    private String spELContent;
+
+    private Integer calcOrder;
     private String[] spELTriggers;
+    private String spELContent;
+
+    private Boolean required;
+    private String message;
 
     private Map<String,Object> inputOptions;
 }
