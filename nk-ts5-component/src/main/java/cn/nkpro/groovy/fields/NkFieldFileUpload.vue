@@ -30,12 +30,12 @@
                         上传
                     </div>
                 </div>
-                <div v-else-if="fileList.length === 0" style="margin-left: 10px;">
+                <div v-else-if="fileList.length === 0 && progressStatus!=='active'" style="margin-left: 10px;">
                     <a>上传</a>
                 </div>
             </a-upload>
         </div>
-        <a-progress v-if="progressPercent!==undefined" :percent="progressPercent" :status="progressStatus" size="small" />
+        <a-progress v-if="editMode && progressPercent!==undefined" :percent="progressPercent" :status="progressStatus" size="small" />
         <a-modal :visible="previewVisible" :footer="null" @cancel="previewVisible = false">
             <img alt="example" style="width: 100%" :src="previewImage" />
         </a-modal>
@@ -137,11 +137,9 @@ export default {
                 case 'down':
                 case 'done':
                     //为了演示效果，增加延时
-                    setTimeout(()=>{
-                        this.progressStatus  = 'success';
-                        this.$message.success(`文件 ${info.file.name} 已上传`);
-                        this.fileUploaded(info);
-                    },3000);
+                    this.progressStatus  = 'success';
+                    this.$message.success(`文件 ${info.file.name} 已上传`);
+                    this.fileUploaded(info);
                     break;
                 case 'removed':
                     this.fileList = info.fileList;
@@ -169,12 +167,17 @@ export default {
                 url = res.data;
             }
 
-            if (this.inputOptions.listType === 'picture-card') {
-                this.previewImage = url;
-                this.previewVisible = true;
-            } else {
-                this.$refs.link.href=url;
-                this.$refs.link.click();
+            if(url.length<1024*1024){
+                if (this.inputOptions.listType === 'picture-card') {
+                    this.previewImage = url;
+                    this.previewVisible = true;
+                } else {
+                    this.$refs.link.href=url;
+                    this.$refs.link.click();
+                }
+            }else{
+                console.warn("文件URL过大，不能预览",url.length)
+                this.$message.warn("文件URL过大，不能预览");
             }
         },
         change(e){
