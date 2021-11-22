@@ -50,11 +50,6 @@ public abstract class NkAbstractCard<DT,DDT> extends NkAbstractCustomScriptObjec
     }
 
     @Override
-    public String desc() {
-        return beanName + " | " + cardName;
-    }
-
-    @Override
     public String getDataComponentName() {
         if(StringUtils.isNotBlank(scriptDef.getVueMain())){
             return beanName;

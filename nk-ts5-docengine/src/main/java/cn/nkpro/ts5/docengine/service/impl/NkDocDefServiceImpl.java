@@ -843,7 +843,7 @@ public class NkDocDefServiceImpl implements NkDocDefService, DeployAble {
         export.put("name","单据类型");
         export.put("list",getAllDocTypes()
                                 .stream()
-                                .map(docDefH -> new NkCustomObjectDesc(docDefH.getDocType(),docDefH.getDocName()))
+                                .map(docDefH -> new NkCustomObjectDesc(docDefH.getDocType(),docDefH.getDocType() + " | " + docDefH.getDocName()))
         );
         exports.add(export);
     }

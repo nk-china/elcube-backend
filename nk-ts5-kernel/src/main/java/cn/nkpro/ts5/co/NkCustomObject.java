@@ -17,7 +17,7 @@ public interface NkCustomObject {
 
         NkNote nkNote = this.getClass().getAnnotation(NkNote.class);
         if(nkNote!=null)
-            return nkNote.value();
+            return getBeanName() + " | " + nkNote.value();
 
         return getBeanName();
     }

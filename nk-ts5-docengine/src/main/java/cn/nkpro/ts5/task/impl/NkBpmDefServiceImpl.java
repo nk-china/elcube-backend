@@ -136,7 +136,7 @@ public class NkBpmDefServiceImpl implements NkBpmDefService, DeployAble {
                     Map<String,Object> map = new HashMap<>();
 
                     map.put("key",definition.getId());
-                    map.put("name",definition.getName());
+                    map.put("name",definition.getKey() + " | " + definition.getName());
 
                     return map;
                 })

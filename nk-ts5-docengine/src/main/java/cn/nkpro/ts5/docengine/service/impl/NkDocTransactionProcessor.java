@@ -1,5 +1,6 @@
 package cn.nkpro.ts5.docengine.service.impl;
 
+import cn.nkpro.ts5.annotation.NkNote;
 import cn.nkpro.ts5.basic.GUID;
 import cn.nkpro.ts5.basic.TransactionSync;
 import cn.nkpro.ts5.co.NkCustomObjectManager;
@@ -40,6 +41,7 @@ import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
+@NkNote("交易")
 @SuppressWarnings("unchecked")
 @Component("NKDocTransactionProcessor")
 public class NkDocTransactionProcessor implements NkDocProcessor {
@@ -70,10 +72,6 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
     @Override
     public EnumDocClassify classify() {
         return EnumDocClassify.TRANSACTION;
-    }
-    @Override
-    public String desc() {
-        return "交易";
     }
 
     @Override
