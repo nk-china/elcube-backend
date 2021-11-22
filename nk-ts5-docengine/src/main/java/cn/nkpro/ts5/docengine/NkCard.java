@@ -1,5 +1,6 @@
 package cn.nkpro.ts5.docengine;
 
+import cn.nkpro.ts5.annotation.NkScriptType;
 import cn.nkpro.ts5.co.NkScriptCard;
 import cn.nkpro.ts5.docengine.model.DocDefHV;
 import cn.nkpro.ts5.docengine.model.DocDefIV;
@@ -9,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
 
+@NkScriptType("Card")
 public interface NkCard<DT,DDT> extends NkScriptCard {
 
     String POSITION_DEFAULT = "default";

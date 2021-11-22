@@ -1,11 +1,11 @@
 package cn.nkpro.ts5.co.meter;
 
-import cn.nkpro.ts5.co.NkComponent;
-import cn.nkpro.ts5.co.NkCustomObject;
+import cn.nkpro.ts5.annotation.NkScriptType;
+import cn.nkpro.ts5.co.NkScriptComponent;
 
-import java.util.Map;
 
-public interface NkMeter<DT> extends NkComponent {
+@NkScriptType("Meter")
+public interface NkMeter<DT> extends NkScriptComponent {
 
     DT getData(Object config);
 

@@ -11,9 +11,9 @@ import lombok.Getter;
 public class NkComponentException extends NkRuntimeException {
 
     @Getter
-    private NkComponent component;
+    private NkScriptComponent component;
 
-    public NkComponentException(NkComponent component, Throwable cause) {
+    public NkComponentException(NkScriptComponent component, Throwable cause) {
         super(String.format("组件[%s]发生错误：%s",component.getName(),cause.getMessage()), cause);
         this.component = component;
     }

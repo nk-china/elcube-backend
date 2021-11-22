@@ -1,12 +1,14 @@
 package cn.nkpro.ts5.docengine;
 
-import cn.nkpro.ts5.co.NkComponent;
+import cn.nkpro.ts5.annotation.NkScriptType;
+import cn.nkpro.ts5.co.NkScriptComponent;
 import cn.nkpro.ts5.docengine.cards.NkDynamicFormDefI;
 import cn.nkpro.ts5.docengine.model.DocHV;
 import cn.nkpro.ts5.docengine.model.easy.EasySingle;
 import org.springframework.expression.EvaluationContext;
 
-public interface NkField extends NkComponent {
+@NkScriptType("Field")
+public interface NkField extends NkScriptComponent {
 
     default void beforeCalculate(NkDynamicFormDefI field, EvaluationContext context, DocHV doc, EasySingle card){}
 

@@ -1,7 +1,8 @@
 package cn.nkpro.ts5.co;
 
+import cn.nkpro.ts5.annotation.NkScriptType;
 import cn.nkpro.ts5.basic.NkProperties;
-import cn.nkpro.ts5.co.meter.NkMeter;
+import cn.nkpro.ts5.exception.NkDefineException;
 import cn.nkpro.ts5.utils.ClassUtils;
 import cn.nkpro.ts5.utils.GroovyUtils;
 import cn.nkpro.ts5.utils.ResourceUtils;
@@ -19,10 +20,7 @@ import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public abstract class NkAbstractCustomScriptObject implements NkCustomScriptObject, InitializingBean {
@@ -87,15 +85,28 @@ public abstract class NkAbstractCustomScriptObject implements NkCustomScriptObje
             scriptDefH.setState("Active");
 
             Class<?> groovy = GroovyUtils.compileGroovy(className, scriptDefH.getGroovyMain());
-            List interfaces = org.apache.commons.lang3.ClassUtils.getAllInterfaces(groovy);
+            List<Class<?>> interfaces = org.apache.commons.lang3.ClassUtils.getAllInterfaces(groovy);
 
-            if(interfaces.contains(NkScriptCard.class)){
-                scriptDefH.setScriptType("Card");
-            }else if(interfaces.contains(NkMeter.class)){
-                scriptDefH.setScriptType("Meter");
+            if(interfaces.contains(NkCustomScriptObject.class)){
+                scriptDefH.setScriptType(
+                    interfaces.stream()
+                            .map(i -> i.getAnnotation(NkScriptType.class))
+                            .filter(Objects::nonNull)
+                            .findFirst()
+                            .map(NkScriptType::value)
+                            .orElse("Service")
+                );
             }else{
-                scriptDefH.setScriptType("Service");
+                throw new NkDefineException("组件必须实现NkScriptObject接口");
             }
+
+//            if(interfaces.contains(NkScriptCard.class)){
+//                scriptDefH.setScriptType("Card");
+//            }else if(interfaces.contains(NkMeter.class)){
+//                scriptDefH.setScriptType("Meter");
+//            }else{
+//                scriptDefH.setScriptType("Service");
+//            }
 
             NkNote annotation = groovy.getAnnotation(NkNote.class);
             scriptDefH.setScriptDesc(annotation != null ? annotation.value() : beanName);

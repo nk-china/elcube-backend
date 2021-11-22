@@ -33,7 +33,7 @@ public class ScriptResController {
     public Map<Object, Object> vueTemplates() {
 
         Map<Object, Object> vueMap = new HashMap<>();
-        customObjectManager.getCustomObjects(NkComponent.class)
+        customObjectManager.getCustomObjects(NkScriptComponent.class)
                 .values()
                 .forEach(nkCard -> vueMap.putAll(nkCard.getVueTemplate()));
 
