@@ -35,7 +35,9 @@ public class ScriptController {
     public PageList<PlatformScript> page(
             @NkNote("查询关键字")
             @RequestParam(value = "keyword",    required = false)           String keyword,
-            @NkNote("单据类型")
+            @NkNote("分类")
+            @RequestParam(value = "type",       required = false)           String type,
+            @NkNote("版本")
             @RequestParam(value = "version",    required = false)           String version,
             @NkNote("状态")
             @RequestParam(value = "state",      required = false)           String state,
@@ -47,7 +49,7 @@ public class ScriptController {
             @RequestParam(value = "orderField", defaultValue = "")          String orderField,
             @NkNote("排序方式")
             @RequestParam(value = "order",      defaultValue = "")          String order){
-        return scriptService.getPage(keyword,version,state,from,rows,orderField,order);
+        return scriptService.getPage(keyword,type,version,state,from,rows,orderField,order);
     }
 
     @NkNote("2、通过脚本ID获取脚本")

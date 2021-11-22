@@ -47,11 +47,12 @@ public class NkScriptManagerImpl implements NkScriptManager, DeployAble {
     private NkCustomObjectManager customObjectManager;
     @Autowired@SuppressWarnings("all")
     private DebugContextManager debugContextManager;
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private NkProperties nkProperties;
 
     @Override
     public PageList<PlatformScript> getPage(String keyword,
+                                        String type,
                                         String version,
                                         String state,
                                         int from,
@@ -68,9 +69,15 @@ public class NkScriptManagerImpl implements NkScriptManager, DeployAble {
             example.or().andScriptDescLike(String.format("%%%s%%",keyword));
         }
 
+        if(StringUtils.isNotBlank(type)){
+            example.getOredCriteria().forEach(
+                    criteria -> criteria.andScriptTypeEqualTo(type)
+            );
+        }
+
         if(StringUtils.isNotBlank(version)){
             example.getOredCriteria().forEach(
-                    criteria -> criteria.andVersionLike(String.format("%%%s",version))
+                    criteria -> criteria.andVersionLike(String.format("%%%s%%",version))
             );
         }
         if(StringUtils.isNotBlank(state)){

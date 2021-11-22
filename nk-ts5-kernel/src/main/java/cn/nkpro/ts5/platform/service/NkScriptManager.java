@@ -17,6 +17,7 @@ import java.util.List;
 public interface NkScriptManager extends ApplicationListener<ContextRefreshedEvent> {
 
     PageList<PlatformScript> getPage(String keyword,
+                                     String type,
                                      String version,
                                      String state,
                                      int from,
