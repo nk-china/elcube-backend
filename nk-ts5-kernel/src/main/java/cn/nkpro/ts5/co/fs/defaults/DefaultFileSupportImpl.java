@@ -76,7 +76,7 @@ public class DefaultFileSupportImpl implements FSSupport<Map<String, Object>> {
                     os.write(b);
                 }
                 status.setName(file.getOriginalFilename());
-                status.setStatus("down");
+                status.setStatus("done");
                 status.setUrl(url);
                 status.setThumbUrl(url);
             }else{
