@@ -1,17 +1,16 @@
 <template>
-    <div  v-if="!editMode" style="display: flex">
-        <template v-if="inputOptions.listType==='picture-card'">
-            <div v-for="item in fileList" :key="item.uid" class="avatar-border">
-                <a-avatar :src="item.url" shape="square" :size="84"></a-avatar>
-            </div>
-        </template>
-        <template v-else>
-            <a v-for="item in fileList" :key="item.uid">{{item.name}}</a>
-        </template>
-    </div>
-    <div v-else style="width: 90%;">
-        <div style="display: flex;align-items: center;">
-
+    <div style="width: 90%;">
+        <div  v-if="!editMode" style="display: flex">
+            <template v-if="inputOptions.listType==='picture-card'">
+                <div v-for="item in fileList" :key="item.uid" class="avatar-border" @click="handlePreview(item)">
+                    <a-avatar :src="item.url" shape="square" :size="84"></a-avatar>
+                </div>
+            </template>
+            <template v-else>
+                <a v-for="item in fileList" :key="item.uid" @click="handlePreview(item)">{{item.name}}</a>
+            </template>
+        </div>
+        <div v-else style="display: flex;align-items: center;">
             <a-upload v-if="editMode"
                       :accept    ="inputOptions.accept"
                       class     ="uploader"
@@ -40,6 +39,7 @@
         <a-modal :visible="previewVisible" :footer="null" @cancel="previewVisible = false">
             <img alt="example" style="width: 100%" :src="previewImage" />
         </a-modal>
+        <a v-show="false" ref="link"></a>
     </div>
 </template>
 
@@ -82,26 +82,31 @@ export default {
         }
     },
     mounted(){
-        if(this.value){
-            if(this.inputOptions.listType==='picture-card'){
-                this.$http.get("/api/fs/download?url="+this.value.path).then(res=>{
+        this.nk$editModeChanged(this.editMode);
+    },
+    methods:{
+        nk$editModeChanged(){
+            if(this.value){
+                this.fileList = [];
+                if(this.inputOptions.listType==='picture-card'){
+                    this.$http.get("/api/fs/download?url="+this.value.path).then(res=>{
+                        this.fileList.push({
+                            uid : -1,
+                            name: this.value.name,
+                            url:  res.data,
+                            path: this.value.path,
+                        })
+                    });
+                }else{
                     this.fileList.push({
                         uid : -1,
                         name: this.value.name,
-                        url:  res.data,
                         path: this.value.path,
                     })
-                });
-            }else{
-                this.fileList.push({
-                    uid : -1,
-                    name: this.value.name,
-                    path: this.value.path,
-                })
+                }
             }
-        }
-    },
-    methods:{
+            this.progressPercent = undefined
+        },
         beforeUpload(file){
             return new Promise((resolve,reject)=>{
                 this.$http.postJSON("/api/fs/init", {name:file.name,size:file.size,type:file.type})
@@ -140,6 +145,7 @@ export default {
                     break;
                 case 'removed':
                     this.fileList = info.fileList;
+                    this.$emit('input',undefined);
                     break;
             }
         },
@@ -167,7 +173,8 @@ export default {
                 this.previewImage = url;
                 this.previewVisible = true;
             } else {
-                location.href = url;
+                this.$refs.link.href=url;
+                this.$refs.link.click();
             }
         },
         change(e){
@@ -182,5 +189,6 @@ export default {
         padding: 8px;
         border: 1px solid #d9d9d9;
         border-radius: 4px;
+        cursor: pointer;
     }
 </style>
