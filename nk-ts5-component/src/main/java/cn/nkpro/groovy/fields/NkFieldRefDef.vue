@@ -5,6 +5,10 @@
                 {{value.modelConfig}}
                 <nk-sp-el-template-editor slot="edit" v-model="value.options"></nk-sp-el-template-editor>
             </nk-form-item>
+            <nk-form-item title="数据映射模版">
+                {{value.dataMappings}}
+                <nk-sp-el-template-editor slot="edit" v-model="value.dataMappings"></nk-sp-el-template-editor>
+            </nk-form-item>
         </nk-form>
     </div>
 </template>

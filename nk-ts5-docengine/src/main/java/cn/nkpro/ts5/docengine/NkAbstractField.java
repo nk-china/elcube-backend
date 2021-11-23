@@ -3,10 +3,15 @@ package cn.nkpro.ts5.docengine;
 import cn.nkpro.ts5.annotation.NkNote;
 import cn.nkpro.ts5.co.NkAbstractCustomScriptObject;
 import cn.nkpro.ts5.co.NkScriptV;
+import cn.nkpro.ts5.docengine.cards.NkDynamicCalculateContext;
+import cn.nkpro.ts5.docengine.cards.NkDynamicFormDefI;
+import cn.nkpro.ts5.docengine.model.DocHV;
+import cn.nkpro.ts5.docengine.model.easy.EasySingle;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import lombok.Getter;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.expression.EvaluationContext;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -44,5 +49,20 @@ public abstract class NkAbstractField extends NkAbstractCustomScriptObject imple
             return vueMap;
         }
         return Collections.emptyMap();
+    }
+
+    @Override
+    public void beforeCalculate(NkDynamicFormDefI field, EvaluationContext context, EasySingle card, NkDynamicCalculateContext calculateContext) {
+
+    }
+
+    @Override
+    public void processOptions(NkDynamicFormDefI field, EvaluationContext context, EasySingle card, NkDynamicCalculateContext calculateContext) {
+
+    }
+
+    @Override
+    public void afterCalculate(NkDynamicFormDefI field, EvaluationContext context, EasySingle card, NkDynamicCalculateContext calculateContext) {
+
     }
 }

@@ -16,27 +16,37 @@ import org.springframework.expression.EvaluationContext;
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class NkDynamicBase<DT, DDT> extends NkAbstractCard<DT, DDT> {
 
     @Autowired
     protected NkCustomObjectManager customObjectManager;
 
-    void execSpEL(EasySingle data, DocHV doc, List<? extends NkDynamicFormDefI> fields, String cardKey, boolean isNewCreate, boolean calculate){
+    void execSpEL(EasySingle data, DocHV doc, List<? extends NkDynamicFormDefI> fields, String cardKey, boolean isNewCreate, boolean calculate, boolean isTrigger, Map options){
 
         EvaluationContext context = spELManager.createContext(doc);
+
+        Map<String,Object> original = new HashMap<>();
 
         fields.stream()
                 .sorted(Comparator.comparing(NkDynamicFormDefI::getCalcOrder))
                 .filter(field-> !StringUtils.equals(field.getInputType(),"divider"))
                 .peek( field -> {
                     if(calculate){
+                        NkDynamicCalculateContext calculateContext = new NkDynamicCalculateContext();
+                        calculateContext.setDoc(doc);
+                        calculateContext.setTrigger(isTrigger);
+                        calculateContext.setFieldTrigger(isTrigger && StringUtils.equals(field.getKey(), (String) options.get("triggerKey")));
+
                         NkField nkField = customObjectManager.getCustomObject(field.getInputType(), NkField.class);
-                        nkField.beforeCalculate(field, context, doc, data);
+                        nkField.beforeCalculate(field, context, data, calculateContext);
                     }
                 })
                 .peek( field -> {
+                    original.put(field.getKey(), data.get(field.getKey()));
 
                     if(StringUtils.isNotBlank(field.getSpELControl())){
 
@@ -96,13 +106,21 @@ public class NkDynamicBase<DT, DDT> extends NkAbstractCard<DT, DDT> {
                     }
                     context.setVariable(field.getKey(), data.get(field.getKey()));
                 }).forEach(field->{
-            NkField nkField = customObjectManager.getCustomObject(field.getInputType(), NkField.class);
-            nkField.processOptions(field, context, doc, data);
+                    NkDynamicCalculateContext calculateContext = new NkDynamicCalculateContext();
+                    calculateContext.setDoc(doc);
 
-            if(calculate){
-                nkField.afterCalculate(field, context, doc, data);
-            }
-        });
+                    NkField nkField = customObjectManager.getCustomObject(field.getInputType(), NkField.class);
+                    nkField.processOptions(field, context, data, calculateContext);
+
+                    if(calculate){
+
+                        calculateContext.setTrigger(isTrigger);
+                        calculateContext.setOriginal(original);
+                        calculateContext.setFieldTrigger(isTrigger && StringUtils.equals(field.getKey(), (String) options.get("triggerKey")));
+
+                        nkField.afterCalculate(field, context, data, calculateContext);
+                    }
+                });
     }
 
     private static boolean isBlank(Object value){
