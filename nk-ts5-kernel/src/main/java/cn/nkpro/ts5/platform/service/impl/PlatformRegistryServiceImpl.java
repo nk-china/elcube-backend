@@ -57,6 +57,20 @@ public class PlatformRegistryServiceImpl implements PlatformRegistryService , De
         return null;
     }
 
+    @Override
+    public Object getString(String regType, String regKey){
+
+        PlatformRegistryKey pk = new PlatformRegistryKey();
+        pk.setRegType(regType);
+        pk.setRegKey(regKey);
+        PlatformRegistry registry = constantMapper.selectByPrimaryKey(pk);
+
+        if(registry!=null){
+            return registry.getContent();
+        }
+        return null;
+    }
+
 
     @Override
     public List<Object> getList(String regType, String regKeyPrefix){
