@@ -141,7 +141,9 @@ public class NkDocSearchService {
                 .fieldSort(params.getOrderField())
                 .order(SortOrder.fromString(StringUtils.defaultIfBlank(params.getOrder(),"desc")))
             );
-            sourceBuilder.sort(SortBuilders.scoreSort());
+            if(!StringUtils.equals(params.getOrderField(),"_score")){
+                sourceBuilder.sort(SortBuilders.scoreSort());
+            }
         }else{
             sourceBuilder.sort(SortBuilders.scoreSort());
             sourceBuilder.sort(SortBuilders.fieldSort("updatedTime").order(SortOrder.DESC));
