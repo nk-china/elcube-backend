@@ -1,15 +1,19 @@
 <template>
-    <span v-if="!editMode">{{value}}</span>
+    <span v-if="!editMode">
+        <nk-doc-link :doc="value"></nk-doc-link>
+    </span>
     <div v-else>
         <a-input size="small"
-                 v-model="val"
                  :read-only="true"
-                 @change="change"
                  @blur="blur"
                  @click="docSelectModalVisible=true"
                  style="cursor: pointer;"
+                 :value="value && value.docName"
         ></a-input>
-        <nk-doc-select-modal v-model="docSelectModalVisible" :modal="inputOptions.optionsObject" @select="docSelected"></nk-doc-select-modal>
+        <nk-doc-select-modal v-model="docSelectModalVisible"
+                             :modal="inputOptions.optionsObject"
+                             @select="docSelected"
+        ></nk-doc-select-modal>
     </div>
 </template>
 
@@ -32,27 +36,15 @@ export default {
         return {
             docSelectModalVisible:false,
         }
-
-    },
-    computed:{
-        val:{
-            get(){
-                return this.value;
-            },
-            set(value){
-                this.$emit('input',value);
-            }
-        }
     },
     methods:{
-        change(e){
-            //this.$emit('change',e);
-        },
-        blur(e){
-            this.$emit('change',e);
-        },
         docSelected(e){
-            console.log(e)
+            const value = {
+                docId:e.docId,
+                docName:e.docName
+            };
+            this.$emit('input', value);
+            this.$emit('change',value);
         }
     }
 }
