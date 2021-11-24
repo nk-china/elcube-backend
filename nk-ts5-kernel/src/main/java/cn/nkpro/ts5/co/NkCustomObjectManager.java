@@ -47,8 +47,13 @@ public class NkCustomObjectManager implements ApplicationContextAware {
                 .entrySet()
                 .stream()
                 .filter(predicate)
-                .map((e)->new NkCustomObjectDesc(e.getKey(),e.getValue().desc()))
-                .sorted(Comparator.comparing(NkCustomObjectDesc::getName))
+                .map((e)->new NkCustomObjectDesc(e.getKey(),e.getValue().desc(),e.getValue().order()))
+                .sorted((o1,o2)->{
+                    if(o1.getOrder()==o2.getOrder()){
+                        return o1.getName().compareTo(o2.getName());
+                    }
+                    return o1.getOrder()-o2.getOrder();
+                })
                 .collect(Collectors.toList());
         if(emptyValue)
             list.add(0,new NkCustomObjectDesc(StringUtils.EMPTY,"空配置"));

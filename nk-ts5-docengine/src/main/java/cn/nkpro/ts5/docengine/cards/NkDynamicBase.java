@@ -33,7 +33,7 @@ public class NkDynamicBase<DT, DDT> extends NkAbstractCard<DT, DDT> {
 
         fields.stream()
                 .sorted(Comparator.comparing(NkDynamicFormDefI::getCalcOrder))
-                .filter(field-> !StringUtils.equals(field.getInputType(),"divider"))
+                .filter(field-> !(StringUtils.equalsAny(field.getInputType(),"divider","-","--")))
                 .peek( field -> {
                     if(calculate){
                         NkDynamicCalculateContext calculateContext = new NkDynamicCalculateContext();

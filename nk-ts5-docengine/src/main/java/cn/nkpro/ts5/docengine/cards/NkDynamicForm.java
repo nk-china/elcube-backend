@@ -45,6 +45,6 @@ public class NkDynamicForm extends NkDynamicBase<Map, NkDynamicFormDef> {
 
     @Override
     public Object callDef(NkDynamicFormDef def, Object options) {
-        return customObjectManager.getCustomObjectDescriptionList(NkField.class, false, null);
+        return customObjectManager.getCustomObjectDescriptionList(NkField.class, false, (entry)-> entry.getValue() instanceof NkDynamicFormField);
     }
 }

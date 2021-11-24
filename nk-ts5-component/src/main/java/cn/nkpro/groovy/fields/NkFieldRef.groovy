@@ -6,17 +6,21 @@ import cn.nkpro.ts5.docengine.NkAbstractField
 import cn.nkpro.ts5.docengine.NkDocEngine
 import cn.nkpro.ts5.docengine.cards.NkDynamicCalculateContext
 import cn.nkpro.ts5.docengine.cards.NkDynamicFormDefI
+import cn.nkpro.ts5.docengine.cards.NkDynamicFormField
+import cn.nkpro.ts5.docengine.cards.NkDynamicGridField
 import cn.nkpro.ts5.docengine.model.easy.EasySingle
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.annotation.Order
 import org.springframework.expression.EvaluationContext
 import org.springframework.stereotype.Component
 
 import static com.alibaba.fastjson.JSON.parseObject
 
+@Order(80)
 @NkNote("单据引用")
 @Component("NkFieldRef")
-class NkFieldRef extends NkAbstractField {
+class NkFieldRef extends NkAbstractField implements NkDynamicFormField, NkDynamicGridField {
 
     @Autowired
     private NkSpELManager spELManager

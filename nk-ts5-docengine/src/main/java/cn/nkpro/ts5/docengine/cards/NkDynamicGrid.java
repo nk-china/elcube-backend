@@ -53,6 +53,6 @@ public class NkDynamicGrid extends NkDynamicBase<List<Map>, NkDynamicGridDef> {
 
     @Override
     public Object callDef(NkDynamicGridDef def, Object options) {
-        return customObjectManager.getCustomObjectDescriptionList(NkField.class, false, null);
+        return customObjectManager.getCustomObjectDescriptionList(NkField.class, false, (entry)-> entry.getValue() instanceof NkDynamicGridField);
     }
 }

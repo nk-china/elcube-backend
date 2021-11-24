@@ -1,5 +1,6 @@
 import cn.nkpro.ts5.basic.secret.DesCbcUtil;
 import com.apifan.common.random.source.NumberSource;
+import lombok.Data;
 import org.junit.Test;
 
 import java.time.LocalDate;
@@ -19,6 +20,8 @@ public class TestSimple {
         System.out.println(
             str
         );
+
+        System.out.println(Integer.MAX_VALUE);
 
 //        System.out.println(DesCbcUtil.decode("FM0cn97Fn2elThYej9M2409D08zwCGEPpDi3OI2ihy8gFN/ACnknIl3uR/6FxSjxZy+KO+BmodWpFFszxHlRxQcFsfAzXQZk0Hocdm8FYOG1Bt5bWyc6C2b1t6aMrm9wsZs2aSe7xDx8p0Mgyj8apM7klxQhl6Ge","b2c17b46e2b1415392aab5a82869856c","61960842"));;
     }

@@ -31,6 +31,7 @@ import org.apache.ibatis.session.RowBounds;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.annotation.Order;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.stereotype.Component;
 
@@ -40,6 +41,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
+@Order(0)
 @Slf4j
 @NkNote("交易")
 @SuppressWarnings("unchecked")
@@ -68,6 +70,11 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
     private NkDocHistoryService docHistoryService;
     @Autowired@SuppressWarnings("all")
     private NkSpELManager spELManager;
+
+    @Override
+    public String desc() {
+        return "Transaction | 交易";
+    }
 
     @Override
     public EnumDocClassify classify() {
