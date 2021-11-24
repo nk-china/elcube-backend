@@ -6,6 +6,7 @@ import cn.nkpro.ts5.docengine.model.DocDefIV;
 import cn.nkpro.ts5.docengine.model.DocHV;
 import cn.nkpro.ts5.docengine.model.easy.EasySingle;
 import cn.nkpro.ts5.docengine.utils.CopyUtils;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Order(1002)
 @NkNote("动态表格")
 @Component("NkDynamicGrid")
 public class NkDynamicGrid extends NkDynamicBase<List<Map>, NkDynamicGridDef> {

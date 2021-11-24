@@ -2,7 +2,7 @@ package cn.nkpro.ts5.docengine;
 
 import cn.nkpro.ts5.docengine.service.NkDocEngineContext;
 import cn.nkpro.ts5.docengine.service.SequenceSupport;
-import cn.nkpro.ts5.docengine.service.impl.DefaultSequenceSupportImpl;
+import cn.nkpro.ts5.docengine.service.sequences.DefaultSequenceSupportImpl;
 import cn.nkpro.ts5.task.NkBpmTaskService;
 import cn.nkpro.ts5.task.impl.DefaultBpmTaskServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;

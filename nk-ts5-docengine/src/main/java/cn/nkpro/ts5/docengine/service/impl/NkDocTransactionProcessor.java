@@ -6,6 +6,7 @@ import cn.nkpro.ts5.basic.TransactionSync;
 import cn.nkpro.ts5.co.NkCustomObjectManager;
 import cn.nkpro.ts5.co.spel.NkSpELManager;
 import cn.nkpro.ts5.data.elasticearch.SearchEngine;
+import cn.nkpro.ts5.docengine.EnumDocClassify;
 import cn.nkpro.ts5.docengine.NkCard;
 import cn.nkpro.ts5.docengine.NkDocCycle;
 import cn.nkpro.ts5.docengine.NkDocProcessor;

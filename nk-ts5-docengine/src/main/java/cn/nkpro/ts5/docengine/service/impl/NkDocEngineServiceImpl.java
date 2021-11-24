@@ -300,7 +300,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
         NkDocEngineContext.startLog("UPDATE", docHV.getDocId());
 
         String      lockId = UUID.randomUUID().toString();
-        boolean     lock = redisSupport.lock(docHV.getDocId(), lockId, 10,10);
+        boolean     lock = redisSupport.lock(docHV.getDocId(), lockId, 10, 1000,600);
         Assert.isTrue(lock,"单据被其他用户锁定，请稍后再试");
         if(log.isInfoEnabled())log.info("{}锁定单据成功 redis", NkDocEngineContext.currLog());
 
@@ -341,7 +341,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
         DocHV docHV = null;
         try{
             String      lockId = UUID.randomUUID().toString();
-            boolean     lock = redisSupport.lock(docId, lockId, 10,10);
+            boolean     lock = redisSupport.lock(docId, lockId, 10, 1000,600);
             Assert.isTrue(lock,"单据被其他用户锁定，请稍后再试");
             if(log.isInfoEnabled())log.info("{}锁定单据成功 redis", NkDocEngineContext.currLog());
 
@@ -365,7 +365,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
         NkDocEngineContext.startLog("UPDATE", doc.getDocId());
         try{
             String      lockId = UUID.randomUUID().toString();
-            boolean     lock = redisSupport.lock(doc.getDocId(), lockId, 10,10);
+            boolean     lock = redisSupport.lock(doc.getDocId(), lockId, 10, 1000,600);
             Assert.isTrue(lock,"单据被其他用户锁定，请稍后再试");
             if(log.isInfoEnabled())log.info("{}锁定单据成功 redis", NkDocEngineContext.currLog());
 

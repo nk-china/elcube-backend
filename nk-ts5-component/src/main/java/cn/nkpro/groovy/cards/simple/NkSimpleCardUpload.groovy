@@ -11,8 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
 @NkNote("文件上传演示")
-@Component("NkCardUploadSimple")
-class NkCardUploadSimple extends NkAbstractCard<Map,Map> {
+@Component("NkSimpleCardUpload")
+class NkSimpleCardUpload extends NkAbstractCard<Map,Map> {
 
     @Autowired
     NkDocEngine docEngine;

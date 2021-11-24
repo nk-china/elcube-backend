@@ -66,7 +66,8 @@ public class DefaultRedisSupportImpl<T> implements RedisSupport<T> {
     @Override
     public long increment(String key, long l) {
         Long L = redisTemplate.opsForValue().increment(key,l);
-        return L == null ? 0 : L;
+        Assert.notNull(L,"Redis出现错误");
+        return L;
     }
 
 
@@ -201,7 +202,7 @@ public class DefaultRedisSupportImpl<T> implements RedisSupport<T> {
     }
 
     @Override
-    public boolean lock(String key, String value, int retry, int expire) {
+    public boolean lock(String key, String value, int retry, int interval, int expire) {
         ValueOperations<String, String> ops = stringRedisTemplate.opsForValue();
         int i=0;
         do{
@@ -209,9 +210,9 @@ public class DefaultRedisSupportImpl<T> implements RedisSupport<T> {
             if(ret != null && ret){
                 return true;
             }
-            log.debug("尝试获取锁[{}]失败，1s后重试", key);
+            log.debug("尝试获取锁[{}]失败，{}ms后重试", key, interval);
             try {
-                Thread.sleep(1000);
+                Thread.sleep(interval);
             } catch (InterruptedException e) {
                 throw new NkSystemException(e.getMessage(),e);
             }

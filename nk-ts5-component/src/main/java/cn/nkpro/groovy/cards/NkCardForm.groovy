@@ -1,4 +1,4 @@
-package cn.nkpro.groovy.cards.universal
+package cn.nkpro.groovy.cards
 
 import cn.nkpro.ts5.annotation.NkNote
 import cn.nkpro.ts5.docengine.NkAbstractCard
@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
+@Deprecated
 @SuppressWarnings("unused")
 @NkNote("基础表单")
 @Component("NkCardForm")

@@ -1,4 +1,4 @@
-package cn.nkpro.groovy.cards.universal
+package cn.nkpro.groovy.cards
 
 import cn.nkpro.ts5.annotation.NkNote
 import cn.nkpro.ts5.docengine.NkAbstractCard
@@ -8,7 +8,7 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 
-@NkNote("相关方")
+@NkNote("附件")
 @Component("NkCardRelatedPartners")
-class NkCardRelatedPartners extends NkAbstractCard<Map,Map> {
+class NkCardAccessories extends NkAbstractCard<Map,Map> {
 }

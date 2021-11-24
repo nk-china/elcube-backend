@@ -6,12 +6,14 @@ import cn.nkpro.ts5.docengine.model.DocDefIV;
 import cn.nkpro.ts5.docengine.model.DocHV;
 import cn.nkpro.ts5.docengine.model.easy.EasySingle;
 import cn.nkpro.ts5.docengine.utils.CopyUtils;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+@Order(1001)
 @NkNote("动态表单")
 @Component("NkDynamicForm")
 public class NkDynamicForm extends NkDynamicBase<Map<String,Object>, NkDynamicFormDef> {

@@ -8,10 +8,7 @@ import cn.nkpro.ts5.docengine.model.DocHV;
 
 public interface NkDocProcessor extends NkCustomObject {
 
-    enum EnumDocClassify {
-        PARTNER,
-        TRANSACTION
-    }
+
     EnumDocClassify classify();
 
     DocHV detail(DocDefHV def, DocHBasis docHD);

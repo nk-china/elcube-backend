@@ -1,4 +1,4 @@
-package cn.nkpro.groovy.cards.universal
+package cn.nkpro.groovy.cards
 
 import cn.nkpro.ts5.annotation.NkNote
 import cn.nkpro.ts5.docengine.NkAbstractCard
@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
+@Deprecated
 @NkNote("基础表格")
 @Component("NkCardGrid")
 class NkCardGrid extends NkAbstractCard<List<Map<String,Object>>,NkCardGridDef> {

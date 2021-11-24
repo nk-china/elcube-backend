@@ -1,4 +1,4 @@
-package cn.nkpro.groovy.defaults
+package cn.nkpro.groovy.services
 
 import cn.nkpro.ts5.annotation.NkNote
 import cn.nkpro.ts5.co.remote.NkAbstractRemoteAdapter
