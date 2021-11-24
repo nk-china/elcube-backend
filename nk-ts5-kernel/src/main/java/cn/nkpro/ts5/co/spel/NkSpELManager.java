@@ -6,19 +6,17 @@ import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.expression.BeanFactoryResolver;
 import org.springframework.context.expression.MapAccessor;
-import org.springframework.core.convert.TypeDescriptor;
-import org.springframework.expression.*;
+import org.springframework.expression.EvaluationContext;
+import org.springframework.expression.EvaluationException;
+import org.springframework.expression.ExpressionParser;
+import org.springframework.expression.ParseException;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -43,17 +41,8 @@ public class NkSpELManager {
         StandardEvaluationContext ctx = new StandardEvaluationContext(root);
         ctx.addPropertyAccessor(new MapAccessor());
         ctx.setBeanResolver((evaluationContext, s) -> customObjectManager.getCustomObject("SpEL"+s,NkSpELInjection.class));
-        //getSpELMap().forEach(ctx::setVariable);
-
         return ctx;
     }
-
-//    private Map<String, Object> getSpELMap(){
-//        return customObjectManager.getCustomObjects(NkSpELInjection.class)
-//                .values()
-//                .stream()
-//                .collect(Collectors.toMap(NkSpELInjection::getSpELName, t->t));
-//    }
 
     public Object invoke(String el, Object root){
         StandardEvaluationContext context = new StandardEvaluationContext(root);
