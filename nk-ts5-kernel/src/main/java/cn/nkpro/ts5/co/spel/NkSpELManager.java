@@ -6,7 +6,6 @@ import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.expression.MapAccessor;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.expression.EvaluationException;
 import org.springframework.expression.ExpressionParser;
@@ -46,7 +45,7 @@ public class NkSpELManager {
 
     public Object invoke(String el, Object root){
         StandardEvaluationContext context = new StandardEvaluationContext(root);
-        context.addPropertyAccessor(new MapAccessor());
+        context.addPropertyAccessor(mapAccessor);
         el = convert(el, context);
         try{
             return parser.parseExpression(el).getValue(context);
