@@ -66,21 +66,21 @@ public class SpELTest {
         ctx.setVariable("doc",docH);
 
 
-//        NkSpELManager nkSpELManager = new NkSpELManager();
+        NkSpELManager nkSpELManager = new NkSpELManager();
+
+        long a = System.currentTimeMillis();
+        for(int i=0;i<1000000;i++){
+            nkSpELManager.convert("{" +
+                    "\"name\":\"${docName}\"" +
+                    "" +
+                    "}", docH);
+        }
+//        System.out.println(nkSpELManager.convert("{" +
+//                "\"name\":\"${#doc}\"" +
+////                "\"prop\":${1 between {1, 2}}" +
+//                "}", ctx));
 //
-//        long a = System.currentTimeMillis();
-////        for(int i=0;i<1000000;i++){
-////            nkSpELManager.convert("{" +
-////                    "\"name\":\"${docName}\"" +
-////                    "" +
-////                    "}", docH);
-////        }
-////        System.out.println(nkSpELManager.convert("{" +
-////                "\"name\":\"${#doc}\"" +
-//////                "\"prop\":${1 between {1, 2}}" +
-////                "}", ctx));
-////
-//        System.out.println(System.currentTimeMillis()-a);
+        System.out.println(System.currentTimeMillis()-a);
 ////
 //
 //        System.out.println(parser.parseExpression("{" +

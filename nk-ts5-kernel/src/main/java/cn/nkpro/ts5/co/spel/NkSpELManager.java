@@ -22,6 +22,7 @@ import java.util.regex.Pattern;
 @Component
 public class NkSpELManager {
 
+    private static final NkMapAccessor mapAccessor = new NkMapAccessor();
     private static final ExpressionParser parser = new SpelExpressionParser();
 
     // 这个表达式有问题，${{}}嵌套匹配不了
@@ -33,13 +34,12 @@ public class NkSpELManager {
     // private static final Pattern pattern = Pattern.compile("\"?\\$\\{((?:\"[^\"]*\"|'[^']*'|\\{[^}]*\\{[^}]*}[^}]*}|\\{[^}]*}|[^\"'}])*?)}\"?");
     private static final Pattern pattern = Pattern.compile("\"?\\$\\{(?:\"[^\"]*\"|'[^']*'|\\{[^}]*\\{[^}]*}[^}]*}|\\{[^}]*}|[^\"'}])*?}\"?");
 
-
     @Autowired@SuppressWarnings("all")
     private NkCustomObjectManager customObjectManager;
 
     public EvaluationContext createContext(Object root){
         StandardEvaluationContext ctx = new StandardEvaluationContext(root);
-        ctx.addPropertyAccessor(new MapAccessor());
+        ctx.addPropertyAccessor(mapAccessor);
         ctx.setBeanResolver((evaluationContext, s) -> customObjectManager.getCustomObject("SpEL"+s,NkSpELInjection.class));
         return ctx;
     }

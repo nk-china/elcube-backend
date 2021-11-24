@@ -1,9 +1,11 @@
 package cn.nkpro.ts5.docengine.gen;
 
+import cn.nkpro.ts5.docengine.gen.DocI;
+import cn.nkpro.ts5.docengine.gen.DocIExample;
+import cn.nkpro.ts5.docengine.gen.DocIKey;
+import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.RowBounds;
-
-import java.util.List;
 
 public interface DocIMapper {
     /**

@@ -5,7 +5,7 @@
 <generatorConfiguration>
 
 
-	<context id="dataEngine">
+	<context id="docEngine">
 
 		<property name="javaFileEncoding" value="UTF-8"/>
 
@@ -25,13 +25,29 @@
 			<property name="forceBigDecimals" value="false" />
 		</javaTypeResolver>
 
-		<javaModelGenerator targetPackage="cn.nkpro.ts5.bigdata.gen" targetProject="src/main/java" />
-		<sqlMapGenerator targetPackage="cn.nkpro.ts5.bigdata.gen" targetProject="src/main/resources" />
-		<javaClientGenerator targetPackage="cn.nkpro.ts5.bigdata.gen" targetProject="src/main/java" type="XMLMAPPER" />
+		<javaModelGenerator 	targetPackage="cn.nkpro.ts5.docengine.gen" 	targetProject="src/main/java" />
+		<sqlMapGenerator 		targetPackage="cn.nkpro.ts5.docengine.gen" 	targetProject="src/main/resources" />
+		<javaClientGenerator 	targetPackage="cn.nkpro.ts5.docengine.gen" 	targetProject="src/main/java" type="XMLMAPPER" />
 
 		<!-- 2.0 -->
-		<table tableName="nk_data_view"				 		enableDeleteByExample="false"   domainObjectName="DataView"/>
+		<table tableName="nk_constant_def"					enableDeleteByExample="true"  domainObjectName="ConstantDef"/>
 
+		<table tableName="nk_doc_h"		  					enableDeleteByExample="false" domainObjectName="DocH"/>
+		<table tableName="nk_doc_i"		 					enableDeleteByExample="false" domainObjectName="DocI"/>
+		<table tableName="nk_doc_i_index"		 			enableDeleteByExample="true"  domainObjectName="DocIIndex"/>
+		<table tableName="nk_doc_def_h"		 				enableDeleteByExample="false" domainObjectName="DocDefH"/>
+		<table tableName="nk_doc_def_i"		 				enableDeleteByExample="true"  domainObjectName="DocDefI"/>
+		<table tableName="nk_doc_def_state"				 	enableDeleteByExample="true"  domainObjectName="DocDefState"/>
+		<table tableName="nk_doc_def_cycle"				 	enableDeleteByExample="true"  domainObjectName="DocDefCycle"/>
+		<table tableName="nk_doc_def_index_rule"			enableDeleteByExample="true"  domainObjectName="DocDefIndexRule"/>
+		<table tableName="nk_doc_def_index_custom"			enableDeleteByExample="true"  domainObjectName="DocDefIndexCustom"/>
+		<table tableName="nk_doc_def_data_sync"				enableDeleteByExample="true"  domainObjectName="DocDefDataSync"/>
+		<table tableName="nk_doc_def_flow"				 	enableDeleteByExample="true"  domainObjectName="DocDefFlow"/>
+		<table tableName="nk_doc_def_bpm"					enableDeleteByExample="true"  domainObjectName="DocDefBpm"/>
+
+		<table tableName="nk_async_queue"					enableDeleteByExample="false"/>
+
+		<table tableName="sys_log_doc_record"			 	enableDeleteByExample="false"/>
 	</context>
 
 </generatorConfiguration>

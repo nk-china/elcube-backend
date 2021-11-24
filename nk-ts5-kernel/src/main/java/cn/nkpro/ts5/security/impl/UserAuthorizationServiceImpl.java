@@ -2,7 +2,9 @@ package cn.nkpro.ts5.security.impl;
 
 import cn.nkpro.ts5.basic.Constants;
 import cn.nkpro.ts5.basic.GUID;
+import cn.nkpro.ts5.co.spel.NkSpELManager;
 import cn.nkpro.ts5.data.redis.RedisSupport;
+import cn.nkpro.ts5.exception.NkInputFailedCaution;
 import cn.nkpro.ts5.platform.DeployAble;
 import cn.nkpro.ts5.platform.gen.UserAccount;
 import cn.nkpro.ts5.platform.gen.UserAccountExample;
@@ -12,7 +14,6 @@ import cn.nkpro.ts5.security.UserBusinessAdapter;
 import cn.nkpro.ts5.security.bo.GrantedAuthority;
 import cn.nkpro.ts5.security.bo.UserGroupBO;
 import cn.nkpro.ts5.security.gen.*;
-import cn.nkpro.ts5.co.spel.NkSpELManager;
 import cn.nkpro.ts5.utils.BeanUtilz;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
@@ -239,7 +240,11 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService, D
     public void updateLimit(AuthLimit limit){
         Assert.hasText(limit.getLimitDesc(),"限制描述不能为空");
 
-        QueryBuilders.wrapperQuery(limit.getContent());
+        try{
+            QueryBuilders.wrapperQuery(limit.getContent());
+        }catch (IllegalArgumentException e){
+            throw new NkInputFailedCaution("限制规则配置错误");
+        }
 
         if(StringUtils.isBlank(limit.getLimitId())){
             limit.setLimitId(guid.nextId(AuthLimit.class));

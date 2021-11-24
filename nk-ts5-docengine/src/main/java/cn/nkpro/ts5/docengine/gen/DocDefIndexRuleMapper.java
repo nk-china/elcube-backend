@@ -1,9 +1,11 @@
 package cn.nkpro.ts5.docengine.gen;
 
+import cn.nkpro.ts5.docengine.gen.DocDefIndexRule;
+import cn.nkpro.ts5.docengine.gen.DocDefIndexRuleExample;
+import cn.nkpro.ts5.docengine.gen.DocDefIndexRuleKey;
+import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.RowBounds;
-
-import java.util.List;
 
 public interface DocDefIndexRuleMapper {
     /**

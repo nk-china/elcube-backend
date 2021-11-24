@@ -913,6 +913,66 @@ public class DocDefIExample {
             addCriterion("UPDATED_TIME not between", value1, value2, "updatedTime");
             return (Criteria) this;
         }
+
+        public Criteria andCopyFromRefIsNull() {
+            addCriterion("COPY_FROM_REF is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCopyFromRefIsNotNull() {
+            addCriterion("COPY_FROM_REF is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCopyFromRefEqualTo(Integer value) {
+            addCriterion("COPY_FROM_REF =", value, "copyFromRef");
+            return (Criteria) this;
+        }
+
+        public Criteria andCopyFromRefNotEqualTo(Integer value) {
+            addCriterion("COPY_FROM_REF <>", value, "copyFromRef");
+            return (Criteria) this;
+        }
+
+        public Criteria andCopyFromRefGreaterThan(Integer value) {
+            addCriterion("COPY_FROM_REF >", value, "copyFromRef");
+            return (Criteria) this;
+        }
+
+        public Criteria andCopyFromRefGreaterThanOrEqualTo(Integer value) {
+            addCriterion("COPY_FROM_REF >=", value, "copyFromRef");
+            return (Criteria) this;
+        }
+
+        public Criteria andCopyFromRefLessThan(Integer value) {
+            addCriterion("COPY_FROM_REF <", value, "copyFromRef");
+            return (Criteria) this;
+        }
+
+        public Criteria andCopyFromRefLessThanOrEqualTo(Integer value) {
+            addCriterion("COPY_FROM_REF <=", value, "copyFromRef");
+            return (Criteria) this;
+        }
+
+        public Criteria andCopyFromRefIn(List<Integer> values) {
+            addCriterion("COPY_FROM_REF in", values, "copyFromRef");
+            return (Criteria) this;
+        }
+
+        public Criteria andCopyFromRefNotIn(List<Integer> values) {
+            addCriterion("COPY_FROM_REF not in", values, "copyFromRef");
+            return (Criteria) this;
+        }
+
+        public Criteria andCopyFromRefBetween(Integer value1, Integer value2) {
+            addCriterion("COPY_FROM_REF between", value1, value2, "copyFromRef");
+            return (Criteria) this;
+        }
+
+        public Criteria andCopyFromRefNotBetween(Integer value1, Integer value2) {
+            addCriterion("COPY_FROM_REF not between", value1, value2, "copyFromRef");
+            return (Criteria) this;
+        }
     }
 
     /**

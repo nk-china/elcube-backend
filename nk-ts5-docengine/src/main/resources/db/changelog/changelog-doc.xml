@@ -185,7 +185,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet id="NK_DOC_DEF_I-01" author="bean" context="default">
+    <changeSet id="NK_DOC_DEF_I-02" author="bean" context="default">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="NK_DOC_DEF_I" />
@@ -208,11 +208,24 @@
             <column name="ORDER_BY" type="${type.int}" remarks="" />
             <column name="CALC_ORDER" type="${type.int}" remarks="" />
             <column name="CALC_TIMES" type="${type.int}" remarks="" />
+            <column name="COPY_FROM_REF" type="${type.int}" remarks="从前序单据或参考单据复制数据" />
             <column name="EDITABLE_SP_E_L" type="${type.var}" remarks="" />
             <column name="MARKDOWN_FLAG" type="${type.int}" remarks="" />
             <column name="MARKDOWN" type="${type.clob}" remarks="" />
             <column name="UPDATED_TIME" type="${type.long}" remarks="" />
         </createTable>
+    </changeSet>
+
+
+    <changeSet id="NK_DOC_DEF_I-03" author="bean" context="default">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="NK_DOC_DEF_I" columnName="COPY_FROM_REF" />
+            </not>
+        </preConditions>
+        <addColumn tableName="NK_DOC_DEF_I">
+            <column name="COPY_FROM_REF" type="${type.int}" remarks="从前序单据或参考单据复制数据" beforeColumn="EDITABLE_SP_E_L" />
+        </addColumn>
     </changeSet>
 
     <changeSet id="NK_DOC_DEF_INDEX_CUSTOM-01" author="bean" context="default">
@@ -265,7 +278,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet id="NK_DOC_DEF_STATE-01" author="bean" context="default">
+    <changeSet id="NK_DOC_DEF_STATE-02" author="bean" context="default">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="NK_DOC_DEF_STATE" />
@@ -286,6 +299,7 @@
                 <constraints primaryKey="true" />
             </column>
             <column name="DOC_STATE_DESC" type="${type.desc}" remarks="" />
+            <column name="OPERATOR_NAME" type="${type.desc}" remarks="操作名" />
             <column name="SYS_STATE" type="${type.desc}" remarks="" />
             <column name="REF_OBJECT_TYPE" type="${type.var}" remarks="业务逻辑处理类" />
             <column name="EDIT_PERM" type="${type.int}" remarks="0 不可编辑，1 可编辑，2 流程中可编辑" />
@@ -294,6 +308,17 @@
             <column name="ACTION" type="${type.desc}" remarks="ACTIVATE, CANCEL" />
             <column name="ORDER_BY" type="${type.int}" remarks="" />
         </createTable>
+    </changeSet>
+
+    <changeSet id="NK_DOC_DEF_STATE-03" author="bean" context="default">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="NK_DOC_DEF_STATE" columnName="OPERATOR_NAME" />
+            </not>
+        </preConditions>
+        <addColumn tableName="NK_DOC_DEF_STATE">
+            <column name="OPERATOR_NAME" type="${type.desc}" remarks="操作名" beforeColumn="SYS_STATE" />
+        </addColumn>
     </changeSet>
 
     <changeSet id="NK_DOC_H-01" author="bean" context="default">

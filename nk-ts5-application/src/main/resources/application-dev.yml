@@ -35,4 +35,5 @@ spring:
       uris: ["http://192.168.1.157:9200"]
       username: elastic
       password: 1qazxsw2
-
+  liquibase:
+    enabled: true

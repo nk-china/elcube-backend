@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-public class EasyList implements EasyCollection<EasySingle> {
+public class EasyList implements EasyCollection {
 
     private List<Object> target;
     List<EasySingle> easies;

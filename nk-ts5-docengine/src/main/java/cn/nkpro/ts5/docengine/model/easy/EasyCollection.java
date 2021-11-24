@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.function.Function;
 
 @SuppressWarnings("all")
-public interface EasyCollection<T> extends Collection<T> {
+public interface EasyCollection extends Collection<EasySingle> {
 
     EasySingle append(int index);
 

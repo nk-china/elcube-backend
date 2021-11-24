@@ -11,7 +11,7 @@
             </template>
         </div>
         <div v-else style="display: flex;align-items: center;">
-            <a-upload v-if="editMode"
+            <a-upload v-if="editMode && fileList"
                       :accept    ="inputOptions.accept"
                       class     ="uploader"
                       :default-file-list="fileList"
@@ -74,12 +74,19 @@ export default {
             progressPercent:undefined,
             progressStatus:undefined,
 
-            fileList:[],
+            fileList:undefined,
             downloadUrl:undefined,
 
             previewVisible: false,
             previewImage: '',
         }
+    },
+    watch:{
+        // 待解决问题：a-upload的组件如果设置file-list属性，导致文件上传总是不回调
+        // 因此
+        // 考虑要不要坚挺value变化，以达到其他字段可以更改文件上传字段的效果
+        // value(e){
+        // }
     },
     mounted(){
         this.nk$editModeChanged(this.editMode);

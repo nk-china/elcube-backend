@@ -7,6 +7,7 @@ import cn.nkpro.ts5.exception.NkDefineException;
 import cn.nkpro.ts5.exception.abstracts.NkCaution;
 import cn.nkpro.ts5.exception.abstracts.NkRuntimeException;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ClassUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.security.access.AccessDeniedException;
@@ -19,13 +20,14 @@ import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 @ControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
 
-    private static Map<Class<? extends Throwable>,Integer> codes = new HashMap<>();
+    private static Map<Class<? extends Throwable>,Integer> codes = new LinkedHashMap<>();
 
     static {
         // 用户操作错误或警告提示
@@ -61,7 +63,13 @@ public class GlobalExceptionHandler {
 
         log.error(message,ex);
 
-        response.setStatus(codes.getOrDefault(ex.getClass(),500));
+        response.setStatus(500);
+        for(Class<?> type : codes.keySet()){
+            if(ClassUtils.isAssignable(ex.getClass(),type)){
+                response.setStatus(codes.get(type));
+                break;
+            }
+        }
 
         MappingJackson2JsonView view = new MappingJackson2JsonView();
         Map<String, Object> attributes = new HashMap<>();

@@ -1,9 +1,11 @@
 package cn.nkpro.ts5.docengine.gen;
 
+import cn.nkpro.ts5.docengine.gen.DocDefBpm;
+import cn.nkpro.ts5.docengine.gen.DocDefBpmExample;
+import cn.nkpro.ts5.docengine.gen.DocDefBpmKey;
+import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.RowBounds;
-
-import java.util.List;
 
 public interface DocDefBpmMapper {
     /**

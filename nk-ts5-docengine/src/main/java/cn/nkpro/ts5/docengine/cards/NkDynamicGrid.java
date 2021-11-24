@@ -5,12 +5,14 @@ import cn.nkpro.ts5.docengine.NkField;
 import cn.nkpro.ts5.docengine.model.DocDefIV;
 import cn.nkpro.ts5.docengine.model.DocHV;
 import cn.nkpro.ts5.docengine.model.easy.EasySingle;
+import cn.nkpro.ts5.docengine.utils.CopyUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @NkNote("动态表格")
 @Component("NkDynamicGrid")
@@ -28,6 +30,16 @@ public class NkDynamicGrid extends NkDynamicBase<List<Map>, NkDynamicGridDef> {
 
     @Override
     public List<Map> afterCreate(DocHV doc, DocHV preDoc, List<Map> data, DocDefIV defIV, NkDynamicGridDef d) {
+
+        if(defIV.getCopyFromRef()!=null&&defIV.getCopyFromRef()==1){
+            CopyUtils.copy(
+                    preDoc.getData().get(defIV.getCardKey()),
+                    data,
+                    HashMap.class,
+                    d.getItems().stream().map(NkDynamicFormDefI::getKey).collect(Collectors.toList())
+            );
+        }
+
         this.execSpEL(data, doc, d.getItems(), defIV.getCardKey(), true, false, false, Collections.emptyMap());
         return super.afterCreate(doc, preDoc, data, defIV, d);
     }

@@ -1,9 +1,11 @@
 package cn.nkpro.ts5.docengine.gen;
 
+import cn.nkpro.ts5.docengine.gen.DocDefCycle;
+import cn.nkpro.ts5.docengine.gen.DocDefCycleExample;
+import cn.nkpro.ts5.docengine.gen.DocDefCycleKey;
+import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.RowBounds;
-
-import java.util.List;
 
 public interface DocDefCycleMapper {
     /**
