@@ -57,6 +57,14 @@ class NkFieldRef extends NkAbstractField implements NkDynamicFormField, NkDynami
     @Override
     void afterCalculate(NkDynamicFormDefI field, EvaluationContext context, EasySingle card, NkCalculateContext calculateContext) {
 
+        def isPartner = field.getInputOptions().getOrDefault("isPartner", false)
+        if(isPartner){
+            Map data = card.get(field.getKey())
+            if(data!=null && StringUtils.isNotBlank(data.get("docId") as CharSequence)){
+                calculateContext.getDoc().setPartnerId(data.get("docId") as String)
+                calculateContext.getDoc().setPartnerName(data.get("docName") as String)
+            }
+        }
 
         // 当上下文计算由当前字段触发、或者当前字段的值在计算阶段发生改变
         if(calculateContext.fieldTrigger || !Objects.equals(card.get(field.getKey()),calculateContext.original.get(field.getKey()))){

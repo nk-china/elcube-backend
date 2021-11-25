@@ -4,7 +4,7 @@
             {{doc.def && doc.def.docType}} | {{doc.def && doc.def.docName}}
         </nk-form-item>
         <nk-form-item term="交易伙伴">
-            <router-link v-if="doc.partnerId" :to="`/apps/partners/detail/${doc.partnerId}`">{{doc.partnerName}}</router-link>
+            <router-link v-if="doc.partnerId" :to="`/apps/doc/detail/${doc.partnerId}`">{{doc.partnerName}}</router-link>
             <span v-else style="color: rgba(0, 0, 0, 0.45);">&lt;未选择&gt;</span>
         </nk-form-item>
         <nk-form-item term="交易编号">
@@ -34,14 +34,19 @@
     import Mixin from "Mixin";
 
     export default {
-    mixins:[new Mixin()],
-    data(){
-        return {
+        mixins:[new Mixin()],
+        data(){
+            return {
+            }
+        },
+        created() {
+        },
+        methods:{
+            hasError(){
+                return this.$refs.form.hasError()
+            }
         }
-    },
-    created() {
     }
-}
 </script>
 
 <style scoped>
@@ -49,14 +54,14 @@
 </style>
 
 <i18n>
-{
+    {
     "en": {
-        "hello": "hello world!"
+    "hello": "hello world!"
     },
     "zh_CN": {
-        "hello": "你好，世界！"
+    "hello": "你好，世界！"
     }
-}
+    }
 </i18n>
 
 <docs>

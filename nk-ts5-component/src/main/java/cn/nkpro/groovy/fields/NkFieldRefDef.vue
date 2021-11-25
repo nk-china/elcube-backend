@@ -13,6 +13,10 @@
                 {{value.optionMappings}}
                 <nk-sp-el-template-editor slot="edit" v-model="value.optionMappings"></nk-sp-el-template-editor>
             </nk-form-item>
+            <nk-form-item title="单据TP">
+                {{value.isPartner?'是':'否'}}
+                <a-switch slot="edit" size="small" v-model="value.isPartner"></a-switch>
+            </nk-form-item>
         </nk-form>
     </div>
 </template>

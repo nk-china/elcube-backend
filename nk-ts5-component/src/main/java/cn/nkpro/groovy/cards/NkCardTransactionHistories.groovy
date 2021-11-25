@@ -27,6 +27,7 @@ class NkCardTransactionHistories extends NkAbstractCard<Map,Map> {
         return docSearchService.queryList(
                 QueryBuilders.termQuery("refObjectId", doc.getRefObjectId()),
                 SearchParams.defaults(1000)
+                        .order("createdTime", true)
         )
     }
 }

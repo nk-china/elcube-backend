@@ -2,6 +2,7 @@ package cn.nkpro.ts5.docengine.model;
 
 import com.alibaba.fastjson.JSONObject;
 import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -16,6 +17,12 @@ public class SearchParams {
         SearchParams params = defaults();
         params.setRows(limit);
         return params;
+    }
+
+    public SearchParams order(String orderField, boolean asc){
+        this.setOrderField(orderField);
+        this.setOrder(asc?"ASC":"DESC");
+        return this;
     }
 
     private JSONObject postCondition;

@@ -28,9 +28,8 @@
                     <span v-else style="color: #2b2b2b;font-weight: bold;">{{row.docNumber}}</span>
                 </template>
             </vxe-table-column>
-            <vxe-table-column key="docType"       title="交易代码"  field="docType"     width="10%"  />
-            <vxe-table-column key="docName"       title="交易名称"  field="docName"     width="16%"  />
-            <vxe-table-column key="docDesc"       title="交易描述"  field="docDesc"     width="20%"  />
+            <vxe-table-column key="docTypeDesc"   title="交易类型"  field="docTypeDesc" width="26%"  />
+            <vxe-table-column key="docName"       title="交易描述"  field="docName"     width="20%"  />
             <vxe-table-column key="docStateDesc"  title="状态"     field="docStateDesc" width="16%" />
             <vxe-table-column key="updatedTime"   title="更新时间"  field="updatedTime"  formatter="nkDatetimeFriendly" />
         </vxe-table>

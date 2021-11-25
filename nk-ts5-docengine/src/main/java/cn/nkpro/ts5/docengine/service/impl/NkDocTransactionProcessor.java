@@ -6,10 +6,7 @@ import cn.nkpro.ts5.basic.TransactionSync;
 import cn.nkpro.ts5.co.NkCustomObjectManager;
 import cn.nkpro.ts5.co.spel.NkSpELManager;
 import cn.nkpro.ts5.data.elasticearch.SearchEngine;
-import cn.nkpro.ts5.docengine.EnumDocClassify;
-import cn.nkpro.ts5.docengine.NkCard;
-import cn.nkpro.ts5.docengine.NkDocCycle;
-import cn.nkpro.ts5.docengine.NkDocProcessor;
+import cn.nkpro.ts5.docengine.*;
 import cn.nkpro.ts5.docengine.gen.*;
 import cn.nkpro.ts5.docengine.interceptor.NkDocCycleInterceptor;
 import cn.nkpro.ts5.docengine.model.*;
@@ -32,6 +29,7 @@ import org.apache.ibatis.session.RowBounds;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.annotation.Order;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.stereotype.Component;
@@ -71,6 +69,8 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
     private NkDocHistoryService docHistoryService;
     @Autowired@SuppressWarnings("all")
     private NkSpELManager spELManager;
+    @Lazy@Autowired
+    private NkDocEngine docEngine;
 
     @Override
     public String desc() {
@@ -100,7 +100,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
 
         // 关联字段
         doc.setRefObjectId(optPreDoc.map(DocHV::getRefObjectId).orElse(doc.getDocId()));
-        doc.setPreDocId(optPreDoc.map(DocHV::getRefObjectId).orElse("@"));
+        doc.setPreDocId(optPreDoc.map(DocHV::getDocId).orElse("@"));
 
         // 系统字段
         doc.setCreatedTime(DateTimeUtilz.nowSeconds());
@@ -590,6 +590,19 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
     }
 
     private void humanize(DocHV doc){
+
+        // 设置单据交易伙伴
+        if(StringUtils.isNotBlank(doc.getPartnerId())){
+            if(StringUtils.equals(doc.getDocId(),doc.getPartnerId())){
+                doc.setPartnerName(doc.getDocName());
+            }else{
+                doc.setPartnerName(
+                    docEngine.detail(doc.getPartnerId())
+                        .getDocName()
+                );
+            }
+        }
+
         doc.setDocTypeDesc(String.format("%s | %s",doc.getDocType(),doc.getDef().getDocName()));
         doc.getDef().getStatus().stream()
                 .filter(defDocStatus -> StringUtils.equals(defDocStatus.getDocState(),doc.getDocState()))

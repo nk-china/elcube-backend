@@ -32,7 +32,7 @@ public class NkDynamicGrid extends NkDynamicBase<List<Map>, NkDynamicGridDef> {
     @Override
     public List<Map> afterCreate(DocHV doc, DocHV preDoc, List<Map> data, DocDefIV defIV, NkDynamicGridDef d) {
 
-        if(defIV.getCopyFromRef()!=null&&defIV.getCopyFromRef()==1){
+        if(preDoc != null && defIV.getCopyFromRef()!=null&&defIV.getCopyFromRef()==1){
             CopyUtils.copy(
                     preDoc.getData().get(defIV.getCardKey()),
                     data,

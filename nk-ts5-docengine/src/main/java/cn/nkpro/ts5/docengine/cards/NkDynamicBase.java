@@ -26,7 +26,7 @@ public class NkDynamicBase<DT, DDT> extends NkAbstractCard<DT, DDT> {
 
     void copyFromPre(DocHV preDoc, Map<String,Object> data, DocDefIV defIV, List<? extends NkDynamicFormDefI> fields){
 
-        if(defIV.getCopyFromRef()!=null&&defIV.getCopyFromRef()==1){
+        if(preDoc!=null && defIV.getCopyFromRef()!=null&&defIV.getCopyFromRef()==1){
             CopyUtils.copy(
                     preDoc.getData().get(defIV.getCardKey()),
                     data,
