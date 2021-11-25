@@ -3,7 +3,7 @@ package cn.nkpro.groovy.abandoned
 import cn.nkpro.ts5.annotation.NkNote
 import cn.nkpro.ts5.co.spel.NkSpELManager
 import cn.nkpro.ts5.docengine.NkAbstractField
-import cn.nkpro.ts5.docengine.cards.NkDynamicCalculateContext
+import cn.nkpro.ts5.docengine.cards.NkCalculateContext
 import cn.nkpro.ts5.docengine.cards.NkDynamicFormDefI
 import cn.nkpro.ts5.docengine.cards.NkLinkageFormField
 import cn.nkpro.ts5.docengine.model.easy.EasySingle
@@ -22,7 +22,7 @@ class NkFieldPercentageValue extends NkAbstractField implements NkLinkageFormFie
     private NkSpELManager spELManager
 
     @Override
-    void afterCalculate(NkDynamicFormDefI field, EvaluationContext context, EasySingle card, NkDynamicCalculateContext calculateContext) {
+    void afterCalculate(NkDynamicFormDefI field, EvaluationContext context, EasySingle card, NkCalculateContext calculateContext) {
 
         // 默认通过百分比计算值
         def calcByPercent = true

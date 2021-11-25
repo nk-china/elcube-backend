@@ -3,9 +3,11 @@ package cn.nkpro.ts5.docengine.cards;
 import cn.nkpro.ts5.co.NkCustomObjectManager;
 import cn.nkpro.ts5.docengine.NkAbstractCard;
 import cn.nkpro.ts5.docengine.NkField;
+import cn.nkpro.ts5.docengine.model.DocDefIV;
 import cn.nkpro.ts5.docengine.model.DocHV;
 import cn.nkpro.ts5.docengine.model.easy.EasySingle;
 import cn.nkpro.ts5.docengine.service.NkDocEngineContext;
+import cn.nkpro.ts5.docengine.utils.CopyUtils;
 import cn.nkpro.ts5.exception.NkDefineException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -14,115 +16,158 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.expression.EvaluationContext;
 
 import java.lang.reflect.Array;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class NkDynamicBase<DT, DDT> extends NkAbstractCard<DT, DDT> {
 
     @Autowired
     protected NkCustomObjectManager customObjectManager;
 
-    void execSpEL(EasySingle data, DocHV doc, List<? extends NkDynamicFormDefI> fields, String cardKey, boolean isNewCreate, boolean calculate, boolean isTrigger, Map options){
+    void copyFromPre(DocHV preDoc, Map<String,Object> data, DocDefIV defIV, List<? extends NkDynamicFormDefI> fields){
+
+        if(defIV.getCopyFromRef()!=null&&defIV.getCopyFromRef()==1){
+            CopyUtils.copy(
+                    preDoc.getData().get(defIV.getCardKey()),
+                    data,
+                    fields.stream().map(NkDynamicFormDefI::getKey).collect(Collectors.toList())
+            );
+        }
+    }
+
+    void processOptions(EasySingle data, DocHV doc, List<? extends NkDynamicFormDefI> fields){
+
+        EvaluationContext context = spELManager.createContext(doc);
+
+        // 创建一个计算上下文
+        NkBaseContext calculateContext = new NkBaseContext();
+        calculateContext.setDoc(doc);
+        calculateContext.setFields(fields);
+
+        // 处理字段的inputOptions
+        fields.forEach(field -> {
+            NkField nkField = customObjectManager.getCustomObject(field.getInputType(), NkField.class);
+            nkField.processOptions(field, context, data, calculateContext);
+        });
+    }
+
+
+    void execSpEL(EasySingle data, DocHV doc, List<? extends NkDynamicFormDefI> fields, String cardKey, boolean isTrigger, Map options){
 
         EvaluationContext context = spELManager.createContext(doc);
 
         Map<String,Object> original = new HashMap<>();
 
-        fields.stream()
-                .sorted(Comparator.comparing(NkDynamicFormDefI::getCalcOrder))
+        // 按计算顺序排序
+        List<? extends NkDynamicFormDefI> sortedFields = fields.stream()
                 .filter(field-> !(StringUtils.equalsAny(field.getInputType(),"divider","-","--")))
-                .peek( field -> {
-                    if(calculate){
-                        NkDynamicCalculateContext calculateContext = new NkDynamicCalculateContext();
-                        calculateContext.setDoc(doc);
-                        calculateContext.setOptions(options);
-                        calculateContext.setTrigger(isTrigger);
-                        calculateContext.setFieldTrigger(isTrigger && options !=null && StringUtils.equals(field.getKey(), (String) options.get("triggerKey")));
+                .sorted(Comparator.comparing(NkDynamicFormDefI::getCalcOrder))
+                .collect(Collectors.toList());
 
-                        NkField nkField = customObjectManager.getCustomObject(field.getInputType(), NkField.class);
-                        nkField.beforeCalculate(field, context, data, calculateContext);
-                    }
-                })
-                .peek( field -> {
-                    original.put(field.getKey(), data.get(field.getKey()));
+        // 初始化上下文及保留原始值
+        sortedFields.forEach(field -> {
+            original.put(field.getKey(), data.get(field.getKey()));
+            context.setVariable(field.getKey(), data.get(field.getKey()));
+        });
 
-                    if(StringUtils.isNotBlank(field.getSpELControl())){
+        // 设置需要跳过SpEL计算的字段
+        //List<String> skip = new ArrayList<>();
+        //if(isTrigger && options !=null){
+        //    skip.add((String) options.get("triggerKey"));
+        //}
 
-                        if(log.isInfoEnabled())
-                            log.info("{}\t\t{} 执行表达式 KEY={} T=CONTROL EL={}",
-                                    NkDocEngineContext.currLog(),
-                                    cardKey,
+        // 创建一个计算上下文
+        NkCalculateContext calculateContext = new NkCalculateContext();
+        calculateContext.setDoc(doc);
+        calculateContext.setFields(sortedFields);
+        calculateContext.setSkip(Collections.emptyList());
+        calculateContext.setOptions(options);
+        calculateContext.setTrigger(isTrigger);
+        calculateContext.setOriginal(original);
+
+        // 处理字段的inputOptions
+        sortedFields.forEach(field -> {
+            NkField nkField = customObjectManager.getCustomObject(field.getInputType(), NkField.class);
+            nkField.processOptions(field, context, data, calculateContext);
+        });
+
+        sortedFields.forEach( field -> {
+            calculateContext.setFieldTrigger(isTrigger && options !=null && StringUtils.equals(field.getKey(), (String) options.get("triggerKey")));
+
+            NkField nkField = customObjectManager.getCustomObject(field.getInputType(), NkField.class);
+            nkField.beforeCalculate(field, context, data, calculateContext);
+        });
+
+        fields.forEach( field -> {
+
+            if(StringUtils.isNotBlank(field.getSpELControl())){
+
+                if(log.isInfoEnabled())
+                    log.info("{}\t\t{} 执行表达式 KEY={} T=CONTROL EL={}",
+                            NkDocEngineContext.currLog(),
+                            cardKey,
+                            field.getKey(),
+                            field.getSpELControl()
+                    );
+                try{
+                    field.setControl((Integer) spELManager.invoke(field.getSpELControl(),context));
+                }catch(Exception e){
+                    throw new NkDefineException(
+                            String.format("KEY=%s T=CONTROL %s",
                                     field.getKey(),
-                                    field.getSpELControl()
-                            );
-                        try{
-                            field.setControl((Integer) spELManager.invoke(field.getSpELControl(),context));
-                        }catch(Exception e){
-                            throw new NkDefineException(
-                                    String.format("KEY=%s T=CONTROL %s",
-                                            field.getKey(),
-                                            e.getMessage()
-                                    )
-                            );
-                        }
-                    }
+                                    e.getMessage()
+                            )
+                    );
+                }
+            }
 
-                    if (StringUtils.isNotBlank(field.getSpELContent())) {
+            if (StringUtils.isNotBlank(field.getSpELContent())) {
 
-                        String trigger = null;
-                        if (ArrayUtils.contains(field.getSpELTriggers(), "ALWAYS")) {
-                            trigger = "ALWAYS";
-                        } else if (ArrayUtils.contains(field.getSpELTriggers(), "INIT") && isNewCreate) {
-                            trigger = "INIT";
-                        } else if (ArrayUtils.contains(field.getSpELTriggers(), "BLANK") && isBlank(data.get(field.getKey()))) {
-                            trigger = "BLANK";
-                        }
+                String trigger = null;
+                if (ArrayUtils.contains(field.getSpELTriggers(), "ALWAYS")) {
+                    trigger = "ALWAYS";
+                } else if (ArrayUtils.contains(field.getSpELTriggers(), "INIT")) {
+                    trigger = "INIT";
+                } else if (ArrayUtils.contains(field.getSpELTriggers(), "BLANK") && isBlank(data.get(field.getKey()))) {
+                    trigger = "BLANK";
+                }
 
-                        if (trigger != null) {
+                if (trigger != null) {
 
-                            if (log.isInfoEnabled())
-                                log.info("{}\t\t{} 执行表达式 KEY={} T={} EL={}",
-                                        NkDocEngineContext.currLog(),
-                                        cardKey,
+                    if (log.isInfoEnabled())
+                        log.info("{}\t\t{} 执行表达式 KEY={} T={} EL={}",
+                                NkDocEngineContext.currLog(),
+                                cardKey,
+                                field.getKey(),
+                                trigger,
+                                field.getSpELContent()
+                        );
+
+                    try {
+                        data.set(field.getKey(), spELManager.invoke(field.getSpELContent(), context));
+                    } catch (Exception e) {
+                        throw new NkDefineException(
+                                String.format("KEY=%s T=%s %s",
                                         field.getKey(),
                                         trigger,
-                                        field.getSpELContent()
-                                );
-
-                            try {
-                                data.set(field.getKey(), spELManager.invoke(field.getSpELContent(), context));
-                            } catch (Exception e) {
-                                throw new NkDefineException(
-                                        String.format("KEY=%s T=%s %s",
-                                                field.getKey(),
-                                                trigger,
-                                                e.getMessage()
-                                        )
-                                );
-                            }
-                        }
+                                        e.getMessage()
+                                )
+                        );
                     }
-                    context.setVariable(field.getKey(), data.get(field.getKey()));
-                }).forEach(field->{
-                    NkDynamicCalculateContext calculateContext = new NkDynamicCalculateContext();
-                    calculateContext.setDoc(doc);
-                    calculateContext.setOptions(options);
+                }
+            }
 
-                    NkField nkField = customObjectManager.getCustomObject(field.getInputType(), NkField.class);
-                    nkField.processOptions(field, context, data, calculateContext);
+            calculateContext.setFieldTrigger(
+                    isTrigger
+                            && options !=null
+                            && StringUtils.equals(field.getKey(), (String) options.get("triggerKey"))
+            );
 
-                    if(calculate){
+            customObjectManager.getCustomObject(field.getInputType(), NkField.class)
+                    .afterCalculate(field, context, data, calculateContext);
 
-                        calculateContext.setTrigger(isTrigger);
-                        calculateContext.setOriginal(original);
-                        calculateContext.setFieldTrigger(isTrigger && options !=null && StringUtils.equals(field.getKey(), (String) options.get("triggerKey")));
-
-                        nkField.afterCalculate(field, context, data, calculateContext);
-                    }
-                });
+            context.setVariable(field.getKey(), data.get(field.getKey()));
+        });
     }
 
     private static boolean isBlank(Object value){

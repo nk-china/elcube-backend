@@ -9,7 +9,6 @@ import cn.nkpro.ts5.docengine.utils.CopyUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,27 +41,27 @@ public class NkDynamicGrid extends NkDynamicBase<List<Map>, NkDynamicGridDef> {
             );
         }
 
-        this.execSpEL(data, doc, d.getItems(), defIV.getCardKey(), true, false, false, Collections.emptyMap());
+        this.processOptions(EasySingle.from(data), doc, d.getItems());
         return super.afterCreate(doc, preDoc, data, defIV, d);
     }
 
     @Override
     public List<Map> afterGetData(DocHV doc, List<Map> data, DocDefIV defIV, NkDynamicGridDef d) {
-        this.execSpEL(data, doc, d.getItems(), defIV.getCardKey(), false, false, false, Collections.emptyMap());
+        this.processOptions(EasySingle.from(data), doc, d.getItems());
         return super.afterGetData(doc, data, defIV, d);
     }
 
     @Override
     public List<Map> calculate(DocHV doc, List<Map> data, DocDefIV defIV, NkDynamicGridDef d, boolean isTrigger, Object options) {
-        this.execSpEL(data, doc, d.getItems(), defIV.getCardKey(), false, true, true, (Map) options);
+        this.execSpEL(data, doc, d.getItems(), defIV.getCardKey(), isTrigger, (Map) options);
         return super.calculate(doc, data, defIV, d, isTrigger, options);
     }
 
-    private void execSpEL(List<Map> data, DocHV doc, List<NkDynamicGridDefI> fields, String cardKey, boolean isNewCreate, boolean calculate, boolean isTrigger, Map options){
+    private void execSpEL(List<Map> data, DocHV doc, List<NkDynamicGridDefI> fields, String cardKey, boolean isTrigger, Map options){
         if(data.isEmpty())
-            execSpEL(EasySingle.from(new HashMap()), doc, fields,cardKey, isNewCreate, calculate, isTrigger, options);
+            execSpEL(EasySingle.from(new HashMap()), doc, fields,cardKey, isTrigger, options);
         else
-            data.forEach(item-> execSpEL(EasySingle.from(item), doc, fields, cardKey, isNewCreate, calculate, isTrigger, options));
+            data.forEach(item-> execSpEL(EasySingle.from(item), doc, fields, cardKey, isTrigger, options));
     }
 
     @Override

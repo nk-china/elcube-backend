@@ -38,10 +38,10 @@ export default {
     },
     methods:{
         docSelected(e){
-            const value = {
+            const value = Object.assign(this.value||{},{
                 docId:e.docId,
                 docName:e.docName
-            };
+            });
             this.$emit('input', value);
             this.$emit('change',{});
         }

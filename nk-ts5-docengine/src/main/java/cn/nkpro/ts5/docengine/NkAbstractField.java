@@ -3,9 +3,9 @@ package cn.nkpro.ts5.docengine;
 import cn.nkpro.ts5.annotation.NkNote;
 import cn.nkpro.ts5.co.NkAbstractCustomScriptObject;
 import cn.nkpro.ts5.co.NkScriptV;
-import cn.nkpro.ts5.docengine.cards.NkDynamicCalculateContext;
+import cn.nkpro.ts5.docengine.cards.NkBaseContext;
+import cn.nkpro.ts5.docengine.cards.NkCalculateContext;
 import cn.nkpro.ts5.docengine.cards.NkDynamicFormDefI;
-import cn.nkpro.ts5.docengine.model.DocHV;
 import cn.nkpro.ts5.docengine.model.easy.EasySingle;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -52,17 +52,17 @@ public abstract class NkAbstractField extends NkAbstractCustomScriptObject imple
     }
 
     @Override
-    public void beforeCalculate(NkDynamicFormDefI field, EvaluationContext context, EasySingle card, NkDynamicCalculateContext calculateContext) {
+    public void beforeCalculate(NkDynamicFormDefI field, EvaluationContext context, EasySingle card, NkCalculateContext calculateContext) {
 
     }
 
     @Override
-    public void processOptions(NkDynamicFormDefI field, EvaluationContext context, EasySingle card, NkDynamicCalculateContext calculateContext) {
+    public void processOptions(NkDynamicFormDefI field, EvaluationContext context, EasySingle card, NkBaseContext baseContext) {
 
     }
 
     @Override
-    public void afterCalculate(NkDynamicFormDefI field, EvaluationContext context, EasySingle card, NkDynamicCalculateContext calculateContext) {
+    public void afterCalculate(NkDynamicFormDefI field, EvaluationContext context, EasySingle card, NkCalculateContext calculateContext) {
 
     }
 }

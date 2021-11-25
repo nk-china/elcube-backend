@@ -10,9 +10,6 @@ import cn.nkpro.ts5.docengine.model.easy.EasySingle;
 import cn.nkpro.ts5.docengine.service.NkDocEngineContext;
 import cn.nkpro.ts5.docengine.utils.CopyUtils;
 import cn.nkpro.ts5.exception.NkDefineException;
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
@@ -32,7 +29,7 @@ import java.util.stream.Collectors;
 @Order(1002)
 @NkNote("联动表单")
 @Component("NkLinkageForm")
-public class NkLinkageForm extends NkAbstractCard<Map<String,Object>, NkLinkageFormDef> {
+public class NkLinkageForm extends NkDynamicBase<Map<String,Object>, NkLinkageFormDef> {
 
     @Autowired
     protected NkCustomObjectManager customObjectManager;
@@ -50,51 +47,47 @@ public class NkLinkageForm extends NkAbstractCard<Map<String,Object>, NkLinkageF
 
     @Override
     public Map<String,Object> afterCreate(DocHV doc, DocHV preDoc, Map<String,Object> data, DocDefIV defIV, NkLinkageFormDef d) {
-
-        if(defIV.getCopyFromRef()!=null&&defIV.getCopyFromRef()==1){
-            CopyUtils.copy(
-                    preDoc.getData().get(defIV.getCardKey()),
-                    data,
-                    d.getItems().stream().map(NkLinkageFormDefI::getKey).collect(Collectors.toList())
-            );
-        }
-
+        this.copyFromPre(preDoc, data, defIV, d.getItems());
+        this.processOptions(EasySingle.from(data), doc, d.getItems());
         return super.afterCreate(doc, preDoc, data, defIV, d);
     }
 
     @Override
     public Map<String,Object> afterGetData(DocHV doc, Map<String,Object> data, DocDefIV defIV, NkLinkageFormDef d) {
+        this.processOptions(EasySingle.from(data), doc, d.getItems());
         return super.afterGetData(doc, data, defIV, d);
     }
 
     @Override
     public Map<String, Object> calculate(DocHV doc, Map<String, Object> data, DocDefIV defIV, NkLinkageFormDef d, boolean isTrigger, Object options) {
-        this.execSpEL(EasySingle.from(data), doc, d.getItems(), defIV.getCardKey(), isTrigger, (Map) options);
+        this.execLinkageSpEL(EasySingle.from(data), doc, d.getItems(), defIV.getCardKey(), isTrigger, (Map) options);
         return super.calculate(doc, data, defIV, d, isTrigger, options);
     }
 
-
-    private void execSpEL(EasySingle data, DocHV doc, List<? extends NkLinkageFormDefI> fields, String cardKey, boolean isTrigger, Map options){
+    private void execLinkageSpEL(EasySingle data, DocHV doc, List<? extends NkLinkageFormDefI> fields, String cardKey, boolean isTrigger, Map options){
 
         EvaluationContext context = spELManager.createContext(doc);
 
         Map<String,Object> original = new HashMap<>();
 
+        // 按计算顺序排序
         List<? extends NkLinkageFormDefI> sortedFields = fields.stream()
                 .sorted(Comparator.comparing(NkDynamicFormDefI::getCalcOrder)).collect(Collectors.toList());
 
+        // 初始化上下文及保留原始值
         sortedFields.forEach(field -> {
             original.put(field.getKey(), data.get(field.getKey()));
             context.setVariable(field.getKey(), data.get(field.getKey()));
         });
 
+        // 设置需要跳过SpEL计算的字段
         List<String> skip = new ArrayList<>();
         if(isTrigger && options !=null){
             skip.add((String) options.get("triggerKey"));
         }
 
-
-        NkDynamicCalculateContext calculateContext = new NkDynamicCalculateContext();
+        // 创建一个计算上下文
+        NkCalculateContext calculateContext = new NkCalculateContext();
         calculateContext.setDoc(doc);
         calculateContext.setFields(sortedFields);
         calculateContext.setSkip(skip);
@@ -102,8 +95,16 @@ public class NkLinkageForm extends NkAbstractCard<Map<String,Object>, NkLinkageF
         calculateContext.setTrigger(isTrigger);
         calculateContext.setOriginal(original);
 
+        // 处理字段的inputOptions
+        sortedFields.forEach(field -> {
+            NkField nkField = customObjectManager.getCustomObject(field.getInputType(), NkField.class);
+            nkField.processOptions(field, context, data, calculateContext);
+        });
+
+        // 执行字段计算
         sortedFields.forEach(field -> {
 
+            // 执行字段的SpEL
             if(!skip.contains(field.getKey()) && StringUtils.isNotBlank(field.getSpELContent())){
                 if (log.isInfoEnabled())
                     log.info("{}\t\t{} 执行表达式 KEY={} EL={}",
@@ -125,11 +126,17 @@ public class NkLinkageForm extends NkAbstractCard<Map<String,Object>, NkLinkageF
                 }
             }
 
-            calculateContext.setFieldTrigger(isTrigger && options !=null && StringUtils.equals(field.getKey(), (String) options.get("triggerKey")));
+            calculateContext.setFieldTrigger(
+                    isTrigger
+                && options !=null
+                && StringUtils.equals(field.getKey(), (String) options.get("triggerKey"))
+            );
 
-            NkField nkField = customObjectManager.getCustomObject(field.getInputType(), NkField.class);
-            nkField.afterCalculate(field, context, data, calculateContext);
+            // 执行字段的计算逻辑
+            customObjectManager.getCustomObject(field.getInputType(), NkField.class)
+                    .afterCalculate(field, context, data, calculateContext);
 
+            // 更新上下文中的值
             context.setVariable(field.getKey(), data.get(field.getKey()));
         });
     }
