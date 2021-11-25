@@ -11,6 +11,8 @@ public class TestSimple {
 
     @Test
     public void test() throws Exception {
+
+        System.out.println(String.format("%012d",1));
         String plain =
                 "{id:'"+ UUID.randomUUID().toString().replaceAll("-","").toUpperCase()+"',name:'纽扣互联（北京）科技有限公司',expire:'20991231'}";
 

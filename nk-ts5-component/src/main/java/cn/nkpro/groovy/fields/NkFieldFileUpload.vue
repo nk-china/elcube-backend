@@ -187,8 +187,8 @@ export default {
                 this.$message.warn("文件URL过大，不能预览");
             }
         },
-        change(e){
-            this.$emit('change',e);
+        change(){
+            this.$emit('change',{});
         }
     }
 }

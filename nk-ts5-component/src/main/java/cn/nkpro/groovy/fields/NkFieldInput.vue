@@ -1,6 +1,6 @@
 <template>
     <span v-if="!editMode">{{value}}</span>
-    <a-input size="small" v-else v-model="val" @change="change" @blur="blur" :max-length="inputOptions.maxLength"></a-input>
+    <a-input size="small" v-else v-model="val" @blur="blur" :max-length="inputOptions.maxLength"></a-input>
 </template>
 
 <script>
@@ -29,11 +29,8 @@ export default {
         }
     },
     methods:{
-        change(e){
-            //this.$emit('change',e);
-        },
-        blur(e){
-            this.$emit('change',e);
+        blur(){
+            this.$emit('change',{});
         }
     }
 }

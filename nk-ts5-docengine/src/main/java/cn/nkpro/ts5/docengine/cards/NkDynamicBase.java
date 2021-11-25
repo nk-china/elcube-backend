@@ -38,6 +38,7 @@ public class NkDynamicBase<DT, DDT> extends NkAbstractCard<DT, DDT> {
                     if(calculate){
                         NkDynamicCalculateContext calculateContext = new NkDynamicCalculateContext();
                         calculateContext.setDoc(doc);
+                        calculateContext.setOptions(options);
                         calculateContext.setTrigger(isTrigger);
                         calculateContext.setFieldTrigger(isTrigger && options !=null && StringUtils.equals(field.getKey(), (String) options.get("triggerKey")));
 
@@ -108,6 +109,7 @@ public class NkDynamicBase<DT, DDT> extends NkAbstractCard<DT, DDT> {
                 }).forEach(field->{
                     NkDynamicCalculateContext calculateContext = new NkDynamicCalculateContext();
                     calculateContext.setDoc(doc);
+                    calculateContext.setOptions(options);
 
                     NkField nkField = customObjectManager.getCustomObject(field.getInputType(), NkField.class);
                     nkField.processOptions(field, context, data, calculateContext);

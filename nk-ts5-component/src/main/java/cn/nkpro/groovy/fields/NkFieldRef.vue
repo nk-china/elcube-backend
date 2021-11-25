@@ -5,9 +5,8 @@
     <div v-else>
         <a-input size="small"
                  :read-only="true"
-                 @blur="blur"
                  @click="docSelectModalVisible=true"
-                 style="cursor: pointer;"
+                 style="cursor: pointer; max-width: 300px;"
                  :value="value && value.docName"
         ></a-input>
         <nk-doc-select-modal v-model="docSelectModalVisible"
@@ -44,7 +43,7 @@ export default {
                 docName:e.docName
             };
             this.$emit('input', value);
-            this.$emit('change',value);
+            this.$emit('change',{});
         }
     }
 }

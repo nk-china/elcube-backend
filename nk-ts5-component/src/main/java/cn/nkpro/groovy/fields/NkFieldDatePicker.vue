@@ -36,8 +36,8 @@
         },
         methods:{
             moment,
-            change(e){
-                this.$emit('change',e);
+            change(){
+                this.$emit('change',{});
             }
         }
     }

@@ -8,6 +8,7 @@ import cn.nkpro.ts5.docengine.cards.NkDynamicCalculateContext
 import cn.nkpro.ts5.docengine.cards.NkDynamicFormDefI
 import cn.nkpro.ts5.docengine.cards.NkDynamicFormField
 import cn.nkpro.ts5.docengine.cards.NkDynamicGridField
+import cn.nkpro.ts5.docengine.cards.NkLinkageFormField
 import cn.nkpro.ts5.docengine.model.easy.EasySingle
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
@@ -20,7 +21,7 @@ import static com.alibaba.fastjson.JSON.parseObject
 @Order(80)
 @NkNote("单据引用")
 @Component("NkFieldRef")
-class NkFieldRef extends NkAbstractField implements NkDynamicFormField, NkDynamicGridField {
+class NkFieldRef extends NkAbstractField implements NkDynamicFormField, NkDynamicGridField, NkLinkageFormField {
 
     @Autowired
     private NkSpELManager spELManager
@@ -43,25 +44,44 @@ class NkFieldRef extends NkAbstractField implements NkDynamicFormField, NkDynami
     @Override
     void afterCalculate(NkDynamicFormDefI field, EvaluationContext context, EasySingle card, NkDynamicCalculateContext calculateContext) {
 
-        String dataMappings = field.getInputOptions().get("dataMappings")
 
-        // 如果映射模版不为空
-        if(StringUtils.isNotBlank(dataMappings)){
+        // 当上下文计算由当前字段触发、或者当前字段的值在计算阶段发生改变
+        if(calculateContext.fieldTrigger || !Objects.equals(card.get(field.getKey()),calculateContext.original.get(field.getKey()))){
+            String optionMappings = field.getInputOptions().get("optionMappings")
+            String dataMappings = field.getInputOptions().get("dataMappings")
 
             Map data = card.get(field.getKey())
 
-            // 当上下文计算由当前字段触发、或者当前字段的值在计算阶段发生改变
-            if(calculateContext.fieldTrigger || !Objects.equals(card.get(field.getKey()),calculateContext.original.get(field.getKey()))){
+            if(StringUtils.isNotBlank(data.get("docId") as CharSequence) && !StringUtils.isAllBlank(optionMappings,dataMappings)){
 
                 // 获取选中的单据
                 def refDoc = docEngine.detail(data.get("docId") as String)
 
-                // 将数据映射到 卡片数据
-                def json = parseObject(spELManager.convert(dataMappings, refDoc))
+                // 如果映射模版不为空
+                if(StringUtils.isNotBlank(optionMappings)){
+                    parseObject(spELManager.convert(optionMappings, refDoc))
+                        .forEach({ k, v ->
+                            NkDynamicFormDefI f = calculateContext.getFields().find { f -> f.getKey() == k }
+                            if(f){
+                                Map map = f.getInputOptions()
+                                (v as Map).forEach({vk,vv -> map.put(vk,vv)})
+                                // 顺便把值也清空
+                                //card.set(k,null)
+                            }
+                        })
+                }
 
-                json.forEach({ k, v -> card.set(k,v) })
+                // 如果映射模版不为空
+                if(StringUtils.isNotBlank(dataMappings)){
+                    // 将数据映射到 卡片数据，这里设置的值，应该符合optionMappings中的规则，不然会导致数据不合理
+                    parseObject(spELManager.convert(dataMappings, refDoc))
+                        .forEach({ k, v ->
+                            card.set(k,v)
+                            context.setVariable(k,v)
+                            calculateContext.getSkip().add(k)
+                        })
+                }
             }
         }
-
     }
 }

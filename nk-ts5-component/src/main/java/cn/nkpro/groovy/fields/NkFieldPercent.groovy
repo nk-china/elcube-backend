@@ -11,14 +11,12 @@ import cn.nkpro.ts5.docengine.model.easy.EasySingle
 import org.springframework.core.annotation.Order
 import org.springframework.expression.EvaluationContext
 import org.springframework.stereotype.Component
-
 import java.math.RoundingMode
 
-@Order(20)
-@NkNote("数字")
-@Component("NkFieldInputNumber")
-class NkFieldInputNumber extends NkAbstractField implements NkDynamicFormField, NkDynamicGridField, NkLinkageFormField {
-
+@Order(21)
+@NkNote("百分比")
+@Component("NkFieldPercent")
+class NkFieldPercent extends NkAbstractField implements NkDynamicFormField, NkDynamicGridField, NkLinkageFormField {
     @Override
     void afterCalculate(NkDynamicFormDefI field, EvaluationContext context, EasySingle card, NkDynamicCalculateContext calculateContext) {
 
@@ -27,7 +25,7 @@ class NkFieldInputNumber extends NkAbstractField implements NkDynamicFormField, 
         if(value !=null ){
             card.set(field.getKey(),
                 new BigDecimal(value as double)
-                    .setScale(field.getInputOptions().getOrDefault('digits', 2) as int, RoundingMode.HALF_UP)
+                    .setScale(field.getInputOptions().getOrDefault('digits', 4) as int, RoundingMode.HALF_UP)
                     .doubleValue()
             )
         }

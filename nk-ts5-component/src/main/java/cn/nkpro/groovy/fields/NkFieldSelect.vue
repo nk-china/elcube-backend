@@ -32,8 +32,8 @@ export default {
         }
     },
     methods:{
-        change(e){
-            this.$emit('change',e);
+        change(){
+            this.$emit('change',{});
         }
     }
 }
