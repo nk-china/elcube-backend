@@ -22,9 +22,11 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
+import org.elasticsearch.search.suggest.Suggest;
 import org.elasticsearch.search.suggest.SuggestBuilder;
 import org.elasticsearch.search.suggest.SuggestBuilders;
 import org.elasticsearch.search.suggest.SuggestionBuilder;
+import org.elasticsearch.search.suggest.completion.CompletionSuggestion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -127,11 +129,13 @@ public class NkDocSearchService {
         if(!boolQueryBuilder.must().isEmpty())
             sourceBuilder.query(boolQueryBuilder);
 
+        sourceBuilder.fetchSource(params.getSuggest().getString("field"),null);
+
         SuggestionBuilder suggestionBuilder = SuggestBuilders
-                .phraseSuggestion(
+                .completionSuggestion(
                         params.getSuggest().getString("field")
                 )
-                .text(
+                .prefix(
                         params.getSuggest().getString("text")
                 );
         SuggestBuilder suggestBuilder = new SuggestBuilder();
@@ -256,7 +260,11 @@ public class NkDocSearchService {
         List<Object> suggests = null;
         if(response.getSuggest()!=null){
             List<Object> sug = new ArrayList<>();
-            response.getSuggest().forEach(sug::add);
+            response.getSuggest().forEach(i->{
+                CompletionSuggestion completionSuggestion = (CompletionSuggestion) i;
+                completionSuggestion.getOptions()
+                        .forEach(option -> sug.add(option.getHit().getSourceAsMap()));
+            });
             suggests = sug;
         }
 
