@@ -24,11 +24,6 @@ class CiticCardHeader extends NkAbstractCard<Map,Def> {
     }
 
     @Override
-    String getDataComponentName() {
-        return "NkCardHeaderDefault"
-    }
-
-    @Override
     Map afterGetData(DocHV doc, Map data, DocDefIV defIV, Def d) {
 
         if(StringUtils.isNotBlank(d.getPartnerNameSpEL())){

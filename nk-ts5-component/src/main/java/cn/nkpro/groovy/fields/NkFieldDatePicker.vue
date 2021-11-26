@@ -10,7 +10,7 @@
     import NkFormat from 'NkFormat';
     export default {
         props:{
-            value: Number,
+            value: {},
             editMode: Boolean,
             inputOptions: {
                 type:Object,

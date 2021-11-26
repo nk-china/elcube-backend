@@ -23,5 +23,7 @@ public class NkDynamicFormDefI {
     private Boolean required;
     private String message;
 
+    private String indexName;
+
     private Map<String,Object> inputOptions;
 }

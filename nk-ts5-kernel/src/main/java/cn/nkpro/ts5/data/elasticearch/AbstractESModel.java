@@ -63,7 +63,11 @@ public abstract class AbstractESModel {
      * @param value 值
      */
     public void addDynamicField(String key, Object value){
-        dynamics.put(key, value);
+        if(value instanceof Date){
+            dynamics.put(key,((Date) value).getTime()/1000);
+        }else{
+            dynamics.put(key, value);
+        }
     }
 
     public void validateDynamic(){

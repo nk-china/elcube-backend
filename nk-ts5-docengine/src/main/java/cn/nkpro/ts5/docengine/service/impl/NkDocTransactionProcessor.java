@@ -24,6 +24,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.apifan.common.random.source.PersonInfoSource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.aop.framework.Advised;
@@ -278,6 +279,8 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
             log.info("{}保存单据内容", NkDocEngineContext.currLog());
 
         AtomicReference<DocHV> atomic = new AtomicReference(doc);
+        doc.getDynamics().clear();
+
         // 原始单据
         Optional<DocHV> optionalOriginal = Optional.ofNullable(original);
 
@@ -421,6 +424,31 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         //example.createCriteria().andDocIdEqualTo(atomic.get().getDocId());
         //docIIndexMapper.deleteByExample(example);
 
+        if(MapUtils.isNotEmpty(doc.getDynamics())){
+            doc.getDynamics().forEach((name,value)->{
+                if(value!=null){
+                    int i = name.lastIndexOf("_");
+
+                    if(i==-1||i==name.length()-1){
+                        throw new NkDefineException("索引名不合法");
+                    }
+
+                    DocIIndex index = new DocIIndex();
+                    index.setDocId(atomic.get().getDocId());
+                    index.setName(name);
+                    index.setValue(JSON.toJSONString(value));
+                    index.setDataType(name.substring(i+1));
+                    index.setOrderBy(doc.getDynamics().size());
+                    index.setUpdatedTime(DateTimeUtilz.nowSeconds());
+
+                    if(optionalOriginal.isPresent()&&original.getDynamics().containsKey(name)){
+                        docIIndexMapper.updateByPrimaryKey(index);
+                    }else{
+                        docIIndexMapper.insert(index);
+                    }
+                }
+            });
+        }
         if(atomic.get().getDef().getIndexRules()!=null)
             atomic.get().getDef()
                 .getIndexRules()
@@ -438,7 +466,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
                     index.setName(name);
                     index.setValue(JSON.toJSONString(value));
                     index.setDataType(type);
-                    index.setOrderBy(rule.getOrderBy());
+                    index.setOrderBy(doc.getDynamics().size()+rule.getOrderBy());
                     index.setUpdatedTime(DateTimeUtilz.nowSeconds());
 
                     if(optionalOriginal.isPresent()&&original.getDynamics().containsKey(name)){
@@ -447,6 +475,8 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
                         docIIndexMapper.insert(index);
                     }
                 });
+
+
         // 删除已过时的索引
         optionalOriginal.ifPresent(o -> o.getDynamics().forEach((k, v) -> {
             if (!atomic.get().getDynamics().containsKey(k)) {
@@ -509,7 +539,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if(log.isInfoEnabled())log.info("{}保存单据内容 触发单据 afterUpdated 接口", NkDocEngineContext.currLog());
-        processCycle(atomic.get(), NkDocCycleContext.build(NkDocCycle.afterCalculated).original(original));
+        processCycle(atomic.get(), NkDocCycleContext.build(NkDocCycle.afterUpdated).original(original));
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////

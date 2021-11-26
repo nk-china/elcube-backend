@@ -5,6 +5,7 @@ import cn.nkpro.ts5.docengine.NkField;
 import cn.nkpro.ts5.docengine.model.DocDefIV;
 import cn.nkpro.ts5.docengine.model.DocHV;
 import cn.nkpro.ts5.co.easy.EasySingle;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -36,6 +37,23 @@ public class NkDynamicForm extends NkDynamicBase<Map<String,Object>, NkDynamicFo
     public Map<String,Object> afterGetData(DocHV doc, Map<String,Object> data, DocDefIV defIV, NkDynamicFormDef d) {
         this.processOptions(EasySingle.from(data), doc, d.getItems());
         return super.afterGetData(doc, data, defIV, d);
+    }
+
+    @Override
+    public Map<String, Object> beforeUpdate(DocHV doc, Map<String, Object> data, Map<String, Object> original, DocDefIV defIV, NkDynamicFormDef d) {
+
+        d.getItems().forEach(item->{
+            if(StringUtils.isNotBlank(item.getIndexName())){
+                doc.getDynamics().put(item.getIndexName(), data.get(item.getKey()));
+            }
+        });
+
+        return super.beforeUpdate(doc, data, original, defIV, d);
+    }
+
+    @Override
+    public Map<String, Object> afterUpdated(DocHV doc, Map<String, Object> data, Map<String, Object> original, DocDefIV defIV, NkDynamicFormDef d) {
+        return super.afterUpdated(doc, data, original, defIV, d);
     }
 
     @Override

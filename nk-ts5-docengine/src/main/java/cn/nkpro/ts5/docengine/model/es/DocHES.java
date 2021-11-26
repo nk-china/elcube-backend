@@ -29,6 +29,8 @@ public class DocHES extends AbstractBaseES {
     private String docDesc;
 
     public static DocHES from(DocHV docHV){
-        return BeanUtilz.copyFromObject(docHV, DocHES.class);
+        DocHES doc = BeanUtilz.copyFromObject(docHV, DocHES.class);
+        docHV.getDynamics().forEach(doc::addDynamicField);
+        return doc;
     }
 }

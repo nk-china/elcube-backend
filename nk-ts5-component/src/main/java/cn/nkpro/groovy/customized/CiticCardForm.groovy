@@ -9,6 +9,7 @@ import cn.nkpro.ts5.docengine.cards.NkDynamicFormField
 import cn.nkpro.ts5.docengine.model.DocDefIV
 import cn.nkpro.ts5.docengine.model.DocHV
 import cn.nkpro.ts5.co.easy.EasySingle
+import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
@@ -41,11 +42,23 @@ class CiticCardForm extends NkDynamicBase<Map<String,Object>, CiticFormDef> {
 
         this.processOptions(EasySingle.from(data), doc, d.getItems())
 
+        d.getItems().forEach({ item ->
+            if (StringUtils.isNotBlank(item.getIndexName())) {
+                doc.getDynamics().put(item.getIndexName(), data.get(item.getKey()))
+            }
+        })
+
         return data
     }
 
     @Override
     Map<String, Object> beforeUpdate(DocHV doc, Map<String, Object> data, Map<String, Object> original, DocDefIV defIV, CiticFormDef d) {
+
+        d.getItems().forEach({ item ->
+            if (StringUtils.isNotBlank(item.getIndexName())) {
+                doc.getDynamics().put(item.getIndexName(), data.get(item.getKey()))
+            }
+        })
 
         def upsetFields = d.getItems()
                 .stream()
