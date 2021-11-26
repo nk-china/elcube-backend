@@ -4,7 +4,7 @@
             {{doc.def && doc.def.docType}} | {{doc.def && doc.def.docName}}
         </nk-form-item>
         <nk-form-item term="交易伙伴">
-            <router-link v-if="doc.partnerId" :to="`/apps/doc/detail/${doc.partnerId}`">{{doc.partnerName}}</router-link>
+            <router-link v-if="doc.partnerId" :to="`/apps/docs/detail/${doc.partnerId}`">{{doc.partnerName}}</router-link>
             <span v-else style="color: rgba(0, 0, 0, 0.45);">&lt;未选择&gt;</span>
         </nk-form-item>
         <nk-form-item term="交易编号">
