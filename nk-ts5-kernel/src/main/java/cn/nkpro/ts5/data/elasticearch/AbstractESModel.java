@@ -23,6 +23,8 @@ import java.util.*;
 // 分词文本：需要进行分词的 中文或中英文混合 的文本
 @ESDynamicTemplate(value = "text",      match = "*_text",   mappingType = ESFieldType.Text,     analyzer = ESAnalyzerType.ik_max_word,    original = true)
 @ESDynamicTemplate(value = "text$",     match = "*_text$",  mappingType = ESFieldType.Text,     analyzer = ESAnalyzerType.ik_max_word,    original = true, copyToKeyword = true)
+
+@ESDynamicTemplate(value = "completion",match = "*_completion",   mappingType = ESFieldType.Completion,analyzer = ESAnalyzerType.ik_max_word,    original = true)
 // 名字：人名、企业名称等
 @ESDynamicTemplate(value = "name",      match = "*_name",   mappingType = ESFieldType.Text,     analyzer = ESAnalyzerType.standard,       original = true)
 @ESDynamicTemplate(value = "name$",     match = "*_name$",  mappingType = ESFieldType.Text,     analyzer = ESAnalyzerType.standard,       original = true, copyToKeyword = true)

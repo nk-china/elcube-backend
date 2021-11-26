@@ -4,6 +4,7 @@ import lombok.Getter;
 
 public enum ESFieldType {
     Text("text"),
+    Completion("completion"),
     Integer("integer"),
     Long("long"),
     Date("date"),

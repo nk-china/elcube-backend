@@ -38,4 +38,6 @@ public class SearchParams {
     private String orderField;
     private String order = "ASC";
 
+    private JSONObject suggest;
+
 }

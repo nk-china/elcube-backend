@@ -42,11 +42,17 @@ public class DocController {
     private NkDocSearchService searchService;
     @Autowired@SuppressWarnings("all")
     private NkDocHistoryService docHistoryService;
-    
+
     @NkNote("1.拉取交易列表数据")
     @RequestMapping(value = "/list/{index}",method = RequestMethod.POST)
     public ESPageList<JSONObject> list(@RequestBody SearchParams params, @PathVariable String index) {
         return searchService.queryList(index, null, params);
+    }
+
+    @NkNote("1.拉取交易列表搜索提示")
+    @RequestMapping(value = "/suggest/{index}",method = RequestMethod.POST)
+    public ESPageList<JSONObject> suggest(@RequestBody SearchParams params, @PathVariable String index) {
+        return searchService.querySuggest(index, null, params);
     }
 
     

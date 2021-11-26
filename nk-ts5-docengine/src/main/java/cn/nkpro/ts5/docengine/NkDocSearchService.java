@@ -22,10 +22,14 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.sort.SortBuilders;
 import org.elasticsearch.search.sort.SortOrder;
+import org.elasticsearch.search.suggest.SuggestBuilder;
+import org.elasticsearch.search.suggest.SuggestBuilders;
+import org.elasticsearch.search.suggest.SuggestionBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -79,6 +83,64 @@ public class NkDocSearchService {
     ){
         return this.queryList("document", preQueryBuilder, params);
     }
+
+
+    public ESPageList<JSONObject> querySuggest(
+            String indexName,
+            QueryBuilder preQueryBuilder,
+            SearchParams params){
+
+
+        BoolQueryBuilder postQueryBuilder = QueryBuilders.boolQuery();
+
+        if(preQueryBuilder!=null){
+            postQueryBuilder.must(preQueryBuilder);
+        }
+        // 功能前置条件
+        if(params.getPostCondition()!=null) {
+            postQueryBuilder.must(
+                new LimitQueryBuilder(params.getPostCondition())
+            );
+        }
+
+        QueryBuilder permQuery = docPermService.buildDocFilter(NkDocPermService.MODE_READ, null, null, false);
+        if(permQuery!=null)
+            postQueryBuilder.must(permQuery);
+
+        // 构造检索语句
+        SearchSourceBuilder sourceBuilder = new SearchSourceBuilder()
+                .from(0)
+                .size(0);
+        // 过滤权限
+        if(!postQueryBuilder.must().isEmpty())
+            sourceBuilder.postFilter(postQueryBuilder);
+
+        BoolQueryBuilder boolQueryBuilder = QueryBuilders.boolQuery();
+
+        if(params.getConditions()!=null){
+            JSONObject filter = params.getConditions();
+            if(filter!=null){
+                filter.forEach((k,v)-> boolQueryBuilder.must(new LimitQueryBuilder(filter.getJSONObject(k))));
+            }
+        }
+
+        if(!boolQueryBuilder.must().isEmpty())
+            sourceBuilder.query(boolQueryBuilder);
+
+        SuggestionBuilder suggestionBuilder = SuggestBuilders
+                .phraseSuggestion(
+                        params.getSuggest().getString("field")
+                )
+                .text(
+                        params.getSuggest().getString("text")
+                );
+        SuggestBuilder suggestBuilder = new SuggestBuilder();
+        suggestBuilder.addSuggestion(params.getSuggest().getString("field"), suggestionBuilder);
+        sourceBuilder.suggest(suggestBuilder);
+
+        return searchPage(indexName,sourceBuilder);
+    }
+
 
     public ESPageList<JSONObject> queryList(
             String indexName,
@@ -191,6 +253,13 @@ public class NkDocSearchService {
                 })
                 .collect(Collectors.toList());
 
+        List<Object> suggests = null;
+        if(response.getSuggest()!=null){
+            List<Object> sug = new ArrayList<>();
+            response.getSuggest().forEach(sug::add);
+            suggests = sug;
+        }
+
         Map<String, ESAgg> aggs = null;
         if(response.getAggregations()!=null){
 
@@ -224,6 +293,7 @@ public class NkDocSearchService {
         return new ESPageList<>(
                 collect,
                 aggs,
+                suggests,
                 builder.from(),
                 builder.size(),
                 response.getHits().getTotalHits().value

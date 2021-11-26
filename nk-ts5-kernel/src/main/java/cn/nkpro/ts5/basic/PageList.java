@@ -27,10 +27,9 @@ public class PageList<T>{
 		this.list = list;
 		this.from = from;
 		this.rows = size;
-		this.page = from/size+1;
+		this.page = size!=0?(from/size+1):1;
 		this.total = total;
-		this.max = total == 0 ? 0
-				: ((total / size) + (total % size == 0 ? 0 : 1));
+		this.max = size == 0 || total == 0 ? 0 : ((total / size) + (total % size == 0 ? 0 : 1));
 		this.end = from + list.size() - 1;
 	}
 }
