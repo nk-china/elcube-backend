@@ -49,10 +49,12 @@ public class NkDynamicBase<DT, DDT> extends NkAbstractCard<DT, DDT> {
         calculateContext.setFields(fields);
 
         // 处理字段的inputOptions
-        fields.forEach(field -> {
-            NkField nkField = customObjectManager.getCustomObject(field.getInputType(), NkField.class);
-            nkField.processOptions(field, context, data, calculateContext);
-        });
+        fields.stream()
+                .filter(field-> !(StringUtils.equalsAny(field.getInputType(),"divider","-","--")))
+                .forEach(field -> {
+                    NkField nkField = customObjectManager.getCustomObject(field.getInputType(), NkField.class);
+                    nkField.processOptions(field, context, data, calculateContext);
+                });
     }
 
 
@@ -102,7 +104,7 @@ public class NkDynamicBase<DT, DDT> extends NkAbstractCard<DT, DDT> {
             nkField.beforeCalculate(field, context, data, calculateContext);
         });
 
-        fields.forEach( field -> {
+        sortedFields.forEach( field -> {
 
             if(StringUtils.isNotBlank(field.getSpELControl())){
 

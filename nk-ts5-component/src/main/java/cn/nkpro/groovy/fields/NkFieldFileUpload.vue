@@ -93,8 +93,8 @@ export default {
     },
     methods:{
         nk$editModeChanged(){
+            this.fileList = [];
             if(this.value){
-                this.fileList = [];
                 if(this.inputOptions.listType==='picture-card'){
                     this.$http.get("/api/fs/download?url="+this.value.path).then(res=>{
                         this.fileList.push({
@@ -157,6 +157,7 @@ export default {
         fileUploaded(info){
 
             info.file.path = info.file.response.url||(this.config.path+(this.config.filename||info.file.name));
+            this.fileList = [];
             this.fileList.push(info.file);
 
             this.$emit('input',{
