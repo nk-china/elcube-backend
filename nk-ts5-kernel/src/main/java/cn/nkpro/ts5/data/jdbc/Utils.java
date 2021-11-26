@@ -33,7 +33,7 @@ public class Utils {
             if (isPascal) {
                 result.append(Character.toUpperCase(firstChar));
             } else {
-                result.append(firstChar);
+                result.append(Character.toLowerCase(firstChar));
             }
             for (int i = 1; i < underscoreName.length(); i++) {
                 char ch = underscoreName.charAt(i);
@@ -44,7 +44,7 @@ public class Utils {
                         result.append(Character.toUpperCase(ch));
                         flag = false;
                     } else {
-                        result.append(ch);
+                        result.append(Character.toLowerCase(ch));
                     }
                 }
             }

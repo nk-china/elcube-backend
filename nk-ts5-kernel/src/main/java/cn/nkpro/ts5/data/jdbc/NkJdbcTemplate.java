@@ -29,7 +29,7 @@ public class NkJdbcTemplate {
 
         EasySingle single = EasySingle.from(data);
 
-        List<String> args = new ArrayList<>();
+        List<Object> args = new ArrayList<>();
 
         List<String> sqlWhereBuilder = new ArrayList<>();
         keyFields.forEach(key->{

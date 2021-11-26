@@ -742,7 +742,13 @@ public class NkDocDefServiceImpl implements NkDocDefService, DeployAble {
     }
 
     private void runLoopCards(DocDefHV docDefHV, boolean ignoreError, Function function){
-        for(DocDefIV docDefI : docDefHV.getCards()){
+
+        List<DocDefIV> cards = docDefHV.getCards()
+                .stream()
+                .sorted(Comparator.comparing(DocDefI::getCalcOrder))
+                .collect(Collectors.toList());
+
+        for(DocDefIV docDefI : cards){
             // 找到对应的组件实现类
             NkCard nkCard = customObjectManager.getCustomObjectIfExists(docDefI.getBeanName(), NkCard.class);
 

@@ -9,6 +9,10 @@
                 {{def.partnerNameSpEL}}
                 <nk-sp-el-editor slot="edit" v-model="def.partnerNameSpEL"></nk-sp-el-editor>
             </nk-form-item>
+            <nk-form-item title="单据描述SpEL">
+                {{def.docNameSpEL}}
+                <nk-sp-el-editor slot="edit" v-model="def.docNameSpEL"></nk-sp-el-editor>
+            </nk-form-item>
         </nk-form>
     </nk-def-card>
 </template>

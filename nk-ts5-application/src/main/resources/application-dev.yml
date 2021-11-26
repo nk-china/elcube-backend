@@ -1,7 +1,7 @@
 nk:
   secret-id: AEF1D52777444FDDBC354928D7D2BFD3
   secret-key: UWLnyjGgg0NuRKNFLFZ3mmoNI8VoNqHlBy1B6ZFIom0fhVCEx8uQB7J/g0wnPFADOtyq2ZVuHuJJy0QCUAzDXeCu5j75hDRFtBKaV9DEE4912FmgNb+ekV6/gdemyVulibQs/J8izXoVkD5LTALKBQ==
-  env-key: ts5_bb_rd
+  env-key: ts5_bb_citic
   env-name: 研发环境2.0
   file-root-path: /Users/bean/Downloads/tfms
   compress:
@@ -21,7 +21,7 @@ nk:
       demo-index: cn.nkpro.ts5.docengine.model.es.DocExtES
 spring:
   datasource:
-    url: jdbc:mysql://192.168.1.149:3306/ts5_bb_rd
+    url: jdbc:mysql://192.168.1.149:3306/ts5_bb_citic
     username: root
     password: VTOZ8clUpSerX6hI
     driver-class-name: com.mysql.jdbc.Driver
@@ -31,8 +31,11 @@ spring:
     password: 1qazxsw2
   elasticsearch:
     rest:
-      #uris: [ "http://192.168.1.119:9200" ,"http://192.168.1.119:9201","http://192.168.1.119:9202" ],
-      uris: ["http://192.168.1.157:9200"]
+      uris:
+        - "http://192.168.1.119:9200"
+        - "http://192.168.1.119:9201"
+        - "http://192.168.1.119:9202"
+#      uris: ["http://192.168.1.157:9200"]
       username: elastic
       password: 1qazxsw2
   liquibase:

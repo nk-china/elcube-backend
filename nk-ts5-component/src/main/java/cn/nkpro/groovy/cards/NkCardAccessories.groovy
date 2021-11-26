@@ -9,6 +9,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Component
 
 @NkNote("附件")
-@Component("NkCardRelatedPartners")
+@Component("NkCardAccessories")
 class NkCardAccessories extends NkAbstractCard<Map,Map> {
 }
