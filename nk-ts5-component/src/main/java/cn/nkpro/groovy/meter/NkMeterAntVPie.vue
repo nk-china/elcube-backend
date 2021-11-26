@@ -108,8 +108,8 @@
                     const gConfig = {
                         data : res.data,
                         appendPadding: 10,
-                        colorField: config.colorField,
-                        angleField: config.angleField,
+                        colorField: config.colorField[0],
+                        angleField: config.angleField[0],
                         radius: 0.9,
                         innerRadius: config.innerRadius,
                         label,

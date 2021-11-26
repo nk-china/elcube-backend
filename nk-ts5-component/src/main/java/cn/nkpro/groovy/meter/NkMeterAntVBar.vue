@@ -67,8 +67,8 @@
                 this.load(config).then(res=>{
                     const gConfig = {
                         data : res.data,
-                        xField: config.xField,
-                        yField: config.yField,
+                        xField: config.xField[0],
+                        yField: config.yField[0],
                         seriesField: 'label',
                         legend: {
                             position: 'top-left',

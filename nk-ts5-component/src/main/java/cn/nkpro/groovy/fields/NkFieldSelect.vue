@@ -1,5 +1,12 @@
 <template>
-    <span v-if="!editMode">{{value | nkFromList(inputOptions.optionsObject)}}</span>
+    <span v-if="!editMode">
+        <template v-if="inputOptions.tagColor">
+            <a-tag v-for="(item,index) in list" :key="index" :color="inputOptions.tagColor">{{item | nkFromList(inputOptions.optionsObject)}}</a-tag>
+        </template>
+        <template v-else>
+            {{value | nkFromList(inputOptions.optionsObject)}}
+        </template>
+    </span>
     <a-select size="small"
               v-else
               v-model="val"
@@ -22,6 +29,11 @@ export default {
         }
     },
     computed:{
+        list(){
+            if(this.value){
+                return typeof this.value === 'object' && this.value[0] ? this.value : [this.value];
+            }
+        },
         val:{
             get(){
                 return this.value;

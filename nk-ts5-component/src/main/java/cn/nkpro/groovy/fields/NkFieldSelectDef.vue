@@ -13,6 +13,10 @@
                     <a-select-option key="tags" disabled>tags</a-select-option>
                 </a-select>
             </nk-form-item>
+            <nk-form-item title="Tag颜色">
+                {{value.tagColor}}
+                <a-input slot="edit" v-model="value.tagColor"></a-input>
+            </nk-form-item>
         </nk-form>
     </div>
 </template>
