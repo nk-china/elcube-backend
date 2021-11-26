@@ -774,9 +774,12 @@ public class NkDocDefServiceImpl implements NkDocDefService, DeployAble {
     }
     @Override
     public void runLoopCards(String docId, DocDefHV docDefHV, boolean ignoreError, Function function){
-        NkDocEngineContext.lockDoc(docId);
-        this.runLoopCards(docDefHV,ignoreError,function);
-        NkDocEngineContext.unlockDoc(docId);
+        try{
+            NkDocEngineContext.lockDoc(docId);
+            this.runLoopCards(docDefHV,ignoreError,function);
+        }finally {
+            NkDocEngineContext.unlockDoc(docId);
+        }
     }
 
     @Transactional(propagation = Propagation.NEVER)
