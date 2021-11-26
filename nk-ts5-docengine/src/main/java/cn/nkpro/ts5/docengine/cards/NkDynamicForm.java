@@ -4,7 +4,7 @@ import cn.nkpro.ts5.annotation.NkNote;
 import cn.nkpro.ts5.docengine.NkField;
 import cn.nkpro.ts5.docengine.model.DocDefIV;
 import cn.nkpro.ts5.docengine.model.DocHV;
-import cn.nkpro.ts5.docengine.model.easy.EasySingle;
+import cn.nkpro.ts5.co.easy.EasySingle;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 

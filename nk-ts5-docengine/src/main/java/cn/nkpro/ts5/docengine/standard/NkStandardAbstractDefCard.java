@@ -4,7 +4,7 @@ import cn.nkpro.ts5.docengine.NkAbstractCard;
 import cn.nkpro.ts5.docengine.model.DocDefHV;
 import cn.nkpro.ts5.docengine.model.DocDefIV;
 import cn.nkpro.ts5.docengine.model.DocHV;
-import cn.nkpro.ts5.docengine.model.easy.EasySingle;
+import cn.nkpro.ts5.co.easy.EasySingle;
 import cn.nkpro.ts5.docengine.service.NkDocEngineContext;
 import cn.nkpro.ts5.exception.NkDefineException;
 import com.alibaba.fastjson.JSON;

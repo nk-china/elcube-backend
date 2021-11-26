@@ -1,7 +1,7 @@
 package cn.nkpro.ts5.docengine.utils;
 
-import cn.nkpro.ts5.docengine.model.easy.EasyCollection;
-import cn.nkpro.ts5.docengine.model.easy.EasySingle;
+import cn.nkpro.ts5.co.easy.EasyCollection;
+import cn.nkpro.ts5.co.easy.EasySingle;
 import cn.nkpro.ts5.exception.NkSystemException;
 
 import java.lang.reflect.InvocationTargetException;

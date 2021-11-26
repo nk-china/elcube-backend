@@ -328,7 +328,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
             if(existsOriginal){
 
                 DocI docI = BeanUtilz.copyFromObject(optionalOriginal.get().getItems().get(defIV.getCardKey()),DocI.class);
-                docI.setCardContent(JSON.toJSONString(cardData));
+                docI.setCardContent(cardData!=null?JSON.toJSONString(cardData):null);
 
                 docIMapper.updateByPrimaryKeyWithBLOBs(docI);
 
@@ -349,7 +349,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
                 atomic.get().getItems().put(defIV.getCardKey(),docI);
             }
 
-            atomic.get().getData().put(defIV.getCardKey(),cardData);
+            // atomic.get().getData().put(defIV.getCardKey(),cardData);
         });
 
         // 单据状态发生变化

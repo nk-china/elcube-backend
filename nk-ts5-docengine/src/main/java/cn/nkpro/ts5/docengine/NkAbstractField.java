@@ -6,7 +6,7 @@ import cn.nkpro.ts5.co.NkScriptV;
 import cn.nkpro.ts5.docengine.cards.NkBaseContext;
 import cn.nkpro.ts5.docengine.cards.NkCalculateContext;
 import cn.nkpro.ts5.docengine.cards.NkDynamicFormDefI;
-import cn.nkpro.ts5.docengine.model.easy.EasySingle;
+import cn.nkpro.ts5.co.easy.EasySingle;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import lombok.Getter;

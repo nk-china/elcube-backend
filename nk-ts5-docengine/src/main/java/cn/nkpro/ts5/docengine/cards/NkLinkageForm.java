@@ -2,13 +2,11 @@ package cn.nkpro.ts5.docengine.cards;
 
 import cn.nkpro.ts5.annotation.NkNote;
 import cn.nkpro.ts5.co.NkCustomObjectManager;
-import cn.nkpro.ts5.docengine.NkAbstractCard;
 import cn.nkpro.ts5.docengine.NkField;
 import cn.nkpro.ts5.docengine.model.DocDefIV;
 import cn.nkpro.ts5.docengine.model.DocHV;
-import cn.nkpro.ts5.docengine.model.easy.EasySingle;
+import cn.nkpro.ts5.co.easy.EasySingle;
 import cn.nkpro.ts5.docengine.service.NkDocEngineContext;
-import cn.nkpro.ts5.docengine.utils.CopyUtils;
 import cn.nkpro.ts5.exception.NkDefineException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;

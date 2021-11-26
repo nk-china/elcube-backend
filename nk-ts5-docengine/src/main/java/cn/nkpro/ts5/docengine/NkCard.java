@@ -57,7 +57,11 @@ public interface NkCard<DT,DDT> extends NkScriptCard {
     // 调用方法
     Object call(DocHV doc, DT data, DocDefIV defIV, DDT def, Object options);
 
-    // 更新方法
+    /**
+     * 更新前数据处理
+     * 如果返回null，那么数据将不尽兴存储，但是用户录入的数据不会丢失
+     * 在这个阶段，自定义卡片可自行处理数据
+     */
     DT beforeUpdate(DocHV doc, DT data, DT original, DocDefIV defIV, DDT def);
     // 更新之后调用
     @Transactional(propagation = Propagation.NOT_SUPPORTED, readOnly = true)

@@ -1,4 +1,4 @@
-package cn.nkpro.ts5.docengine.model.easy;
+package cn.nkpro.ts5.co.easy;
 
 import cn.nkpro.ts5.exception.NkOperateNotAllowedCaution;
 

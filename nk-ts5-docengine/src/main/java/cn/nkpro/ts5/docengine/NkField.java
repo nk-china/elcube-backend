@@ -5,7 +5,7 @@ import cn.nkpro.ts5.co.NkScriptComponent;
 import cn.nkpro.ts5.docengine.cards.NkBaseContext;
 import cn.nkpro.ts5.docengine.cards.NkCalculateContext;
 import cn.nkpro.ts5.docengine.cards.NkDynamicFormDefI;
-import cn.nkpro.ts5.docengine.model.easy.EasySingle;
+import cn.nkpro.ts5.co.easy.EasySingle;
 import org.springframework.expression.EvaluationContext;
 @NkScriptType("Field")
 public interface NkField extends NkScriptComponent {

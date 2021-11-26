@@ -9,7 +9,7 @@ import cn.nkpro.ts5.docengine.cards.NkDynamicFormDefI
 import cn.nkpro.ts5.docengine.cards.NkDynamicFormField
 import cn.nkpro.ts5.docengine.cards.NkDynamicGridField
 import cn.nkpro.ts5.docengine.cards.NkLinkageFormField
-import cn.nkpro.ts5.docengine.model.easy.EasySingle
+import cn.nkpro.ts5.co.easy.EasySingle
 import com.alibaba.fastjson.JSON
 import com.alibaba.fastjson.JSONArray
 import org.springframework.beans.factory.annotation.Autowired

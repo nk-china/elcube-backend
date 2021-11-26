@@ -7,7 +7,7 @@ import cn.nkpro.ts5.docengine.cards.NkDynamicFormDefI
 import cn.nkpro.ts5.docengine.cards.NkDynamicFormField
 import cn.nkpro.ts5.docengine.cards.NkDynamicGridField
 import cn.nkpro.ts5.docengine.cards.NkLinkageFormField
-import cn.nkpro.ts5.docengine.model.easy.EasySingle
+import cn.nkpro.ts5.co.easy.EasySingle
 import org.springframework.core.annotation.Order
 import org.springframework.expression.EvaluationContext
 import org.springframework.stereotype.Component

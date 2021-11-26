@@ -5,7 +5,7 @@ import cn.nkpro.ts5.docengine.NkAbstractCard;
 import cn.nkpro.ts5.docengine.NkField;
 import cn.nkpro.ts5.docengine.model.DocDefIV;
 import cn.nkpro.ts5.docengine.model.DocHV;
-import cn.nkpro.ts5.docengine.model.easy.EasySingle;
+import cn.nkpro.ts5.co.easy.EasySingle;
 import cn.nkpro.ts5.docengine.service.NkDocEngineContext;
 import cn.nkpro.ts5.docengine.utils.CopyUtils;
 import cn.nkpro.ts5.exception.NkDefineException;
@@ -14,6 +14,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.expression.EvaluationContext;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.lang.reflect.Array;
 import java.util.*;
@@ -24,7 +25,10 @@ public class NkDynamicBase<DT, DDT> extends NkAbstractCard<DT, DDT> {
     @Autowired
     protected NkCustomObjectManager customObjectManager;
 
-    void copyFromPre(DocHV preDoc, Map<String,Object> data, DocDefIV defIV, List<? extends NkDynamicFormDefI> fields){
+    @Autowired
+    protected JdbcTemplate jdbcTemplate;
+
+    protected void copyFromPre(DocHV preDoc, Map<String, Object> data, DocDefIV defIV, List<? extends NkDynamicFormDefI> fields){
 
         if(preDoc!=null && defIV.getCopyFromRef()!=null&&defIV.getCopyFromRef()==1){
             CopyUtils.copy(
@@ -35,7 +39,7 @@ public class NkDynamicBase<DT, DDT> extends NkAbstractCard<DT, DDT> {
         }
     }
 
-    void processOptions(EasySingle data, DocHV doc, List<? extends NkDynamicFormDefI> fields){
+    protected void processOptions(EasySingle data, DocHV doc, List<? extends NkDynamicFormDefI> fields){
 
         EvaluationContext context = spELManager.createContext(doc);
 
@@ -52,7 +56,7 @@ public class NkDynamicBase<DT, DDT> extends NkAbstractCard<DT, DDT> {
     }
 
 
-    void execSpEL(EasySingle data, DocHV doc, List<? extends NkDynamicFormDefI> fields, String cardKey, boolean isTrigger, Map options){
+    protected void execSpEL(EasySingle data, DocHV doc, List<? extends NkDynamicFormDefI> fields, String cardKey, boolean isTrigger, Map options){
 
         EvaluationContext context = spELManager.createContext(doc);
 

@@ -4,11 +4,12 @@ import cn.nkpro.ts5.annotation.NkNote;
 import cn.nkpro.ts5.docengine.NkField;
 import cn.nkpro.ts5.docengine.model.DocDefIV;
 import cn.nkpro.ts5.docengine.model.DocHV;
-import cn.nkpro.ts5.docengine.model.easy.EasySingle;
+import cn.nkpro.ts5.co.easy.EasySingle;
 import cn.nkpro.ts5.docengine.utils.CopyUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,13 +42,13 @@ public class NkDynamicGrid extends NkDynamicBase<List<Map>, NkDynamicGridDef> {
             );
         }
 
-        this.processOptions(EasySingle.from(data), doc, d.getItems());
+        this.processOptions(EasySingle.from(Collections.emptyMap()), doc, d.getItems());
         return super.afterCreate(doc, preDoc, data, defIV, d);
     }
 
     @Override
     public List<Map> afterGetData(DocHV doc, List<Map> data, DocDefIV defIV, NkDynamicGridDef d) {
-        this.processOptions(EasySingle.from(data), doc, d.getItems());
+        this.processOptions(EasySingle.from(Collections.emptyMap()), doc, d.getItems());
         return super.afterGetData(doc, data, defIV, d);
     }
 
