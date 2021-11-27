@@ -28,7 +28,7 @@
 </template>
 
 <script>
-    import {Mixin, NkFormat} from "nk-ts5-platform";
+    import {Mixin, NkFormat} from "nk";
 
     const columnTypes = {
     text(field){

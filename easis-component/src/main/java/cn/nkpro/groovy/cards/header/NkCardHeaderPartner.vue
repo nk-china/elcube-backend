@@ -20,7 +20,7 @@
 </template>
 
 <script>
-    import {Mixin} from "nk-ts5-platform";
+    import {Mixin} from "nk";
 
     export default {
         mixins:[new Mixin()],

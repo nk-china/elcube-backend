@@ -1,15 +1,15 @@
 
 # TS5 默认配置文件
 nk:
-  env-key: ts5
-  env-name: TS5统一开发平台
-  file-root-path: /data/ts5
+  env-key: easis
+  env-name: Easis企业级快速开发模型
+  file-root-path: /data/easis
   #长度介于6-16位，且必须包含1个大写字母，1个小写字母，及1个特殊符号
   password-strategy: ^.*(?=.{6,16})(?=.*\d)(?=.*[A-Z]{1,})(?=.*[a-z]{1,})(?=.*[.!@#$%^&*?\(\)]).*$
   compress:
     enabled: false #开发环境不压缩
   component-base-packages:
-    - cn.nkpro.ts5.cards
+    - cn.nkpro.easis.cards
     - cn.nkpro.groovy
 # component-disable-online-editing 表示是否禁用在线编辑组件代码
   component-disable-online-editing: true
@@ -47,7 +47,7 @@ server:
 
 spring:
   application:
-    name: nk-ts5-beebattle-dev
+    name: nk-easis-beebattle
   profiles:
     active: dev
   aop:
@@ -82,7 +82,7 @@ spring:
       read-timeout: 30s
   liquibase:
     enabled: false
-    change-log: classpath:cn/nkpro/ts5/liquibase/master.xml
+    change-log: classpath:cn/nkpro/easis/liquibase/master.xml
     database-change-log-table: SYS_DATABASECHANGEDLOG
     database-change-log-lock-table: SYS_DATABASECHANGEDLOGLOCK
     drop-first: false
@@ -102,7 +102,7 @@ logging:
 
 mybatis:
   config-location: classpath:/mybatis-configuration.xml
-  dialect: cn.nkpro.ts5.data.mybatis.pagination.dialect.MySQLDialect
+  dialect: cn.nkpro.easis.data.mybatis.pagination.dialect.MySQLDialect
 
 camunda:
   bpm:

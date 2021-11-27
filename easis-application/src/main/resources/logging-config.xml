@@ -14,7 +14,7 @@
             <charset>UTF-8</charset>
         </encoder>
     </appender>
-<!--    <appender name="nk" class="cn.nkpro.ts5.config.log.NkLogAppender">-->
+<!--    <appender name="nk" class="cn.nkpro.easis.config.log.NkLogAppender">-->
 <!--        &lt;!&ndash;设置输出格式&ndash;&gt;-->
 <!--        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">-->
 <!--            &lt;!&ndash;格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符&ndash;&gt;-->

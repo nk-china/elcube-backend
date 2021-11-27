@@ -48,7 +48,7 @@ public class DevOpsDeployController {
         byte[] export = deployService.export(config).getBytes(StandardCharsets.UTF_8);
 
         String date = new SimpleDateFormat("yyyyMMddHHmmssSSS").format(new Date());
-        String filename = "config."+date+".ts5";
+        String filename = "config."+date+".easis";
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentDispositionFormData("attachment",

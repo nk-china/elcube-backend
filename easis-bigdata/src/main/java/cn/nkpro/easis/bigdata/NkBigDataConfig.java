@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @MapperScan(basePackages = {
-        "cn.nkpro.ts5.bigdata.gen",
+        "cn.nkpro.easis.bigdata.gen",
 })
 public class NkBigDataConfig {
 }

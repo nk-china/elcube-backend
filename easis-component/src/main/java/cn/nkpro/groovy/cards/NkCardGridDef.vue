@@ -155,7 +155,7 @@
 </template>
 
 <script>
-    import {MixinDef, MixinSortable} from "nk-ts5-platform";
+    import {MixinDef, MixinSortable} from "nk";
 
     const inputTypeDefs = [
     {label:'文本 | text',    value:'text',     options:{                            minLength:0, maxLength:200,pattern:''                     }},

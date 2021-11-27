@@ -27,9 +27,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 @EnableScheduling
 @EnableTransactionManagement
 @MapperScan(basePackages = {
-        "cn.nkpro.ts5.platform.gen",
-        "cn.nkpro.ts5.security.gen",
-        "cn.nkpro.ts5.docengine.gen",
+        "cn.nkpro.easis.platform.gen",
+        "cn.nkpro.easis.security.gen",
+        "cn.nkpro.easis.docengine.gen",
 })
 @EnableConfigurationProperties(NkProperties.class)
 public class NkAutoConfigurer implements ApplicationRunner {

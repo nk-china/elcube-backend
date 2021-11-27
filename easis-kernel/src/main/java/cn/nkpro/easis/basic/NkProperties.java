@@ -22,6 +22,6 @@ public class NkProperties {
 
     private boolean  componentDisableOnlineEditing = false;
     private boolean  componentReloadClassPath      = false;
-    private String[] componentBasePackages         = new String[]{"cn.nkpro.ts5.cards"};
+    private String[] componentBasePackages         = new String[]{"cn.nkpro.easis.cards"};
 }
 

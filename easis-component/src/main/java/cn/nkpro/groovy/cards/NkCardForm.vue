@@ -164,7 +164,7 @@
 </template>
 
 <script>
-    import {Mixin} from "nk-ts5-platform";
+    import {Mixin} from "nk";
     import moment from "moment";
     import {TreeSelect} from 'ant-design-vue';
 
