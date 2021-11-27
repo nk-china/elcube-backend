@@ -1,1 +1,14 @@
-.idea/
+
+.idea
+**/*.iml
+*.iml
+
+/node_modules/
+yarn.lock
+package-lock.json
+
+/*/target/
+/*/logs/
+/**/application-local-*.yml
+
+/classes/

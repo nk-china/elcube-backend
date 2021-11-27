@@ -1,0 +1,34 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <!--
+    -->
+
+    <changeSet id="NK_DATA_VIEW-01" author="bean" context="default">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="NK_DATA_VIEW" />
+            </not>
+        </preConditions>
+        <comment />
+        <createTable tableName="NK_DATA_VIEW" remarks="">
+            <column name="ID" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="NAME" type="${type.desc}" remarks="" />
+            <column name="WIDTH" type="${type.int}" remarks="" />
+            <column name="HEIGHT" type="${type.int}" remarks="" />
+            <column name="THUMBNAIL" type="${type.clob}" remarks="" />
+            <column name="THEME" type="${type.desc}" remarks="" />
+            <column name="CONFIG" type="${type.clob}" remarks="" />
+            <column name="ACCOUNT_ID" type="${type.uuid}" remarks="" />
+            <column name="SHARED" type="${type.int}" remarks="" />
+            <column name="UPDATED_TIME" type="${type.long}" remarks="" />
+            <column name="ORDER_BY" type="${type.int}" remarks="" />
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
