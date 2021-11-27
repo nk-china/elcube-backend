@@ -11,7 +11,7 @@ import org.springframework.context.annotation.FullyQualifiedAnnotationBeanNameGe
 @SpringBootApplication
 @ComponentScan(nameGenerator = FullyQualifiedAnnotationBeanNameGenerator.class,
                 basePackages = {
-                        "cn.nkpro.easis",
+                    "cn.nkpro.easis",
                     "cn.nkpro.groovy"
 })
 public class TS5Application {
