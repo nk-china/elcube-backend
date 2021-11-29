@@ -277,7 +277,7 @@ public class NkScriptManagerImpl implements NkScriptManager, DeployAble {
                 });
             }
         }
-        if(event instanceof NkHeartbeatEvent){
+        if(event instanceof NkHeartbeatEvent && !nkProperties.isComponentReloadClassPath()){
             // 系统心跳事件
             // 每次心跳都检查一下脚本的随机值
             // 如果随机值发生改变，则重新编译脚本对象
@@ -299,7 +299,7 @@ public class NkScriptManagerImpl implements NkScriptManager, DeployAble {
                             debugContextManager.addActiveResource(
                                     "#"+scriptDef.getScriptName(),
                                     BeanUtilz.copyFromObject(scriptDef, NkScriptV.class),
-                                    !nkProperties.isComponentReloadClassPath());
+                                    true);
                         }catch (RuntimeException e){
                             log.error(e.getMessage(),e);
                         }
