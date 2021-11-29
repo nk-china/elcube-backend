@@ -1,20 +1,32 @@
 package cn.nkpro.easis.platform;
 
+import cn.nkpro.easis.data.redis.RedisSupport;
+import cn.nkpro.easis.platform.model.NkHeartbeatEvent;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+@Slf4j
 @Configuration
 public class ScheduledConfig implements SchedulingConfigurer {
 
     @Autowired
-    private ApplicationContext context;
+    private ApplicationEventPublisher applicationEventPublisher;
+
+    @Scheduled(cron = "0 * * * * ?")
+    public void heartbeat(){
+        log.debug("heartbeat");
+        applicationEventPublisher.publishEvent(new NkHeartbeatEvent(System.currentTimeMillis()));
+    }
 
     @Override
     public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {

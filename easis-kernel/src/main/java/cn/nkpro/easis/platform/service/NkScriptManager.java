@@ -5,6 +5,7 @@ import cn.nkpro.easis.basic.PageList;
 import cn.nkpro.easis.co.NkScriptV;
 import cn.nkpro.easis.platform.gen.PlatformScript;
 import cn.nkpro.easis.platform.gen.PlatformScriptWithBLOBs;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,7 +15,7 @@ import java.util.List;
 /**
  * Created by bean on 2020/7/17.
  */
-public interface NkScriptManager extends ApplicationListener<ContextRefreshedEvent> {
+public interface NkScriptManager extends ApplicationListener<ApplicationEvent> {
 
     PageList<PlatformScript> getPage(String keyword,
                                      String type,

@@ -5,12 +5,15 @@ import org.apache.commons.codec.binary.Base64;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
 public interface TextUtils {
 
-    public static String compress(String str) {
+    static String compress(String str) {
         if (str == null || str.length() == 0) {
             return str;
         }
@@ -32,7 +35,7 @@ public interface TextUtils {
         }
         return Base64.encodeBase64String(out.toByteArray());
     }
-    public static String uncompress(String compressedStr) {
+    static String uncompress(String compressedStr) {
         if (compressedStr == null) {
             return null;
         }
@@ -73,5 +76,20 @@ public interface TextUtils {
             }
         }
         return decompressed;
+    }
+
+    static String md5(String plainText) {
+        byte[] secretBytes;
+        try {
+            secretBytes = MessageDigest.getInstance("md5").digest(
+                    plainText.getBytes());
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("没有这个md5算法！");
+        }
+        StringBuilder md5code = new StringBuilder(new BigInteger(1, secretBytes).toString(16));
+        for (int i = 0; i < 32 - md5code.length(); i++) {
+            md5code.insert(0, "0");
+        }
+        return md5code.toString();
     }
 }

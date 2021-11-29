@@ -72,8 +72,8 @@ public class ScriptController {
     @NkNote("6.激活")
     @RequestMapping("/active")
     public PlatformScript active(
-            @NkNote("脚本对象")@RequestBody NkScriptV script){
-        return scriptService.doActive(script, false);
+            @NkNote("脚本对象")@RequestBody NkScriptV script,@RequestParam(value = "force",defaultValue = "false",required = false) Boolean force){
+        return scriptService.doActive(script, force);
     }
 
     @NkNote("7.删除")

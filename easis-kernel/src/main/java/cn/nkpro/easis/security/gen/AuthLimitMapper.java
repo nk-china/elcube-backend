@@ -1,5 +1,7 @@
 package cn.nkpro.easis.security.gen;
 
+import cn.nkpro.easis.security.gen.AuthLimit;
+import cn.nkpro.easis.security.gen.AuthLimitExample;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.RowBounds;

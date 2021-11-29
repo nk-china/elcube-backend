@@ -1,5 +1,8 @@
 package cn.nkpro.easis.platform.gen;
 
+import cn.nkpro.easis.platform.gen.UserDashboardRef;
+import cn.nkpro.easis.platform.gen.UserDashboardRefExample;
+import cn.nkpro.easis.platform.gen.UserDashboardRefKey;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.RowBounds;

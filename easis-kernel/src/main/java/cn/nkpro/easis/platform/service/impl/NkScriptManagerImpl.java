@@ -9,16 +9,20 @@ import cn.nkpro.easis.data.redis.RedisSupport;
 import cn.nkpro.easis.exception.NkDefineException;
 import cn.nkpro.easis.platform.DeployAble;
 import cn.nkpro.easis.platform.gen.*;
+import cn.nkpro.easis.platform.model.NkHeartbeatEvent;
 import cn.nkpro.easis.platform.service.NkScriptManager;
 import cn.nkpro.easis.utils.BeanUtilz;
 import cn.nkpro.easis.utils.DateTimeUtilz;
+import cn.nkpro.easis.utils.TextUtils;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationEvent;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
@@ -32,6 +36,7 @@ import java.util.stream.Collectors;
 
 /**
  * Created by bean on 2020/7/17.
+ * Updated by bean on 2021/11/29.
  */
 @Order(30)
 @Slf4j
@@ -42,6 +47,8 @@ public class NkScriptManagerImpl implements NkScriptManager, DeployAble {
     @Autowired@SuppressWarnings("all")
     private RedisSupport<List<PlatformScriptWithBLOBs>> redisSupport;
     @Autowired@SuppressWarnings("all")
+    private RedisSupport<String> redisSupportString;
+    @Autowired@SuppressWarnings("all")
     private PlatformScriptMapper scriptDefHMapper;
     @Autowired@SuppressWarnings("all")
     private NkCustomObjectManager customObjectManager;
@@ -49,6 +56,8 @@ public class NkScriptManagerImpl implements NkScriptManager, DeployAble {
     private DebugContextManager debugContextManager;
     @Autowired@SuppressWarnings("all")
     private NkProperties nkProperties;
+
+    private String scriptRandom;
 
     @Override
     public PageList<PlatformScript> getPage(String keyword,
@@ -181,11 +190,27 @@ public class NkScriptManagerImpl implements NkScriptManager, DeployAble {
         return scriptDefH;
     }
 
+    /**
+     * <h4>激活脚本
+     * <p>注意：由于系统可能是分布式的，那么一个节点激活脚本后，应把激活的脚本同步到其他节点
+     * <p>系统为了避免使用过于复杂的分布式管理工具，采用redis心跳的方式处理脚本的同步，具体步骤如下：
+     * <p>step1: 激活脚本时，会重新计算脚本的md5值
+     * <p>step2: 激活后更新缓存中的随机值以及激活操作所在节点的scriptRandom属性，因为激活节点的值与redis保持一致，因此不会重复激活
+     * <p>step3: 每个节点都会有心跳检测随机值变化，一旦随机值变化，就重新加载脚本
+     * <p>step4: 根据md5值的变化，编译新的脚本编译对象并注入到Spring容器
+     * <p>
+     * <p>随机值有两份 1、本类中的scriptRandom属性，2、缓存中的CACHE_DEF_SCRIPT_RANDOM
+     * <p>在 onApplicationEvent 方法中判断两个值是否一致，如果不一致，会根据md5值重新加载脚本
+     * @see #scriptRandom
+     * @see Constants#CACHE_DEF_SCRIPT_RANDOM
+     * @see #onApplicationEvent(ApplicationEvent)
+     */
     @Override
     @Transactional
     public PlatformScript doActive(NkScriptV scriptDefH, boolean force){
 
         if(!force){
+            Assert.isTrue(!nkProperties.isComponentReloadClassPath(),"IDE模式不能激活脚本");
             Assert.isTrue(!StringUtils.equals(scriptDefH.getVersion(),"@"),"IDE版本不能激活");
             Assert.isTrue(!StringUtils.equals(scriptDefH.getState(),"Active"),"已激活的版本不能激活");
         }
@@ -201,13 +226,27 @@ public class NkScriptManagerImpl implements NkScriptManager, DeployAble {
 
         // 激活版本
         scriptDefH.setState("Active");
-        doUpdate(scriptDefH,force);
 
-        Assert.isTrue(!nkProperties.isComponentReloadClassPath(),"IDE模式不能激活脚本");
+
+        // 计算Groovy脚本的md5值
+        StringBuilder groovy = new StringBuilder();
+        if(StringUtils.isNotBlank(scriptDefH.getGroovyMain()))
+            groovy.append(scriptDefH.getGroovyMain());
+        if(StringUtils.isNotBlank(scriptDefH.getGroovyRefs()))
+            groovy.append(scriptDefH.getGroovyRefs());
+
+        scriptDefH.setGroovyMd5(TextUtils.md5(groovy.toString()));
+
+        // 持久化脚本
+        doUpdate(scriptDefH,force);
 
         debugContextManager.addActiveResource("#"+scriptDefH.getScriptName(), scriptDefH, true);
 
-        redisSupport.delete(Constants.CACHE_DEF_SCRIPT);
+        // 激活脚本后，更新随机值，并清空脚本缓存
+
+        this.scriptRandom = UUID.randomUUID().toString();
+        redisSupportString.set(Constants.CACHE_DEF_SCRIPT_RANDOM,this.scriptRandom);
+        redisSupportString.delete(Constants.CACHE_DEF_SCRIPT);
 
         return scriptDefH;
     }
@@ -222,18 +261,53 @@ public class NkScriptManagerImpl implements NkScriptManager, DeployAble {
 
     @SneakyThrows
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
-        if(contextRefreshedEvent.getApplicationContext() == debugContextManager.getApplicationContext()){
-            getActiveResources().forEach((scriptDef)-> {
-                try {
-                    debugContextManager.addActiveResource(
-                            "#"+scriptDef.getScriptName(),
-                            BeanUtilz.copyFromObject(scriptDef, NkScriptV.class),
-                            !nkProperties.isComponentReloadClassPath());
-                }catch (RuntimeException e){
-                    log.error(e.getMessage(),e);
-                }
-            });
+    public void onApplicationEvent(@NotNull ApplicationEvent event) {
+
+        if(event instanceof ContextRefreshedEvent){
+            if(((ContextRefreshedEvent)event).getApplicationContext() == debugContextManager.getApplicationContext()){
+                getActiveResources().forEach((scriptDef)-> {
+                    try {
+                        debugContextManager.addActiveResource(
+                                "#"+scriptDef.getScriptName(),
+                                BeanUtilz.copyFromObject(scriptDef, NkScriptV.class),
+                                !nkProperties.isComponentReloadClassPath());
+                    }catch (RuntimeException e){
+                        log.error(e.getMessage(),e);
+                    }
+                });
+            }
+        }
+        if(event instanceof NkHeartbeatEvent){
+            // 系统心跳事件
+            // 每次心跳都检查一下脚本的随机值
+            // 如果随机值发生改变，则重新编译脚本对象
+            String scriptRandom = redisSupportString.get(Constants.CACHE_DEF_SCRIPT_RANDOM);
+
+            if(!StringUtils.equals(this.scriptRandom,scriptRandom)){
+
+                getActiveResources().forEach(scriptDef->{
+
+                    NkCustomScriptObject object = customObjectManager.getCustomObject(scriptDef.getScriptName(), NkCustomScriptObject.class);
+
+                    String nMd5 = scriptDef.getGroovyMd5();
+                    String oMd5 = object.getScriptDef().getGroovyMd5();
+
+                    if(!StringUtils.equals(nMd5, oMd5)){
+                        log.info("脚本 {} 发生改变, 立即重新载入", scriptDef.getScriptName());
+
+                        try {
+                            debugContextManager.addActiveResource(
+                                    "#"+scriptDef.getScriptName(),
+                                    BeanUtilz.copyFromObject(scriptDef, NkScriptV.class),
+                                    !nkProperties.isComponentReloadClassPath());
+                        }catch (RuntimeException e){
+                            log.error(e.getMessage(),e);
+                        }
+                    }
+                });
+
+                this.scriptRandom = scriptRandom;
+            }
         }
     }
 

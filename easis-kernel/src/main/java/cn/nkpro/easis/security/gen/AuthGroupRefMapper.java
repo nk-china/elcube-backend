@@ -1,5 +1,7 @@
 package cn.nkpro.easis.security.gen;
 
+import cn.nkpro.easis.security.gen.AuthGroupRefExample;
+import cn.nkpro.easis.security.gen.AuthGroupRefKey;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.RowBounds;

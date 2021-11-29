@@ -13,9 +13,6 @@ import java.util.Map;
 @SuppressWarnings("unused")
 public interface RedisSupport<T> {
 
-    @Scheduled(cron = "0 * * * * ?")
-    void heartbeat();
-
     void    clear();
     boolean exists(String key);
     void    expire(String key, long expire);

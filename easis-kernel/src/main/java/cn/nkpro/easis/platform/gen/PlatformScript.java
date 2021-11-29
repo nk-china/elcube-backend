@@ -26,6 +26,13 @@ public class PlatformScript extends PlatformScriptKey implements Serializable {
     private String state;
 
     /**
+     * 服务类MD5值
+     *
+     * @mbggenerated
+     */
+    private String groovyMd5;
+
+    /**
      * ref User ID
      *
      * @mbggenerated
@@ -106,6 +113,29 @@ public class PlatformScript extends PlatformScriptKey implements Serializable {
      */
     public void setState(String state) {
         this.state = state;
+    }
+
+    /**
+     * 获取 服务类MD5值
+     *
+     * @return 服务类MD5值
+     *
+     * @mbggenerated
+     */
+    @cn.nkpro.easis.annotation.CodeFieldNotes("服务类MD5值")
+    public String getGroovyMd5() {
+        return groovyMd5;
+    }
+
+    /**
+     * 设置 服务类MD5值
+     *
+     * @return 服务类MD5值
+     *
+     * @mbggenerated
+     */
+    public void setGroovyMd5(String groovyMd5) {
+        this.groovyMd5 = groovyMd5;
     }
 
     /**

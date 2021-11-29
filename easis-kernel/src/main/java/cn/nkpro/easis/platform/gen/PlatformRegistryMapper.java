@@ -1,5 +1,8 @@
 package cn.nkpro.easis.platform.gen;
 
+import cn.nkpro.easis.platform.gen.PlatformRegistry;
+import cn.nkpro.easis.platform.gen.PlatformRegistryExample;
+import cn.nkpro.easis.platform.gen.PlatformRegistryKey;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.RowBounds;

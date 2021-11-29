@@ -28,11 +28,6 @@ public class DefaultRedisSupportImpl<T> implements RedisSupport<T> {
     @Autowired@SuppressWarnings("all")
     private EnvRedisTemplate<String> stringRedisTemplate;
 
-    @Scheduled(cron = "0 * * * * ?")
-    public void heartbeat(){
-        redisTemplate.opsForValue().get("__.heartbeat");
-    }
-
     @Override
     public void clear() {
 

@@ -38,5 +38,5 @@ spring:
   liquibase:
     contexts: default,demo-data
     drop-first: false
-    enabled: false
+    enabled: true
 

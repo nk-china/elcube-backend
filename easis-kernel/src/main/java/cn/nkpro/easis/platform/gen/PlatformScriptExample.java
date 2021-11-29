@@ -614,6 +614,76 @@ public class PlatformScriptExample {
             return (Criteria) this;
         }
 
+        public Criteria andGroovyMd5IsNull() {
+            addCriterion("GROOVY_MD5 is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andGroovyMd5IsNotNull() {
+            addCriterion("GROOVY_MD5 is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andGroovyMd5EqualTo(String value) {
+            addCriterion("GROOVY_MD5 =", value, "groovyMd5");
+            return (Criteria) this;
+        }
+
+        public Criteria andGroovyMd5NotEqualTo(String value) {
+            addCriterion("GROOVY_MD5 <>", value, "groovyMd5");
+            return (Criteria) this;
+        }
+
+        public Criteria andGroovyMd5GreaterThan(String value) {
+            addCriterion("GROOVY_MD5 >", value, "groovyMd5");
+            return (Criteria) this;
+        }
+
+        public Criteria andGroovyMd5GreaterThanOrEqualTo(String value) {
+            addCriterion("GROOVY_MD5 >=", value, "groovyMd5");
+            return (Criteria) this;
+        }
+
+        public Criteria andGroovyMd5LessThan(String value) {
+            addCriterion("GROOVY_MD5 <", value, "groovyMd5");
+            return (Criteria) this;
+        }
+
+        public Criteria andGroovyMd5LessThanOrEqualTo(String value) {
+            addCriterion("GROOVY_MD5 <=", value, "groovyMd5");
+            return (Criteria) this;
+        }
+
+        public Criteria andGroovyMd5Like(String value) {
+            addCriterion("GROOVY_MD5 like", value, "groovyMd5");
+            return (Criteria) this;
+        }
+
+        public Criteria andGroovyMd5NotLike(String value) {
+            addCriterion("GROOVY_MD5 not like", value, "groovyMd5");
+            return (Criteria) this;
+        }
+
+        public Criteria andGroovyMd5In(List<String> values) {
+            addCriterion("GROOVY_MD5 in", values, "groovyMd5");
+            return (Criteria) this;
+        }
+
+        public Criteria andGroovyMd5NotIn(List<String> values) {
+            addCriterion("GROOVY_MD5 not in", values, "groovyMd5");
+            return (Criteria) this;
+        }
+
+        public Criteria andGroovyMd5Between(String value1, String value2) {
+            addCriterion("GROOVY_MD5 between", value1, value2, "groovyMd5");
+            return (Criteria) this;
+        }
+
+        public Criteria andGroovyMd5NotBetween(String value1, String value2) {
+            addCriterion("GROOVY_MD5 not between", value1, value2, "groovyMd5");
+            return (Criteria) this;
+        }
+
         public Criteria andOwnerIsNull() {
             addCriterion("OWNER is null");
             return (Criteria) this;
