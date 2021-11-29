@@ -58,8 +58,9 @@ public class NkDynamicBase<DT, DDT> extends NkAbstractCard<DT, DDT> {
     }
 
 
-    protected void execSpEL(EasySingle data, DocHV doc, List<? extends NkDynamicFormDefI> fields, String cardKey, boolean isTrigger, Map options, boolean isNewCreate){
+    protected void execSpEL(EasySingle data, DocHV doc, List<? extends NkDynamicFormDefI> fields, String cardKey, boolean isTrigger, Map options, DocHV preDoc, boolean isNewCreate){
         EvaluationContext context = spELManager.createContext(doc);
+        context.setVariable("pre", preDoc);
 
         Map<String,Object> original = new HashMap<>();
 
@@ -85,7 +86,7 @@ public class NkDynamicBase<DT, DDT> extends NkAbstractCard<DT, DDT> {
         NkCalculateContext calculateContext = new NkCalculateContext();
         calculateContext.setDoc(doc);
         calculateContext.setFields(sortedFields);
-        calculateContext.setSkip(Collections.emptyList());
+        calculateContext.setSkip(new ArrayList<>());
         calculateContext.setOptions(options);
         calculateContext.setTrigger(isTrigger);
         calculateContext.setOriginal(original);
@@ -176,7 +177,7 @@ public class NkDynamicBase<DT, DDT> extends NkAbstractCard<DT, DDT> {
     }
 
     protected void execSpEL(EasySingle data, DocHV doc, List<? extends NkDynamicFormDefI> fields, String cardKey, boolean isTrigger, Map options){
-        this.execSpEL(data, doc, fields, cardKey, isTrigger, options, false);
+        this.execSpEL(data, doc, fields, cardKey, isTrigger, options, null, false);
 
     }
 

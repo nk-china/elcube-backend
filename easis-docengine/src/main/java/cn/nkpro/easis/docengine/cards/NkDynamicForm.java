@@ -30,7 +30,7 @@ public class NkDynamicForm extends NkDynamicBase<Map<String,Object>, NkDynamicFo
     public Map<String,Object> afterCreate(DocHV doc, DocHV preDoc, Map<String,Object> data, DocDefIV defIV, NkDynamicFormDef d) {
         this.copyFromPre(preDoc, data, defIV, d.getItems());
         this.processOptions(EasySingle.from(data), doc, d.getItems());
-        this.execSpEL(EasySingle.from(data), doc, d.getItems(), defIV.getCardKey(), false, null, true);
+        this.execSpEL(EasySingle.from(data), doc, d.getItems(), defIV.getCardKey(), false, null, preDoc, true);
         return super.afterCreate(doc, preDoc, data, defIV, d);
     }
 
