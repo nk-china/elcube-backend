@@ -1,6 +1,6 @@
 package dmn;
 
-import cn.nkpro.easis.TS5Application;
+import cn.nkpro.easis.EasisApplication;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.variable.Variables;
 import org.junit.Test;
@@ -14,7 +14,7 @@ import org.testng.Assert;
  * Created by bean on 2020/7/22.
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes={TS5Application.class})
+@SpringBootTest(classes={EasisApplication.class})
 public class DMNVersionTest {
     @Autowired
     private ProcessEngine processEngine;

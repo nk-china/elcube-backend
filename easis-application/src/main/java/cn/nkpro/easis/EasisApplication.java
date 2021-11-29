@@ -14,8 +14,8 @@ import org.springframework.context.annotation.FullyQualifiedAnnotationBeanNameGe
                     "cn.nkpro.easis",
                     "cn.nkpro.groovy"
 })
-public class TS5Application {
+public class EasisApplication {
     public static void main(String[] args) {
-        SpringApplication.run(TS5Application.class, args);
+        SpringApplication.run(EasisApplication.class, args);
     }
 }

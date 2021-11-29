@@ -1,4 +1,4 @@
-import cn.nkpro.easis.TS5Application;
+import cn.nkpro.easis.EasisApplication;
 import cn.nkpro.easis.data.redis.RedisSupport;
 import cn.nkpro.easis.docengine.service.SequenceSupport;
 import org.junit.Test;
@@ -13,7 +13,7 @@ import org.springframework.test.context.junit4.SpringRunner;
  * Created by bean on 2020/7/22.
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes={TS5Application.class})
+@SpringBootTest(classes={EasisApplication.class})
 public class RedisLockTest {
 
     @Autowired
