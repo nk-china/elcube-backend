@@ -10,7 +10,7 @@
                 <nk-sp-el-template-editor slot="edit" v-model="value.dataMappings"></nk-sp-el-template-editor>
             </nk-form-item>
             <nk-form-item title="选项映射模版">
-                {{value.optionMappings}}
+                <span style="width:100%;">{{value.optionMappings}}</span>
                 <nk-sp-el-template-editor slot="edit" v-model="value.optionMappings"></nk-sp-el-template-editor>
             </nk-form-item>
         </nk-form>

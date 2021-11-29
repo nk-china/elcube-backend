@@ -8,6 +8,7 @@ import cn.nkpro.easis.docengine.cards.NkDynamicFormField
 import cn.nkpro.easis.docengine.cards.NkDynamicGridField
 import cn.nkpro.easis.docengine.cards.NkLinkageFormField
 import cn.nkpro.easis.co.easy.EasySingle
+import com.alibaba.fastjson.JSONArray
 import org.springframework.core.annotation.Order
 import org.springframework.expression.EvaluationContext
 import org.springframework.stereotype.Component
@@ -24,6 +25,31 @@ class NkFieldInputNumber extends NkAbstractField implements NkDynamicFormField, 
 
         def value = card.get(field.getKey())
 
+        // 如果字段被指定来options，先校验value是否合法
+        if(field.getInputOptions().containsKey("options")){
+            JSONArray array = field.getInputOptions().get("options") as JSONArray
+            if(array){
+                def find = array.stream().find {i-> value==i}
+                if(!find){
+                    value = array.size()>0?array[0]:null
+                    card.set(field.getKey(), value)
+                }
+            }
+        }
+        if(field.getInputOptions().containsKey("min")){
+            def min = field.getInputOptions().get("min") as Double
+            if(value < min){
+                value = min
+            }
+        }
+        if(field.getInputOptions().containsKey("max")){
+            def max = field.getInputOptions().get("max") as Double
+            if(value > max){
+                value = max
+            }
+        }
+
+        // 如果value有值，设置value的格式
         if(value !=null ){
             card.set(field.getKey(),
                 new BigDecimal(value as double)
@@ -31,6 +57,7 @@ class NkFieldInputNumber extends NkAbstractField implements NkDynamicFormField, 
                     .doubleValue()
             )
         }
+
 
         super.afterCalculate(field, context, card, calculateContext)
     }

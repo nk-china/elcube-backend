@@ -47,6 +47,7 @@ public class NkLinkageForm extends NkDynamicBase<Map<String,Object>, NkLinkageFo
     public Map<String,Object> afterCreate(DocHV doc, DocHV preDoc, Map<String,Object> data, DocDefIV defIV, NkLinkageFormDef d) {
         this.copyFromPre(preDoc, data, defIV, d.getItems());
         this.processOptions(EasySingle.from(data), doc, d.getItems());
+        this.execLinkageSpEL(EasySingle.from(data), doc, d.getItems(), defIV.getCardKey(), false, null);
         return super.afterCreate(doc, preDoc, data, defIV, d);
     }
 
@@ -130,6 +131,41 @@ public class NkLinkageForm extends NkDynamicBase<Map<String,Object>, NkLinkageFo
                 && StringUtils.equals(field.getKey(), (String) options.get("triggerKey"))
             );
 
+            // 执行字段的计算逻辑
+            customObjectManager.getCustomObject(field.getInputType(), NkField.class)
+                    .afterCalculate(field, context, data, calculateContext);
+
+            // 更新上下文中的值
+            context.setVariable(field.getKey(), data.get(field.getKey()));
+        });
+
+        // 清空所有过滤条件，执行第二次计算，以确保所有的值符合校验规则
+        calculateContext.setTrigger(false);
+        calculateContext.setFieldTrigger(false);
+        skip.clear();
+        sortedFields.forEach(field -> {
+
+            // 执行字段的SpEL
+            if(!skip.contains(field.getKey()) && StringUtils.isNotBlank(field.getSpELContent())){
+                if (log.isInfoEnabled())
+                    log.info("{}\t\t{} 执行表达式 KEY={} EL={}",
+                            NkDocEngineContext.currLog(),
+                            cardKey,
+                            field.getKey(),
+                            field.getSpELContent()
+                    );
+
+                try {
+                    data.set(field.getKey(), spELManager.invoke(field.getSpELContent(), context));
+                } catch (Exception e) {
+                    throw new NkDefineException(
+                            String.format("KEY=%s %s",
+                                    field.getKey(),
+                                    e.getMessage()
+                            )
+                    );
+                }
+            }
             // 执行字段的计算逻辑
             customObjectManager.getCustomObject(field.getInputType(), NkField.class)
                     .afterCalculate(field, context, data, calculateContext);

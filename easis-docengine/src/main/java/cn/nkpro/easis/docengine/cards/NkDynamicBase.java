@@ -58,8 +58,7 @@ public class NkDynamicBase<DT, DDT> extends NkAbstractCard<DT, DDT> {
     }
 
 
-    protected void execSpEL(EasySingle data, DocHV doc, List<? extends NkDynamicFormDefI> fields, String cardKey, boolean isTrigger, Map options){
-
+    protected void execSpEL(EasySingle data, DocHV doc, List<? extends NkDynamicFormDefI> fields, String cardKey, boolean isTrigger, Map options, boolean isNewCreate){
         EvaluationContext context = spELManager.createContext(doc);
 
         Map<String,Object> original = new HashMap<>();
@@ -132,7 +131,7 @@ public class NkDynamicBase<DT, DDT> extends NkAbstractCard<DT, DDT> {
                 String trigger = null;
                 if (ArrayUtils.contains(field.getSpELTriggers(), "ALWAYS")) {
                     trigger = "ALWAYS";
-                } else if (ArrayUtils.contains(field.getSpELTriggers(), "INIT")) {
+                } else if (ArrayUtils.contains(field.getSpELTriggers(), "INIT") && isNewCreate) {
                     trigger = "INIT";
                 } else if (ArrayUtils.contains(field.getSpELTriggers(), "BLANK") && isBlank(data.get(field.getKey()))) {
                     trigger = "BLANK";
@@ -174,6 +173,11 @@ public class NkDynamicBase<DT, DDT> extends NkAbstractCard<DT, DDT> {
 
             context.setVariable(field.getKey(), data.get(field.getKey()));
         });
+    }
+
+    protected void execSpEL(EasySingle data, DocHV doc, List<? extends NkDynamicFormDefI> fields, String cardKey, boolean isTrigger, Map options){
+        this.execSpEL(data, doc, fields, cardKey, isTrigger, options, false);
+
     }
 
     private static boolean isBlank(Object value){
