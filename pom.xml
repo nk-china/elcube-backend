@@ -21,6 +21,7 @@
         <module>easis-application</module>
         <module>easis-module-financial</module>
         <module>easis-component-parent</module>
+        <module>easis-customized-citic</module>
     </modules>
 
     <build>
