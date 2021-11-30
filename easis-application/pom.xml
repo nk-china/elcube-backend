@@ -61,7 +61,12 @@
         </dependency>
         <dependency>
             <groupId>cn.nkpro.easis</groupId>
-            <artifactId>easis-component</artifactId>
+            <artifactId>easis-component-defaults</artifactId>
+            <version>${parent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>cn.nkpro.easis</groupId>
+            <artifactId>easis-component-financial</artifactId>
             <version>${parent.version}</version>
         </dependency>
 

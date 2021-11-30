@@ -19,6 +19,8 @@
         <module>easis-bigdata</module>
         <module>easis-component</module>
         <module>easis-application</module>
+        <module>easis-module-financial</module>
+        <module>easis-component-parent</module>
     </modules>
 
     <build>
