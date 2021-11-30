@@ -7,8 +7,7 @@ nk:
   compress:
     enabled: false
   component-base-packages:
-    - cn.nkpro.easis.cards
-    - cn.nkpro.groovy
+    - cn.nkpro.easis.components
   component-disable-online-editing: true
   component-reload-class-path: true
   clickhouse:
@@ -18,7 +17,7 @@ nk:
     password: oo2zSP8J
   doc:
     indices:
-      - demo-index : cn.nkpro.easis.docengine.model.es.DocExtES
+      - demo-index: cn.nkpro.easis.docengine.model.es.DocExtES
 spring:
   datasource:
     url: jdbc:mysql://192.168.1.149:3306/ts5_bb_preview

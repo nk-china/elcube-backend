@@ -9,8 +9,7 @@ nk:
   compress:
     enabled: false #开发环境不压缩
   component-base-packages:
-    - cn.nkpro.easis.cards
-    - cn.nkpro.groovy
+    - cn.nkpro.easis.components
 # component-disable-online-editing 表示是否禁用在线编辑组件代码
   component-disable-online-editing: true
 # component-reload-class-path 如果为false，那么程序启动后，修改ide中的vue文件前端不会生效
