@@ -181,13 +181,17 @@ public class UserAccountServiceImpl implements UserAccountService {
     }
 
     @Override
-    public PageList<UserAccount> accountsPage(Integer from, Integer size, String keyword){
+    public PageList<UserAccount> accountsPage(Integer from, Integer size, String orderField, String order, String keyword){
 
         PaginationContext context = PaginationContext.init();
 
         UserAccountExample example = new UserAccountExample();
         example.createCriteria()
                 .andUsernameLike(String.format("%%%s%%",keyword));
+
+        if(StringUtils.isNotBlank(orderField)){
+            example.setOrderByClause(orderField + " "+ StringUtils.defaultIfBlank(order,"ASC"));
+        }
 
         return new PageList<>(
                 userAccountMapper.selectByExample(example,new RowBounds(0,10))
@@ -235,6 +239,7 @@ public class UserAccountServiceImpl implements UserAccountService {
 
             account.setId(UUID.randomUUID().toString());
             account.setLocked(0);
+            account.setCreatedTime(DateTimeUtilz.nowSeconds());
             account.setUpdatedTime(DateTimeUtilz.nowSeconds());
             userAccountMapper.insert(account);
         }

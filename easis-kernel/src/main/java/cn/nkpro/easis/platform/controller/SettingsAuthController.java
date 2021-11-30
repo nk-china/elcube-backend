@@ -109,8 +109,10 @@ public class SettingsAuthController {
     public PageList<UserAccount> accountsList(
             @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
             @RequestParam(value = "rows", required = false, defaultValue = "10") Integer rows,
+            @RequestParam(value = "orderField", required = false) String orderField,
+            @RequestParam(value = "order", required = false) String order,
             @RequestParam(value = "keyword", required = false, defaultValue = "") String keyword){
-        return accountService.accountsPage(from, rows, keyword);
+        return accountService.accountsPage(from, rows, orderField, order, keyword);
     }
 
     @RequestMapping("/accounts/detail")

@@ -33,7 +33,7 @@ public interface UserAccountService extends UserDetailsService {
 
     UserDetails loadUserByUsernameFromCache(String username) throws UsernameNotFoundException;
 
-    PageList<UserAccount> accountsPage(Integer from, Integer size, String keyword);
+    PageList<UserAccount> accountsPage(Integer from, Integer size, String orderField, String order, String keyword);
 
     UserAccountBO update(UserAccountBO account);
 }
