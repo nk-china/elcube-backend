@@ -1,5 +1,6 @@
 package cn.nkpro.easis.security;
 
+import cn.nkpro.easis.basic.PageList;
 import cn.nkpro.easis.platform.gen.UserAccount;
 import cn.nkpro.easis.security.bo.GrantedAuthority;
 import cn.nkpro.easis.security.bo.UserGroupBO;

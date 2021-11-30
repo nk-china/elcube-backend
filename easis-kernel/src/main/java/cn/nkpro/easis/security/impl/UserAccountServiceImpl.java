@@ -2,6 +2,8 @@ package cn.nkpro.easis.security.impl;
 
 import cn.nkpro.easis.basic.Constants;
 import cn.nkpro.easis.basic.NkProperties;
+import cn.nkpro.easis.basic.PageList;
+import cn.nkpro.easis.data.mybatis.pagination.PaginationContext;
 import cn.nkpro.easis.data.redis.RedisSupport;
 import cn.nkpro.easis.platform.gen.UserAccount;
 import cn.nkpro.easis.platform.gen.UserAccountExample;
@@ -15,6 +17,7 @@ import cn.nkpro.easis.security.bo.UserDetails;
 import cn.nkpro.easis.utils.BeanUtilz;
 import cn.nkpro.easis.utils.DateTimeUtilz;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -24,6 +27,7 @@ import org.springframework.util.CollectionUtils;
 
 import java.util.*;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 /**
  * Created by bean on 2019/12/30.
@@ -93,6 +97,9 @@ public class UserAccountServiceImpl implements UserAccountService {
 
     @Override
     public void checkPasswordStrategyAndSha1(UserAccount account){
+
+        Assert.notNull(account.getPassword(),"密码不能为空");
+
         // 检查密码是否健壮
         if(StringUtils.isNotBlank(nkProperties.getPasswordStrategy())){
             Assert.isTrue(Pattern.matches(nkProperties.getPasswordStrategy(),account.getPassword()),"密码强度不符合要求");
@@ -171,5 +178,67 @@ public class UserAccountServiceImpl implements UserAccountService {
         return Optional.ofNullable(getAccount(username,false))
                 .map(account->BeanUtilz.copyFromObject(account, UserDetails.class))
                 .orElse(null);
+    }
+
+    @Override
+    public PageList<UserAccount> accountsPage(Integer from, Integer size, String keyword){
+
+        PaginationContext context = PaginationContext.init();
+
+        UserAccountExample example = new UserAccountExample();
+        example.createCriteria()
+                .andUsernameLike(String.format("%%%s%%",keyword));
+
+        return new PageList<>(
+                userAccountMapper.selectByExample(example,new RowBounds(0,10))
+                        .stream()
+                        .peek(a -> a.setPassword(null))
+                        .collect(Collectors.toList()),
+                from,
+                size,
+                context.getTotal()
+        );
+    }
+
+    @Override
+    public UserAccountBO update(UserAccountBO account) {
+
+        if(StringUtils.isNotBlank(account.getId())){
+
+            if(StringUtils.isNotBlank(account.getPassword()))
+                checkPasswordStrategyAndSha1(account);
+
+            UserAccount exists = userAccountMapper.selectByPrimaryKey(account.getId());
+
+            if(!StringUtils.equals(exists.getUsername(),account.getUsername())){
+
+
+                UserAccountExample example = new UserAccountExample();
+                example.createCriteria()
+                        .andUsernameEqualTo(account.getUsername());
+
+                Assert.isTrue(userAccountMapper.countByExample(example)==0,"用户名已存在，请更换");
+            }
+
+            account.setUpdatedTime(DateTimeUtilz.nowSeconds());
+            userAccountMapper.updateByPrimaryKeySelective(account);
+            redisTemplate.deleteHash(Constants.CACHE_USERS, exists.getUsername());
+            redisTemplate.deleteHash(Constants.CACHE_USERS, account.getUsername());
+        }else{
+            checkPasswordStrategyAndSha1(account);
+
+            UserAccountExample example = new UserAccountExample();
+            example.createCriteria()
+                    .andUsernameEqualTo(account.getUsername());
+
+            Assert.isTrue(userAccountMapper.countByExample(example)==0,"用户名已存在，请更换");
+
+            account.setId(UUID.randomUUID().toString());
+            account.setLocked(0);
+            account.setUpdatedTime(DateTimeUtilz.nowSeconds());
+            userAccountMapper.insert(account);
+        }
+
+        return account;
     }
 }

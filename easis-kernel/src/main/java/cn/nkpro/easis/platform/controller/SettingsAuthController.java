@@ -1,7 +1,10 @@
 package cn.nkpro.easis.platform.controller;
 
+import cn.nkpro.easis.basic.PageList;
 import cn.nkpro.easis.platform.gen.UserAccount;
+import cn.nkpro.easis.security.UserAccountService;
 import cn.nkpro.easis.security.UserAuthorizationService;
+import cn.nkpro.easis.security.bo.UserAccountBO;
 import cn.nkpro.easis.security.bo.UserGroupBO;
 import cn.nkpro.easis.security.gen.AuthGroup;
 import cn.nkpro.easis.security.gen.AuthLimit;
@@ -11,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -23,7 +27,9 @@ public class SettingsAuthController {
 
     @Autowired@SuppressWarnings("all")
     private UserAuthorizationService permService;
-    
+    @Autowired@SuppressWarnings("all")
+    private UserAccountService accountService;
+
     @RequestMapping("/limit/list")
     public List<AuthLimit> limits(){
         return permService.getLimits(null);
@@ -45,7 +51,6 @@ public class SettingsAuthController {
         permService.removeLimit(limitId);
     }
 
-    
     @RequestMapping("/perm/list")
     public List<AuthPermission> perms(){
         return permService.getPerms();
@@ -67,13 +72,11 @@ public class SettingsAuthController {
         permService.removePerm(permId);
     }
 
-    
     @RequestMapping("/group/list")
     public List<AuthGroup> groups(){
         return permService.getGroups();
     }
 
-    
     @RequestMapping("/group/detail")
     public AuthGroup groupDetail(String groupId){
         return permService.getGroupDetail(groupId);
@@ -100,6 +103,26 @@ public class SettingsAuthController {
     public AuthGroup groupAddAccount(String groupId, String accountId){
         permService.addAccountFromGroup(groupId,accountId);
         return permService.getGroupDetail(groupId);
+    }
+
+    @RequestMapping("/accounts/list")
+    public PageList<UserAccount> accountsList(
+            @RequestParam(value = "from", required = false, defaultValue = "0") Integer from,
+            @RequestParam(value = "rows", required = false, defaultValue = "10") Integer rows,
+            @RequestParam(value = "keyword", required = false, defaultValue = "") String keyword){
+        return accountService.accountsPage(from, rows, keyword);
+    }
+
+    @RequestMapping("/accounts/detail")
+    public UserAccountBO accountsDetail(@RequestParam(value = "username") String username){
+        UserAccountBO account = accountService.getAccount(username, false);
+        account.setPassword(null);
+        return account;
+    }
+
+    @RequestMapping("/accounts/update")
+    public UserAccountBO accountsUpdate(@RequestBody UserAccountBO user){
+        return accountService.update(user);
     }
     
     @RequestMapping("/accounts")

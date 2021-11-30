@@ -1,5 +1,6 @@
 package cn.nkpro.easis.security;
 
+import cn.nkpro.easis.basic.PageList;
 import cn.nkpro.easis.platform.gen.UserAccount;
 import cn.nkpro.easis.security.bo.UserAccountBO;
 import cn.nkpro.easis.security.bo.UserDetails;
@@ -31,4 +32,8 @@ public interface UserAccountService extends UserDetailsService {
     Map<String, Object> refreshToken();
 
     UserDetails loadUserByUsernameFromCache(String username) throws UsernameNotFoundException;
+
+    PageList<UserAccount> accountsPage(Integer from, Integer size, String keyword);
+
+    UserAccountBO update(UserAccountBO account);
 }
