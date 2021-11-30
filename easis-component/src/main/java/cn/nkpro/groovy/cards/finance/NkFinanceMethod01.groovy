@@ -1,7 +1,6 @@
 package cn.nkpro.groovy.cards.finance
 
 import cn.nkpro.easis.co.NkAbstractApplyCSO
-import cn.nkpro.easis.co.easy.EasySingle
 import cn.nkpro.easis.co.spel.NkSpELManager
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -9,7 +8,7 @@ import org.springframework.stereotype.Component
 import java.math.RoundingMode
 
 @Component("NkFinanceMethod01")
-class NkFinanceMethod01 extends NkAbstractApplyCSO {
+class NkFinanceMethod01 extends NkAbstractApplyCSO{
 
     @Autowired
     NkSpELManager spELManager
@@ -17,24 +16,19 @@ class NkFinanceMethod01 extends NkAbstractApplyCSO {
     @Override
     Object apply(Object options) throws Exception {
 
-        def single = EasySingle.from(options)
-        def mfOptions = single.get("options")
+        def params  = options as Map
 
-        def context = spELManager.createContext(single.get("doc"))
-        def params  = spELManager.invoke(mfOptions as String, context) as Map
-
-        Double  ir = params.get("irSpEL") as Double
-        Integer np = params.get("npSpEL") as Integer
-        Integer pf = params.get("pfSpEL") as Integer
-        Double  pv = params.get("pvSpEL") as Double
-        Double  fv = params.get("fvSpEL") as Double
-        Long    dt = params.get("dtSpEL") as Long
+        Double  ir = params.get("ir") as Double
+        Integer np = params.get("np") as Integer
+        Integer pf = params.get("pf") as Integer
+        Double  pv = params.get("pv") as Double
+        Double  fv = params.get("fv") as Double
+        Long    dt = params.get("dt") as Long
 
 
         if (ir != null && np != null && pf != null && pv != null && fv != null && dt != null){
 
             Calendar calendar = Calendar.getInstance()
-            calendar.setTimeInMillis(dt*1000)
 
             // 期间利率 = 年利率 / 付款频率
             Double ip = ir / pf
@@ -51,8 +45,8 @@ class NkFinanceMethod01 extends NkAbstractApplyCSO {
             PaymentI item
             for(int i=0;i<np;i++){
 
-
-                calendar.add(Calendar.MONTH, step)
+                calendar.setTimeInMillis(dt*1000)
+                calendar.add(Calendar.MONTH, step*(i+1))
                 item = new PaymentI()
                 item.setPeriod(i+1)
                 item.setExpireDate(calendar.getTimeInMillis()/1000 as Long)

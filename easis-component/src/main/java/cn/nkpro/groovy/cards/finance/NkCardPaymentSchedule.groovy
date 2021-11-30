@@ -30,13 +30,10 @@ class NkCardPaymentSchedule extends NkAbstractCard<List<PaymentI>,Def> {
             def context = spELManager.createContext(doc)
 
             String  mt = spELManager.invoke(d.getMtSpEL(), context)
-
-            Map mtOptions = new HashMap()
-            mtOptions.put("options",d.getMtOptions())
-            mtOptions.put("doc",doc)
+            def params  = spELManager.invoke(d.getMtOptions(), context) as Map
 
             def apply = customObjectManager.getCustomObject(mt, NkApplyCSO.class)
-                .apply(mtOptions) as List
+                .apply(params) as List
 
             if(apply!=null){
                 data = apply.stream()
