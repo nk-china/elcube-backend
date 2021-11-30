@@ -11,6 +11,8 @@ public interface Constants {
     String CACHE_USERS              = "CACHE_SYS_ACCOUNT";
     String CACHE_AUTH_GROUP         = "CACHE_AUTH_GROUP";
     String CACHE_AUTH_LIMIT         = "CACHE_AUTH_LIMIT";
+    String CACHE_AUTH_ERROR         = "CACHE_AUTH_ERROR:";
+    String CACHE_AUTH_LOCK          = "CACHE_AUTH_LOCK:";
 
     String CACHE_DEF_CONSTANT       = "CACHE_DEF_CONSTANT";
     String CACHE_DEF_SCRIPT         = "CACHE_DEF_SCRIPT";

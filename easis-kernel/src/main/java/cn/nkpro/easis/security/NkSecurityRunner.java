@@ -15,7 +15,7 @@ public class NkSecurityRunner {
 
     public void runAsUser(String username){
 
-        NkPasswordAuthentication authentication = new NkPasswordAuthentication(username,null);
+        NkPasswordAuthentication authentication = new NkPasswordAuthentication(username,null,null,null);
         UserDetails details = (UserDetails) userDetailsService.loadUserByUsername(authentication.getUsername());
 
         authentication.setAuthenticated(true);

@@ -21,7 +21,7 @@
         <module>easis-component-parent</module>
         <module>easis-component-defaults</module>
         <module>easis-component-financial</module>
-<!--        <module>easis-customized-citic</module>-->
+        <module>easis-customized-citic</module>
 
         <module>easis-application</module>
     </modules>

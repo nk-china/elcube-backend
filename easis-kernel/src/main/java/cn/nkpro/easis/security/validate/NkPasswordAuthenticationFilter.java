@@ -45,9 +45,11 @@ public class NkPasswordAuthenticationFilter extends GenericFilterBean {
 
                 String username = StringUtils.defaultString(obtainParam(request, "username"));
                 String password = StringUtils.defaultString(obtainParam(request, "password"));
+                String verKey   = StringUtils.defaultString(obtainParam(request, "verKey"));
+                String verCode  = StringUtils.defaultString(obtainParam(request, "verCode"));
 
                 if (StringUtils.isNoneBlank(nkApp, username, password)) {
-                    NkPasswordAuthentication nkAuthentication = new NkPasswordAuthentication(username, password);
+                    NkPasswordAuthentication nkAuthentication = new NkPasswordAuthentication(username, password, verKey, verCode);
                     try {
                         Authentication responseAuthentication = authenticationManager.authenticate(nkAuthentication);
                         if (responseAuthentication != null) {

@@ -1,5 +1,6 @@
 package cn.nkpro.easis.security;
 
+import cn.nkpro.easis.data.redis.RedisSupport;
 import cn.nkpro.easis.security.validate.NkPasswordAuthenticationFilter;
 import cn.nkpro.easis.security.validate.NkPasswordAuthenticationProvider;
 import cn.nkpro.easis.security.validate.NkTokenAuthenticationFilter;
@@ -27,6 +28,10 @@ public class NkWebSecurityConfig extends WebSecurityConfigurerAdapter {
     @SuppressWarnings("all")
     @Autowired
     private UserAccountService userDetailsService;
+
+    @SuppressWarnings("all")
+    @Autowired
+    private RedisSupport<Object> redisSupport;
 
     @Bean(name = BeanIds.AUTHENTICATION_MANAGER)
     @Override
@@ -96,7 +101,7 @@ public class NkWebSecurityConfig extends WebSecurityConfigurerAdapter {
     @ConditionalOnMissingBean
     @Bean
     protected NkPasswordAuthenticationProvider passwordAuthenticationProvider() {
-        return new NkPasswordAuthenticationProvider(userDetailsService);
+        return new NkPasswordAuthenticationProvider(userDetailsService,redisSupport);
     }
 
     @ConditionalOnMissingBean

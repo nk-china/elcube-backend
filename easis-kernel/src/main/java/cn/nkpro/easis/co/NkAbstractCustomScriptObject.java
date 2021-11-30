@@ -1,12 +1,12 @@
 package cn.nkpro.easis.co;
 
+import cn.nkpro.easis.annotation.NkNote;
 import cn.nkpro.easis.annotation.NkScriptType;
 import cn.nkpro.easis.basic.NkProperties;
 import cn.nkpro.easis.exception.NkDefineException;
 import cn.nkpro.easis.utils.ClassUtils;
 import cn.nkpro.easis.utils.GroovyUtils;
 import cn.nkpro.easis.utils.ResourceUtils;
-import cn.nkpro.easis.annotation.NkNote;
 import com.alibaba.fastjson.JSON;
 import lombok.Getter;
 import lombok.Setter;

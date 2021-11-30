@@ -1,10 +1,7 @@
 package cn.nkpro.easis.basic;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.mybatis.spring.annotation.MapperScan;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
+import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -31,15 +28,9 @@ import java.util.concurrent.ThreadPoolExecutor;
         "cn.nkpro.easis.security.gen",
         "cn.nkpro.easis.docengine.gen",
 })
+@AutoConfigureOrder
 @EnableConfigurationProperties(NkProperties.class)
-public class NkAutoConfigurer implements ApplicationRunner {
-
-    @Override
-    public void run(ApplicationArguments args) throws Exception {
-
-        JSON.DEFAULT_GENERATE_FEATURE |= SerializerFeature.WriteMapNullValue.getMask();
-        JSON.DEFAULT_GENERATE_FEATURE |= SerializerFeature.DisableCircularReferenceDetect.getMask();
-    }
+public class NkAutoConfigurer {
     /**
      * ID序列配置 默认UUID
      * @return
