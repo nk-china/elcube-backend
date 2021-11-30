@@ -10,10 +10,8 @@ import org.springframework.context.annotation.FullyQualifiedAnnotationBeanNameGe
  */
 @SpringBootApplication
 @ComponentScan(nameGenerator = FullyQualifiedAnnotationBeanNameGenerator.class,
-                basePackages = {
-                    "cn.nkpro.easis",
-                    "cn.nkpro.groovy"
-})
+                basePackages = {"cn.nkpro.easis",}
+                )
 public class EasisApplication {
     public static void main(String[] args) {
         SpringApplication.run(EasisApplication.class, args);
