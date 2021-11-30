@@ -8,6 +8,7 @@ nk:
     enabled: false
   component-base-packages:
     - cn.nkpro.easis.components
+    - cn.nkpro.easis.customized
   component-disable-online-editing: true
   component-reload-class-path: true
   clickhouse:
