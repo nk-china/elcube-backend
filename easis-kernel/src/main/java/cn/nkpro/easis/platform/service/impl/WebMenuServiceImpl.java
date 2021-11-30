@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -109,10 +110,12 @@ public class WebMenuServiceImpl implements WebMenuService, DeployAble,Initializi
         menus.forEach(menu->{
             menu.setParentId(null);
             menu.setOrderBy((menus.indexOf(menu)+1) * 10000);
+            menu.setMenuId(StringUtils.defaultIfBlank(menu.getMenuId(), UUID.randomUUID().toString()));
             update(menu,updateTime);
             if(menu.getChildren()!=null){
                     menu.getChildren().forEach(m->{
                         m.setParentId(menu.getMenuId());
+                        m.setMenuId(StringUtils.defaultIfBlank(m.getMenuId(), UUID.randomUUID().toString()));
                         m.setOrderBy(menu.getOrderBy()+menu.getChildren().indexOf(m));
                         update(m,updateTime);
                     });

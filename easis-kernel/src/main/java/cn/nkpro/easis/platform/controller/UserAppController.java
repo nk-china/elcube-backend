@@ -5,6 +5,7 @@ import cn.nkpro.easis.basic.NkProperties;
 import cn.nkpro.easis.platform.gen.PlatformMenu;
 import cn.nkpro.easis.platform.gen.UserSavedQuery;
 import cn.nkpro.easis.platform.model.WebMenuBO;
+import cn.nkpro.easis.platform.service.PlatformRegistryService;
 import cn.nkpro.easis.platform.service.UserQueryService;
 import cn.nkpro.easis.platform.service.WebMenuService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,8 @@ public class UserAppController {
 
     @Autowired@SuppressWarnings("all")
     private UserQueryService userQueryService;
+    @Autowired
+    private PlatformRegistryService constantService;
 
 
     @NkNote("1.获取环境名称")
@@ -51,8 +54,8 @@ public class UserAppController {
     @PreAuthorize("authenticated")
     @NkNote("3.加载菜单详情")
     @RequestMapping("/menu/{id}")
-    public PlatformMenu menus(@PathVariable("id") String id){
-        return menuService.getDetail(id);
+    public String menus(@PathVariable("id") String id){
+        return constantService.getString("@PAGE",id);
     }
 
     @PreAuthorize("authenticated")

@@ -58,7 +58,7 @@ public class PlatformRegistryServiceImpl implements PlatformRegistryService , De
     }
 
     @Override
-    public Object getString(String regType, String regKey){
+    public String getString(String regType, String regKey){
 
         PlatformRegistryKey pk = new PlatformRegistryKey();
         pk.setRegType(regType);

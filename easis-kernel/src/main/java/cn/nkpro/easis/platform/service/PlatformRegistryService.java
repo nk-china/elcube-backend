@@ -9,7 +9,7 @@ public interface PlatformRegistryService {
 
     Object getJSON(String regType, String regKey);
 
-    Object getString(String regType, String regKey);
+    String getString(String regType, String regKey);
 
     List<Object> getList(String regType, String regKeyPrefix);
 
