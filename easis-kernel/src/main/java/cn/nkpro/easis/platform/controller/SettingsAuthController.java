@@ -126,6 +126,11 @@ public class SettingsAuthController {
     public UserAccountBO accountsUpdate(@RequestBody UserAccountBO user){
         return accountService.update(user);
     }
+
+    @RequestMapping("/accounts/clearLoginLock")
+    public void clearLoginLock(@RequestBody UserAccountBO user){
+        accountService.clearLoginLock(user);
+    }
     
     @RequestMapping("/accounts")
     public List<UserAccount> accounts(String keyword){

@@ -246,4 +246,9 @@ public class UserAccountServiceImpl implements UserAccountService {
 
         return account;
     }
+
+    @Override
+    public void clearLoginLock(UserAccountBO user) {
+        redisTemplate.delete(Constants.CACHE_AUTH_ERROR+user.getUsername());
+    }
 }

@@ -52,6 +52,11 @@ public class NkPasswordAuthenticationProvider implements AuthenticationProvider 
                 throw new BadCredentialsException("验证码不正确");
             }
         }
+        // 校验验证码
+        Object code = redisSupport.get(nkAuthentication.getVerKey());
+        if(code!=null && !Objects.equals(code, nkAuthentication.getVerCode())){
+            throw new BadCredentialsException("验证码不正确");
+        }
 
         UserDetails details = (UserDetails) userDetailsService.loadUserByUsername(nkAuthentication.getUsername());
 

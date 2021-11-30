@@ -36,4 +36,6 @@ public interface UserAccountService extends UserDetailsService {
     PageList<UserAccount> accountsPage(Integer from, Integer size, String orderField, String order, String keyword);
 
     UserAccountBO update(UserAccountBO account);
+
+    void clearLoginLock(UserAccountBO user);
 }
