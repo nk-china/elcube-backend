@@ -1,10 +1,10 @@
 package cn.nkpro.easis.security;
 
 import cn.nkpro.easis.data.redis.RedisSupport;
-import cn.nkpro.easis.security.validate.NkPasswordAuthenticationFilter;
-import cn.nkpro.easis.security.validate.NkPasswordAuthenticationProvider;
+import cn.nkpro.easis.security.validate.NkUsernamePasswordAuthenticationProvider;
+import cn.nkpro.easis.security.validate.NkUsernamePasswordVerCodeAuthenticationFilter;
+import cn.nkpro.easis.security.validate.NkUsernamePasswordVerCodeAuthenticationProvider;
 import cn.nkpro.easis.security.validate.NkTokenAuthenticationFilter;
-import cn.nkpro.easis.security.validate.NkTokenAuthenticationProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +17,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 /**
  * Created by bean on 2019/12/30.
@@ -33,10 +34,18 @@ public class NkWebSecurityConfig extends WebSecurityConfigurerAdapter {
     @Autowired
     private RedisSupport<Object> redisSupport;
 
+    private NkAuthenticationEntryPoint nkAuthenticationEntryPoint = new NkAuthenticationEntryPoint();
+
     @Bean(name = BeanIds.AUTHENTICATION_MANAGER)
     @Override
     public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
+    }
+
+    @Override
+    protected void configure(AuthenticationManagerBuilder auth) {
+        auth.authenticationProvider(new NkUsernamePasswordAuthenticationProvider(userDetailsService,redisSupport));
+        auth.authenticationProvider(new NkUsernamePasswordVerCodeAuthenticationProvider(userDetailsService,redisSupport));
     }
 
 
@@ -50,64 +59,14 @@ public class NkWebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .frameOptions()
                 .sameOrigin()
                 .and()
-//            .authorizeRequests()
-//                .antMatchers(
-//                        "/wsdoc",
-//                        "/wsdoc/**",
-//                        "/public/**",
-//                        "/file/d/**",
-//                        "/def/deploy/d/**"
-//                    ).permitAll()
-//                .antMatchers("/authentication/token")
-//                    .hasAnyAuthority("*:*","SYS:LOGIN")
-//                .anyRequest()
-//                    .authenticated()
-//                .and()
+            .addFilterBefore(new NkTokenAuthenticationFilter(authenticationManager(),nkAuthenticationEntryPoint), UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(new BasicAuthenticationFilter(authenticationManager(),nkAuthenticationEntryPoint), UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(new NkUsernamePasswordVerCodeAuthenticationFilter(authenticationManager(),nkAuthenticationEntryPoint), UsernamePasswordAuthenticationFilter.class)
             .exceptionHandling()
                 .accessDeniedHandler(new NkAccessDeniedHandler())
-                .authenticationEntryPoint(authenticationEntryPoint())
+                .authenticationEntryPoint(nkAuthenticationEntryPoint)
                 .and()
-            .addFilterBefore(tokenAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
-            .addFilterBefore(passwordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
         ;
-
-    }
-
-    @Override
-    protected void  configure(AuthenticationManagerBuilder auth) {
-        auth.authenticationProvider(tokenAuthenticationProvider());
-        auth.authenticationProvider(passwordAuthenticationProvider());
-    }
-
-    @ConditionalOnMissingBean
-    @Bean
-    protected NkPasswordAuthenticationFilter passwordAuthenticationFilter() throws Exception {
-        return new NkPasswordAuthenticationFilter(authenticationManager(),authenticationEntryPoint());
-    }
-
-    @ConditionalOnMissingBean
-    @Bean
-    protected NkTokenAuthenticationFilter tokenAuthenticationFilter() throws Exception {
-        return new NkTokenAuthenticationFilter(authenticationManager(),authenticationEntryPoint());
-    }
-
-
-    @ConditionalOnMissingBean
-    @Bean
-    protected NkTokenAuthenticationProvider tokenAuthenticationProvider() {
-        return new NkTokenAuthenticationProvider(userDetailsService);
-    }
-
-    @ConditionalOnMissingBean
-    @Bean
-    protected NkPasswordAuthenticationProvider passwordAuthenticationProvider() {
-        return new NkPasswordAuthenticationProvider(userDetailsService,redisSupport);
-    }
-
-    @ConditionalOnMissingBean
-    @Bean
-    protected NkAuthenticationEntryPoint authenticationEntryPoint(){
-        return new NkAuthenticationEntryPoint();
     }
 
     @ConditionalOnMissingBean

@@ -2,11 +2,13 @@ package cn.nkpro.easis.security.validate;
 
 import cn.nkpro.easis.basic.Constants;
 import cn.nkpro.easis.data.redis.RedisSupport;
-import cn.nkpro.easis.security.bo.UserDetails;
 import cn.nkpro.easis.security.UserAccountService;
+import cn.nkpro.easis.security.bo.UserDetails;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -14,13 +16,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.Objects;
 
-public class NkPasswordAuthenticationProvider implements AuthenticationProvider {
+public class NkUsernamePasswordVerCodeAuthenticationProvider implements AuthenticationProvider {
 
     private UserAccountService userDetailsService;
 
     private RedisSupport<Object> redisSupport;
 
-    public NkPasswordAuthenticationProvider(UserDetailsService userDetailsService, RedisSupport<Object> redisSupport){
+    public NkUsernamePasswordVerCodeAuthenticationProvider(UserDetailsService userDetailsService, RedisSupport<Object> redisSupport){
         this.userDetailsService = (UserAccountService) userDetailsService;
         this.redisSupport = redisSupport;
     }
@@ -28,7 +30,7 @@ public class NkPasswordAuthenticationProvider implements AuthenticationProvider 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
 
-        NkPasswordAuthentication nkAuthentication = (NkPasswordAuthentication) authentication;
+        NkUsernamePasswordVerCodeAuthentication nkAuthentication = (NkUsernamePasswordVerCodeAuthentication) authentication;
 
         String key = Constants.CACHE_AUTH_ERROR+nkAuthentication.getUsername();
 
@@ -75,16 +77,20 @@ public class NkPasswordAuthenticationProvider implements AuthenticationProvider 
             }
 
         }else{
-            nkAuthentication.setAuthenticated(true);
-            nkAuthentication.setDetails(details);
             redisSupport.delete(key);
-            return nkAuthentication;
+
+            AbstractAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                    nkAuthentication.getPrincipal(),
+                    nkAuthentication.getCredentials(),
+                    details.getAuthorities());
+            auth.setDetails(details);
+            return auth;
         }
     }
 
  
     @Override
     public boolean supports(Class<?> authentication) {
-        return (NkPasswordAuthentication.class.isAssignableFrom(authentication));
+        return (NkUsernamePasswordVerCodeAuthentication.class.isAssignableFrom(authentication));
     }
 }

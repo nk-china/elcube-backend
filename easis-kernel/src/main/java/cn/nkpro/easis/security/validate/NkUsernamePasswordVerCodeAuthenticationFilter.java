@@ -1,6 +1,5 @@
 package cn.nkpro.easis.security.validate;
 
-import cn.nkpro.easis.security.bo.UserDetails;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,13 +22,13 @@ import java.util.Objects;
  * Created by bean on 2019/12/30.
  */
 @Slf4j
-public class NkPasswordAuthenticationFilter extends GenericFilterBean {
+public class NkUsernamePasswordVerCodeAuthenticationFilter extends GenericFilterBean {
 
     private AuthenticationManager authenticationManager;
 
     private AuthenticationEntryPoint authenticationEntryPoint;
 
-    public NkPasswordAuthenticationFilter(AuthenticationManager authenticationManager, AuthenticationEntryPoint authenticationEntryPoint) {
+    public NkUsernamePasswordVerCodeAuthenticationFilter(AuthenticationManager authenticationManager, AuthenticationEntryPoint authenticationEntryPoint) {
         this.authenticationManager = authenticationManager;
         this.authenticationEntryPoint = authenticationEntryPoint;
     }
@@ -49,13 +48,13 @@ public class NkPasswordAuthenticationFilter extends GenericFilterBean {
                 String verCode  = StringUtils.defaultString(obtainParam(request, "verCode"));
 
                 if (StringUtils.isNoneBlank(nkApp, username, password)) {
-                    NkPasswordAuthentication nkAuthentication = new NkPasswordAuthentication(username, password, verKey, verCode);
                     try {
-                        Authentication responseAuthentication = authenticationManager.authenticate(nkAuthentication);
+                        Authentication responseAuthentication = authenticationManager.authenticate(
+                            new NkUsernamePasswordVerCodeAuthentication(username, password, verKey, verCode)
+                        );
                         if (responseAuthentication != null) {
                             if (responseAuthentication.isAuthenticated()) {
-                                SecurityContextHolder.getContext().setAuthentication(
-                                        new NkTokenAuthentication(nkAuthentication, (UserDetails) responseAuthentication.getDetails()));
+                                SecurityContextHolder.getContext().setAuthentication(responseAuthentication);
                             }
                         }
                     }catch (AuthenticationException e){

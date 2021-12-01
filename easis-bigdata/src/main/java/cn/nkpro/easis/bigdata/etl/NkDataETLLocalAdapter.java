@@ -89,13 +89,13 @@ public class NkDataETLLocalAdapter implements NkDataETLAdapter {
                     searchEngine.updateBeforeCommit(buildCustomES(dataKey, dataMapping));
                 });
 
-
-                securityRunner.runAsUser("admin");
-                docEngine.doUpdate(config.getDocId(),"by etl job",(doc)->{
-                    doc.fetch(config.getCardKey())
-                            .set("state","Complete")
-                            .set("records", (long) data.size());
-                });
+                securityRunner.runAsUser("admin",()->
+                    docEngine.doUpdate(config.getDocId(),"by etl job",(doc)->
+                        doc.fetch(config.getCardKey())
+                                .set("state","Complete")
+                                .set("records", (long) data.size())
+                    )
+                );
             });
         });
     }

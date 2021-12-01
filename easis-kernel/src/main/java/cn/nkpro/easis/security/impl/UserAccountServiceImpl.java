@@ -142,10 +142,13 @@ public class UserAccountServiceImpl implements UserAccountService {
     @Override
     public Map<String, Object> createToken() {
 
+        String username = (String) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        UserAccountBO account = getAccount(username, false);
 
         Map<String,Object> map = new HashMap<>();
-        map.put("username",SecurityContextHolder.getContext().getAuthentication().getPrincipal());
-        map.put("password",SecurityContextHolder.getContext().getAuthentication().getCredentials());
+        map.put("username",username);
+        map.put("password",account.getPassword());
 
         long time   = 1000L * 60 * 45;             // 有效期默认为45分钟
         long expire = 1000L * 60 * 15;             // 过期时间设定为15分钟

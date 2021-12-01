@@ -1,8 +1,11 @@
 package cn.nkpro.easis.security.validate;
 
-import cn.nkpro.easis.security.bo.UserDetails;
+import cn.nkpro.easis.security.JwtHelper;
+import io.jsonwebtoken.Claims;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -45,17 +48,23 @@ public class NkTokenAuthenticationFilter extends GenericFilterBean {
                 String tokenStr = obtainParam(request, "NK-Token");
 
                 if (StringUtils.isNoneBlank(nkApp, tokenStr)) {
+                    Claims token = JwtHelper.verifyJwt(tokenStr);
 
-                    NkTokenAuthentication nkAuthentication = new NkTokenAuthentication(tokenStr);
+                    if(token==null){
+                        throw new BadCredentialsException("无效的token");
+                    }
+                    String username = token.get("username", String.class);
+                    String password = token.get("password", String.class);
 
                     try{
-                        Authentication responseAuthentication = authenticationManager.authenticate(nkAuthentication);
+                        Authentication responseAuthentication = authenticationManager.authenticate(
+                                new UsernamePasswordAuthenticationToken(username, password)
+                        );
 
                         if (responseAuthentication != null && responseAuthentication.isAuthenticated()) {
                             if(logger.isDebugEnabled())
                                 logger.debug("["+responseAuthentication.getPrincipal()+"] successfully authenticated");
-                            SecurityContextHolder.getContext().setAuthentication(
-                                    new NkTokenAuthentication(nkAuthentication, (UserDetails) responseAuthentication.getDetails()));
+                            SecurityContextHolder.getContext().setAuthentication(responseAuthentication);
                         }
                     }catch (AuthenticationException e){
                         this.authenticationEntryPoint.commence((HttpServletRequest)request, (HttpServletResponse)response, e);
