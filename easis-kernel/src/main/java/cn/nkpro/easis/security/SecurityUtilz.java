@@ -48,7 +48,7 @@ public class SecurityUtilz {
                                             .replaceAll("[*]","[@#]?[A-Za-z0-9_-]+"))
                     );
                     return Arrays.stream(targetAuthoritys)
-                                .anyMatch(targetAuthority->pattern.matcher(targetAuthority).matches());
+                                .anyMatch(targetAuthority->pattern.matcher(targetAuthority.toUpperCase()).matches());
                 });
     }
 }

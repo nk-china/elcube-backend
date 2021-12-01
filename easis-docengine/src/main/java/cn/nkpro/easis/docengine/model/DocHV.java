@@ -29,6 +29,8 @@ public class DocHV extends DocHBasis implements Cloneable {
 
     private boolean newCreate = false;
 
+    private String runtimeKey = null;
+
     public DocHV() {
         super();
     }

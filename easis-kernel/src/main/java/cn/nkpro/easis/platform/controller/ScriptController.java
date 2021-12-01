@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @NkNote("34.[DevDef]脚本配置")
 @RestController
 @RequestMapping("/def/script")
-@PreAuthorize("hasAnyAuthority('*:*','DEF:*','DEF:SCRIPT')")
+@PreAuthorize("hasAnyAuthority('*:*','DEF:*','DEF:COMPONENT')")
 public class ScriptController {
 
 

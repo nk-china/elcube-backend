@@ -4,6 +4,7 @@ import cn.nkpro.easis.basic.Constants;
 import cn.nkpro.easis.basic.GUID;
 import cn.nkpro.easis.co.spel.NkSpELManager;
 import cn.nkpro.easis.data.redis.RedisSupport;
+import cn.nkpro.easis.exception.NkDefineException;
 import cn.nkpro.easis.exception.NkInputFailedCaution;
 import cn.nkpro.easis.platform.DeployAble;
 import cn.nkpro.easis.platform.gen.UserAccount;
@@ -13,9 +14,11 @@ import cn.nkpro.easis.security.UserAccountService;
 import cn.nkpro.easis.security.UserAuthorizationService;
 import cn.nkpro.easis.security.UserBusinessAdapter;
 import cn.nkpro.easis.security.bo.GrantedAuthority;
+import cn.nkpro.easis.security.bo.GrantedAuthoritySub;
 import cn.nkpro.easis.security.bo.UserGroupBO;
 import cn.nkpro.easis.security.gen.*;
 import cn.nkpro.easis.utils.BeanUtilz;
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
@@ -119,7 +122,7 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService, D
         });
 
         permList.forEach(perm->
-            permList.stream().filter(e -> StringUtils.equals(e.getPermResource(), perm.getPermResource()))
+            permList.stream().filter(e -> StringUtils.equals(e.getAuthority(), perm.getAuthority()))
                     .findFirst()
                     .ifPresent(first-> perm.setDisabled(perm!=first))
         );
@@ -278,6 +281,14 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService, D
         Assert.hasText(perm.getPermDesc(),"权限描述不能为空");
         Assert.hasText(perm.getPermResource(),"权限资源不能为空");
         Assert.hasText(perm.getPermOperate(),"权限操作不能为空");
+
+        if(StringUtils.isNotBlank(perm.getSubResource())){
+            try{
+                JSON.parseObject(perm.getSubResource(), GrantedAuthoritySub.class);
+            }catch (Exception e){
+                throw new NkDefineException("操作限制不合法："+e.getMessage());
+            }
+        }
 
         if(StringUtils.isNotBlank(perm.getLimitId())){
             perm.setLimitId(

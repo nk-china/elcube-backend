@@ -83,10 +83,22 @@ public class NkDocPermServiceImpl implements NkDocPermService {
                         if(writeSubPerm.getStatus()!=null){
                             // 移除非contains的状态
                             defHV.getStatus().removeIf(state->
-                                    !writeSubPerm.getStatus().contains(state.getDocState())
+                                    !(
+                                          writeSubPerm.getStatus().contains(state.getDocState())
+                                        ||StringUtils.equals(docHV.getDocState(),state.getDocState()) // 当前状态必须显示
+                                    )
                             );
                         }
                 });
+
+        // 设置单据WRITE权限
+        if(defHV.getCards().stream().anyMatch(DocDefIV::getWriteable)){
+            docHV.setWriteable(hasDocPerm(NkDocPermService.MODE_WRITE, docHV.getDocId(), docHV.getDocType()));
+        }else{
+            // 如果所有卡片的写权限都没有，那么直接设置成不可write
+            docHV.setWriteable(false);
+        }
+
     }
 
     /**

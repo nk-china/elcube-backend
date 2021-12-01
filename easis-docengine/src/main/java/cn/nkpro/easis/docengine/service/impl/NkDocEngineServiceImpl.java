@@ -53,6 +53,8 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
     @Autowired@SuppressWarnings("all")
     private RedisSupport<DocHPersistent> redisSupport;
     @Autowired@SuppressWarnings("all")
+    private RedisSupport<DocHV> redisRuntime;
+    @Autowired@SuppressWarnings("all")
     private NkCustomObjectManager customObjectManager;
     @Autowired@SuppressWarnings("all")
     private NkDocDefService docDefService;
@@ -103,7 +105,10 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
             NkDocProcessor processor = customObjectManager.getCustomObject(def.getRefObjectType(), NkDocProcessor.class);
 
             // 创建单据
-            return processor.toCreate(def, preDoc);
+            DocHV docHV = processor.toCreate(def, preDoc);
+            docHV.setRuntimeKey(UUID.randomUUID().toString());
+
+            return processView(docHV);
         }finally {
             NkDocEngineContext.endLog();
         }
@@ -132,7 +137,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
                 docHPersistent.set(fetchDoc(docId));
                 Assert.notNull(docHPersistent.get(),"单据不存在");
 
-                // 检查权限
+                // 检查READ权限
                 docPermService.assertHasDocPerm(NkDocPermService.MODE_READ, docId, docHPersistent.get().getDocType());
             }
 
@@ -246,21 +251,64 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
         try{
 
             validate(doc);
-            DocDefHV def = docDefService.deserializeDef(doc.getDef());
+            DocDefHV defHV = docDefService.deserializeDef(doc.getDef());
 
-            // 获取单据配置 todo 之前为什么要替换def？ 需要思考下
+            DocHV runtime = processRuntime(doc);
+            /*
+             *  todo 替换def
+             *  因为前端回传的单据配置是经过权限过滤的，不完整的，所以需要重新获取完整的单据和数据进行计算
+             *  计算完成后，再进行权限过滤，返回给前端
+             */
             //DocDefHV def = docDefService.getDocDefForRuntime(doc.getDocType());
             //doc.setDef(def);
 
             // 获取单据处理器 并执行
-            return customObjectManager
-                    .getCustomObject(def.getRefObjectType(), NkDocProcessor.class)
+            doc =  customObjectManager
+                    .getCustomObject(runtime.getDef().getRefObjectType(), NkDocProcessor.class)
                     .calculate(doc, fromCard, options);
+
+            doc.setDef(defHV);
+
+            return processView(doc);
+
         }finally {
             if(log.isInfoEnabled())log.info("{}单据计算 完成", NkDocEngineContext.currLog());
             NkDocEngineContext.endLog();
         }
     }
+
+    private void clearRuntime(DocHV doc){
+        if(StringUtils.isNotBlank(doc.getRuntimeKey())){
+            redisRuntime.delete(doc.getRuntimeKey());
+            doc.setRuntimeKey(null);
+        }
+    }
+    private DocHV processRuntime(DocHV doc){
+
+        // 获取单据运行时状态，如果runtimeKey为空，获取当前最新单据作为运行时
+        DocHV docHVRuntime;
+        if(StringUtils.isNotBlank(doc.getRuntimeKey())){
+            docHVRuntime = redisRuntime.get(doc.getRuntimeKey());
+
+            Assert.notNull(docHVRuntime,"操作已超时");
+        }else{
+            docHVRuntime = detail(doc.getDocId());
+            doc.setRuntimeKey(UUID.randomUUID().toString());
+        }
+
+        // 将运行时数据填充到用户单据中，使单据数据完整
+        docHVRuntime.getData().forEach((k,v)-> doc.getData().putIfAbsent(k,v));
+        docHVRuntime.getDef().getCards().forEach(runtimeCard->{
+            boolean present = doc.getDef().getCards().stream()
+                    .anyMatch(card -> StringUtils.equals(card.getCardKey(), runtimeCard.getCardKey()));
+            if(!present)
+                doc.getDef().getCards().add(runtimeCard);
+        });
+        doc.getDef().getCards().sort(Comparator.comparingInt(DocDefI::getOrderBy));
+
+        return docHVRuntime;
+    }
+
     /**
      *
      * @throws IllegalTransactionStateException 在无transaction状态下执行；如果当前已有transaction，则抛出异常
@@ -310,23 +358,33 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
             docPermService.assertHasDocPerm(NkDocPermService.MODE_WRITE, docHV.getDocType());
 
             if(log.isInfoEnabled())log.info("{}准备获取原始单据 用于填充被权限过滤的数据", NkDocEngineContext.currLog());
-            DocHV original = detail(docHV.getDocId());
-            if(original!=null){
 
+            DocDefHV def = docDefService.deserializeDef(docHV.getDef());
+
+            DocHV runtime = processRuntime(docHV);
+
+            // 如果单据为修改模式下，检查是否有该单据的write权限
+            if(!runtime.isNewCreate()){
                 if(!debugContextManager.isDebug()){
                     docPermService.assertHasDocPerm(NkDocPermService.MODE_WRITE, docHV.getDocId(), docHV.getDocType());
                 }
-
-                original.getData().forEach((k,v)-> docHV.getData().putIfAbsent(k,v));
             }
 
-            DocHV doc = processView(execUpdate(docHV, optSource, lockId));
+//            DocHV original = detail(docHV.getDocId());
+//            if(original!=null){
+//                original.getData().forEach((k,v)-> docHV.getData().putIfAbsent(k,v));
+//            }
+            docHV = execUpdate(docHV, optSource, lockId);
+            docHV.setDef(def);
+
+            processView(docHV);
+            clearRuntime(docHV);
 
             if(debugContextManager.isDebug()){
-                debugContextManager.addDebugResource("$"+doc.getDocId(), doc.toPersistent());
+                debugContextManager.addDebugResource("$"+docHV.getDocId(), docHV.toPersistent());
             }
 
-            return doc;
+            return docHV;
         }finally {
             if(log.isInfoEnabled())log.info("{}保存单据视图 完成",NkDocEngineContext.currLog());
             NkDocEngineContext.endLog();
@@ -600,6 +658,11 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
 
                 flow.setVisible(visibleState);
             });
+
+        if(StringUtils.isNotBlank(docHV.getRuntimeKey())){
+            redisRuntime.set(docHV.getRuntimeKey(),docHV);
+            redisRuntime.expire(docHV.getRuntimeKey(),60 * 60);//1小时
+        }
 
         if(log.isInfoEnabled())
             log.info("{}设置单据后续操作 操作数量 = {}",

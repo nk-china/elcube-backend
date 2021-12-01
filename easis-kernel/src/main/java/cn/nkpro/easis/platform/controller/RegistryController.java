@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 @NkNote("32.[DevDef]常量")
 @RequestMapping("/platform/registry")
 @RestController
-@PreAuthorize("hasAnyAuthority('*:*','DEF:*','DEF:REGISTRY')")
+@PreAuthorize("authenticated")
 public class RegistryController {
 
     @Autowired
