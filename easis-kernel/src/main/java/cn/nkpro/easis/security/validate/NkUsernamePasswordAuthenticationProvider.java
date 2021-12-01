@@ -37,12 +37,15 @@ public class NkUsernamePasswordAuthenticationProvider implements AuthenticationP
             }
         }
 
-        UserDetails user = userDetailsService.loadUserByUsernameFromCache((String) passwordAuthenticationToken.getPrincipal());
-        if(user==null){
-            throw new BadCredentialsException("无效的用户信息");
+        UserDetails details = userDetailsService.loadUserByUsernameFromCache((String) passwordAuthenticationToken.getPrincipal());
+        if(details==null){
+            throw new BadCredentialsException("无效的账号信息");
+        }
+        if(details.getLocked()!=null && details.getLocked()==1){
+            throw new BadCredentialsException("账号已禁用");
         }
 
-        if(!StringUtils.equals((CharSequence) passwordAuthenticationToken.getCredentials(),user.getPassword())){
+        if(!StringUtils.equals((CharSequence) passwordAuthenticationToken.getCredentials(),details.getPassword())){
             long increment = redisSupport.increment(key, 1);
             if(increment>=5){
                 redisSupport.expire(key, 60 * 60);
@@ -56,9 +59,9 @@ public class NkUsernamePasswordAuthenticationProvider implements AuthenticationP
         passwordAuthenticationToken =  new UsernamePasswordAuthenticationToken(
                 passwordAuthenticationToken.getPrincipal(),
                 passwordAuthenticationToken.getCredentials(),
-                user.getAuthorities()
+                details.getAuthorities()
         );
-        passwordAuthenticationToken.setDetails(user);
+        passwordAuthenticationToken.setDetails(details);
         return passwordAuthenticationToken;
     }
 

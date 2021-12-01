@@ -65,7 +65,12 @@ public class NkUsernamePasswordVerCodeAuthenticationProvider implements Authenti
 
         if(details==null){
             throw new UsernameNotFoundException("账号没有找到");
-        }else if(!StringUtils.equals(details.getPassword(),nkAuthentication.getPassword())){
+        }
+        if(details.getLocked()!=null && details.getLocked()==1){
+            throw new BadCredentialsException("账号已禁用");
+        }
+
+        if(!StringUtils.equals(details.getPassword(),nkAuthentication.getPassword())){
             long increment = redisSupport.increment(key, 1);
 
             if(increment>=5){
@@ -76,16 +81,16 @@ public class NkUsernamePasswordVerCodeAuthenticationProvider implements Authenti
                 throw new BadCredentialsException("密码错误");
             }
 
-        }else{
-            redisSupport.delete(key);
-
-            AbstractAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                    nkAuthentication.getPrincipal(),
-                    nkAuthentication.getCredentials(),
-                    details.getAuthorities());
-            auth.setDetails(details);
-            return auth;
         }
+
+        redisSupport.delete(key);
+
+        AbstractAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                nkAuthentication.getPrincipal(),
+                nkAuthentication.getCredentials(),
+                details.getAuthorities());
+        auth.setDetails(details);
+        return auth;
     }
 
  
