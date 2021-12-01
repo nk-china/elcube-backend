@@ -13,7 +13,6 @@ import cn.nkpro.easis.security.SecurityUtilz;
 import cn.nkpro.easis.security.bo.GrantedAuthority;
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -47,16 +46,21 @@ public class NkDocPermServiceImpl implements NkDocPermService {
         getDocAuthorities(mode,defHV.getDocType())
                 .stream()
                 .findFirst()
-                .map(authority -> StringUtils.split(authority.getSubResource(),'|'))
-                .ifPresent(authority->
-                    defHV.getCards().removeIf(defIV ->{
-                        boolean removeIf = !ArrayUtils.contains(authority,defIV.getCardKey());
-                        if(removeIf){
-                            docHV.getData().remove(defIV.getCardKey());
-                        }
-                        return removeIf;
-                    })
-                );
+                .map(GrantedAuthority::getSubPerm)
+                .ifPresent(subPerm->{
+                    if(subPerm.getIncludes()!=null){
+                        // 移除非contains的卡片
+                        defHV.getCards().removeIf(defIV->
+                                !subPerm.getIncludes().contains(defIV.getCardKey())
+                        );
+                    }
+                    if(subPerm.getExcludes()!=null){
+                        // 移除contains的卡片
+                        defHV.getCards().removeIf(defIV->
+                                subPerm.getExcludes().contains(defIV.getCardKey())
+                        );
+                    }
+                });
 
         // 设置卡片的writeable值
         defHV.getCards()
@@ -64,15 +68,25 @@ public class NkDocPermServiceImpl implements NkDocPermService {
         getDocAuthorities(NkDocPermService.MODE_WRITE, defHV.getDocType())
                 .stream()
                 .findFirst()
-                .map(writeAuthority -> StringUtils.split(writeAuthority.getSubResource(),'|'))
-                .ifPresent(writeAuthority ->
+                .map(GrantedAuthority::getSubPerm)
+                .ifPresent(writeSubPerm ->{
                         defHV.getCards()
                             .stream()
                             .filter(DocDefIV::getWriteable)
-                            .forEach(defIV -> defIV.setWriteable(
-                                    ArrayUtils.contains(writeAuthority,defIV.getCardKey())
-                            ))
-                );
+                            .forEach(defIV -> {
+
+                                boolean include = writeSubPerm.getIncludes()==null || writeSubPerm.getIncludes().contains(defIV.getCardKey());
+                                boolean exclude = writeSubPerm.getExcludes()!=null && writeSubPerm.getExcludes().contains(defIV.getCardKey());
+
+                                defIV.setWriteable(include && !exclude);
+                            });
+                        if(writeSubPerm.getStatus()!=null){
+                            // 移除非contains的状态
+                            defHV.getStatus().removeIf(state->
+                                    !writeSubPerm.getStatus().contains(state.getDocState())
+                            );
+                        }
+                });
     }
 
     /**

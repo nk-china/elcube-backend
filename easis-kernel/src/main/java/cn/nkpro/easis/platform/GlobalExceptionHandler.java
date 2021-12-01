@@ -35,10 +35,10 @@ public class GlobalExceptionHandler {
         codes.put(IllegalArgumentException.class,400);
 
         // 用户未登陆 或 token失效
-        codes.put(AccessDeniedException.class,401);
         codes.put(AuthenticationException.class,401);
 
         // 没有权限，拒绝访问
+        codes.put(AccessDeniedException.class,403);
         codes.put(NkAccessDeniedException.class,403);
 
         // 系统错误

@@ -1,5 +1,6 @@
 package cn.nkpro.easis.security.bo;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Data;
@@ -24,8 +25,6 @@ public class GrantedAuthority implements org.springframework.security.core.Grant
 
     private String permOperate;
 
-    private String subResource;
-
     private String[] limitIds;
     private String limitQuery;
 
@@ -39,6 +38,8 @@ public class GrantedAuthority implements org.springframework.security.core.Grant
 
     private Boolean disabled = false;
 
+    private GrantedAuthoritySub subPerm = null;
+
 
     public String getDocType(){
         return StringUtils.startsWith(getPermResource(),"@")
@@ -48,6 +49,10 @@ public class GrantedAuthority implements org.springframework.security.core.Grant
 
     public void setDocType(String var0){}
 
+    public void parseSubPerm(String subResource) {
+        if(StringUtils.isNotBlank(subResource))
+            this.subPerm = JSON.parseObject(subResource, GrantedAuthoritySub.class);
+    }
 
     @Override
     public int compareTo(GrantedAuthority o) {

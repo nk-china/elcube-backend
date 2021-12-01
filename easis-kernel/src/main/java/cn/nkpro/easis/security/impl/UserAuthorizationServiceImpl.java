@@ -2,9 +2,7 @@ package cn.nkpro.easis.security.impl;
 
 import cn.nkpro.easis.basic.Constants;
 import cn.nkpro.easis.basic.GUID;
-import cn.nkpro.easis.basic.PageList;
 import cn.nkpro.easis.co.spel.NkSpELManager;
-import cn.nkpro.easis.data.mybatis.pagination.PaginationContext;
 import cn.nkpro.easis.data.redis.RedisSupport;
 import cn.nkpro.easis.exception.NkInputFailedCaution;
 import cn.nkpro.easis.platform.DeployAble;
@@ -50,8 +48,6 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService, D
     private AuthLimitMapper authLimitMapper;
     @Autowired@SuppressWarnings("all")
     private UserAccountMapper accountMapper;
-    @Autowired
-    private UserAccountService accountService;
 
     @Autowired@SuppressWarnings("all")
     private RedisSupport<UserGroupBO> redisSupport;
@@ -211,7 +207,7 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService, D
         GrantedAuthority authority = new GrantedAuthority();
         authority.setPermResource(resource);
         authority.setPermOperate(perm.getPermOperate());
-        authority.setSubResource(perm.getSubResource());
+        authority.parseSubPerm(perm.getSubResource());
         authority.setLimitIds(StringUtils.split(perm.getLimitId(),'|'));
         authority.setLevel(perm.getPermLevel());
         authority.setFromPermissionId(perm.getPermId());
