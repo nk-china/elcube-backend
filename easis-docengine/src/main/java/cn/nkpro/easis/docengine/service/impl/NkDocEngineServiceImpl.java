@@ -20,7 +20,6 @@ import cn.nkpro.easis.docengine.service.NkDocEngineFrontService;
 import cn.nkpro.easis.docengine.service.NkDocPermService;
 import cn.nkpro.easis.exception.NkDefineException;
 import cn.nkpro.easis.exception.NkOperateNotAllowedCaution;
-import cn.nkpro.easis.exception.abstracts.NkRuntimeException;
 import cn.nkpro.easis.security.SecurityUtilz;
 import cn.nkpro.easis.task.NkBpmTaskService;
 import cn.nkpro.easis.utils.BeanUtilz;
@@ -256,11 +255,6 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
             DocDefHV defHV = docDefService.deserializeDef(doc.getDef());
 
             DocHV runtime = processRuntime(doc);
-            /*
-             *  todo 替换def
-             *  因为前端回传的单据配置是经过权限过滤的，不完整的，所以需要重新获取完整的单据和数据进行计算
-             *  计算完成后，再进行权限过滤，返回给前端
-             */
             //DocDefHV def = docDefService.getDocDefForRuntime(doc.getDocType());
             //doc.setDef(def);
 
@@ -279,12 +273,29 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
         }
     }
 
+    /**
+     * 保存成功后，移除runtime标示
+     */
     private void clearRuntime(DocHV doc){
         if(StringUtils.isNotBlank(doc.getRuntimeKey())){
             redisRuntime.delete(doc.getRuntimeKey());
             doc.setRuntimeKey(null);
         }
     }
+
+    /**
+     *
+     * 因为前端回传的单据配置是经过权限过滤的，不完整的，
+     * 所以需要重新获取完整的单据和数据进行处理
+     * 涉及方法：
+     * @see #create(String, String)
+     * @see #calculate(DocHV, String, Object)
+     * @see #doUpdateView(DocHV, String)
+     *
+     * 逻辑处理完成后，再进行权限过滤，返回给前端
+     * @see #processView(DocHV)
+     * 
+     */
     private DocHV processRuntime(DocHV doc){
 
         // 获取单据运行时状态，如果runtimeKey为空，获取当前最新单据作为运行时
