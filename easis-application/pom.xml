@@ -69,11 +69,6 @@
             <artifactId>easis-component-financial</artifactId>
             <version>${parent.version}</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>cn.nkpro.easis</groupId>-->
-<!--            <artifactId>easis-customized-citic</artifactId>-->
-<!--            <version>${parent.version}</version>-->
-<!--        </dependency>-->
 
         <!--SpringBoot 基础库-->
         <dependency>

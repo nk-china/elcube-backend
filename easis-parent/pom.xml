@@ -52,25 +52,37 @@
         </developer>
     </developers>
 
-
-    <distributionManagement>
-<!--        <repository>-->
-<!--            <id>ossrh</id>-->
-<!--            <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>-->
-<!--        </repository>-->
-<!--        <snapshotRepository>-->
-<!--            <id>ossrh</id>-->
-<!--            <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>-->
-<!--        </snapshotRepository>-->
-        <repository>
-            <id>nk-pro</id>
-            <url>http://ns.nkpro.it/repository/maven-releases/</url>
-        </repository>
-        <snapshotRepository>
-            <id>nk-pro</id>
-            <url>http://ns.nkpro.it/repository/maven-snapshots/</url>
-        </snapshotRepository>
-    </distributionManagement>
+    <profiles>
+        <profile>
+            <id>nk-repos</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <distributionManagement>
+                <repository>
+                    <id>nk-pro</id>
+                    <url>http://ns.nkpro.it/repository/maven-releases/</url>
+                </repository>
+                <snapshotRepository>
+                    <id>nk-pro</id>
+                    <url>http://ns.nkpro.it/repository/maven-snapshots/</url>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+        <profile>
+            <id>ossrh</id>
+            <distributionManagement>
+                <repository>
+                    <id>ossrh</id>
+                    <url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                </repository>
+                <snapshotRepository>
+                    <id>ossrh</id>
+                    <url>https://s01.oss.sonatype.org/content/repositories/snapshots/</url>
+                </snapshotRepository>
+            </distributionManagement>
+        </profile>
+    </profiles>
 
     <dependencies>
 
@@ -201,7 +213,6 @@
                     <skip>true</skip>
                 </configuration>
             </plugin>
-            <!-- 源码插件
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
@@ -214,7 +225,6 @@
                     </execution>
                 </executions>
             </plugin>
-            -->
             <plugin>
                 <groupId>org.mybatis.generator</groupId>
                 <artifactId>mybatis-generator-maven-plugin</artifactId>
