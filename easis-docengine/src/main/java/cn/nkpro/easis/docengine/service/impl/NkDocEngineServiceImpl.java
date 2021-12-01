@@ -19,6 +19,8 @@ import cn.nkpro.easis.docengine.service.NkDocEngineContext;
 import cn.nkpro.easis.docengine.service.NkDocEngineFrontService;
 import cn.nkpro.easis.docengine.service.NkDocPermService;
 import cn.nkpro.easis.exception.NkDefineException;
+import cn.nkpro.easis.exception.NkOperateNotAllowedCaution;
+import cn.nkpro.easis.exception.abstracts.NkRuntimeException;
 import cn.nkpro.easis.security.SecurityUtilz;
 import cn.nkpro.easis.task.NkBpmTaskService;
 import cn.nkpro.easis.utils.BeanUtilz;
@@ -361,7 +363,13 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
 
             DocDefHV def = docDefService.deserializeDef(docHV.getDef());
 
-            DocHV runtime = processRuntime(docHV);
+            DocHV runtime;
+            try{
+                runtime = processRuntime(docHV);
+            }catch (Exception e){
+                redisSupport.unLock(docHV.getDocId(), lockId);
+                throw new NkOperateNotAllowedCaution(e.getMessage());
+            }
 
             // 如果单据为修改模式下，检查是否有该单据的write权限
             if(!runtime.isNewCreate()){
