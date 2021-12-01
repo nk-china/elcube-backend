@@ -2,7 +2,7 @@ nk:
   secret-id: AEF1D52777444FDDBC354928D7D2BFD3
   secret-key: UWLnyjGgg0NuRKNFLFZ3mmoNI8VoNqHlBy1B6ZFIom0fhVCEx8uQB7J/g0wnPFADOtyq2ZVuHuJJy0QCUAzDXeCu5j75hDRFtBKaV9DEE4912FmgNb+ekV6/gdemyVulibQs/J8izXoVkD5LTALKBQ==
   env-key: ts5_bb_preview
-  env-name: Easis预览版(v2.0.2)
+  env-name: Easis社区预览版(v2.0.2)
   file-root-path: /Users/bean/Downloads/tfms
   compress:
     enabled: false
