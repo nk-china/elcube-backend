@@ -38,8 +38,9 @@ public class NkPasswordAuthenticationProvider implements AuthenticationProvider 
             if(s>=5){
                 // 如果用户仍然继续尝试登陆，那么延长锁定时间 重试6次锁定4小时，7次9小时，8次16小时，9次25小时，10次36小时，以此类推
                 long increment = redisSupport.increment(key, 1);
-                redisSupport.expire(key, (long) (60 * 60 * Math.pow(increment-4,2)));
-                throw new BadCredentialsException("账号已被锁定，请稍后再试");
+                long hour = (long) Math.pow(increment-4,2);
+                redisSupport.expire(key, 60 * 60 * hour);
+                throw new BadCredentialsException("账号已被锁定，请"+hour+"小时后再试");
             }
 
             // 校验验证码
@@ -66,8 +67,8 @@ public class NkPasswordAuthenticationProvider implements AuthenticationProvider 
             long increment = redisSupport.increment(key, 1);
 
             if(increment>=5){
-                redisSupport.expire(key, 60 * 60 * increment);
-                throw new BadCredentialsException("密码错误次数过多，账号已被锁定，请稍后再试");
+                redisSupport.expire(key, 60 * 60);
+                throw new BadCredentialsException("密码错误次数过多，账号已被锁定，请1小时后再试");
             }else{
                 redisSupport.expire(key,60 * 5 * increment);
                 throw new BadCredentialsException("密码错误");

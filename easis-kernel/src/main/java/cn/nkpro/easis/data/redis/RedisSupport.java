@@ -16,6 +16,9 @@ public interface RedisSupport<T> {
     void    clear();
     boolean exists(String key);
     void    expire(String key, long expire);
+
+    Long getExpire(String key);
+
     long    increment(String key, long l);
 
     void set(String key, T value);

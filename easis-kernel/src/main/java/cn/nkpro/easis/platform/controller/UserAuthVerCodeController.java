@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServletResponse;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by bean on 2019/12/30.
@@ -30,9 +32,22 @@ public class UserAuthVerCodeController {
     private RedisSupport<Integer> redisSupportInteger;
 
     @NkNote("检查是否需要验证码")
-    @RequestMapping(value = "/has/{username}",produces = MediaType.IMAGE_PNG_VALUE)
-    public String verCode(@PathVariable("username") String username) {
-        return String.valueOf(redisSupportInteger.get(Constants.CACHE_AUTH_ERROR+username));
+    @RequestMapping(value = "/has/{username}")
+    public Map<String,Object> verCode(@PathVariable("username") String username) {
+        String key = Constants.CACHE_AUTH_ERROR + username;
+        Integer count = redisSupportInteger.get(key);
+        Long time = redisSupport.getExpire(key);
+
+        String message = null;
+        if(count!=null && count>=5){
+            message = "账号已被锁定，请"+((int)(time/60/60)+1)+"小时后再试";
+        }
+
+        Map<String,Object> ret = new HashMap<>();
+        ret.put("count",count);
+        ret.put("message",message);
+
+        return ret;
     }
 
     @NkNote("登陆验证码")

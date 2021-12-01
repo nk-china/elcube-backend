@@ -59,6 +59,10 @@ public class DefaultRedisSupportImpl<T> implements RedisSupport<T> {
         redisTemplate.expire(key,timeout, TimeUnit.SECONDS);
     }
     @Override
+    public Long getExpire(String key) {
+        return redisTemplate.getExpire(key, TimeUnit.SECONDS);
+    }
+    @Override
     public long increment(String key, long l) {
         Long L = redisTemplate.opsForValue().increment(key,l);
         Assert.notNull(L,"Redis出现错误");
