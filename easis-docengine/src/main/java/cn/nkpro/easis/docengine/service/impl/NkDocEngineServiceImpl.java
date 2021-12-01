@@ -500,7 +500,6 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
             }
 
             // 获取单据处理器 并执行
-            // doc.setDef(def);todo 之前为什么要替换def？ 需要思考下
             doc = customObjectManager
                     .getCustomObject(def.getRefObjectType(), NkDocProcessor.class)
                     .doUpdate(doc, optionalOriginal.orElse(null),optSource);
