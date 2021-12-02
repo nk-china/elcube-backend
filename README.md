@@ -219,7 +219,11 @@ EAsis业务流，是单据引擎的一部分，负责将多个单据，根据业
 ### 使用概要
 EAsis Backend 为EAsis模型的服务端部分，需要配合EAsis的WEB前端服务一起使用
 
-相关链接：[asdf](docs/UserGuide/index.md)
+相关链接：
+
+[EAsis 演示系统-搭建中]
+
+[EAsis 指南-逐步完善中](http://docs.easis.nkpro.cn/)
 
 [EAsis Front Gitee仓库](https://gitee.com/newcorenet/easis-front)
 
