@@ -1,37 +1,39 @@
-# EAsis Backend
+# EAsis 企业级快速开发模型
 
-#### 介绍
-EAsis Backend 企业级快速开发模型
+EAsis 名称是Easy Oasis两个单词的组合，表示着我们希望开发一套快速、
+容易的企业级模型方案，让所有企业级信息化实施的程序员可以走出困境，
+享受绿洲下的新鲜空气
 
-#### 软件架构
+### 权利声明
+EAsis 遵照AGPL-3.0协议开放源代码，在遵照协议约束条件下，您可以自由传播和修改。
+协议原文见LICENSE文件，或查阅 http://www.gnu.org/licenses/agpl-3.0.html
+
+### 使用概要
+EAsis Backend 为EAsis模型的服务端部分，需要配合EAsis的WEB前端服务一起使用
+
+相关链接：
+
+[EAsis Front Gitee仓库](https://gitee.com/newcorenet/easis-front)
+
+[EAsis Front Github仓库](https://github.com/nk-china/easis-front)
+
+### 软件架构
 软件架构说明
 
 
-#### 安装教程
+### 安装教程
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+1.  安装JDK
+2.  安装关系型数据库，如MySQL5
+3.  安装Redis
+4.  安装ElasticSearch
+5.  在application-dev.yml中配置数据库、Redis、ElasticSearch的地址及密钥
+6.  通过SpringBoot启动程序
+7.  启动EAsis WEB前端
 
-#### 使用说明
-
-1.  xxxx
-2.  xxxx
-3.  xxxx
-
-#### 参与贡献
+### 参与贡献
 
 1.  Fork 本仓库
 2.  新建 Feat_xxx 分支
 3.  提交代码
 4.  新建 Pull Request
-
-
-#### 特技
-
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
