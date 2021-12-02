@@ -223,7 +223,7 @@ EAsis Backend 为EAsis模型的服务端部分，需要配合EAsis的WEB前端�
 
 [EAsis 演示系统-搭建中]
 
-[EAsis 指南-逐步完善中](http://docs.easis.nkpro.cn/)
+[EAsis 指南-逐步完善中](http://docs.easis.nkpro.cn/guide/)
 
 [EAsis Front Gitee仓库](https://gitee.com/newcorenet/easis-front)
 
