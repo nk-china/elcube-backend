@@ -30,6 +30,7 @@ EAsis Backend 为EAsis模型的服务端部分，需要配合EAsis的WEB前端�
 5.  在application-dev.yml中配置数据库、Redis、ElasticSearch的地址及密钥
 6.  通过SpringBoot启动程序
 7.  启动EAsis WEB前端
+8.  使用初始管理员admin/admin登陆体验
 
 ### 参与贡献
 
