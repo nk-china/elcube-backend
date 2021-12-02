@@ -226,7 +226,9 @@ EAsis Backend 为EAsis模型的服务端部分，需要配合EAsis的WEB前端�
 [EAsis Front Github仓库](https://github.com/nk-china/easis-front)
 
 ### 软件架构
-软件架构说明
+
+![系统架构图](https://images.gitee.com/uploads/images/2021/1203/002555_d2e69655_4817814.png)
+
 
 
 ### 安装教程
