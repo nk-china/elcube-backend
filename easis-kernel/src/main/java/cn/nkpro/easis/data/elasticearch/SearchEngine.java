@@ -178,7 +178,7 @@ public class SearchEngine extends ESContentBuilder{
     }
 
     public void deleteBeforeCommit(Class<? extends AbstractESModel> esType, QueryBuilder query){
-        TransactionSync.runBeforeCommit(()-> {
+        TransactionSync.runBeforeCommit("删除索引",()-> {
             try{
                 client.deleteByQuery(
                         new DeleteByQueryRequest(
@@ -197,7 +197,7 @@ public class SearchEngine extends ESContentBuilder{
     }
 
     public void deleteBeforeCommit(Class<? extends AbstractESModel> esType, Collection<String> keys){
-        TransactionSync.runBeforeCommit(()-> {
+        TransactionSync.runBeforeCommit("删除索引" + keys.size(),()-> {
             try{
                 for(String id : keys) {
                     client.delete(
@@ -217,7 +217,7 @@ public class SearchEngine extends ESContentBuilder{
 
     public void updateBeforeCommit(Collection<AbstractESModel> docs){
 
-        TransactionSync.runBeforeCommit(()-> {
+        TransactionSync.runBeforeCommit("更新索引",()-> {
             for(AbstractESModel doc : docs){
                 doc.validateDynamic();
             }
@@ -251,7 +251,7 @@ public class SearchEngine extends ESContentBuilder{
 
     public void indexBeforeCommit(String indexName, Collection<AbstractESModel> docs){
 
-        TransactionSync.runBeforeCommit(()-> {
+        TransactionSync.runBeforeCommit("创建索引",()-> {
 
             if(log.isInfoEnabled()){
                 log.info("重建索引开始 数量 = {}", docs.size());

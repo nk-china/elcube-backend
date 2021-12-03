@@ -79,16 +79,16 @@ class AbstractNkDocEngine {
     @Autowired
     protected NkCustomObjectManager customObjectManager;
 
-    protected void info(String message,Object... params){
-        log.info(NkDocEngineContext.currLog() + message, params);
-    }
+    //protected void info(String message,Object... params){
+    //    log.info(NkDocEngineContext.currLog() + message, params);
+    //}
 
 
     /**
      * 获取单据的持久化对象
      */
     DocHPersistent fetchDoc(String docId){
-        if(log.isInfoEnabled())info("获取单据原始数据");
+        if(log.isInfoEnabled())log.info("{}获取单据原始数据", NkDocEngineContext.currLog());
 
         // 获取单据抬头和行项目数据
         final long start = System.currentTimeMillis();
@@ -116,7 +116,7 @@ class AbstractNkDocEngine {
 
         }finally {
             if(log.isInfoEnabled())
-                info("获取单据原始数据 耗时{}ms", System.currentTimeMillis()-start);
+                log.info("{}获取单据原始数据 耗时{}ms", NkDocEngineContext.currLog(), System.currentTimeMillis()-start);
         }
     }
 
@@ -170,7 +170,7 @@ class AbstractNkDocEngine {
                     .getCustomObject(def.getRefObjectType(), NkDocProcessor.class);
 
             if(log.isInfoEnabled())
-                info("确定单据处理器 = {}", docProcessor.getBeanName());
+                log.info("{}确定单据处理器 = {}", NkDocEngineContext.currLog(), docProcessor.getBeanName());
 
             return docProcessor.detail(def, docProcessor.deserialize(def, docHPersistent));
         }

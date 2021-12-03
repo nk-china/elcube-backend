@@ -61,17 +61,17 @@ public class TransactionSync {
 	 * <p>如果当前上下文没有事务，则立即执行
 	 * @param t t
 	 */
-	public static void runBeforeCommit(Function t){
-		run(t, System.currentTimeMillis(), tasksRunBeforeCommit);
+	public static void runBeforeCommit(String taskDesc, Function t){
+		run(taskDesc, t, System.currentTimeMillis(), tasksRunBeforeCommit);
 	}
 	/**
 	 * <p>在事务提交后执行函数
-	 * <p>将函数放置队列中间，在{@link #runAfterCommitLast(Function)}之前
+	 * <p>将函数放置队列中间，在{@link #runAfterCommitLast(String, Function)}之前
 	 * <p>如果当前上下文没有事务，则立即执行
 	 * @param t t
 	 */
-	public static void runAfterCommit(Function t){
-		run(t, System.currentTimeMillis(), tasksRunAfterCommit);
+	public static void runAfterCommit(String taskDesc, Function t){
+		run(taskDesc, t, System.currentTimeMillis(), tasksRunAfterCommit);
 	}
 	
 	/**
@@ -81,18 +81,18 @@ public class TransactionSync {
 	 * @param t
 	 */
 	@SuppressWarnings("all")
-	public static void runAfterCommitLast(Function t){
-		run(t, Long.MAX_VALUE - System.currentTimeMillis(), tasksRunAfterCommit);
+	public static void runAfterCommitLast(String taskDesc, Function t){
+		run(taskDesc, t, Long.MAX_VALUE - System.currentTimeMillis(), tasksRunAfterCommit);
 	}
 
 
-	public static void runAfterCompletion(FunctionCompletion t){
-		runAfterCompletion(t, System.currentTimeMillis());
+	public static void runAfterCompletion(String taskDesc, FunctionCompletion t){
+		runAfterCompletion(taskDesc, t, System.currentTimeMillis());
 	}
-	public static void runAfterCompletionLast(FunctionCompletion t){
-		runAfterCompletion(t, Long.MAX_VALUE - System.currentTimeMillis());
+	public static void runAfterCompletionLast(String taskDesc, FunctionCompletion t){
+		runAfterCompletion(taskDesc, t, Long.MAX_VALUE - System.currentTimeMillis());
 	}
-	private static void runAfterCompletion(FunctionCompletion function, Long priority){
+	private static void runAfterCompletion(String taskDesc, FunctionCompletion function, Long priority){
 		if(lock.get()!=null)
 			throw new RuntimeException("事务已经开始提交，不能嵌套绑定任务");
 
@@ -100,7 +100,7 @@ public class TransactionSync {
 		// 启动异步线程，在事务提交后，将需要更新solr索引的数据写入同步队列
 		if(TransactionSynchronizationManager.isSynchronizationActive()){
 
-			HandlerCompletion handler = new HandlerCompletion(function, System.currentTimeMillis());
+			HandlerCompletion handler = new HandlerCompletion(taskDesc, function, priority);
 
 			List<HandlerCompletion> handlers = tasksRunAfterCompletion.get();
 			if(handlers==null){
@@ -114,6 +114,7 @@ public class TransactionSync {
 
 			if(log.isInfoEnabled()){
 				log.info("* 绑定事务任务, 任务将在事务完成后执行, 当前任务数量 = {}",handlers.size());
+				handlers.stream().sorted().forEach(h-> log.info("* -- {}",h.taskDesc));
 			}
 
 		}else{
@@ -126,7 +127,7 @@ public class TransactionSync {
 		}
 	}
 
-	private static void run(Function function, Long priority, ThreadLocal<List<Handler>> targetTaskList){
+	private static void run(String taskDesc, Function function, Long priority, ThreadLocal<List<Handler>> targetTaskList){
 		
 		
 		if(lock.get()!=null)
@@ -136,7 +137,7 @@ public class TransactionSync {
 		// 启动异步线程，在事务提交后，将需要更新solr索引的数据写入同步队列
 		if(TransactionSynchronizationManager.isSynchronizationActive()){
 			
-			Handler handler = new Handler(function, priority);
+			Handler handler = new Handler(taskDesc, function, priority);
 			
 			List<Handler> handlers = targetTaskList.get();
 			if(handlers==null){
@@ -154,6 +155,7 @@ public class TransactionSync {
 				}else{
 					log.info("* 绑定事务任务, 任务将在事务提交后执行, 当前任务数量 = {}",handlers.size());
 				}
+				handlers.stream().sorted().forEach(h-> log.info("* -- {}",h.taskDesc));
 			}
 
 		}else{
@@ -181,10 +183,21 @@ public class TransactionSync {
 
 				tasksRunBeforeCommit.remove();
 
-				for(Handler handler : handlers.stream().sorted().collect(Collectors.toList())){
-					handler.getTask().apply();
+
+				Handler last = null;
+				try{
+					for(Handler handler : handlers.stream().sorted().collect(Collectors.toList())){
+						last = handler;
+						log.info("* >> 执行： {}",handler.taskDesc);
+						handler.getTask().apply();
+						log.info("* >> 完成： {}",handler.taskDesc);
+					}
+					log.info("* <<<<<<<< 事务提交前的任务执行完成");
+				}catch(RuntimeException e){
+					log.error("* >> 错误： {} Exception: {}",last!=null?last.taskDesc:"unknown",e.getMessage(), e);
+					log.info("* <<<<<<<< 事务提交前的任务执行终止");
+					throw e;
 				}
-				log.info("* <<<<<<<< 事务提交前的任务执行完成");
 			}
 
 			unlock();
@@ -203,9 +216,11 @@ public class TransactionSync {
 
 				for (Handler handler : handlers.stream().sorted().collect(Collectors.toList())) {
 					try {
+						log.info("* >> 执行： {}",handler.taskDesc);
 						handler.getTask().apply();
+						log.info("* >> 完成： {}",handler.taskDesc);
 					} catch (Exception e) {
-						log.error(e.getMessage(), e);
+						log.error("* >> 错误： {} Exception: {}",handler.taskDesc,e.getMessage(), e);
 					}
 				}
 				log.info("* <<<<<<<< 事务提交后的任务执行完成");
@@ -226,9 +241,11 @@ public class TransactionSync {
 
 				for (HandlerCompletion handler : handlers.stream().sorted().collect(Collectors.toList())) {
 					try {
+						log.info("* >> 执行： {}",handler.taskDesc);
 						handler.getTask().apply(status);
+						log.info("* >> 完成： {}",handler.taskDesc);
 					} catch (Exception e) {
-						log.error(e.getMessage(), e);
+						log.error("* >> 错误： {} Exception: {}",handler.taskDesc,e.getMessage(), e);
 					}
 				}
 				log.info("* <<<<<<<< 事务完成的任务执行完成");
@@ -248,10 +265,12 @@ public class TransactionSync {
 
 	static class Handler implements Comparable<Handler> {
 
+		private String taskDesc;
 		private Function task;
 		private Long priority;
 
-		Handler(Function task, Long priority) {
+		Handler(String taskDesc, Function task, Long priority) {
+			this.taskDesc = taskDesc;
 			this.priority = priority;
 			this.task = task;
 		}
@@ -266,12 +285,14 @@ public class TransactionSync {
 		}
 	}
 
-	static class HandlerCompletion implements Comparable<Handler> {
+	static class HandlerCompletion implements Comparable<HandlerCompletion> {
 
+		private String taskDesc;
 		private FunctionCompletion task;
 		private Long priority;
 
-		HandlerCompletion(FunctionCompletion task, Long priority) {
+		HandlerCompletion(String taskDesc, FunctionCompletion task, Long priority) {
+			this.taskDesc = taskDesc;
 			this.priority = priority;
 			this.task = task;
 		}
@@ -281,7 +302,7 @@ public class TransactionSync {
 		}
 
 		@Override
-		public int compareTo(Handler other) {
+		public int compareTo(HandlerCompletion other) {
 			return priority.compareTo(other.priority);
 		}
 	}

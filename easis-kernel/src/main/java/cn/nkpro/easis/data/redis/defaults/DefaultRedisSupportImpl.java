@@ -52,6 +52,11 @@ public class DefaultRedisSupportImpl<T> implements RedisSupport<T> {
     private EnvRedisTemplate<String> stringRedisTemplate;
 
     @Override
+    public Set<String> keys(String pattern){
+        return redisTemplate.keys(pattern);
+    }
+
+    @Override
     public void clear() {
 
         List<String> keysKeepPrefix = Arrays.asList("stream","debug","lock","keep","runtime");
@@ -336,17 +341,17 @@ public class DefaultRedisSupportImpl<T> implements RedisSupport<T> {
                 return runLocked.apply();
             }finally {
                 if(transaction){
-                    TransactionSync.runAfterCompletionLast((status)-> {
+                    TransactionSync.runAfterCompletionLast("解除Redis锁",(status)-> {
                         stringRedisTemplate.delete("LOCK:" + key);
                         if(afterUnLock!=null){
                             afterUnLock.apply();
                         }
                     });
-                }
-
-                stringRedisTemplate.delete("LOCK:" + key);
-                if(afterUnLock!=null){
-                    afterUnLock.apply();
+                }else{
+                    stringRedisTemplate.delete("LOCK:" + key);
+                    if(afterUnLock!=null){
+                        afterUnLock.apply();
+                    }
                 }
             }
         }else{

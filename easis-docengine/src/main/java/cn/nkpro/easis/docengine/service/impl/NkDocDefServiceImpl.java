@@ -463,7 +463,7 @@ public class NkDocDefServiceImpl implements NkDocDefService, DeployAble {
 
         // 一旦单据激活，更新缓存中的业务流
         DocDefHV def = docDefHV;
-        TransactionSync.runBeforeCommit(()->
+        TransactionSync.runBeforeCommit("删除业务流缓存",()->
             redisSupportFlows.set(Constants.CACHE_DEF_DOC_FLOWS, def.getDocType(), def.getFlows())
         );
 

@@ -20,6 +20,7 @@ import cn.nkpro.easis.basic.PageList;
 import cn.nkpro.easis.docengine.NkDocEngine;
 import cn.nkpro.easis.docengine.gen.DocH;
 import cn.nkpro.easis.docengine.model.DocHV;
+import cn.nkpro.easis.docengine.model.DocState;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,7 +30,7 @@ public interface NkDocEngineFrontService extends NkDocEngine {
 
     DocHV createForView(String docType, String preDocId);
 
-    DocHV detailView(String docId);
+    DocHV detailView(String docId, boolean edit);
 
     @Transactional(propagation = Propagation.NEVER)
     Object call(DocHV doc, String fromCard, String method, Object options);
@@ -40,4 +41,6 @@ public interface NkDocEngineFrontService extends NkDocEngine {
     void onBpmKilled(String docId, String processKey, String optSource);
 
     void reDataSync(DocHV doc);
+
+    DocState state(String docId);
 }

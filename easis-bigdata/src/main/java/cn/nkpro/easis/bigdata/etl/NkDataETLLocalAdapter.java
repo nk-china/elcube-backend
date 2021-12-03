@@ -62,7 +62,7 @@ public class NkDataETLLocalAdapter implements NkDataETLAdapter {
     @Override
     public void execute(ReduceConfig config) {
 
-        TransactionSync.runAfterCommitLast(()->{
+        TransactionSync.runAfterCommitLast("执行数据同步任务",()->{
 
             taskExecutor.execute(()->{
 

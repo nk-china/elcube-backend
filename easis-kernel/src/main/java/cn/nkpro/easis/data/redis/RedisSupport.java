@@ -22,6 +22,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -39,6 +40,8 @@ import java.util.Map;
  */
 @SuppressWarnings("unused")
 public interface RedisSupport<T> {
+
+    Set<String> keys(String pattern);
 
     void    clear();
     boolean exists(String key);

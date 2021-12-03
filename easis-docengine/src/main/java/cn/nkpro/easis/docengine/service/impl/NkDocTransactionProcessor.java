@@ -418,7 +418,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
 
             // 调用 卡片 updateCommitted
             if(isOverride(card)){
-                TransactionSync.runAfterCommit(()->
+                TransactionSync.runAfterCommit("执行卡片updateCommitted",()->
                         card.updateCommitted(
                                 atomic.get(),
                                 atomic.get().getData().get(defIV.getCardKey()),
@@ -586,7 +586,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         final String currLog = NkDocEngineContext.currLog();
-        TransactionSync.runAfterCommit(()->{
+        TransactionSync.runAfterCommit("执行单据afterUpdateCommitted",()->{
             if(log.isInfoEnabled())log.info("{}保存单据内容 触发单据 afterUpdateCommitted 接口", currLog);
             processCycle(atomic.get(), DocUpdateEvent.build(NkDocCycle.afterUpdateCommitted,original));
         });

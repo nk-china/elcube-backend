@@ -28,11 +28,13 @@ import cn.nkpro.easis.docengine.gen.DocHExample;
 import cn.nkpro.easis.docengine.model.DocDefHV;
 import cn.nkpro.easis.docengine.model.DocHPersistent;
 import cn.nkpro.easis.docengine.model.DocHV;
+import cn.nkpro.easis.docengine.model.DocState;
 import cn.nkpro.easis.docengine.model.es.DocHES;
 import cn.nkpro.easis.docengine.service.NkDocEngineContext;
 import cn.nkpro.easis.docengine.service.NkDocEngineFrontService;
 import cn.nkpro.easis.docengine.service.NkDocPermService;
 import cn.nkpro.easis.exception.NkOperateNotAllowedCaution;
+import cn.nkpro.easis.utils.BeanUtilz;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
@@ -103,7 +105,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
 
             // 创建单据
             DocHV docHV = processor.toCreate(def, preDoc);
-            docHV.setRuntimeKey(UUID.randomUUID().toString());
+            docHV.setRuntimeKey("runtime:"+ docHV.getDocId()+":"+UUID.randomUUID().toString());
 
             return docToView(docHV);
         }finally {
@@ -113,7 +115,15 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
 
 
     @Override
-    public DocHV detailView(String docId) {
+    public DocState state(String docId) {
+
+        DocHPersistent docHPersistent = fetchDoc(docId);
+
+        return BeanUtilz.copyFromObject(docHPersistent, DocState.class);
+    }
+
+    @Override
+    public DocHV detailView(String docId, boolean edit) {
 
         final long start = System.currentTimeMillis();
 
@@ -122,7 +132,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
 
             if(log.isInfoEnabled()){
                 log.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-                info("获取单据视图");
+                log.info("{}获取单据视图",NkDocEngineContext.currLog());
             }
             // 获取原始数据
 
@@ -152,12 +162,14 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
 
             Assert.notNull(docHV,"单据不存在");
 
+            // redisRuntime.keys("runtime:"+docId);
+
             return docToView(docHV);
 
         }finally {
 
             if(log.isInfoEnabled()){
-                info("获取单据视图 完成 总耗时{}ms", System.currentTimeMillis() - start);
+                log.info("{}获取单据视图 完成 总耗时{}ms",NkDocEngineContext.currLog(), System.currentTimeMillis() - start);
                 log.info("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
             }
 
@@ -171,10 +183,10 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
         final long start = System.currentTimeMillis();
         NkDocEngineContext.startLog("DETAIL", docId);
         try{
-            if(log.isInfoEnabled())info("获取单据");
+            if(log.isInfoEnabled())log.info("{}获取单据",NkDocEngineContext.currLog());
             return NkDocEngineContext.getDoc(docId, (id)-> persistentToHV(fetchDoc(id)));
         }finally {
-            if(log.isInfoEnabled())info("获取单据 完成 总耗时{}ms", System.currentTimeMillis() - start);
+            if(log.isInfoEnabled())log.info("{}获取单据 完成 总耗时{}ms",NkDocEngineContext.currLog(), System.currentTimeMillis() - start);
             NkDocEngineContext.endLog();
         }
     }
@@ -206,7 +218,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
             return docToView(doc);
 
         }finally {
-            if(log.isInfoEnabled())info("单据计算 完成");
+            if(log.isInfoEnabled())log.info("{}单据计算 完成",NkDocEngineContext.currLog());
             NkDocEngineContext.endLog();
         }
     }
@@ -253,13 +265,13 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
 
         return redisSupport.lockRunInTransaction(docHV.getDocId(), UUID.randomUUID().toString(), 10, 1000, () -> {
 
-            if (log.isInfoEnabled()) info("锁定单据成功 redis");
+            if (log.isInfoEnabled())log.info("{}锁定单据成功 redis",NkDocEngineContext.currLog());
 
-            if (log.isInfoEnabled()) info("开始保存单据视图");
+            if (log.isInfoEnabled())log.info("{}开始保存单据视图",NkDocEngineContext.currLog());
 
             docPermService.assertHasDocPerm(NkDocPermService.MODE_WRITE, atomicDocHV.get().getDocType());
 
-            if (log.isInfoEnabled()) info("准备获取原始单据 用于填充被权限过滤的数据");
+            if (log.isInfoEnabled())log.info("{}准备获取原始单据 用于填充被权限过滤的数据",NkDocEngineContext.currLog());
 
             DocHV runtime = runtimeAppend(atomicDocHV.get());
 
@@ -283,7 +295,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
             }
             return atomicDocHV.get();
         }, () -> {
-            if (log.isInfoEnabled()) log.info("{}解锁单据 redis分布式锁", atomicDocHV.get().getDocId());
+            if (log.isInfoEnabled()) log.info("{}解锁单据 {}", NkDocEngineContext.currLog(), atomicDocHV.get().getDocId());
             NkDocEngineContext.endLog();
             atomicDocHV.get().clearItemContent();
         }, () -> {
@@ -439,7 +451,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
         customObjectManager.getCustomObject(docHV.getDef().getRefObjectType(), NkDocProcessor.class)
                 .doOnBpmKilled(docHV, processKey, optSource);
         // 事务提交后清空缓存
-        TransactionSync.runAfterCommit(()-> redisSupport.deleteHash(Constants.CACHE_DOC, docId));
+        TransactionSync.runAfterCommit("清除单据缓存"+docId, ()-> redisSupport.deleteHash(Constants.CACHE_DOC, docId));
         NkDocEngineContext.endLog();
     }
 
@@ -501,7 +513,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
         // tips: 先删除缓存，避免事务提交成功后，缓存更新失败
         redisSupport.deleteHash(Constants.CACHE_DOC, docId);
 
-        TransactionSync.runAfterCompletion((status)-> {
+        TransactionSync.runAfterCompletion("更新单据缓存"+docId,(status)-> {
 
             if(status == TransactionSynchronization.STATUS_COMMITTED){
                 // 如果事务更新成功，将更新后的单据更新到缓存
@@ -540,7 +552,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
             docHVRuntime = detail(doc.getDocId());
             Assert.notNull(docHVRuntime,"原始单据不存在");
 
-            doc.setRuntimeKey(UUID.randomUUID().toString());
+            doc.setRuntimeKey("runtime:"+ doc.getDocId()+":"+UUID.randomUUID().toString());
         }
 
         // 将运行时数据填充到用户单据中，使单据数据完整

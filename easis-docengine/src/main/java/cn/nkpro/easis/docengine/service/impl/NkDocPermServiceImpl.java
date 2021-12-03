@@ -294,7 +294,7 @@ public class NkDocPermServiceImpl implements NkDocPermService {
         }
 
         if(log.isDebugEnabled()){
-            log.debug("单据数据权限Limit: "+(filter==null?"<Unlimited>":JSON.parseObject(filter.toString())));
+            log.debug("* 单据数据权限Limit: "+(filter==null?"<Unlimited>":JSON.parseObject(filter.toString())));
         }
 
         return filter;

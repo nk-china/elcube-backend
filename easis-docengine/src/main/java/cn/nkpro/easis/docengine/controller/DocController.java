@@ -20,10 +20,7 @@ import cn.nkpro.easis.annotation.NkNote;
 import cn.nkpro.easis.data.elasticearch.ESPageList;
 import cn.nkpro.easis.docengine.NkDocSearchService;
 import cn.nkpro.easis.docengine.gen.DocRecord;
-import cn.nkpro.easis.docengine.model.DocDefFlowV;
-import cn.nkpro.easis.docengine.model.DocHHistory;
-import cn.nkpro.easis.docengine.model.DocHV;
-import cn.nkpro.easis.docengine.model.SearchParams;
+import cn.nkpro.easis.docengine.model.*;
 import cn.nkpro.easis.docengine.service.NkDocDefService;
 import cn.nkpro.easis.docengine.service.NkDocEngineFrontService;
 import cn.nkpro.easis.docengine.service.NkDocHistoryService;
@@ -80,8 +77,14 @@ public class DocController {
 
     @NkNote("3.拉取交易详情")
     @RequestMapping(value = "/detail/{docId}",method = RequestMethod.GET)
-    public DocHV get(@PathVariable("docId") String docId) {
-        return docEngine.detailView(docId);
+    public DocHV get(@PathVariable("docId") String docId,@RequestParam(value = "edit",required = false,defaultValue = "false") Boolean edit) {
+        return docEngine.detailView(docId, edit);
+    }
+
+    @NkNote("3.拉取交易编辑状态")
+    @RequestMapping(value = "/state/{docId}",method = RequestMethod.GET)
+    public DocState state(@PathVariable("docId") String docId) {
+        return docEngine.state(docId);
     }
 
 

@@ -96,7 +96,7 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
         queue.setUpdatedTime(queue.getCreatedTime());
         asyncQueueMapper.insert(queue);
 
-        TransactionSync.runAfterCommitLast(()->{
+        TransactionSync.runAfterCommitLast("doSync", ()->{
             taskExecutor.execute(new RunInner(queue));
         });
     }
