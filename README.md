@@ -5,6 +5,9 @@ Easis由easy（简单、轻松）和oasis（绿洲、舒适的地方）两个词
 
 
 ### 权利声明
+
+![agpl-v3](http://www.gnu.org/graphics/agplv3-88x31.png)
+
 EAsis 遵照AGPL-3.0协议开放源代码，在遵照协议约束条件下，您可以自由传播和修改。
 协议原文见LICENSE文件，或查阅 http://www.gnu.org/licenses/agpl-3.0.html
 
