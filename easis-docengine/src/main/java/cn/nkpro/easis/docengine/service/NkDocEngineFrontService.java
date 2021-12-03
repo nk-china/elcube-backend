@@ -27,6 +27,8 @@ public interface NkDocEngineFrontService extends NkDocEngine {
 
     PageList<DocH> list(String docType, int offset, int rows, String orderBy);
 
+    DocHV createForView(String docType, String preDocId);
+
     DocHV detailView(String docId);
 
     @Transactional(propagation = Propagation.NEVER)

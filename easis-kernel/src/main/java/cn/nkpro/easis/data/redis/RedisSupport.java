@@ -19,6 +19,7 @@ package cn.nkpro.easis.data.redis;
 import cn.nkpro.easis.exception.abstracts.NkRuntimeException;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.Map;
 
@@ -56,11 +57,27 @@ public interface RedisSupport<T> {
     void            deleteHash(String hash, Object... keys);
     void            deleteHash(String hash, Collection<String> keys);
 
-    boolean lock(String key, String value, int retry, int interval, int expire);
-    boolean lock(String key, String value, int expire);
-    void    unLock(String key, String value);
+    <R> R lockRun(String key, String value, int retry, int interval,
+                    @NotNull Function<R> runLocked,
+                    FunctionRun afterUnLock,
+                    FunctionRun runLockFailed);
+
+    <R> R lockRunInTransaction(String key, String value, int retry, int interval,
+                    @NotNull Function<R> runLocked,
+                    FunctionRun afterUnLock,
+                    FunctionRun runLockFailed);
+
+    <R> R lockRun(@NotNull String key, String value,
+                         @NotNull Function<R> runLocked,
+                         FunctionRun afterUnLock,
+                         FunctionRun runLockFailed);
+
+    //void    unLock(String key, String value);
 
     interface Function<T>{
         T apply() throws NkRuntimeException;
+    }
+    interface FunctionRun{
+        void apply() throws NkRuntimeException;
     }
 }

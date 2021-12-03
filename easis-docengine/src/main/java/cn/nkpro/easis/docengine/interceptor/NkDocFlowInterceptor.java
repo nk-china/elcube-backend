@@ -20,9 +20,33 @@ import cn.nkpro.easis.co.NkCustomScriptObject;
 import cn.nkpro.easis.docengine.model.DocHV;
 import lombok.Getter;
 
+/**
+ * <h3>业务流拦截器
+ *
+ * <p>这个拦截器用于自定义处理业务流可见性
+ *
+ * @see #apply(DocHV)
+ *
+ * @author bean 2021-12-03
+ */
 @SuppressWarnings("unused")
 public interface NkDocFlowInterceptor extends NkCustomScriptObject {
 
+    /**
+     * 返回一个业务流描述
+     *
+     * <p>根据当前活动单据或前序单据 docHV 的值返回一个 FlowDescribe 对象
+     *
+     * <p>当visible为false，那么该业务节点将不可用
+     * <p>visibleDesc为不可用的原因描述
+     *
+     * <p>使用场景主要有2个：
+     * <p>1、在活动单据显示时 根据自身单据 判断后续单据是否可见
+     * <p>2、在活动单据创建时 根据前序单据 判断自身单据是否允许创建
+     *
+     * @param docHV 活动单据或前序单据
+     * @return 业务流描述
+     */
     default FlowDescribe apply(DocHV docHV){return FlowDescribe.visible();}
 
     class FlowDescribe{
@@ -38,10 +62,18 @@ public interface NkDocFlowInterceptor extends NkCustomScriptObject {
             this.visibleDesc = visibleDesc;
         }
 
-        @SuppressWarnings("all")
+        /**
+         * 返回一个可见的结果
+         */
         public static FlowDescribe visible(){
             return new FlowDescribe(true,null);
         }
+
+        /**
+         *
+         * 返回一个不可见的结果
+         * @param visibleDesc 不可见原因
+         */
         public static FlowDescribe invisible(String visibleDesc){
             return new FlowDescribe(false,visibleDesc);
         }

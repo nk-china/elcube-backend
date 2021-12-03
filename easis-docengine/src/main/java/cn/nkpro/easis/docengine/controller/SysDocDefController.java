@@ -152,7 +152,12 @@ public class SysDocDefController {
         int ret = 0;
         for(int i=0;i<count;i++){
             try{
-                docEngine.doUpdate(docEngine.random(docEngine.create(docType, null)),"随机生成");
+
+                docEngine.create(docType, null, "随机生成", (doc)->{
+                    docEngine.random(doc);
+                });
+
+                //docEngine.doUpdate(docEngine.random(docEngine.create(docType, null)),"随机生成");
                 ret ++;
             }catch (Exception e){
                 log.error(e.getMessage(),e);

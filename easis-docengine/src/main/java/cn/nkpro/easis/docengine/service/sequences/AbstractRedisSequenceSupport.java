@@ -24,6 +24,7 @@ import cn.nkpro.easis.exception.NkSystemException;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.UUID;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * Created by bean on 2020/7/7.
@@ -42,18 +43,22 @@ public abstract class AbstractRedisSequenceSupport implements SequenceSupport {
         }
 
         String lockValue = UUID.randomUUID().toString();
-        boolean lock = redisSupport.lock(getClass().getName(), lockValue, 600);
 
-        if(lock){
-            try{
-                long prev = prev(classify, docType);
-                // 返回 +1
-                redisSupport.set(key, prev + 1);
-                return prev + 1;
-            }finally {
-                redisSupport.unLock(getClass().getName(),lockValue);
-            }
-        }else{
+        AtomicReference<Long> atomic = new AtomicReference();
+
+        redisSupport.lockRun(getClass().getName(), lockValue,()->{
+
+            long prev = prev(classify, docType);
+            // 返回 +1
+            redisSupport.set(key, prev + 1);
+
+            atomic.set(prev + 1);
+
+            return null;
+
+        },()->{
+
+        },()->{
             for(int i=0;i<10;i++){
                 try {
                     Thread.sleep(500);
@@ -61,11 +66,39 @@ public abstract class AbstractRedisSequenceSupport implements SequenceSupport {
                     throw new NkSystemException("获取序列号发生错误");
                 }
                 if(redisSupport.exists(key)){
-                    return redisSupport.increment(key, 1L);
+                    atomic.set(redisSupport.increment(key, 1L));
+                    //return redisSupport.increment(key, 1L);
                 }
             }
             throw new NkSystemException("获取序列号发生错误");
-        }
+        });
+
+        return atomic.get();
+
+//        boolean lock = redisSupport.lock(getClass().getName(), lockValue, 600);
+//
+//        if(lock){
+//            try{
+//                long prev = prev(classify, docType);
+//                // 返回 +1
+//                redisSupport.set(key, prev + 1);
+//                return prev + 1;
+//            }finally {
+//                redisSupport.unLock(getClass().getName(),lockValue);
+//            }
+//        }else{
+//            for(int i=0;i<10;i++){
+//                try {
+//                    Thread.sleep(500);
+//                } catch (InterruptedException e) {
+//                    throw new NkSystemException("获取序列号发生错误");
+//                }
+//                if(redisSupport.exists(key)){
+//                    return redisSupport.increment(key, 1L);
+//                }
+//            }
+//            throw new NkSystemException("获取序列号发生错误");
+//        }
     }
 
     abstract long prev(EnumDocClassify classify, String docType);

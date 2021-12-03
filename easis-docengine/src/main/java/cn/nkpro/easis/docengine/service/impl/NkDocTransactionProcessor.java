@@ -26,6 +26,10 @@ import cn.nkpro.easis.docengine.*;
 import cn.nkpro.easis.docengine.gen.*;
 import cn.nkpro.easis.docengine.interceptor.NkDocCycleInterceptor;
 import cn.nkpro.easis.docengine.model.*;
+import cn.nkpro.easis.docengine.model.event.AbstractDocCycleEvent;
+import cn.nkpro.easis.docengine.model.event.DocCalculateEvent;
+import cn.nkpro.easis.docengine.model.event.DocCreateEvent;
+import cn.nkpro.easis.docengine.model.event.DocUpdateEvent;
 import cn.nkpro.easis.docengine.service.NkDocDefService;
 import cn.nkpro.easis.docengine.service.NkDocEngineContext;
 import cn.nkpro.easis.docengine.service.NkDocHistoryService;
@@ -86,7 +90,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
     private NkDocHistoryService docHistoryService;
     @Autowired@SuppressWarnings("all")
     private NkSpELManager spELManager;
-    @Lazy@Autowired
+    @Lazy@Autowired@SuppressWarnings("all")
     private NkDocEngine docEngine;
 
     @Override
@@ -129,10 +133,8 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
 
         AtomicReference<DocHV> atomic = new AtomicReference(doc);
 
-        NkDocCycleContext context = NkDocCycleContext
-                .build(NkDocCycle.beforeCreate)
-                .prev(preDoc);
-        atomic.set(processCycle(atomic.get(), context));
+        atomic.set(processCycle(atomic.get(), DocCreateEvent
+                .build(NkDocCycle.beforeCreate, preDoc)));
 
         docDefService.runLoopCards(atomic.get().getDocId(), def,false, (card, defIV)->
                 atomic.get().getData().put(
@@ -141,7 +143,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
             )
         );
 
-        return processCycle(atomic.get(), context.cycle(NkDocCycle.afterCreated));
+        return processCycle(atomic.get(), DocCreateEvent.build(NkDocCycle.afterCreated, preDoc));
     }
 
     @Override
@@ -186,7 +188,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
             )
         );
 
-        atomic.set(processCycle(atomic.get(), NkDocCycleContext.build(NkDocCycle.beforeCalculate)));
+        atomic.set(processCycle(atomic.get(), DocCalculateEvent.build(NkDocCycle.beforeCalculate)));
 
         docDefService.runLoopCards(atomic.get().getDocId(), atomic.get().getDef(),false, (card, defIV)->{
 
@@ -204,7 +206,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
             );
         });
 
-        return processCycle(atomic.get(), NkDocCycleContext.build(NkDocCycle.afterCalculated));
+        return processCycle(atomic.get(), DocCalculateEvent.build(NkDocCycle.afterCalculated));
     }
 
     @Override
@@ -325,7 +327,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if(log.isInfoEnabled())log.info("{}保存单据内容 触发单据 beforeUpdate 接口", NkDocEngineContext.currLog());
-        atomic.set(processCycle(doc, NkDocCycleContext.build(NkDocCycle.beforeUpdate)));
+        atomic.set(processCycle(doc, DocUpdateEvent.build(NkDocCycle.beforeUpdate, original)));
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -555,7 +557,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if(log.isInfoEnabled())log.info("{}保存单据内容 触发单据 afterUpdated 接口", NkDocEngineContext.currLog());
-        processCycle(atomic.get(), NkDocCycleContext.build(NkDocCycle.afterUpdated).original(original));
+        processCycle(atomic.get(), DocUpdateEvent.build(NkDocCycle.afterUpdated,original));
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -586,7 +588,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         final String currLog = NkDocEngineContext.currLog();
         TransactionSync.runAfterCommit(()->{
             if(log.isInfoEnabled())log.info("{}保存单据内容 触发单据 afterUpdateCommitted 接口", currLog);
-            processCycle(atomic.get(), NkDocCycleContext.build(NkDocCycle.afterUpdateCommitted));
+            processCycle(atomic.get(), DocUpdateEvent.build(NkDocCycle.afterUpdateCommitted,original));
         });
 
         atomic.get().setNewCreate(false);
@@ -672,7 +674,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         }
     }
 
-    private DocHV processCycle(DocHV doc, NkDocCycleContext context){
+    private DocHV processCycle(DocHV doc, AbstractDocCycleEvent context){
 
         if(doc.getDef().getLifeCycles()!=null){
             doc.getDef().getLifeCycles()

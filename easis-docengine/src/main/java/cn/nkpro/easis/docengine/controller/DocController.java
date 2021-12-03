@@ -102,7 +102,7 @@ public class DocController {
     public DocHV preCreate(
             @NkNote(value="前序ID") @RequestParam(value="preDocId",required = false) String preDocId,
             @NkNote(value="单据类型") @RequestParam(value="docType") String docType) {
-        return docEngine.create(docType,preDocId);
+        return docEngine.createForView(docType,preDocId);
     }
 
 

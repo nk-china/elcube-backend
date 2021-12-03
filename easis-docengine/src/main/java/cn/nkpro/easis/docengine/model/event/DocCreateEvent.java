@@ -14,24 +14,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with EAsis.  If not, see <https://www.gnu.org/licenses/>.
  */
-package cn.nkpro.easis.docengine.interceptor;
+package cn.nkpro.easis.docengine.model.event;
 
-
-import cn.nkpro.easis.co.NkCustomObject;
+import cn.nkpro.easis.docengine.NkDocCycle;
 import cn.nkpro.easis.docengine.model.DocHV;
+import lombok.Getter;
 
-/**
- *
- * <b>注意：当前接口尚未实际应用
- *
- * <h3>状态变化拦截器
- * <p>这个拦截器用于处理单据状态变化事件
- * <p>当一个单据被保存时，如果 {@link DocHV#getDocState()} 值发生变化，将触发 {@link #apply()} 方法
- *
- * @author bean 2021-12-03
- * @since v2.0
- *
- */
-public interface NkDocStateInterceptor extends NkCustomObject {
-    default void apply(){}
+public class DocCreateEvent extends AbstractDocCycleEvent {
+
+    public static DocCreateEvent build(NkDocCycle cycle, DocHV prev){
+        DocCreateEvent context = new DocCreateEvent();
+        context.cycle = cycle;
+        context.prev = prev;
+        return context;
+    }
+
+    @Getter
+    private DocHV prev;
 }

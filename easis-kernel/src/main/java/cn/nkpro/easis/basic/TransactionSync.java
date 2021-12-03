@@ -59,7 +59,13 @@ public class TransactionSync {
 	public static void runAfterCommitLast(Function t){
 		run(t, Short.MAX_VALUE+System.currentTimeMillis(), tasksRunAfterCommit);
 	}
+	public static void runAfterCompletionLast(FunctionCompletion t){
+		runAfterCompletion(t, Long.MAX_VALUE - System.currentTimeMillis());
+	}
 	public static void runAfterCompletion(FunctionCompletion t){
+		runAfterCompletion(t, System.currentTimeMillis());
+	}
+	private static void runAfterCompletion(FunctionCompletion function, Long priority){
 		if(lock.get()!=null)
 			throw new RuntimeException("事务已经开始提交，不能嵌套绑定任务");
 
@@ -67,7 +73,7 @@ public class TransactionSync {
 		// 启动异步线程，在事务提交后，将需要更新solr索引的数据写入同步队列
 		if(TransactionSynchronizationManager.isSynchronizationActive()){
 
-			HandlerCompletion handler = new HandlerCompletion(t, System.currentTimeMillis());
+			HandlerCompletion handler = new HandlerCompletion(function, System.currentTimeMillis());
 
 			List<HandlerCompletion> handlers = tasksRunAfterCompletion.get();
 			if(handlers==null){
@@ -86,7 +92,7 @@ public class TransactionSync {
 		}else{
 			log.warn("* 当前线程无事务管理，任务将立即执行");
 			try {
-				t.apply(TransactionSynchronization.STATUS_UNKNOWN);
+				function.apply(TransactionSynchronization.STATUS_UNKNOWN);
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

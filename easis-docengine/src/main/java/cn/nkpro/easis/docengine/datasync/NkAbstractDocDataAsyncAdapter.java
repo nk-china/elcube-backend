@@ -155,8 +155,9 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
     }
 
     private void lockRun(DocAsyncQueue asyncQueue, long time){
-        // 锁定任务
-        if(redisSupport.lock(asyncQueue.getAsyncId(),Thread.currentThread().getName(),60)){
+
+        // 分布式锁定后执行
+        redisSupport.lockRun(asyncQueue.getAsyncId(),Thread.currentThread().getName(),()->{
             if(log.isDebugEnabled())
                 log.debug("锁定任务 {}",asyncQueue.getAsyncId());
             DocAsyncQueueWithBLOBs asyncQueueWithBLOBs = asyncQueueMapper.selectByPrimaryKey(asyncQueue.getAsyncId());
@@ -195,12 +196,13 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
                             log.warn("执行任务 {} 失败，等待{}重试: {}",asyncQueueWithBLOBs.getAsyncId(), asyncQueueWithBLOBs.getAsyncNext(), e.getMessage());
                     }
                 }
-            }finally {
-                redisSupport.unLock(asyncQueueWithBLOBs.getAsyncId(),Thread.currentThread().getName());
-                if(log.isDebugEnabled())
-                    log.debug("解锁任务 {}",asyncQueueWithBLOBs.getAsyncId());
             }
-        }
+
+            return null;
+        },()->{
+            if(log.isDebugEnabled())
+                log.debug("解锁任务 {}",asyncQueue.getAsyncId());
+        },null);
     }
 
 
