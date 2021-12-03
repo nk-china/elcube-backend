@@ -19,32 +19,23 @@ package cn.nkpro.easis.docengine.service.impl;
 import cn.nkpro.easis.basic.Constants;
 import cn.nkpro.easis.basic.PageList;
 import cn.nkpro.easis.basic.TransactionSync;
-import cn.nkpro.easis.co.DebugContextManager;
-import cn.nkpro.easis.co.NkCustomObjectManager;
-import cn.nkpro.easis.data.elasticearch.SearchEngine;
 import cn.nkpro.easis.data.mybatis.pagination.PaginationContext;
-import cn.nkpro.easis.data.redis.RedisSupport;
 import cn.nkpro.easis.docengine.NkDocEngine;
 import cn.nkpro.easis.docengine.NkDocProcessor;
-import cn.nkpro.easis.docengine.gen.*;
-import cn.nkpro.easis.docengine.interceptor.NkDocFlowInterceptor;
-import cn.nkpro.easis.docengine.model.*;
+import cn.nkpro.easis.docengine.gen.DocDefI;
+import cn.nkpro.easis.docengine.gen.DocH;
+import cn.nkpro.easis.docengine.gen.DocHExample;
+import cn.nkpro.easis.docengine.model.DocDefHV;
+import cn.nkpro.easis.docengine.model.DocHPersistent;
+import cn.nkpro.easis.docengine.model.DocHV;
 import cn.nkpro.easis.docengine.model.es.DocHES;
-import cn.nkpro.easis.docengine.service.NkDocDefService;
 import cn.nkpro.easis.docengine.service.NkDocEngineContext;
 import cn.nkpro.easis.docengine.service.NkDocEngineFrontService;
 import cn.nkpro.easis.docengine.service.NkDocPermService;
-import cn.nkpro.easis.exception.NkDefineException;
 import cn.nkpro.easis.exception.NkOperateNotAllowedCaution;
-import cn.nkpro.easis.security.SecurityUtilz;
-import cn.nkpro.easis.task.NkBpmTaskService;
-import cn.nkpro.easis.utils.BeanUtilz;
-import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.IllegalTransactionStateException;
 import org.springframework.transaction.annotation.Propagation;
@@ -55,37 +46,15 @@ import org.springframework.util.Assert;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDocEngineFrontService {
 
-    @Autowired@SuppressWarnings("all")
-    private DocHMapper docHMapper;
-    @Autowired@SuppressWarnings("all")
-    private DocIMapper docIMapper;
-    @Autowired@SuppressWarnings("all")
-    private DocIIndexMapper docIIndexMapper;
-    @Autowired@SuppressWarnings("all")
-    private RedisSupport<DocHPersistent> redisSupport;
-    @Autowired@SuppressWarnings("all")
-    private RedisSupport<DocHV> redisRuntime;
-    @Autowired@SuppressWarnings("all")
-    private NkCustomObjectManager customObjectManager;
-    @Autowired@SuppressWarnings("all")
-    private NkDocDefService docDefService;
-    @Autowired@SuppressWarnings("all")
-    private NkBpmTaskService bpmTaskService;
-    @Autowired@SuppressWarnings("all")
-    private NkDocPermService docPermService;
-    @Autowired@SuppressWarnings("all")
-    private DebugContextManager debugContextManager;
-    @Autowired@SuppressWarnings("all")
-    private SearchEngine searchEngine;
 
-
-
+    /**
+     * 从数据库表中分页查询单据列表
+     */
     @Override
     public PageList<DocH> list(String docType, int offset, int rows, String orderBy){
         DocHExample example = new DocHExample();
@@ -136,7 +105,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
             DocHV docHV = processor.toCreate(def, preDoc);
             docHV.setRuntimeKey(UUID.randomUUID().toString());
 
-            return processView(docHV);
+            return docToView(docHV);
         }finally {
             NkDocEngineContext.endLog();
         }
@@ -145,40 +114,53 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
 
     @Override
     public DocHV detailView(String docId) {
+
+        final long start = System.currentTimeMillis();
+
         NkDocEngineContext.startLog("DETAIL", docId);
         try{
-            final long start = System.currentTimeMillis();
 
             if(log.isInfoEnabled()){
                 log.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
-                log.info("{}获取单据视图", NkDocEngineContext.currLog());
+                info("获取单据视图");
             }
             // 获取原始数据
 
-            AtomicReference<DocHPersistent> docHPersistent = new AtomicReference<>();
-            if(debugContextManager.isDebug()) {
-                docHPersistent.set(debugContextManager.getDebugResource("$" + docId));
-            }
+            //AtomicReference<DocHPersistent> docHPersistent = new AtomicReference<>();
+            //if(debugContextManager.isDebug()) {
+            //    docHPersistent.set(debugContextManager.getDebugResource("$" + docId));
+            //}
 
-            if(docHPersistent.get()==null){
+            //if(docHPersistent.get()==null){
 
-                docHPersistent.set(fetchDoc(docId));
-                Assert.notNull(docHPersistent.get(),"单据不存在");
+            //docHPersistent.set(fetchDoc(docId));
+            //    Assert.notNull(docHPersistent.get(),"单据不存在");
 
-                // 检查READ权限
-                docPermService.assertHasDocPerm(NkDocPermService.MODE_READ, docId, docHPersistent.get().getDocType());
-            }
+            //}
 
-            DocHV docHV = NkDocEngineContext.getDoc(docId, (id)-> fetchDocProcess(docHPersistent.get()));
+            // 先获取单据的持久化数据，主要为了获取单据类型，来判断权限
+            DocHPersistent docHPersistent = fetchDoc(docId);
+
+            // 检查READ权限
+            docPermService.assertHasDocPerm(NkDocPermService.MODE_READ, docId, docHPersistent.getDocType());
+
+            // 尝试先从本地线程中获取单据对象
+            DocHV docHV = NkDocEngineContext.getDoc(
+                    docId,
+                    (id)-> persistentToHV(docHPersistent)
+            );
+
             Assert.notNull(docHV,"单据不存在");
 
-            processView(docHV);
+            return docToView(docHV);
+
+        }finally {
+
             if(log.isInfoEnabled()){
-                log.info("{}获取单据视图 完成 总耗时{}ms", NkDocEngineContext.currLog(),System.currentTimeMillis() - start);
+                info("获取单据视图 完成 总耗时{}ms", System.currentTimeMillis() - start);
                 log.info("<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\n");
             }
-            return docHV;
-        }finally {
+
             NkDocEngineContext.endLog();
         }
     }
@@ -189,83 +171,14 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
         final long start = System.currentTimeMillis();
         NkDocEngineContext.startLog("DETAIL", docId);
         try{
-            if(log.isInfoEnabled())log.info("{}获取单据", NkDocEngineContext.currLog());
-            return NkDocEngineContext.getDoc(docId, (id)-> fetchDocProcess(fetchDoc(id)));
+            if(log.isInfoEnabled())info("获取单据");
+            return NkDocEngineContext.getDoc(docId, (id)-> persistentToHV(fetchDoc(id)));
         }finally {
-            if(log.isInfoEnabled())log.info("{}获取单据 完成 总耗时{}ms", NkDocEngineContext.currLog(), System.currentTimeMillis() - start);
+            if(log.isInfoEnabled())info("获取单据 完成 总耗时{}ms", System.currentTimeMillis() - start);
             NkDocEngineContext.endLog();
         }
     }
 
-    private DocHPersistent fetchDoc(String docId){
-        if(log.isInfoEnabled())log.info("{}获取单据原始数据", NkDocEngineContext.currLog());
-
-        // 获取单据抬头和行项目数据
-        final long start = System.currentTimeMillis();
-
-        try{
-            if(debugContextManager.isDebug()){
-                DocHPersistent doc = debugContextManager.getDebugResource("$"+docId);
-                if(doc!=null)
-                    return doc;
-
-                return fetchDocFromDB(docId);
-            }
-            return redisSupport.getIfAbsent(Constants.CACHE_DOC, docId,()-> fetchDocFromDB(docId));
-
-        }finally {
-            if(log.isInfoEnabled())
-                log.info("{}获取单据原始数据 耗时{}ms", NkDocEngineContext.currLog(), System.currentTimeMillis()-start);
-        }
-    }
-
-    private DocHPersistent fetchDocFromDB(String docId){
-
-        DocHPersistent doc = BeanUtilz.copyFromObject(docHMapper.selectByPrimaryKey(docId), DocHPersistent.class);
-
-        if(doc!=null){
-
-            DocIExample example = new DocIExample();
-            example.createCriteria()
-                    .andDocIdEqualTo(docId);
-
-            doc.setItems(docIMapper.selectByExampleWithBLOBs(example).stream()
-                    .collect(Collectors.toMap(DocIKey::getCardKey, e -> e)));
-
-            DocIIndexExample iIndexExample = new DocIIndexExample();
-            iIndexExample.createCriteria()
-                    .andDocIdEqualTo(docId);
-            iIndexExample.setOrderByClause("ORDER_BY");
-
-            docIIndexMapper.selectByExample(iIndexExample).forEach(docIIndex -> {
-                try {
-                    doc.getDynamics().put(docIIndex.getName(),JSON.parseObject(docIIndex.getValue(),Class.forName(docIIndex.getDataType())));
-                } catch (ClassNotFoundException ex) {
-                    doc.getDynamics().put(docIIndex.getName(),null);
-                }
-            });
-        }
-
-        return doc;
-    }
-
-    private DocHV fetchDocProcess(DocHPersistent docHPersistent){
-
-        // 处理数据
-        if(docHPersistent != null){
-
-            // 获取单据DEF
-            DocDefHV def = docDefService.getDocDefForRuntime(docHPersistent.getDocType());
-
-            // 获取单据处理器 并执行
-            NkDocProcessor docProcessor = customObjectManager
-                    .getCustomObject(def.getRefObjectType(), NkDocProcessor.class);
-            if(log.isInfoEnabled())log.info("{}确定单据处理器 = {}", NkDocEngineContext.currLog(),docProcessor.getBeanName());
-
-            return docProcessor.detail(def, docProcessor.deserialize(def, docHPersistent));
-        }
-        return null;
-    }
 
     /**
      *
@@ -281,72 +194,21 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
             validate(doc);
             DocDefHV defHV = docDefService.deserializeDef(doc.getDef());
 
-            DocHV runtime = processRuntime(doc);
-            //DocDefHV def = docDefService.getDocDefForRuntime(doc.getDocType());
-            //doc.setDef(def);
+            runtimeAppend(doc);
 
             // 获取单据处理器 并执行
             doc =  customObjectManager
-                    .getCustomObject(runtime.getDef().getRefObjectType(), NkDocProcessor.class)
+                    .getCustomObject(defHV.getRefObjectType(), NkDocProcessor.class)
                     .calculate(doc, fromCard, options);
 
             doc.setDef(defHV);
 
-            return processView(doc);
+            return docToView(doc);
 
         }finally {
-            if(log.isInfoEnabled())log.info("{}单据计算 完成", NkDocEngineContext.currLog());
+            if(log.isInfoEnabled())info("单据计算 完成");
             NkDocEngineContext.endLog();
         }
-    }
-
-    /**
-     * 保存成功后，移除runtime标示
-     */
-    private void clearRuntime(DocHV doc){
-        if(StringUtils.isNotBlank(doc.getRuntimeKey())){
-            redisRuntime.delete(doc.getRuntimeKey());
-            doc.setRuntimeKey(null);
-        }
-    }
-
-    /**
-     *
-     * 因为前端回传的单据配置是经过权限过滤的，不完整的，
-     * 所以需要重新获取完整的单据和数据进行处理
-     * 涉及方法：
-     * @see #create(String, String, cn.nkpro.easis.docengine.NkDocEngine.Function)
-     * @see #calculate(DocHV, String, Object)
-     * @see #doUpdateView(DocHV, String)
-     *
-     * 逻辑处理完成后，再进行权限过滤，返回给前端
-     * @see #processView(DocHV)
-     * 
-     */
-    private DocHV processRuntime(DocHV doc){
-
-        // 获取单据运行时状态，如果runtimeKey为空，获取当前最新单据作为运行时
-        DocHV docHVRuntime;
-        if(StringUtils.isNotBlank(doc.getRuntimeKey())){
-            docHVRuntime = redisRuntime.get(doc.getRuntimeKey());
-
-            Assert.notNull(docHVRuntime,"操作已超时");
-        }else{
-            docHVRuntime = detail(doc.getDocId());
-            doc.setRuntimeKey(UUID.randomUUID().toString());
-        }
-
-        // 将运行时数据填充到用户单据中，使单据数据完整
-        docHVRuntime.getData().forEach((k,v)-> doc.getData().putIfAbsent(k,v));
-        docHVRuntime.getDef().getCards().forEach(runtimeCard->{
-            boolean present = doc.getDef().getCards().stream()
-                    .anyMatch(card -> StringUtils.equals(card.getCardKey(), runtimeCard.getCardKey()));
-            if(!present)
-                doc.getDef().getCards().add(runtimeCard);
-        });
-        doc.getDef().getCards().sort(Comparator.comparingInt(DocDefI::getOrderBy));
-
-        return docHVRuntime;
     }
 
     /**
@@ -391,17 +253,17 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
 
         return redisSupport.lockRunInTransaction(docHV.getDocId(), UUID.randomUUID().toString(), 10, 1000, () -> {
 
-            if (log.isInfoEnabled()) log.info("{}锁定单据成功 redis", NkDocEngineContext.currLog());
+            if (log.isInfoEnabled()) info("锁定单据成功 redis");
 
-            if (log.isInfoEnabled()) log.info("{}开始保存单据视图", NkDocEngineContext.currLog());
+            if (log.isInfoEnabled()) info("开始保存单据视图");
 
             docPermService.assertHasDocPerm(NkDocPermService.MODE_WRITE, atomicDocHV.get().getDocType());
 
-            if (log.isInfoEnabled()) log.info("{}准备获取原始单据 用于填充被权限过滤的数据", NkDocEngineContext.currLog());
+            if (log.isInfoEnabled()) info("准备获取原始单据 用于填充被权限过滤的数据");
+
+            DocHV runtime = runtimeAppend(atomicDocHV.get());
 
             DocDefHV def = docDefService.deserializeDef(atomicDocHV.get().getDef());
-
-            DocHV runtime = processRuntime(atomicDocHV.get());
 
             // 如果单据为修改模式下，检查是否有该单据的write权限
             if (!runtime.isNewCreate()) {
@@ -413,8 +275,8 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
             atomicDocHV.set(execUpdate(atomicDocHV.get(), optSource));
             atomicDocHV.get().setDef(def);
 
-            processView(atomicDocHV.get());
-            clearRuntime(atomicDocHV.get());
+            docToView(atomicDocHV.get());
+            runtimeClear(atomicDocHV.get());
 
             if (debugContextManager.isDebug()) {
                 debugContextManager.addDebugResource("$" + atomicDocHV.get().getDocId(), atomicDocHV.get().toPersistent());
@@ -569,6 +431,29 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
         }
     }
 
+
+    @Override
+    public void onBpmKilled(String docId, String processKey, String optSource) {
+        NkDocEngineContext.startLog("BPM_KILLED", docId);
+        DocHV docHV = detail(docId);
+        customObjectManager.getCustomObject(docHV.getDef().getRefObjectType(), NkDocProcessor.class)
+                .doOnBpmKilled(docHV, processKey, optSource);
+        // 事务提交后清空缓存
+        TransactionSync.runAfterCommit(()-> redisSupport.deleteHash(Constants.CACHE_DOC, docId));
+        NkDocEngineContext.endLog();
+    }
+
+
+    /**
+     * 重建索引，单据没有修改，所以两个doc是一样的
+     */
+    @Override
+    public void reDataSync(DocHV doc){
+        this.dataSync(doc, doc, true);
+        searchEngine.indexBeforeCommit(DocHES.from(doc));
+    }
+
+
     private DocHV execUpdate(DocHV doc, String optSource){
         final long      start = System.currentTimeMillis();
         String          docId = doc.getDocId();
@@ -593,7 +478,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
             // 修改
             // 检查单据数据是否已经发生变化
             Assert.isTrue(StringUtils.equals(doc.getIdentification(),optionalOriginal.get().getIdentification()),
-                "单据被其他用户修改，请刷新后重试");
+                    "单据被其他用户修改，请刷新后重试");
         }else{
             // 新建
             // 检查单据是否符合业务流控制
@@ -630,143 +515,44 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
         return doc;
     }
 
-    @Override
-    public void onBpmKilled(String docId, String processKey, String optSource) {
-        NkDocEngineContext.startLog("BPM_KILLED", docId);
-        DocHV docHV = detail(docId);
-        customObjectManager.getCustomObject(docHV.getDef().getRefObjectType(), NkDocProcessor.class)
-                .doOnBpmKilled(docHV, processKey, optSource);
-        // 事务提交后清空缓存
-        TransactionSync.runAfterCommit(()-> redisSupport.deleteHash(Constants.CACHE_DOC, docId));
-        NkDocEngineContext.endLog();
-    }
-
-
-    private void validate(DocHV doc){
-        Assert.hasText(doc.getDocId(),"单据ID不能为空");
-        Assert.hasText(doc.getDocType(),"单据类型不能为空");
-    }
-
     /**
-     * 重建索引，单据没有修改，所以两个doc是一样的
+     *
+     * 因为前端回传的单据配置是经过权限过滤的，不完整的，
+     * 所以需要重新获取完整的单据和数据进行处理
+     * 涉及方法：
+     * create(String, String, String, NkDocEngine.Function)
+     * calculate(DocHV, String, Object)
+     * doUpdateView(DocHV, String)
+     *
+     * 逻辑处理完成后，再进行权限过滤，返回给前端
+     * @see #docToView(DocHV)
+     *
      */
-    @Override
-    public void reDataSync(DocHV doc){
-        this.dataSync(doc, doc, true);
-        searchEngine.indexBeforeCommit(DocHES.from(doc));
-    }
+    private DocHV runtimeAppend(DocHV doc){
 
-    private void execDataSync(DocHV doc, DocHV original){
-        long start1 = System.currentTimeMillis();
-        super.dataSync(doc, original, false);
-        if(log.isInfoEnabled())log.info("{}保存单据 同步数据 耗时{}ms", NkDocEngineContext.currLog(), System.currentTimeMillis() - start1);
-        long start2 = System.currentTimeMillis();
-        searchEngine.indexBeforeCommit(DocHES.from(doc));
-        if(log.isInfoEnabled())log.info("{}保存单据 更新索引 耗时{}ms", NkDocEngineContext.currLog(), System.currentTimeMillis() - start2);
-    }
+        // 获取单据运行时状态，如果runtimeKey为空，获取当前最新单据作为运行时
+        DocHV docHVRuntime;
+        if(StringUtils.isNotBlank(doc.getRuntimeKey())){
+            docHVRuntime = redisRuntime.get(doc.getRuntimeKey());
 
+            Assert.notNull(docHVRuntime,"操作已超时");
+        }else{
+            docHVRuntime = detail(doc.getDocId());
+            Assert.notNull(docHVRuntime,"原始单据不存在");
 
-    private NkDocFlowInterceptor.FlowDescribe applyDocFlowInterceptor(String docFlowInterceptor, DocHV docHV){
-        return customObjectManager.getCustomObject(docFlowInterceptor, NkDocFlowInterceptor.class)
-                .apply(docHV);
-    }
-
-    /**
-     * 验证业务流是否满足要求
-     */
-    private void validateFlow(DocDefHV def, DocHV preDoc){
-
-        long now = System.currentTimeMillis();
-
-        String preDocType = Optional.ofNullable(preDoc).map(DocHV::getDocType).orElse("@");
-        String preDocState = Optional.ofNullable(preDoc).map(DocHV::getDocState).orElse("@");
-
-        if(log.isInfoEnabled())log.info("{}验证单据业务流 docType = {} prevDocType = {}",NkDocEngineContext.currLog(), def.getDocType(), preDocType);
-
-        DocDefFlowV flowV = def.getFlows()
-                .stream()
-                .filter(item -> StringUtils.equals(item.getPreDocType(), preDocType))
-                .findFirst()
-                .orElseThrow(()->new NkDefineException("没有找到业务流配置"));
-
-        if(!StringUtils.equalsAny(flowV.getPreDocState(),preDocState, "@")){
-            throw new NkDefineException("状态不满足条件");
-        }
-        if(StringUtils.isNotBlank(flowV.getRefObjectType())){
-            NkDocFlowInterceptor.FlowDescribe flowDescribe = applyDocFlowInterceptor(flowV.getRefObjectType(), preDoc);
-            if(!flowDescribe.isVisible()){
-                throw new NkDefineException(flowDescribe.getVisibleDesc());
-            }
-        }
-        if(log.isInfoEnabled())
-            log.info("{}验证单据业务流 docType = {} 完成 耗时{}ms",
-                    NkDocEngineContext.currLog(),
-                    def.getDocType(),
-                    System.currentTimeMillis() - now
-            );
-    }
-
-    /**
-     * 处理可创建的后续单据类型
-     */
-    private DocHV processView(DocHV docHV){
-
-        if(StringUtils.isNotBlank(docHV.getProcessInstanceId())){
-            docHV.setBpmTask(
-                    bpmTaskService.taskByBusinessAndAssignee(docHV.getDocId(), SecurityUtilz.getUser().getId())
-            );
-            if(log.isInfoEnabled())log.info("{}获取单据任务", NkDocEngineContext.currLog());
+            doc.setRuntimeKey(UUID.randomUUID().toString());
         }
 
-        docPermService.filterDocCards(null, docHV);
+        // 将运行时数据填充到用户单据中，使单据数据完整
+        docHVRuntime.getData().forEach((k,v)-> doc.getData().putIfAbsent(k,v));
+        docHVRuntime.getDef().getCards().forEach(runtimeCard->{
+            boolean present = doc.getDef().getCards().stream()
+                    .anyMatch(card -> StringUtils.equals(card.getCardKey(), runtimeCard.getCardKey()));
+            if(!present)
+                doc.getDef().getCards().add(runtimeCard);
+        });
+        doc.getDef().getCards().sort(Comparator.comparingInt(DocDefI::getOrderBy));
 
-        Map<String, DocDefStateV> cache = new LinkedHashMap<>();
-        docHV.getDef()
-                .getStatus()
-                .forEach(state->{
-                    if(StringUtils.equalsAny(docHV.getDocState(),state.getPreDocState(),state.getDocState())){
-                        cache.putIfAbsent(state.getDocState(),state);
-                    }
-                });
-        docHV.getDef().setStatus(new ArrayList<>(cache.values()));
-        if(log.isInfoEnabled())
-            log.info("{}设置单据可用状态 状态 = {}",
-                    NkDocEngineContext.currLog(),
-                    docHV.getDef().getStatus()
-            );
-
-        docHV.getDef()
-            .getNextFlows()
-            .forEach(flow->{
-                String[] splitState = StringUtils.split(flow.getPreDocState(), ',');
-                boolean visibleState = ArrayUtils.contains(splitState,docHV.getDocState()) || ArrayUtils.contains(splitState,"@");
-
-                if(!visibleState){
-                    flow.setVisibleDesc("状态不满足条件");
-                }
-
-                // 处理 单据业务流的自定义条件
-                if(visibleState && StringUtils.isNotBlank(flow.getRefObjectType())){
-                    NkDocFlowInterceptor.FlowDescribe flowDescribe = applyDocFlowInterceptor(flow.getRefObjectType(), docHV);
-                    if(!flowDescribe.isVisible()){
-                        flow.setVisibleDesc(flowDescribe.getVisibleDesc());
-                    }
-                }
-
-                flow.setVisible(visibleState);
-            });
-
-        if(StringUtils.isNotBlank(docHV.getRuntimeKey())){
-            redisRuntime.set(docHV.getRuntimeKey(),docHV);
-            redisRuntime.expire(docHV.getRuntimeKey(),60 * 60);//1小时
-        }
-
-        if(log.isInfoEnabled())
-            log.info("{}设置单据后续操作 操作数量 = {}",
-                    NkDocEngineContext.currLog(),
-                    docHV.getDef().getNextFlows().size()
-            );
-
-        return docHV;
+        return docHVRuntime;
     }
 }
