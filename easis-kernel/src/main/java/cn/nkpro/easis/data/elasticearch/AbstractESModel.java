@@ -30,6 +30,11 @@ import org.springframework.util.Assert;
 import java.util.*;
 
 /**
+ *
+ * 抽象的ES 数据模型
+ *
+ * ESDynamicTemplate定义了数据模型中的动态列规则
+ *
  * Created by bean on 2020/6/15.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -88,7 +93,7 @@ public abstract class AbstractESModel {
         }
     }
 
-    public void validateDynamic(){
+    void validateDynamic(){
         ESDynamicTemplate[] dynamicTemplates = dynamicTemplates();
         dynamics.keySet()
                 .forEach(key->
@@ -102,7 +107,7 @@ public abstract class AbstractESModel {
                 );
     }
 
-    public Map<String,Object> toSource(){
+    Map<String,Object> toSource(){
 
         return (JSONObject) JSON.toJSON(this);
     }

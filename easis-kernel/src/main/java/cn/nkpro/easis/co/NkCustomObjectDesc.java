@@ -20,6 +20,9 @@ import cn.nkpro.easis.annotation.Keep;
 import lombok.Data;
 import org.apache.commons.lang3.StringUtils;
 
+/**
+ * 自定义对象描述型结构
+ */
 @Keep
 @Data
 public class NkCustomObjectDesc {

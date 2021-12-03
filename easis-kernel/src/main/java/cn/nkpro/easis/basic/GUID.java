@@ -18,6 +18,14 @@ package cn.nkpro.easis.basic;
 
 import java.util.UUID;
 
+/**
+ * 对系统ID生成规则简单包装
+ *
+ *  事实上这并没有什么用，只是我们遇到有客户强制要求不使用UUID的情况
+ *
+ *  系统中很多功能并没有完全按照这种方式实现ID规则
+ *
+ */
 public interface GUID {
 
     default String nextId(Class type) {

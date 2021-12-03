@@ -18,5 +18,15 @@ package cn.nkpro.easis.co.spel;
 
 import cn.nkpro.easis.co.NkCustomObject;
 
+/**
+ * 自定义SqEL表达式接口
+ *
+ * 实现此接口的Bean会被注入到EvaluationContext中，通过@[name]来使用
+ *
+ * 需要注意的是，实现此接口的Bean的命名需要遵循SpEL+[name]的规则，在SpEL中使用@[name]
+ *
+ * @see NkSpELManager#createContext(Object)
+ *
+ */
 public interface NkSpELInjection extends NkCustomObject {
 }

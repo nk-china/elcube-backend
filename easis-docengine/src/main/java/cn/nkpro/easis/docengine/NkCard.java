@@ -17,7 +17,7 @@
 package cn.nkpro.easis.docengine;
 
 import cn.nkpro.easis.annotation.NkScriptType;
-import cn.nkpro.easis.co.NkScriptCard;
+import cn.nkpro.easis.co.NkScriptComponent;
 import cn.nkpro.easis.docengine.model.DocDefHV;
 import cn.nkpro.easis.docengine.model.DocDefIV;
 import cn.nkpro.easis.docengine.model.DocHV;
@@ -27,7 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Map;
 
 @NkScriptType("Card")
-public interface NkCard<DT,DDT> extends NkScriptCard {
+public interface NkCard<DT,DDT> extends NkScriptComponent {
 
     String POSITION_DEFAULT = "default";
     String POSITION_HEADER  = "header";

@@ -17,6 +17,14 @@
 package cn.nkpro.easis.co;
 
 
+/**
+ * 自定义脚本对象的基础接口
+ *
+ * 需要注意的是，实现该接口的，并非都是脚本对象
+ *
+ * 是否是脚本对象需要通过{@link #getScriptDef()}的scriptType属性进行判断
+ *
+ */
 public interface NkCustomScriptObject extends NkCustomObject {
     NkScriptV getScriptDef();
 }

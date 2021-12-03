@@ -37,7 +37,7 @@ public enum ESFieldType {
     @Getter
     private String value;
 
-    private ESFieldType(String value) {
+    ESFieldType(String value) {
         this.value = value;
     }
 

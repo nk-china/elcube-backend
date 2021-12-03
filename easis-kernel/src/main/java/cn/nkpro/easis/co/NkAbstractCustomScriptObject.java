@@ -39,6 +39,11 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * 抽象的脚本对象基础类
+ *
+ * 由它来管理脚本对象的脚本内容
+ */
 public abstract class NkAbstractCustomScriptObject implements NkCustomScriptObject, InitializingBean {
 
     @Autowired
@@ -115,14 +120,6 @@ public abstract class NkAbstractCustomScriptObject implements NkCustomScriptObje
             }else{
                 throw new NkDefineException("组件必须实现NkScriptObject接口");
             }
-
-//            if(interfaces.contains(NkScriptCard.class)){
-//                scriptDefH.setScriptType("Card");
-//            }else if(interfaces.contains(NkMeter.class)){
-//                scriptDefH.setScriptType("Meter");
-//            }else{
-//                scriptDefH.setScriptType("Service");
-//            }
 
             NkNote annotation = groovy.getAnnotation(NkNote.class);
             scriptDefH.setScriptDesc(annotation != null ? annotation.value() : beanName);

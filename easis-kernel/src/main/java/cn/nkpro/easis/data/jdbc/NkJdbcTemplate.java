@@ -32,6 +32,9 @@ import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * 一个用于卡片动态读写数据库的Template类
+ */
 @Component
 public class NkJdbcTemplate {
 

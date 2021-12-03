@@ -18,6 +18,10 @@ package cn.nkpro.easis.co;
 
 import java.util.Map;
 
+/**
+ * 自定义组件基本接口
+ * 自定义组件包含 卡片、图表、字段等
+ */
 public interface NkScriptComponent extends NkCustomScriptObject {
 
     String getName();

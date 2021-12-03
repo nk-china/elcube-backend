@@ -18,6 +18,7 @@ package cn.nkpro.easis.co;
 
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -31,6 +32,17 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
+ *
+ * 自定义对象管理类
+ *
+ * 它是Spring上下文工厂的代理，由于系统支持多上下文的原因，所有运行时对象从Spring Context中获取时，不能直接调用 {@link BeanFactory#getBean(String)}
+ * 等一系列方法。
+ *
+ * 多上下文的目的是为了不同的用户可以调试不同的配置及脚本，参考{@link DebugContextManager}
+ *
+ * 当然了，这个类也做了一些Bean是否存在的基础校验，省去了很多null指针判断的麻烦
+ *
+ *
  * Created by bean on 2020/7/24.
  */
 @Component

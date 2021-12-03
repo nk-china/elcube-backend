@@ -99,8 +99,8 @@ public class PaginationInterceptor implements Interceptor {
 				log.trace("生成查询数量SQL : " + countSql);
 			}
 			Connection connection = null;
-			ResultSet rs = null;
-			PreparedStatement countStmt = null;
+			ResultSet rs;
+			PreparedStatement countStmt;
 			try {
 				connection = mappedStatement.getConfiguration()
 						.getEnvironment().getDataSource().getConnection();
@@ -147,7 +147,6 @@ public class PaginationInterceptor implements Interceptor {
 					.replaceAll("\n"," ")
 					.replaceAll("\\s{2,}"," "));
 		}
-		return;
 	}
 
 	@Override
@@ -186,7 +185,7 @@ public class PaginationInterceptor implements Interceptor {
 	public static class BoundSqlSqlSource implements SqlSource {
 		BoundSql boundSql;
 
-		public BoundSqlSqlSource(BoundSql boundSql) {
+		BoundSqlSqlSource(BoundSql boundSql) {
 			this.boundSql = boundSql;
 		}
 
@@ -199,11 +198,11 @@ public class PaginationInterceptor implements Interceptor {
 	 * 对SQL参数(?)设值,参考org.apache.ibatis.executor.parameter.
 	 * DefaultParameterHandler
 	 * 
-	 * @param ps
-	 * @param mappedStatement
-	 * @param boundSql
-	 * @param parameterObject
-	 * @throws SQLException
+	 * @param ps ps
+	 * @param mappedStatement mappedStatement
+	 * @param boundSql boundSql
+	 * @param parameterObject parameterObject
+	 * @throws SQLException SQLException
 	 */
 	private void setParameters(PreparedStatement ps,
 			MappedStatement mappedStatement, BoundSql boundSql,

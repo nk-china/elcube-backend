@@ -44,6 +44,11 @@ public class ESSqlResponse {
         Column column;
         Map<String,Object> item;
         List<Map<String,Object>> ret = new ArrayList<>();
+//        避免toMap时数据有空指针，放弃lambda写法
+//        return rows.stream()
+//                .map(item-> item.stream()
+//                        .collect(Collectors.toMap(e-> columns.get(item.indexOf(e)).getName(), e->e)))
+//                .collect(Collectors.toList());
         for(List<Object> row : rows){
             item = new HashMap<>();
             for(int i=0;i<columns.size();i++){
@@ -54,11 +59,6 @@ public class ESSqlResponse {
         }
 
         return  ret;
-//        避免toMap时数据有空指针，放弃lambda写法
-//        return rows.stream()
-//                .map(item-> item.stream()
-//                        .collect(Collectors.toMap(e-> columns.get(item.indexOf(e)).getName(), e->e)))
-//                .collect(Collectors.toList());
     }
 
     @Keep

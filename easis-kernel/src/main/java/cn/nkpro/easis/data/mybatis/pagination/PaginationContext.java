@@ -17,6 +17,9 @@
 package cn.nkpro.easis.data.mybatis.pagination;
 
 
+/**
+ * MyBatis 分页操作上下文
+ */
 public class PaginationContext {
 
 	private Integer total;

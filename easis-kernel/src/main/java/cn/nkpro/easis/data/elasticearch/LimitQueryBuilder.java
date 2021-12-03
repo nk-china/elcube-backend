@@ -28,6 +28,11 @@ import org.apache.lucene.search.Query;
 import java.io.IOException;
 import java.util.Objects;
 
+/**
+ * 自定义的QueryBuilder
+ *
+ * 用于解析前端配置的Limit表达式
+ */
 public class LimitQueryBuilder extends AbstractQueryBuilder<LimitQueryBuilder> {
 
     private JSONObject source;

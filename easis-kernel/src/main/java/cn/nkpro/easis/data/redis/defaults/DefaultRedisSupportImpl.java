@@ -36,6 +36,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
+ *
+ * Redis Template 的代理程序
+ *
+ * 对RedisTemplate进行简单包装，方便使用
+ *
  * Created by bean on 2020/7/24.
  */
 @Slf4j
@@ -240,31 +245,81 @@ public class DefaultRedisSupportImpl<T> implements RedisSupport<T> {
     }
 
 
+    /**
+     *
+     * 带重试机制的锁定
+     * 锁定后立即运行回调函数，回调函数执行后，不立即解锁
+     *
+     * 如果当前上下文有事务，将在事务提交或回滚后解锁，解锁后回调 afterUnLock
+     *
+     * 锁的最长有效期1小时
+     *
+     * @param key 锁的KEY
+     * @param value 锁的值，非空即可
+     * @param retry 重试次数
+     * @param interval 重试间隔（单位毫秒）
+     * @param runLocked 锁定后回调函数
+     * @param afterUnLock 锁定解除后回调函数
+     * @param runLockFailed 锁定失败后回调函数
+     * @param <R> 锁定后回调函数返回数据类型
+     * @return 回调函数返回值
+     */
     @Override
-    public <R> R  lockRunInTransaction(String key, String value, int retry, int interval,
-                        @NotNull Function<R> runLocked,
-                        FunctionRun afterUnLock,
-                        FunctionRun runLockFailed) {
+    public <R> R  lockRunInTransaction(
+            @NotNull String key,
+            @NotNull String value,
+            int retry,
+            int interval,
+            @NotNull Function<R> runLocked,
+            FunctionRun afterUnLock,
+            FunctionRun runLockFailed) {
         return execLockRun(key,value,retry,interval,runLocked,afterUnLock,runLockFailed,true);
     }
+
+    /**
+     * 带重试机制的锁定
+     * 锁定后立即运行回调函数，回调函数执行后，立即解锁
+     *
+     * 锁的最长有效期1小时
+     *
+     * @param key 锁的KEY
+     * @param value 锁的值，非空即可
+     * @param retry 重试次数
+     * @param interval 重试间隔（单位毫秒）
+     * @param runLocked 锁定后回调函数
+     * @param afterUnLock 锁定解除后回调函数
+     * @param runLockFailed 锁定失败后回调函数
+     * @param <R> 锁定后回调函数返回数据类型
+     * @return 回调函数返回值
+     */
     @Override
-    public <R> R  lockRun(String key, String value, int retry, int interval,
-                        @NotNull Function<R> runLocked,
-                        FunctionRun afterUnLock,
-                        FunctionRun runLockFailed) {
+    public <R> R  lockRun(
+            @NotNull String key,
+            @NotNull String value,
+            int retry,
+            int interval,
+            @NotNull Function<R> runLocked,
+            FunctionRun afterUnLock,
+            FunctionRun runLockFailed) {
         return execLockRun(key,value,retry,interval,runLocked,afterUnLock,runLockFailed,false);
     }
-    private <R> R  execLockRun(String key, String value, int retry, int interval,
-                        @NotNull Function<R> runLocked,
-                        FunctionRun afterUnLock,
-                        FunctionRun runLockFailed,
-                        boolean transaction) {
+
+    private <R> R  execLockRun(
+            @NotNull String key,
+            @NotNull String value,
+            int retry,
+            int interval,
+            @NotNull Function<R> runLocked,
+            FunctionRun afterUnLock,
+            FunctionRun runLockFailed,
+            boolean transaction) {
         ValueOperations<String, String> ops = stringRedisTemplate.opsForValue();
         int i=0;
         boolean locked = false;
         do{
             Boolean ret = ops.setIfAbsent("LOCK:"+key, value);
             if(ret != null && ret){
+                redisTemplate.expire(key,60 * 60, TimeUnit.SECONDS);
                 locked = true;
                 break;
             }
@@ -303,8 +358,21 @@ public class DefaultRedisSupportImpl<T> implements RedisSupport<T> {
         }
     }
 
+    /**
+     * 锁定后立即运行回调函数，回调函数执行后，立即解锁
+     *
+     * 锁的最长有效期1小时
+     * @param key 锁的KEY
+     * @param value 锁的值，非空即可
+     * @param runLocked 锁定后回调函数
+     * @param afterUnLock 锁定解除后回调函数
+     * @param runLockFailed 锁定失败后回调函数
+     * @param <R> 锁定后回调函数返回数据类型
+     * @return 回调函数返回值
+     */
     @Override
-    public <R> R lockRun(@NotNull String key, String value,
+    public <R> R lockRun(@NotNull String key,
+                         @NotNull String value,
                          @NotNull Function<R> runLocked,
                          FunctionRun afterUnLock,
                          FunctionRun runLockFailed) {
@@ -312,6 +380,7 @@ public class DefaultRedisSupportImpl<T> implements RedisSupport<T> {
         Boolean ret = ops.setIfAbsent("LOCK:"+key, value);
 
         if(ret != null && ret){
+            redisTemplate.expire(key,60 * 60, TimeUnit.SECONDS);
             try{
                 return runLocked.apply();
             }finally {
@@ -328,6 +397,7 @@ public class DefaultRedisSupportImpl<T> implements RedisSupport<T> {
         }
     }
 
+//    禁止自行解锁，必须在lockRun的回调函数中，对锁定的对象进行数据操作
 //    @Override
 //    public void unLock(String key, String value){
 //        ValueOperations<String, String> ops = stringRedisTemplate.opsForValue();

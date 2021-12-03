@@ -28,6 +28,8 @@ import org.springframework.context.annotation.Configuration;
 import java.lang.reflect.InvocationTargetException;
 
 /**
+ *
+ * 配置MyBatis分页拦截器
  * Created by bean on 2019/3/5.
  */
 @Configuration

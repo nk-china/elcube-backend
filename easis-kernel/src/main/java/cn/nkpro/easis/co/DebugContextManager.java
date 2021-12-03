@@ -45,6 +45,26 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+/**
+ *
+ *
+ * <i>此类的命名有些不合理，事实上它就是ApplicationContextManager
+ *
+ * <p>这个类管理着所有自定义对象的不同状态，激活与调试
+ *
+ * <p>甚至管理系统中运行中的调试Context
+ *
+ * <p>它根据上下文中的debug参数，来给运行时程序返回一个合理的Bean对象
+ * 同时它接收运行时程序需要调试、或者取消调试的命令
+ *
+ * <p>根据 {@link #startThreadLocal(String)} 来启动当前线程为调试模式，从指定的调试上下文中获取运行实例Bean
+ * <p>根据 {@link #addDebugResource(String, Object)} 向指定的调试上下文中覆盖一个需要调试的对象
+ * <p>根据 {@link #addActiveResource(String, NkScriptV, boolean)} 向指定的调试上下文中覆盖一个需要激活的对象
+ *
+ *
+ * <p>调试时，日志在前端的输出也是由它来处理，通过重写System.out，来截取线程中的log信息
+ *
+ */
 @Component
 public class DebugContextManager implements ApplicationContextAware {
 

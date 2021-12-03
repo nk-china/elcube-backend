@@ -27,6 +27,27 @@ import org.springframework.transaction.support.TransactionSynchronizationAdapter
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 
+/**
+ * Spring 事务同步管理器的包装
+ *
+ * 因为Spring自身的{@link TransactionSynchronizationManager}只能增加一个同步任务，而不能完全满足单据模型的复杂事务机制
+ *
+ *
+ * 主要有3中运行情况
+ * 1、beforeCommit 在事务提交前执行，如果事务回滚，不执行
+ * 2、afterCommit  在事务提交后执行，如果事务回滚，不执行
+ * 3、afterCompletion 在事务完成后执行，不论事务提交与回滚，都会执行
+ *
+ * beforeCommit 与 afterCommit 的队列区别：
+ * beforeCommit 的队列中，一旦任务发生异常，则终止后续的任务
+ * afterCommit与afterCompletion  的队列中，即使一个任务发生异常，后续的任务仍然执行
+ *
+ * last：没有last标记的方法，添加的任务按顺序执行，被标记为last的方法，任务倒序执行
+ * 即最先添加到last对列里的任务，最末执行，以此类推
+ * 
+ * @author bean 2021-12-03
+ *
+ */
 @Slf4j
 public class TransactionSync {
 
@@ -35,7 +56,11 @@ public class TransactionSync {
 	private static final ThreadLocal<List<HandlerCompletion>> tasksRunAfterCompletion = new ThreadLocal<>();
 	private static final ThreadLocal<Boolean> lock = new ThreadLocal<>();
 
-
+	/**
+	 * <p>在事务提交前执行函数
+	 * <p>如果当前上下文没有事务，则立即执行
+	 * @param t t
+	 */
 	public static void runBeforeCommit(Function t){
 		run(t, System.currentTimeMillis(), tasksRunBeforeCommit);
 	}
@@ -51,19 +76,21 @@ public class TransactionSync {
 	
 	/**
 	 * <p>在事务提交后执行函数
-	 * <p>将函数放置队列最后执行
+	 * <p>将函数放置队列后执行
 	 * <p>如果当前上下文没有事务，则立即执行
 	 * @param t
 	 */
 	@SuppressWarnings("all")
 	public static void runAfterCommitLast(Function t){
-		run(t, Short.MAX_VALUE+System.currentTimeMillis(), tasksRunAfterCommit);
+		run(t, Long.MAX_VALUE - System.currentTimeMillis(), tasksRunAfterCommit);
+	}
+
+
+	public static void runAfterCompletion(FunctionCompletion t){
+		runAfterCompletion(t, System.currentTimeMillis());
 	}
 	public static void runAfterCompletionLast(FunctionCompletion t){
 		runAfterCompletion(t, Long.MAX_VALUE - System.currentTimeMillis());
-	}
-	public static void runAfterCompletion(FunctionCompletion t){
-		runAfterCompletion(t, System.currentTimeMillis());
 	}
 	private static void runAfterCompletion(FunctionCompletion function, Long priority){
 		if(lock.get()!=null)

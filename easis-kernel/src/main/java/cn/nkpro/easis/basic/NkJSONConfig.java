@@ -22,6 +22,9 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
 
+/**
+ * 全局设置alibaba fastjson的序列化规则
+ */
 @Component
 public class NkJSONConfig implements ApplicationRunner {
 

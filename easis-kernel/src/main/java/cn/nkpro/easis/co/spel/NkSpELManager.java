@@ -33,6 +33,11 @@ import org.springframework.stereotype.Component;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+/**
+ * SpEL 表达式的管理类
+ *
+ * 负责传入一个对象来创建 EvaluationContext， 并执行SpEL
+ */
 @Slf4j
 @Component
 public class NkSpELManager {

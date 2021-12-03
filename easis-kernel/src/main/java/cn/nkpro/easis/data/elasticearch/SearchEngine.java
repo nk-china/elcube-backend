@@ -52,6 +52,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
+ *
+ * ElasticSearch Client的封装类，
+ * 方面业务功能使用
  * Created by bean on 2020/6/15.
  */
 @Slf4j

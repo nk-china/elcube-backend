@@ -23,7 +23,17 @@ import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.Map;
 
+
 /**
+ *
+ * Redis Template 的代理程序
+ *
+ * 对RedisTemplate进行简单包装，方便使用
+ *
+ * 由于部分企业内部不适用RedisTemplate对redis进行访问
+ *
+ * 企业可自行实现此接口，注入到Spring的上下文
+ *
  * 时间单位 秒
  * Created by bean on 2020/7/24.
  */

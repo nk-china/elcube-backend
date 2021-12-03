@@ -21,6 +21,9 @@ import org.springframework.aop.support.AopUtils;
 import org.springframework.core.annotation.Order;
 
 /**
+ *
+ * 自定义对象的基本接口，所有的自定义对象均需要实现该接口
+ *
  * Created by bean on 2020/7/16.
  */
 public interface NkCustomObject {

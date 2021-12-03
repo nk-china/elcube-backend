@@ -32,7 +32,12 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import javax.sql.DataSource;
 
 /**
- * Created by bean on 2019/3/5.
+ *
+ * 关系型数据库的数据源配置，这个DataSource是上下文中的@Primary数据源
+ *
+ * 除此DataSource对象外，系统中包含非RDBMS的DataSource对象
+ *
+ * Created by bean on 2021-12-03
  */
 @Configuration
 @AutoConfigureBefore(DataSourceAutoConfiguration.class)

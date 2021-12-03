@@ -16,7 +16,7 @@
  */
 package cn.nkpro.easis.data.jdbc;
 
-public class Utils {
+class Utils {
 
     static String reverse(String fieldName){
         StringBuilder result = new StringBuilder();

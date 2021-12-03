@@ -16,6 +16,7 @@
  */
 package cn.nkpro.easis.data.redis;
 
+import cn.nkpro.easis.basic.NkProperties;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
@@ -29,6 +30,19 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.lang.Nullable;
 
+/**
+ *
+ *
+ * 带Env前缀的RedisTemplate
+ *
+ * 为避免不同的应用环境对同一个redis库的数据进行污染，重写redis key的命名方法
+ *
+ * 在key加上env的前缀
+ *
+ * @see NkProperties#getEnvKey()
+ *
+ * @param <V>
+ */
 public class EnvRedisTemplate<V> extends RedisTemplate<String, V> implements InitializingBean {
 
     private String env;

@@ -31,9 +31,7 @@ import org.springframework.data.redis.connection.RedisConnectionFactory;
 public class RedisConfiguration {
 
     /**
-     * retemplate相关配置
-     * @param factory
-     * @return
+     * RedisTemplate相关配置
      */
     @Bean
     public EnvRedisTemplate<?> redisTemplate(RedisConnectionFactory factory,NkProperties nkProperties) {
@@ -42,7 +40,6 @@ public class RedisConfiguration {
 
     /**
      * redis 配置 默认使用Spring RedisTemplate的Support实现
-     * @return
      */
     @ConditionalOnMissingBean
     @Bean
