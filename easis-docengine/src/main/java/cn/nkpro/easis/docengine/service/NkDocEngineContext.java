@@ -100,30 +100,32 @@ public class NkDocEngineContext {
             threadLocalDocs.set(docMap);
         }
 
-        DocHV docHV = docMap.get(docId);
+        return function.apply(docId);
 
-        if(docHV!=null){
-            if(log.isInfoEnabled())
-                log.info("{}从本地线程中获取到单据",currLog());
-        }else{
-            // 如果本地线程不存在单据，回调函数
-            docHV = function.apply(docId);
-            if(docHV!=null){
-                // 并将回调函数返回的单据存入本地线程
-                docMap.put(docId,docHV);
-            }
-        }
-
-        // 返回一个克隆的单据对象，避免本地线程中的单据被污染
-        if(docHV!=null){
-            try {
-                return (DocHV) docHV.clone();
-            } catch (CloneNotSupportedException e) {
-                e.printStackTrace();
-            }
-        }
-
-        return null;
+//        DocHV docHV = docMap.get(docId);
+//
+//        if(docHV!=null){
+//            if(log.isInfoEnabled())
+//                log.info("{}从本地线程中获取到单据",currLog());
+//        }else{
+//            // 如果本地线程不存在单据，回调函数
+//            docHV = function.apply(docId);
+//            if(docHV!=null){
+//                // 并将回调函数返回的单据存入本地线程
+//                docMap.put(docId,docHV);
+//            }
+//        }
+//
+//        // 返回一个克隆的单据对象，避免本地线程中的单据被污染
+//        if(docHV!=null){
+//            try {
+//                return (DocHV) docHV.clone();
+//            } catch (CloneNotSupportedException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        return null;
     }
 
     public static synchronized void setDoc(DocHV doc){
