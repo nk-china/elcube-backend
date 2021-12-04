@@ -18,7 +18,6 @@
                 row-key
                 auto-resize
                 keep-source
-                max-height="500"
                 resizable
                 highlight-hover-row
                 show-header-overflow="tooltip"
@@ -26,6 +25,7 @@
                 size="mini"
                 border=inner
                 :data="data"
+                :max-height="data && data.length>100?500:undefined"
                 :edit-config="{trigger: 'click', mode: 'row', showIcon: editMode, showStatus: true}">
             <vxe-column field="expireDate"  width="15%" title="到期日期" formatter="nkDatetime"></vxe-column>
             <vxe-column field="billType"    width="14%" title="账单类别"></vxe-column>
