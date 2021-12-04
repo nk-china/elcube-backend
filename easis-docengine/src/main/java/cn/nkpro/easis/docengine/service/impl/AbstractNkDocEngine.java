@@ -161,7 +161,10 @@ class AbstractNkDocEngine {
         if(docHPersistent != null){
 
             // 获取单据DEF
-            DocDefHV def = docDefService.getDocDefForRuntime(docHPersistent.getDocType());
+            DocDefHV def = NkDocEngineContext.localDef(
+                    docHPersistent.getDocType(),
+                    (docType)->docDefService.getDocDefForRuntime(docType)
+            );
 
             // 获取单据处理器 并执行
             NkDocProcessor docProcessor = customObjectManager

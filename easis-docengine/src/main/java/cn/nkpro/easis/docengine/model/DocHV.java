@@ -16,9 +16,9 @@
  */
 package cn.nkpro.easis.docengine.model;
 
-import cn.nkpro.easis.docengine.gen.DocI;
 import cn.nkpro.easis.co.easy.EasyCollection;
 import cn.nkpro.easis.co.easy.EasySingle;
+import cn.nkpro.easis.docengine.gen.DocI;
 import cn.nkpro.easis.task.model.BpmTask;
 import cn.nkpro.easis.utils.BeanUtilz;
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -36,7 +36,7 @@ import java.util.stream.Collectors;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude()
-public class DocHV extends DocHBasis implements Cloneable {
+public class DocHV extends DocHBasis {
 
     private BpmTask bpmTask;
 
@@ -51,15 +51,15 @@ public class DocHV extends DocHBasis implements Cloneable {
         super();
     }
 
-    @Override
-    public Object clone() throws CloneNotSupportedException {
-        DocHV clone = (DocHV) super.clone();
-        clone.setWriteable(writeable);
-        if(bpmTask!=null)
-            clone.setBpmTask((BpmTask) bpmTask.clone());
-
-        return clone;
-    }
+//    @Override
+//    public Object clone() throws CloneNotSupportedException {
+//        DocHV clone = (DocHV) super.clone();
+//        clone.setWriteable(writeable);
+//        if(bpmTask!=null)
+//            clone.setBpmTask((BpmTask) bpmTask.clone());
+//
+//        return clone;
+//    }
 
     public EasySingle fetch(String cardKey){
         Object o = getData().get(cardKey);

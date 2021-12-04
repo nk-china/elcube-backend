@@ -16,15 +16,16 @@
  */
 package cn.nkpro.easis.platform.service.impl;
 
-import cn.nkpro.easis.basic.Constants;
 import cn.nkpro.easis.annotation.Keep;
+import cn.nkpro.easis.basic.Constants;
+import cn.nkpro.easis.basic.TransactionSync;
 import cn.nkpro.easis.data.redis.RedisSupport;
 import cn.nkpro.easis.platform.DeployAble;
-import cn.nkpro.easis.platform.gen.PlatformRegistryKey;
-import cn.nkpro.easis.platform.service.PlatformRegistryService;
 import cn.nkpro.easis.platform.gen.PlatformRegistry;
 import cn.nkpro.easis.platform.gen.PlatformRegistryExample;
+import cn.nkpro.easis.platform.gen.PlatformRegistryKey;
 import cn.nkpro.easis.platform.gen.PlatformRegistryMapper;
+import cn.nkpro.easis.platform.service.PlatformRegistryService;
 import cn.nkpro.easis.utils.BeanUtilz;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
@@ -47,7 +48,7 @@ public class PlatformRegistryServiceImpl implements PlatformRegistryService , De
     private PlatformRegistryMapper constantMapper;
 
     @Autowired@SuppressWarnings("all")
-    private RedisSupport<Object> redisSupport;
+    private RedisSupport<PlatformRegistry> redisSupport;
 
 
     @Override
@@ -59,13 +60,22 @@ public class PlatformRegistryServiceImpl implements PlatformRegistryService , De
         return constantMapper.selectByExampleWithBLOBs(example);
     }
 
+    private PlatformRegistry getFromCache(String regType, String regKey){
+        return redisSupport.getIfAbsent(
+                Constants.CACHE_DEF_CONSTANT,
+                String.format("%s.%s",regType,regKey),
+                ()->{
+                    PlatformRegistryKey pk = new PlatformRegistryKey();
+                    pk.setRegType(regType);
+                    pk.setRegKey(regKey);
+                    return constantMapper.selectByPrimaryKey(pk);
+                });
+    }
+
     @Override
     public Object getJSON(String regType, String regKey){
 
-        PlatformRegistryKey pk = new PlatformRegistryKey();
-        pk.setRegType(regType);
-        pk.setRegKey(regKey);
-        PlatformRegistry registry = constantMapper.selectByPrimaryKey(pk);
+        PlatformRegistry registry = getFromCache(regType, regKey);
 
         if(registry!=null){
             return JSON.parse(registry.getContent());
@@ -76,10 +86,7 @@ public class PlatformRegistryServiceImpl implements PlatformRegistryService , De
     @Override
     public String getString(String regType, String regKey){
 
-        PlatformRegistryKey pk = new PlatformRegistryKey();
-        pk.setRegType(regType);
-        pk.setRegKey(regKey);
-        PlatformRegistry registry = constantMapper.selectByPrimaryKey(pk);
+        PlatformRegistry registry = getFromCache(regType, regKey);
 
         if(registry!=null){
             return registry.getContent();
@@ -112,10 +119,7 @@ public class PlatformRegistryServiceImpl implements PlatformRegistryService , De
         String regType = StringUtils.substringBefore(key,".");
         String regKey  = StringUtils.substringAfter(key,".");
 
-        PlatformRegistryKey pk = new PlatformRegistryKey();
-        pk.setRegType(regType);
-        pk.setRegKey(regKey);
-        return constantMapper.selectByPrimaryKey(pk);
+        return getFromCache(regType, regKey);
     }
 
     @Override
@@ -125,12 +129,24 @@ public class PlatformRegistryServiceImpl implements PlatformRegistryService , De
             constantMapper.insert(registry);
         }else{
             constantMapper.updateByPrimaryKeyWithBLOBs(registry);
+            TransactionSync.runAfterCommit("redis",()->
+                redisSupport.deleteHash(
+                    Constants.CACHE_DEF_CONSTANT,
+                    String.format("%s.%s",registry.getRegType(),registry.getRegKey())
+                )
+            );
         }
     }
 
     @Override
     public void deleteValue(PlatformRegistry registry){
         constantMapper.deleteByPrimaryKey(registry);
+        TransactionSync.runAfterCommit("redis",()->
+                redisSupport.deleteHash(
+                        Constants.CACHE_DEF_CONSTANT,
+                        String.format("%s.%s",registry.getRegType(),registry.getRegKey())
+                )
+        );
     }
 
     @Override

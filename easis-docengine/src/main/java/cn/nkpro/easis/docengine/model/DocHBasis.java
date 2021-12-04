@@ -16,7 +16,6 @@
  */
 package cn.nkpro.easis.docengine.model;
 
-import cn.nkpro.easis.utils.BeanUtilz;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -30,7 +29,7 @@ import java.util.Map;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude()
-public class DocHBasis extends DocHPersistent implements Cloneable {
+public class DocHBasis extends DocHPersistent {
 
     private String partnerName;
 
@@ -47,16 +46,16 @@ public class DocHBasis extends DocHPersistent implements Cloneable {
         this.data       = new HashMap<>();
     }
 
-    @Override
-    protected Object clone() throws CloneNotSupportedException {
-        DocHBasis clone = (DocHBasis) super.clone();
-        clone.setPartnerName(partnerName);
-        clone.setDocTypeDesc(docTypeDesc);
-        clone.setDocStateDesc(docStateDesc);
-        clone.setDef(def);
-        clone.data     = new HashMap<>();
-        data.forEach((k,v)-> clone.data.put(k,BeanUtilz.cloneWithFastjson(v)));
-
-        return clone;
-    }
+//    @Override
+//    protected Object clone() throws CloneNotSupportedException {
+//        DocHBasis clone = (DocHBasis) super.clone();
+//        clone.setPartnerName(partnerName);
+//        clone.setDocTypeDesc(docTypeDesc);
+//        clone.setDocStateDesc(docStateDesc);
+//        clone.setDef(def);
+//        clone.data     = new HashMap<>();
+//        data.forEach((k,v)-> clone.data.put(k,BeanUtilz.cloneWithFastjson(v)));
+//
+//        return clone;
+//    }
 }

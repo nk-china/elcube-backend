@@ -134,19 +134,6 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
                 log.info(">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>");
                 log.info("{}获取单据视图",NkDocEngineContext.currLog());
             }
-            // 获取原始数据
-
-            //AtomicReference<DocHPersistent> docHPersistent = new AtomicReference<>();
-            //if(debugContextManager.isDebug()) {
-            //    docHPersistent.set(debugContextManager.getDebugResource("$" + docId));
-            //}
-
-            //if(docHPersistent.get()==null){
-
-            //docHPersistent.set(fetchDoc(docId));
-            //    Assert.notNull(docHPersistent.get(),"单据不存在");
-
-            //}
 
             // 先获取单据的持久化数据，主要为了获取单据类型，来判断权限
             DocHPersistent docHPersistent = fetchDoc(docId);
@@ -157,10 +144,17 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
             }
 
             // 尝试先从本地线程中获取单据对象
-            DocHV docHV = NkDocEngineContext.getDoc(
-                    docId,
-                    (id)-> persistentToHV(docHPersistent)
-            );
+            // 因为本地单据clone后会导致数据反序列化找不到脚本编译的Class，所以暂时放弃这个方案
+            //DocHV docHV = NkDocEngineContext.getDoc(
+            //        docId,
+            //        (id)-> persistentToHV(docHPersistent)
+            //);
+            DocHV docHV = persistentToHV(docHPersistent);
+            persistentToHV(docHPersistent);
+            persistentToHV(docHPersistent);
+            persistentToHV(docHPersistent);
+            persistentToHV(docHPersistent);
+            persistentToHV(docHPersistent);
 
             Assert.notNull(docHV,"单据不存在");
 
@@ -186,7 +180,9 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
         NkDocEngineContext.startLog("DETAIL", docId);
         try{
             if(log.isInfoEnabled())log.info("{}获取单据",NkDocEngineContext.currLog());
-            return NkDocEngineContext.getDoc(docId, (id)-> persistentToHV(fetchDoc(id)));
+            //因为本地单据clone后会导致数据反序列化找不到脚本编译的Class，所以暂时放弃这个方案
+            //return NkDocEngineContext.getDoc(docId, (id)-> persistentToHV(fetchDoc(id)));
+            return persistentToHV(fetchDoc(docId));
         }finally {
             if(log.isInfoEnabled())log.info("{}获取单据 完成 总耗时{}ms",NkDocEngineContext.currLog(), System.currentTimeMillis() - start);
             NkDocEngineContext.endLog();
@@ -303,55 +299,6 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
         }, () -> {
             throw new NkOperateNotAllowedCaution("单据被其他用户锁定，请稍后再试");
         });
-
-
-//        boolean     lock = redisSupport.lockRun(docHV.getDocId(), lockId, 10, 1000,600);
-//        Assert.isTrue(lock,"单据被其他用户锁定，请稍后再试");
-//
-//        try {
-//            if(log.isInfoEnabled())log.info("{}开始保存单据视图",NkDocEngineContext.currLog());
-//
-//            docPermService.assertHasDocPerm(NkDocPermService.MODE_WRITE, docHV.getDocType());
-//
-//            if(log.isInfoEnabled())log.info("{}准备获取原始单据 用于填充被权限过滤的数据", NkDocEngineContext.currLog());
-//
-//            DocDefHV def = docDefService.deserializeDef(docHV.getDef());
-//
-//            DocHV runtime;
-//            try{
-//                runtime = processRuntime(docHV);
-//            }catch (Exception e){
-//                redisSupport.unLock(docHV.getDocId(), lockId);
-//                throw new NkOperateNotAllowedCaution(e.getMessage());
-//            }
-//
-//            // 如果单据为修改模式下，检查是否有该单据的write权限
-//            if(!runtime.isNewCreate()){
-//                if(!debugContextManager.isDebug()){
-//                    docPermService.assertHasDocPerm(NkDocPermService.MODE_WRITE, docHV.getDocId(), docHV.getDocType());
-//                }
-//            }
-//
-////            DocHV original = detail(docHV.getDocId());
-////            if(original!=null){
-////                original.getData().forEach((k,v)-> docHV.getData().putIfAbsent(k,v));
-////            }
-//            docHV = execUpdate(docHV, optSource, lockId);
-//            docHV.setDef(def);
-//
-//            processView(docHV);
-//            clearRuntime(docHV);
-//
-//            if(debugContextManager.isDebug()){
-//                debugContextManager.addDebugResource("$"+docHV.getDocId(), docHV.toPersistent());
-//            }
-//
-//            return docHV;
-//        }finally {
-//            if(log.isInfoEnabled())log.info("{}保存单据视图 完成",NkDocEngineContext.currLog());
-//            NkDocEngineContext.endLog();
-//            docHV.clearItemContent();
-//        }
     }
 
     @Override
@@ -366,7 +313,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
 
             if(log.isInfoEnabled())log.info("{}锁定单据成功 redis", NkDocEngineContext.currLog());
 
-            NkDocEngineContext.clearDoc(docId);
+            //NkDocEngineContext.clearDoc(docId);
 
             DocHV doc = detail(docId);
             function.apply(doc);
@@ -382,49 +329,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
         },()->{
             throw new NkOperateNotAllowedCaution("单据被其他用户锁定，请稍后再试");
         });
-
-
-//        DocHV docHV = null;
-//        try{
-//            String      lockId = UUID.randomUUID().toString();
-//            boolean     lock = redisSupport.lockRun(docId, lockId, 10, 1000,600);
-//            Assert.isTrue(lock,"单据被其他用户锁定，请稍后再试");
-//            if(log.isInfoEnabled())log.info("{}锁定单据成功 redis", NkDocEngineContext.currLog());
-//
-//            NkDocEngineContext.clearDoc(docId);
-//
-//            docHV = detail(docId);
-//            function.apply(docHV);
-//            return execUpdate(docHV, optSource, lockId);
-//
-//        }finally {
-//            NkDocEngineContext.endLog();
-//            if(docHV != null){
-//                docHV.clearItemContent();
-//            }
-//        }
     }
-
-//    @Override
-//    @Transactional
-//    public DocHV doUpdate(DocHV doc, String optSource) {
-//        NkDocEngineContext.startLog("UPDATE", doc.getDocId());
-//        try{
-//            String      lockId = UUID.randomUUID().toString();
-//            boolean     lock = redisSupport.lockRun(doc.getDocId(), lockId, 10, 1000,600);
-//            Assert.isTrue(lock,"单据被其他用户锁定，请稍后再试");
-//            if(log.isInfoEnabled())log.info("{}锁定单据成功 redis", NkDocEngineContext.currLog());
-//
-//            // * 锁定单据后，清除本地线程中的单据，保证获取到的数据是最新的
-//            NkDocEngineContext.clearDoc(doc.getDocId());
-//
-//            return execUpdate(doc, optSource, lockId);
-//        }finally {
-//            NkDocEngineContext.endLog();
-//            doc.clearItemContent();
-//        }
-//
-//    }
 
     @Override
     public DocHV random(DocHV doc) {

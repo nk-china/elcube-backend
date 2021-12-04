@@ -32,7 +32,7 @@ import java.util.Map;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @JsonInclude()
-public class DocHPersistent extends DocH implements Cloneable, DebugAble {
+public class DocHPersistent extends DocH implements DebugAble {
 
     private Map<String, DocI> items;
 
@@ -45,11 +45,11 @@ public class DocHPersistent extends DocH implements Cloneable, DebugAble {
         this.dynamics   = new HashMap<>();
     }
 
-    @Override
-    protected Object clone() throws CloneNotSupportedException {
-        DocHPersistent clone = (DocHPersistent) super.clone();
-        clone.items    = items;
-        clone.dynamics = new HashMap<>(dynamics);
-        return clone;
-    }
+//    @Override
+//    protected Object clone() throws CloneNotSupportedException {
+//        DocHPersistent clone = (DocHPersistent) super.clone();
+//        clone.items    = items;
+//        clone.dynamics = new HashMap<>(dynamics);
+//        return clone;
+//    }
 }
