@@ -67,7 +67,7 @@ class NkFieldPercent extends NkAbstractField implements NkDynamicFormField, NkDy
         if(value !=null ){
             card.set(field.getKey(),
                 new BigDecimal(value as double)
-                    .setScale(field.getInputOptions().getOrDefault('digits', 4) as int, RoundingMode.HALF_UP)
+                    .setScale(field.getInputOptions().getOrDefault('digits', 6) as int, RoundingMode.HALF_UP)
                     .doubleValue()
             )
         }
