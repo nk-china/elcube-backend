@@ -11,11 +11,11 @@ nk:
     - cn.nkpro.easis.customized
   component-disable-online-editing: true
   component-reload-class-path: true
-  clickhouse:
-    driver-class-name: ru.yandex.clickhouse.ClickHouseDriver
-    url: jdbc:clickhouse://192.168.1.157:8123/tutorial
-    username: root
-    password: oo2zSP8J
+#  clickhouse:
+#    driver-class-name: ru.yandex.clickhouse.ClickHouseDriver
+#    url: jdbc:clickhouse://192.168.1.157:8123/tutorial
+#    username: root
+#    password: oo2zSP8J
   doc:
     indices:
       - demo-index: cn.nkpro.easis.docengine.model.es.DocExtES

@@ -13,6 +13,27 @@
 -->
 <template>
     <nk-card>
+        <vxe-table
+                ref="xTable"
+                row-key
+                auto-resize
+                keep-source
+                max-height="500"
+                resizable
+                highlight-hover-row
+                show-header-overflow="tooltip"
+                show-overflow="tooltip"
+                size="mini"
+                border=inner
+                :data="data"
+                :edit-config="{trigger: 'click', mode: 'row', showIcon: editMode, showStatus: true}">
+            <vxe-column field="expireDate"  width="15%" title="到期日期" formatter="nkDatetime"></vxe-column>
+            <vxe-column field="billType"    width="14%" title="账单类别"></vxe-column>
+            <vxe-column field="amount"      width="20%" align="right" title="账单金额" formatter="nkCurrency"></vxe-column>
+            <vxe-column field="received"    width="20%" align="right" title="已收金额" formatter="nkCurrency"></vxe-column>
+            <vxe-column field="receivable"  width="20%" align="right" title="应收金额" formatter="nkCurrency"></vxe-column>
+            <vxe-column field="state"       title="状态" :formatter="formatState"></vxe-column>
+        </vxe-table>
     </nk-card>
 </template>
 
@@ -21,6 +42,13 @@
 
     export default {
         mixins:[new Mixin({})],
+        methods:{
+            formatState({row}){
+                if(row.state===1)
+                    return "激活";
+                return "未激活";
+            }
+        }
     }
 </script>
 

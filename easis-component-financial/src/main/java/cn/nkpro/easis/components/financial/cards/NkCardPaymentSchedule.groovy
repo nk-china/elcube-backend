@@ -17,17 +17,19 @@
 package cn.nkpro.easis.components.financial.cards
 
 import cn.nkpro.easis.annotation.NkNote
+import cn.nkpro.easis.co.NkApplyCSO
 import cn.nkpro.easis.co.NkCustomObjectManager
 import cn.nkpro.easis.docengine.NkAbstractCard
 import cn.nkpro.easis.docengine.model.DocDefIV
 import cn.nkpro.easis.docengine.model.DocHV
+import cn.nkpro.easis.utils.BeanUtilz
+import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
 
 import java.util.stream.Collectors
 
-// todo 待开发卡片
 @Order(10001)
 @NkNote("还款计划")
 @Component("NkCardPaymentSchedule")
@@ -35,6 +37,18 @@ class NkCardPaymentSchedule extends NkAbstractCard<List<PaymentI>,Def> {
 
     @Autowired
     NkCustomObjectManager customObjectManager
+
+    @Override
+    List<PaymentI> afterCreate(DocHV doc, DocHV preDoc, List<PaymentI> data, DocDefIV defIV, Def d) {
+        if(defIV.getCopyFromRef()==1 && preDoc!=null && preDoc.getData().containsKey(defIV.getCardKey())){
+            def preData = preDoc.getData()[defIV.getCardKey()]
+
+            if(preData instanceof List){
+                data = BeanUtilz.copyFromList(preData, PaymentI.class)
+            }
+        }
+        return super.afterCreate(doc, preDoc, data, defIV, d) as List
+    }
 
     @Override
     List<PaymentI> calculate(DocHV doc, List<PaymentI> data, DocDefIV defIV, Def d, boolean isTrigger, Object options) {

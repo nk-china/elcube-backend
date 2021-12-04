@@ -80,7 +80,7 @@ class NkFieldRef extends NkAbstractField implements NkDynamicFormField, NkDynami
 
             Map data = card.get(field.getKey())
 
-            if(StringUtils.isNotBlank(data.get("docId") as CharSequence) && !StringUtils.isAllBlank(optionMappings,dataMappings)){
+            if(data!=null && StringUtils.isNotBlank(data.get("docId") as CharSequence) && !StringUtils.isAllBlank(optionMappings,dataMappings)){
 
                 // 获取选中的单据
                 def refDoc = docEngine.detail(data.get("docId") as String)

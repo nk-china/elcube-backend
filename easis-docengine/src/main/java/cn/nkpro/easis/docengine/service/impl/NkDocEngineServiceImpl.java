@@ -152,7 +152,9 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
             DocHPersistent docHPersistent = fetchDoc(docId);
 
             // 检查READ权限
-            docPermService.assertHasDocPerm(NkDocPermService.MODE_READ, docId, docHPersistent.getDocType());
+            if(!debugContextManager.isDebug()) {
+                docPermService.assertHasDocPerm(NkDocPermService.MODE_READ, docId, docHPersistent.getDocType());
+            }
 
             // 尝试先从本地线程中获取单据对象
             DocHV docHV = NkDocEngineContext.getDoc(

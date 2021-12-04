@@ -110,8 +110,6 @@ class AbstractNkDocEngine {
                 );
             }
 
-            Assert.notNull(doc,"单据不存在");
-
             return doc;
 
         }finally {
@@ -294,7 +292,7 @@ class AbstractNkDocEngine {
             );
     }
 
-    NkDocFlowInterceptor.FlowDescribe applyDocFlowInterceptor(String docFlowInterceptor, DocHV docHV){
+    private NkDocFlowInterceptor.FlowDescribe applyDocFlowInterceptor(String docFlowInterceptor, DocHV docHV){
         return customObjectManager.getCustomObject(docFlowInterceptor, NkDocFlowInterceptor.class)
                 .apply(docHV);
     }

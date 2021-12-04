@@ -17,6 +17,7 @@
 package cn.nkpro.easis.utils;
 
 import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.serializer.SerializerFeature;
 import org.springframework.beans.BeanUtils;
 
 import java.lang.reflect.Type;
@@ -31,10 +32,11 @@ import java.util.stream.Collectors;
  */
 public interface BeanUtilz {
 
+    @SuppressWarnings("all")
     public static <T> T cloneWithFastjson(Object source){
         if(source==null)return null;
         return JSON.parseObject(
-                JSON.toJSONString(source),
+                JSON.toJSONString(source, JSON.DEFAULT_GENERATE_FEATURE | SerializerFeature.WriteClassName.getMask()),
                 (Type) source.getClass()
         );
     }
