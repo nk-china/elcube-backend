@@ -16,7 +16,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <parent>
-        <artifactId>elcube-parent</artifactId>
+        <artifactId>parent</artifactId>
         <groupId>cn.nkpro.elcube</groupId>
         <version>2.0-SNAPSHOT</version>
         <relativePath/>
@@ -59,27 +59,27 @@
 
         <dependency>
             <groupId>cn.nkpro.elcube</groupId>
-            <artifactId>elcube-kernel</artifactId>
+            <artifactId>kernel</artifactId>
             <version>${parent.version}</version>
         </dependency>
         <dependency>
             <groupId>cn.nkpro.elcube</groupId>
-            <artifactId>elcube-docengine</artifactId>
+            <artifactId>docengine</artifactId>
             <version>${parent.version}</version>
         </dependency>
         <dependency>
             <groupId>cn.nkpro.elcube</groupId>
-            <artifactId>elcube-bigdata</artifactId>
+            <artifactId>bigdata</artifactId>
             <version>${parent.version}</version>
         </dependency>
         <dependency>
             <groupId>cn.nkpro.elcube</groupId>
-            <artifactId>elcube-component-defaults</artifactId>
+            <artifactId>component-defaults</artifactId>
             <version>${parent.version}</version>
         </dependency>
         <dependency>
             <groupId>cn.nkpro.elcube</groupId>
-            <artifactId>elcube-component-financial</artifactId>
+            <artifactId>component-financial</artifactId>
             <version>${parent.version}</version>
         </dependency>
 
@@ -132,7 +132,7 @@
 
     <build>
         <defaultGoal>clean package</defaultGoal>
-        <finalName>elcube-app</finalName>
+        <finalName>elcube-application</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
