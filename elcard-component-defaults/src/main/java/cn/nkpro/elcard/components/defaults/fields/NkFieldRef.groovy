@@ -1,0 +1,116 @@
+/*
+ * This file is part of ELCard.
+ *
+ * ELCard is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * ELCard is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with ELCard.  If not, see <https://www.gnu.org/licenses/>.
+ */
+package cn.nkpro.elcard.components.defaults.fields
+
+import cn.nkpro.elcard.annotation.NkNote
+import cn.nkpro.elcard.co.spel.NkSpELManager
+import cn.nkpro.elcard.docengine.NkAbstractField
+import cn.nkpro.elcard.docengine.NkDocEngine
+import cn.nkpro.elcard.docengine.cards.NkBaseContext
+import cn.nkpro.elcard.docengine.cards.NkCalculateContext
+import cn.nkpro.elcard.docengine.cards.NkDynamicFormDefI
+import cn.nkpro.elcard.docengine.cards.NkDynamicFormField
+import cn.nkpro.elcard.docengine.cards.NkDynamicGridField
+import cn.nkpro.elcard.docengine.cards.NkLinkageFormField
+import cn.nkpro.elcard.co.easy.EasySingle
+import org.apache.commons.lang3.StringUtils
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.core.annotation.Order
+import org.springframework.expression.EvaluationContext
+import org.springframework.stereotype.Component
+
+import static com.alibaba.fastjson.JSON.parseObject
+
+@Order(80)
+@NkNote("单据引用")
+@Component("NkFieldRef")
+class NkFieldRef extends NkAbstractField implements NkDynamicFormField, NkDynamicGridField, NkLinkageFormField {
+
+    @Autowired
+    private NkSpELManager spELManager
+    @Autowired
+    private NkDocEngine docEngine
+
+    @Override
+    void processOptions(NkDynamicFormDefI field, EvaluationContext context, EasySingle card, NkBaseContext baseContext) {
+
+        def options = field.getInputOptions().get("options")
+
+        if(options){
+            field.getInputOptions().put(
+                    "optionsObject",
+                    parseObject(spELManager.convert(options as String, context))
+            )
+        }
+
+        Map data = card.get(field.getKey())
+
+        if(data!=null && data.containsKey("optionMappings")){
+            (data.get("optionMappings") as Map).forEach({ k, v ->
+                NkDynamicFormDefI f = baseContext.getFields().find { f -> f.getKey() == k }
+                if(f){
+                    Map map = f.getInputOptions()
+                    (v as Map).forEach({vk,vv -> map.put(vk,vv)})
+                }
+            })
+        }
+    }
+
+    @Override
+    void afterCalculate(NkDynamicFormDefI field, EvaluationContext context, EasySingle card, NkCalculateContext calculateContext) {
+
+        // 当上下文计算由当前字段触发、或者当前字段的值在计算阶段发生改变
+        if(calculateContext.fieldTrigger || !Objects.equals(card.get(field.getKey()),calculateContext.original.get(field.getKey()))){
+            String optionMappings = field.getInputOptions().get("optionMappings")
+            String dataMappings = field.getInputOptions().get("dataMappings")
+
+            Map data = card.get(field.getKey())
+
+            if(data!=null && StringUtils.isNotBlank(data.get("docId") as CharSequence) && !StringUtils.isAllBlank(optionMappings,dataMappings)){
+
+                // 获取选中的单据
+                def refDoc = docEngine.detail(data.get("docId") as String)
+
+                // 如果映射模版不为空
+                if(StringUtils.isNotBlank(optionMappings)){
+                    def jSONObject = parseObject(spELManager.convert(optionMappings, refDoc))
+                    data.put("optionMappings", jSONObject)
+
+                    jSONObject.forEach({ k, v ->
+                            NkDynamicFormDefI f = calculateContext.getFields().find { f -> f.getKey() == k }
+                            if(f){
+                                Map map = f.getInputOptions()
+                                (v as Map).forEach({vk,vv -> map.put(vk,vv)})
+                            }
+                        })
+                }
+
+                // 如果映射模版不为空
+                if(StringUtils.isNotBlank(dataMappings)){
+                    def jSONObject = parseObject(spELManager.convert(dataMappings, refDoc))
+                    data.put("dataMappings", jSONObject)
+                    // 将数据映射到 卡片数据，这里设置的值，应该符合optionMappings中的规则，不然会导致数据不合理
+                    jSONObject.forEach({ k, v ->
+                            card.set(k,v)
+                            context.setVariable(k,v)
+                            calculateContext.getSkip().add(k)
+                        })
+                }
+            }
+        }
+    }
+}
