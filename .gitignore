@@ -12,4 +12,4 @@ package-lock.json
 /**/application-local-*.yml
 
 /classes/
-/elcard-customized**/**
+/elcube-customized**/**

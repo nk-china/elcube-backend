@@ -1,0 +1,47 @@
+<!--
+This file is part of ELCube.
+ELCube is free software: you can redistribute it and/or modify
+it under the terms of the GNU Affero General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+ELCube is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Affero General Public License for more details.
+You should have received a copy of the GNU Affero General Public License
+along with ELCube.  If not, see <https://www.gnu.org/licenses/>.
+-->
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <!--
+    -->
+
+    <changeSet id="NK_DATA_VIEW-01" author="bean" context="default">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="NK_DATA_VIEW" />
+            </not>
+        </preConditions>
+        <comment />
+        <createTable tableName="NK_DATA_VIEW" remarks="">
+            <column name="ID" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="NAME" type="${type.desc}" remarks="" />
+            <column name="WIDTH" type="${type.int}" remarks="" />
+            <column name="HEIGHT" type="${type.int}" remarks="" />
+            <column name="THUMBNAIL" type="${type.clob}" remarks="" />
+            <column name="THEME" type="${type.desc}" remarks="" />
+            <column name="CONFIG" type="${type.clob}" remarks="" />
+            <column name="ACCOUNT_ID" type="${type.uuid}" remarks="" />
+            <column name="SHARED" type="${type.int}" remarks="" />
+            <column name="UPDATED_TIME" type="${type.long}" remarks="" />
+            <column name="ORDER_BY" type="${type.int}" remarks="" />
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

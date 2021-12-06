@@ -1,0 +1,43 @@
+nk:
+  secret-id: AEF1D52777444FDDBC354928D7D2BFD3
+  secret-key: UWLnyjGgg0NuRKNFLFZ3mmoNI8VoNqHlBy1B6ZFIom0fhVCEx8uQB7J/g0wnPFADOtyq2ZVuHuJJy0QCUAzDXeCu5j75hDRFtBKaV9DEE4912FmgNb+ekV6/gdemyVulibQs/J8izXoVkD5LTALKBQ==
+  env-key: ts5_bb_citic
+  env-name: 研发环境2.0
+  file-root-path: /Users/bean/Downloads/tfms
+  compress:
+    enabled: false
+  component-base-packages:
+    - cn.nkpro.elcube.components
+    - cn.nkpro.elcube.customized
+  component-disable-online-editing: false
+  component-reload-class-path: true
+  clickhouse:
+    driver-class-name: ru.yandex.clickhouse.ClickHouseDriver
+    url: jdbc:clickhouse://192.168.1.157:8123/tutorial
+    username: root
+    password: oo2zSP8J
+  doc:
+    indices:
+      - demo-index: cn.nkpro.elcube.docengine.model.es.DocExtES
+spring:
+  datasource:
+    url: jdbc:mysql://192.168.1.149:3306/ts5_bb_citic
+    username: root
+    password: VTOZ8clUpSerX6hI
+    driver-class-name: com.mysql.jdbc.Driver
+  redis:
+    host: 192.168.1.157
+    port: 6379
+    password: 1qazxsw2
+    database: 1
+  elasticsearch:
+    rest:
+      uris:
+        - "http://192.168.1.119:9200"
+        - "http://192.168.1.119:9201"
+        - "http://192.168.1.119:9202"
+#      uris: ["http://192.168.1.157:9200"]
+      username: elastic
+      password: 1qazxsw2
+  liquibase:
+    enabled: true

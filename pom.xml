@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-	This file is part of ELCard.
-	ELCard is free software: you can redistribute it and/or modify
+	This file is part of ELCube.
+	ELCube is free software: you can redistribute it and/or modify
 	it under the terms of the GNU Affero General Public License as published by
 	the Free Software Foundation, either version 3 of the License, or
 	(at your option) any later version.
-	ELCard is distributed in the hope that it will be useful,
+	ELCube is distributed in the hope that it will be useful,
 	but WITHOUT ANY WARRANTY; without even the implied warranty of
 	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 	GNU Affero General Public License for more details.
 	You should have received a copy of the GNU Affero General Public License
-	along with ELCard.  If not, see <https://www.gnu.org/licenses/>.
+	along with ELCube.  If not, see <https://www.gnu.org/licenses/>.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -18,24 +18,24 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>cn.nkpro.elcard</groupId>
-    <artifactId>elcard-backend</artifactId>
+    <groupId>cn.nkpro.elcube</groupId>
+    <artifactId>project</artifactId>
     <version>2.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
 
     <modules>
-        <module>elcard-parent</module>
-        <module>elcard-commons</module>
-        <module>elcard-kernel</module>
-        <module>elcard-docengine</module>
-        <module>elcard-bigdata</module>
+        <module>parent</module>
+        <module>commons</module>
+        <module>kernel</module>
+        <module>docengine</module>
+        <module>bigdata</module>
 
-        <module>elcard-component-parent</module>
-        <module>elcard-component-defaults</module>
-        <module>elcard-component-financial</module>
+        <module>component-parent</module>
+        <module>component-defaults</module>
+        <module>component-financial</module>
 
-        <module>elcard-application</module>
+        <module>application</module>
     </modules>
 
     <build>

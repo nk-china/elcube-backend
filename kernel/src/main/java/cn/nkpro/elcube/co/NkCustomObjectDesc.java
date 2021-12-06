@@ -1,0 +1,52 @@
+/*
+ * This file is part of ELCube.
+ *
+ * ELCube is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * ELCube is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ *
+ * You should have received a copy of the GNU Affero General Public License
+ * along with ELCube.  If not, see <https://www.gnu.org/licenses/>.
+ */
+package cn.nkpro.elcube.co;
+
+import cn.nkpro.elcube.annotation.Keep;
+import lombok.Data;
+import org.apache.commons.lang3.StringUtils;
+
+/**
+ * 自定义对象描述型结构
+ */
+@Keep
+@Data
+public class NkCustomObjectDesc {
+
+    private String name;
+    private String key;
+    private int order;
+
+    public NkCustomObjectDesc(String key, String name){
+        this.key = key;
+        this.name = StringUtils.defaultIfBlank(name,key);
+    }
+
+    public NkCustomObjectDesc(String key, String name, int order){
+        this.key = key;
+        this.name = StringUtils.defaultIfBlank(name,key);
+        this.order = order;
+    }
+
+    public String getValue(){
+        return this.key;
+    }
+
+    public String getLabel(){
+        return this.name;
+    }
+}
