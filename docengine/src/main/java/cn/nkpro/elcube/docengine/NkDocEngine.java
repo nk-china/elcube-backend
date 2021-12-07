@@ -17,19 +17,24 @@
 package cn.nkpro.elcube.docengine;
 
 import cn.nkpro.elcube.docengine.model.DocHV;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 public interface NkDocEngine {
 
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     DocHV detail(String docId);
 
+    @Transactional(propagation = Propagation.REQUIRED)
     DocHV create(String docType, String preDocId, String optSource, Function function);
 
+    @Transactional(propagation = Propagation.NEVER)
     DocHV calculate(DocHV doc, String fromCard, Object options);
 
-    //DocHV doUpdate(DocHV doc, String optSource);
-
+    @Transactional
     DocHV doUpdate(String docId, String optSource, Function function);
 
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     DocHV random(DocHV doc);
 
     @FunctionalInterface

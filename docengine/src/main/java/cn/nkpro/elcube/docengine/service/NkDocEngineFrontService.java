@@ -26,10 +26,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface NkDocEngineFrontService extends NkDocEngine {
 
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     PageList<DocH> list(String docType, int offset, int rows, String orderBy);
 
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     DocHV createForView(String docType, String preDocId);
 
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     DocHV detailView(String docId, boolean edit);
 
     @Transactional(propagation = Propagation.NEVER)
@@ -38,9 +41,12 @@ public interface NkDocEngineFrontService extends NkDocEngine {
     @Transactional
     DocHV doUpdateView(DocHV docHV, String optSource);
 
+    @Transactional
     void onBpmKilled(String docId, String processKey, String optSource);
 
+    @Transactional
     void reDataSync(DocHV doc);
 
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     DocState state(String docId);
 }

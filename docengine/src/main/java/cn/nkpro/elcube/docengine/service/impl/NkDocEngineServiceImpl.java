@@ -58,6 +58,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
      * 从数据库表中分页查询单据列表
      */
     @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public PageList<DocH> list(String docType, int offset, int rows, String orderBy){
         DocHExample example = new DocHExample();
         DocHExample.Criteria criteria = example.createCriteria();
@@ -84,6 +85,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
     }
 
     @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public DocHV createForView(String docType, String preDocId) {
         NkDocEngineContext.startLog("CREATE", docType +" from "+ StringUtils.defaultIfBlank(preDocId,"@"));
         try{
@@ -115,6 +117,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
 
 
     @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public DocState state(String docId) {
 
         DocHPersistent docHPersistent = fetchDoc(docId);
@@ -123,6 +126,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
     }
 
     @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public DocHV detailView(String docId, boolean edit) {
 
         final long start = System.currentTimeMillis();
@@ -174,6 +178,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
     }
 
     @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public DocHV detail(String docId) {
 
         final long start = System.currentTimeMillis();
@@ -332,6 +337,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
     }
 
     @Override
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public DocHV random(DocHV doc) {
         NkDocEngineContext.startLog("RANDOM", doc.getDocId());
         if(log.isInfoEnabled())log.info("{}开始生成随机数据", NkDocEngineContext.currLog());
@@ -351,6 +357,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
     }
 
 
+    @Transactional
     @Override
     public void onBpmKilled(String docId, String processKey, String optSource) {
         NkDocEngineContext.startLog("BPM_KILLED", docId);
@@ -366,6 +373,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
     /**
      * 重建索引，单据没有修改，所以两个doc是一样的
      */
+    @Transactional
     @Override
     public void reDataSync(DocHV doc){
         this.dataSync(doc, doc, true);
