@@ -136,6 +136,7 @@ public class SysDMNDefController {
                             .collect(Collectors.toList())
                         :null
         ));
+        threadLocal.remove();
         decision.getRequiredDecisions()
                 .forEach(dmnDecision -> evaluateDecision(dmnDecision,variables,result));
         return result;

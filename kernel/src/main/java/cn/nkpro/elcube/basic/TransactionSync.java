@@ -170,6 +170,7 @@ public class TransactionSync {
 	
 	private static TransactionSynchronization transactionSync = new TransactionSynchronizationAdapter() {
 
+
 		@SneakyThrows
 		@Override
 		public void beforeCommit(boolean readOnly) {
@@ -231,27 +232,33 @@ public class TransactionSync {
 
 		@Override
 		public void afterCompletion(int status) {
-			lock();
+			try{
+				lock();
 
-			List<HandlerCompletion> handlers = tasksRunAfterCompletion.get();
-			if(handlers!=null) {
-				log.info("* >>>>>>>> 准备执行事务完成的任务，任务数量 = {}", handlers.size());
+				List<HandlerCompletion> handlers = tasksRunAfterCompletion.get();
+				if(handlers!=null) {
+					log.info("* >>>>>>>> 准备执行事务完成的任务，任务数量 = {}", handlers.size());
 
-				tasksRunAfterCompletion.remove();
+					tasksRunAfterCompletion.remove();
 
-				for (HandlerCompletion handler : handlers.stream().sorted().collect(Collectors.toList())) {
-					try {
-						log.info("* >> 执行： {}",handler.taskDesc);
-						handler.getTask().apply(status);
-						log.info("* >> 完成： {}",handler.taskDesc);
-					} catch (Exception e) {
-						log.error("* >> 错误： {} Exception: {}",handler.taskDesc,e.getMessage(), e);
+					for (HandlerCompletion handler : handlers.stream().sorted().collect(Collectors.toList())) {
+						try {
+							log.info("* >> 执行： {}",handler.taskDesc);
+							handler.getTask().apply(status);
+							log.info("* >> 完成： {}",handler.taskDesc);
+						} catch (Exception e) {
+							log.error("* >> 错误： {} Exception: {}",handler.taskDesc,e.getMessage(), e);
+						}
 					}
+					log.info("* <<<<<<<< 事务完成的任务执行完成");
 				}
-				log.info("* <<<<<<<< 事务完成的任务执行完成");
+			}finally {
+				// 再一次清理线程变量，确保数据不污染
+				unlock();
+				tasksRunBeforeCommit.remove();
+				tasksRunAfterCommit.remove();
+				tasksRunAfterCompletion.remove();
 			}
-
-			unlock();
 		}
 	};
 
