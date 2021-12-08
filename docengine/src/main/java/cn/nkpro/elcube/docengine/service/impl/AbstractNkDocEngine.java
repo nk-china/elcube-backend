@@ -22,6 +22,7 @@ import cn.nkpro.elcube.co.NkCustomObjectManager;
 import cn.nkpro.elcube.co.spel.NkSpELManager;
 import cn.nkpro.elcube.data.elasticearch.SearchEngine;
 import cn.nkpro.elcube.data.redis.RedisSupport;
+import cn.nkpro.elcube.docengine.NkDocEngineThreadLocalAspect;
 import cn.nkpro.elcube.docengine.NkDocProcessor;
 import cn.nkpro.elcube.docengine.datasync.NkDocDataAdapter;
 import cn.nkpro.elcube.docengine.gen.*;
@@ -29,7 +30,6 @@ import cn.nkpro.elcube.docengine.interceptor.NkDocFlowInterceptor;
 import cn.nkpro.elcube.docengine.model.*;
 import cn.nkpro.elcube.docengine.model.es.DocHES;
 import cn.nkpro.elcube.docengine.service.NkDocDefService;
-import cn.nkpro.elcube.docengine.service.NkDocEngineContext;
 import cn.nkpro.elcube.docengine.service.NkDocPermService;
 import cn.nkpro.elcube.exception.NkDefineException;
 import cn.nkpro.elcube.security.SecurityUtilz;
@@ -78,6 +78,8 @@ class AbstractNkDocEngine {
     protected DebugContextManager debugContextManager;
     @Autowired
     protected NkCustomObjectManager customObjectManager;
+    @Autowired
+    private NkDocEngineThreadLocalAspect docEngineThreadLocal;
 
     //protected void info(String message,Object... params){
     //    log.info(NkDocEngineContext.currLog() + message, params);
@@ -161,7 +163,7 @@ class AbstractNkDocEngine {
         if(docHPersistent != null){
 
             // 获取单据DEF
-            DocDefHV def = NkDocEngineContext.localDef(
+            DocDefHV def = docEngineThreadLocal.localDef(
                     docHPersistent.getDocType(),
                     (docType)->docDefService.getDocDefForRuntime(docType)
             );

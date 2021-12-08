@@ -22,6 +22,7 @@ import cn.nkpro.elcube.basic.TransactionSync;
 import cn.nkpro.elcube.co.*;
 import cn.nkpro.elcube.data.mybatis.pagination.PaginationContext;
 import cn.nkpro.elcube.data.redis.RedisSupport;
+import cn.nkpro.elcube.docengine.NkDocEngineThreadLocalAspect;
 import cn.nkpro.elcube.docengine.NkCard;
 import cn.nkpro.elcube.docengine.NkDocProcessor;
 import cn.nkpro.elcube.docengine.datasync.NkDocDataAdapter;
@@ -34,7 +35,6 @@ import cn.nkpro.elcube.docengine.model.DocDefHV;
 import cn.nkpro.elcube.docengine.model.DocDefIV;
 import cn.nkpro.elcube.docengine.model.DocDefStateV;
 import cn.nkpro.elcube.docengine.service.NkDocDefService;
-import cn.nkpro.elcube.docengine.service.NkDocEngineContext;
 import cn.nkpro.elcube.exception.NkDefineException;
 import cn.nkpro.elcube.platform.DeployAble;
 import cn.nkpro.elcube.utils.BeanUtilz;
@@ -91,6 +91,8 @@ public class NkDocDefServiceImpl implements NkDocDefService, DeployAble {
     private DocDefDataSyncMapper docDefDataSyncMapper;
     @Autowired
     private DocDefBpmMapper docDefBpmMapper;
+    @Autowired
+    private NkDocEngineThreadLocalAspect docEngineThreadLocal;
 
     @Override
     public PageList<DocDefH> getPage(String docClassify,
@@ -788,10 +790,10 @@ public class NkDocDefServiceImpl implements NkDocDefService, DeployAble {
     @Override
     public void runLoopCards(String docId, DocDefHV docDefHV, boolean ignoreError, Function function){
         try{
-            NkDocEngineContext.lockDoc(docId);
+            docEngineThreadLocal.lockDoc(docId);
             this.runLoopCards(docDefHV,ignoreError,function);
         }finally {
-            NkDocEngineContext.unlockDoc(docId);
+            docEngineThreadLocal.unlockDoc(docId);
         }
     }
 

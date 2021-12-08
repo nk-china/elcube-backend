@@ -16,7 +16,6 @@
  */
 package cn.nkpro.elcube.docengine;
 
-import cn.nkpro.elcube.docengine.service.NkDocEngineContext;
 import cn.nkpro.elcube.docengine.service.SequenceSupport;
 import cn.nkpro.elcube.docengine.service.sequences.DefaultSequenceSupportImpl;
 import cn.nkpro.elcube.task.NkBpmTaskService;
@@ -29,13 +28,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.EnableAspectJAutoProxy;
-import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.web.servlet.HandlerInterceptor;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 
 @EnableAspectJAutoProxy
@@ -66,22 +59,22 @@ public class NkDocEngineAutoConfiguration implements ApplicationRunner, WebMvcCo
         return new DefaultBpmTaskServiceImpl();
     }
 
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(new ThreadLocalClearInterceptor());
-    }
+//    @Override
+//    public void addInterceptors(InterceptorRegistry registry) {
+//        registry.addInterceptor(new ThreadLocalClearInterceptor());
+//    }
 
-    public static class ThreadLocalClearInterceptor implements HandlerInterceptor {
-
-        @Override
-        public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-            NkDocEngineContext.clear();
-            return true;
-        }
-
-        @Override
-        public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
-            NkDocEngineContext.clear();
-        }
-    }
+//    public static class ThreadLocalClearInterceptor implements HandlerInterceptor {
+//
+//        @Override
+//        public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
+//            NkDocEngineContext.clear();
+//            return true;
+//        }
+//
+//        @Override
+//        public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) {
+//            NkDocEngineContext.clear();
+//        }
+//    }
 }

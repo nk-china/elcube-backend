@@ -19,13 +19,12 @@ package cn.nkpro.elcube.bigdata.etl;
 import cn.nkpro.elcube.basic.TransactionSync;
 import cn.nkpro.elcube.bigdata.cards.ReduceConfig;
 import cn.nkpro.elcube.bigdata.cards.ReduceState;
+import cn.nkpro.elcube.co.spel.NkSpELManager;
 import cn.nkpro.elcube.data.elasticearch.SearchEngine;
 import cn.nkpro.elcube.docengine.NkDocEngine;
 import cn.nkpro.elcube.docengine.model.DocHV;
 import cn.nkpro.elcube.docengine.model.es.DocExtES;
-import cn.nkpro.elcube.docengine.service.NkDocEngineContext;
 import cn.nkpro.elcube.security.NkSecurityRunner;
-import cn.nkpro.elcube.co.spel.NkSpELManager;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -72,7 +71,6 @@ public class NkDataETLLocalAdapter implements NkDataETLAdapter {
                     if(StringUtils.isBlank(config.getPreTask())){
                         break;
                     }else{
-                        NkDocEngineContext.clear();
                         DocHV docHV = docEngine.detail(config.getDocId());
                         ReduceState reduceState = (ReduceState) docHV.getData().get(config.getPreTask());
                         if(reduceState==null){
