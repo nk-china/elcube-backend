@@ -1,7 +1,7 @@
 nk:
   secret-id: AEF1D52777444FDDBC354928D7D2BFD3
   secret-key: UWLnyjGgg0NuRKNFLFZ3mmoNI8VoNqHlBy1B6ZFIom0fhVCEx8uQB7J/g0wnPFADOtyq2ZVuHuJJy0QCUAzDXeCu5j75hDRFtBKaV9DEE4912FmgNb+ekV6/gdemyVulibQs/J8izXoVkD5LTALKBQ==
-  env-key: elcube_ltg
+  env-key: elcube_demo
   env-name: ELCube社区预览版(v2.0.2)
   file-root-path: /Users/bean/Downloads/tfms
   compress:
@@ -21,7 +21,7 @@ nk:
       - demo-index: cn.nkpro.elcube.docengine.model.es.DocExtES
 spring:
   datasource:
-    url: jdbc:mysql://192.168.1.229:3306/elcube_ltg
+    url: jdbc:mysql://192.168.1.229:3306/elcube_demo
     username: nk
     password: nk@2020
     driver-class-name: com.mysql.jdbc.Driver
