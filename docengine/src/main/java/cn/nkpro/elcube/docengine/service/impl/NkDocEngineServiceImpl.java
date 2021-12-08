@@ -30,10 +30,8 @@ import cn.nkpro.elcube.docengine.model.DocHPersistent;
 import cn.nkpro.elcube.docengine.model.DocHV;
 import cn.nkpro.elcube.docengine.model.DocState;
 import cn.nkpro.elcube.docengine.model.es.DocHES;
-import cn.nkpro.elcube.docengine.service.NkDocEngineContext;
 import cn.nkpro.elcube.docengine.service.NkDocEngineFrontService;
 import cn.nkpro.elcube.docengine.service.NkDocPermService;
-import cn.nkpro.elcube.exception.NkOperateNotAllowedCaution;
 import cn.nkpro.elcube.utils.BeanUtilz;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -46,8 +44,9 @@ import org.springframework.transaction.interceptor.TransactionAspectSupport;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.util.Assert;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.Comparator;
+import java.util.Optional;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -241,73 +240,72 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
             System.out.println("\n\n\n");
         }
 
-        AtomicReference<DocHV> atomicDocHV = new AtomicReference<>(docHV);
 
-        return redisSupport.lockRunInTransaction(docHV.getDocId(), UUID.randomUUID().toString(), 10, 1000, () -> {
+        if (log.isInfoEnabled())
+            log.info("开始保存单据视图");
 
-            if (log.isInfoEnabled())log.info("锁定单据成功 redis");
+        docPermService.assertHasDocPerm(NkDocPermService.MODE_WRITE, docHV.getDocType());
 
-            if (log.isInfoEnabled())log.info("开始保存单据视图");
 
-            docPermService.assertHasDocPerm(NkDocPermService.MODE_WRITE, atomicDocHV.get().getDocType());
+        if (log.isInfoEnabled()){
+            log.info(StringUtils.EMPTY);
+            log.info("1.第一次获取原始单据 用于填充被权限过滤的数据");
+        }
+        DocHV runtime = runtimeAppend(docHV);
 
-            if (log.isInfoEnabled())log.info("准备获取原始单据 用于填充被权限过滤的数据");
 
-            DocHV runtime = runtimeAppend(atomicDocHV.get());
+        if (log.isInfoEnabled()){
+            log.info(StringUtils.EMPTY);
+            log.info("2.反序列化配置");
+        }
+        DocDefHV def = docDefService.deserializeDef(docHV.getDef());
 
-            DocDefHV def = docDefService.deserializeDef(atomicDocHV.get().getDef());
 
-            // 如果单据为修改模式下，检查是否有该单据的write权限
-            if (!runtime.isNewCreate()) {
-                if (!debugContextManager.isDebug()) {
-                    docPermService.assertHasDocPerm(NkDocPermService.MODE_WRITE, atomicDocHV.get().getDocId(), atomicDocHV.get().getDocType());
-                }
+        // 如果单据为修改模式下，检查是否有该单据的write权限
+        if (!runtime.isNewCreate()) {
+            if (!debugContextManager.isDebug()) {
+                docPermService.assertHasDocPerm(NkDocPermService.MODE_WRITE, docHV.getDocId(), docHV.getDocType());
             }
+        }
 
-            atomicDocHV.set(execUpdate(atomicDocHV.get(), optSource));
-            atomicDocHV.get().setDef(def);
 
-            docToView(atomicDocHV.get());
-            runtimeClear(atomicDocHV.get());
+        if (log.isInfoEnabled()){
+            log.info(StringUtils.EMPTY);
+            log.info("3.执行更新逻辑");
+        }
+        docHV = execUpdate(docHV, optSource);
+        docHV.setDef(def);
 
-            if (debugContextManager.isDebug()) {
-                debugContextManager.addDebugResource("$" + atomicDocHV.get().getDocId(), atomicDocHV.get().toPersistent());
-            }
-            return atomicDocHV.get();
-        }, () -> {
-            if (log.isInfoEnabled()) log.info("解锁单据 {}", atomicDocHV.get().getDocId());
-            atomicDocHV.get().clearItemContent();
-        }, () -> {
-            throw new NkOperateNotAllowedCaution("单据被其他用户锁定，请稍后再试");
-        });
+
+        if (log.isInfoEnabled()){
+            log.info(StringUtils.EMPTY);
+            log.info("4.将单据数据做界面显示处理");
+        }
+        docToView(docHV);
+
+        if (debugContextManager.isDebug()) {
+            debugContextManager.addDebugResource("$" + docHV.getDocId(), docHV.toPersistent());
+        }
+
+        if (log.isInfoEnabled()){
+            log.info(StringUtils.EMPTY);
+            log.info("5.更新后清理过程引用");
+        }
+        runtimeClear(docHV);
+        docHV.clearItemContent();
+        return docHV;
     }
 
     @Override
     @Transactional
     public DocHV doUpdate(String docId, String optSource, NkDocEngine.Function function){
 
-        AtomicReference<DocHV> atomicDocHV = new AtomicReference<>();
+        DocHV doc = detail(docId);
+        function.apply(doc);
+        doc = execUpdate(doc, optSource);
+        doc.clearItemContent();
 
-        String      lockId = UUID.randomUUID().toString();
-        return redisSupport.lockRunInTransaction(docId, lockId, 10, 1000, ()->{
-
-            if(log.isInfoEnabled())log.info("锁定单据成功 redis");
-
-            //NkDocEngineContext.clearDoc(docId);
-
-            DocHV doc = detail(docId);
-            function.apply(doc);
-            atomicDocHV.set(execUpdate(doc, optSource));
-
-            return atomicDocHV.get();
-
-        },()->{
-            if(atomicDocHV.get() != null){
-                atomicDocHV.get().clearItemContent();
-            }
-        },()->{
-            throw new NkOperateNotAllowedCaution("单据被其他用户锁定，请稍后再试");
-        });
+        return doc;
     }
 
     @Override
@@ -362,14 +360,16 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
 
 
         // 获取原始单据数据
-        if(log.isInfoEnabled())
-            log.info("准备获取原始单据 用户对比单据修改前后的差异");
-
+        if(log.isInfoEnabled()){
+            log.info(StringUtils.EMPTY);
+            log.info("准备获取原始单据 用于对比单据修改前后的差异");
+        }
         Optional<DocHV> optionalOriginal = Optional.ofNullable(detail(doc.getDocId()));
+        if(log.isInfoEnabled()){
+            log.info("完成获取原始单据");
+            log.info(StringUtils.EMPTY);
+        }
 
-
-        // 获取单据配置
-        DocDefHV def = docDefService.deserializeDef(doc.getDef());
 
         if(optionalOriginal.isPresent()){
             // 修改
@@ -379,12 +379,14 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
         }else{
             // 新建
             // 检查单据是否符合业务流控制
+            // 获取单据配置
+            DocDefHV def = docDefService.deserializeDef(doc.getDef());
             validateFlow(def, detail(doc.getPreDocId()));
         }
 
         // 获取单据处理器 并执行
         doc = customObjectManager
-                .getCustomObject(def.getRefObjectType(), NkDocProcessor.class)
+                .getCustomObject(doc.getDef().getRefObjectType(), NkDocProcessor.class)
                 .doUpdate(doc, optionalOriginal.orElse(null),optSource);
 
         if(log.isInfoEnabled())

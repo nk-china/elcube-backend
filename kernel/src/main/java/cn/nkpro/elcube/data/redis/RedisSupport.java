@@ -18,7 +18,6 @@ package cn.nkpro.elcube.data.redis;
 
 import cn.nkpro.elcube.exception.abstracts.NkRuntimeException;
 
-import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
@@ -69,27 +68,10 @@ public interface RedisSupport<T> {
     void            deleteHash(String hash, Object... keys);
     void            deleteHash(String hash, Collection<String> keys);
 
-    <R> R lockRun(String key, String value, int retry, int interval,
-                    @NotNull Function<R> runLocked,
-                    FunctionRun afterUnLock,
-                    FunctionRun runLockFailed);
-
-    <R> R lockRunInTransaction(String key, String value, int retry, int interval,
-                    @NotNull Function<R> runLocked,
-                    FunctionRun afterUnLock,
-                    FunctionRun runLockFailed);
-
-    <R> R lockRun(@NotNull String key, String value,
-                         @NotNull Function<R> runLocked,
-                         FunctionRun afterUnLock,
-                         FunctionRun runLockFailed);
-
-    //void    unLock(String key, String value);
+    String lock(String id, int expireSeconds);
+    void unlock(String id, String value);
 
     interface Function<T>{
         T apply() throws NkRuntimeException;
-    }
-    interface FunctionRun{
-        void apply() throws NkRuntimeException;
     }
 }

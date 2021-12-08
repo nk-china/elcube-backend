@@ -156,53 +156,55 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
 
     private void lockRun(DocAsyncQueue asyncQueue, long time){
 
-        // 分布式锁定后执行
-        redisSupport.lockRun(asyncQueue.getAsyncId(),Thread.currentThread().getName(),()->{
-            if(log.isDebugEnabled())
-                log.debug("锁定任务 {}",asyncQueue.getAsyncId());
-            DocAsyncQueueWithBLOBs asyncQueueWithBLOBs = asyncQueueMapper.selectByPrimaryKey(asyncQueue.getAsyncId());
-            try{
-                this.schedule(asyncQueueWithBLOBs);
-                asyncQueueMapper.deleteByPrimaryKey(asyncQueueWithBLOBs.getAsyncId());
-            }catch (Exception e){
-                int retry = asyncQueueWithBLOBs.getAsyncRetry()+1;
+        String lock = redisSupport.lock(asyncQueue.getAsyncId(), 60 * 60);
 
-                if(retry>=asyncQueueWithBLOBs.getAsyncLimit()){
-                    markFaild(asyncQueueWithBLOBs, time, ExceptionUtils.getRootCauseStackTrace(e));
-                    if(log.isWarnEnabled())
-                        log.warn("执行任务 {} 失败，重试次数 {} 超出限制 {}, 标记为 失败：{}",
-                                asyncQueueWithBLOBs.getAsyncId(),
-                                retry,
-                                asyncQueueWithBLOBs.getAsyncLimit(),
-                                e.getMessage());
-                }else{
-                    String[] split = asyncQueueWithBLOBs.getAsyncRule().split("[,;|\\s]");
-                    if(split.length<=retry){
+        if(lock!=null){
+            try{
+                if(log.isDebugEnabled())
+                    log.debug("锁定任务 {}",asyncQueue.getAsyncId());
+                DocAsyncQueueWithBLOBs asyncQueueWithBLOBs = asyncQueueMapper.selectByPrimaryKey(asyncQueue.getAsyncId());
+                try{
+                    this.schedule(asyncQueueWithBLOBs);
+                    asyncQueueMapper.deleteByPrimaryKey(asyncQueueWithBLOBs.getAsyncId());
+                }catch (Exception e){
+                    int retry = asyncQueueWithBLOBs.getAsyncRetry()+1;
+
+                    if(retry>=asyncQueueWithBLOBs.getAsyncLimit()){
                         markFaild(asyncQueueWithBLOBs, time, ExceptionUtils.getRootCauseStackTrace(e));
-                        if(log.isDebugEnabled())
-                            log.debug("执行任务{} 重试次数 {} 超出间隔设定 {}, 标记为 失败：{}",
+                        if(log.isWarnEnabled())
+                            log.warn("执行任务 {} 失败，重试次数 {} 超出限制 {}, 标记为 失败：{}",
                                     asyncQueueWithBLOBs.getAsyncId(),
                                     retry,
-                                    asyncQueueWithBLOBs.getAsyncRule(),
+                                    asyncQueueWithBLOBs.getAsyncLimit(),
                                     e.getMessage());
                     }else{
-                        long next = time + Integer.parseInt(split[asyncQueueWithBLOBs.getAsyncRetry()])*60;
-                        asyncQueueWithBLOBs.setAsyncRetry(retry);
-                        asyncQueueWithBLOBs.setAsyncNext(DateTimeUtilz.format(next,"MM-dd HH:mm:ss"));
-                        asyncQueueWithBLOBs.setUpdatedTime(time);
-                        asyncQueueWithBLOBs.setAsyncCauseStackTrace(JSON.toJSONString(ExceptionUtils.getRootCauseStackTrace(e)));
-                        asyncQueueMapper.updateByPrimaryKeyWithBLOBs(asyncQueueWithBLOBs);
-                        if(log.isWarnEnabled())
-                            log.warn("执行任务 {} 失败，等待{}重试: {}",asyncQueueWithBLOBs.getAsyncId(), asyncQueueWithBLOBs.getAsyncNext(), e.getMessage());
+                        String[] split = asyncQueueWithBLOBs.getAsyncRule().split("[,;|\\s]");
+                        if(split.length<=retry){
+                            markFaild(asyncQueueWithBLOBs, time, ExceptionUtils.getRootCauseStackTrace(e));
+                            if(log.isDebugEnabled())
+                                log.debug("执行任务{} 重试次数 {} 超出间隔设定 {}, 标记为 失败：{}",
+                                        asyncQueueWithBLOBs.getAsyncId(),
+                                        retry,
+                                        asyncQueueWithBLOBs.getAsyncRule(),
+                                        e.getMessage());
+                        }else{
+                            long next = time + Integer.parseInt(split[asyncQueueWithBLOBs.getAsyncRetry()])*60;
+                            asyncQueueWithBLOBs.setAsyncRetry(retry);
+                            asyncQueueWithBLOBs.setAsyncNext(DateTimeUtilz.format(next,"MM-dd HH:mm:ss"));
+                            asyncQueueWithBLOBs.setUpdatedTime(time);
+                            asyncQueueWithBLOBs.setAsyncCauseStackTrace(JSON.toJSONString(ExceptionUtils.getRootCauseStackTrace(e)));
+                            asyncQueueMapper.updateByPrimaryKeyWithBLOBs(asyncQueueWithBLOBs);
+                            if(log.isWarnEnabled())
+                                log.warn("执行任务 {} 失败，等待{}重试: {}",asyncQueueWithBLOBs.getAsyncId(), asyncQueueWithBLOBs.getAsyncNext(), e.getMessage());
+                        }
                     }
                 }
+            }finally {
+                if(log.isDebugEnabled())
+                    log.debug("解锁任务 {}",asyncQueue.getAsyncId());
+                redisSupport.unlock(asyncQueue.getAsyncId(),lock);
             }
-
-            return null;
-        },()->{
-            if(log.isDebugEnabled())
-                log.debug("解锁任务 {}",asyncQueue.getAsyncId());
-        },null);
+        }
     }
 
 
@@ -218,7 +220,6 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
         asyncQueueMapper.updateByPrimaryKeySelective(asyncQueue);
     }
 
-    @SuppressWarnings({"all"})
     protected abstract void schedule(DocAsyncQueue asyncQueue);
     protected int limit(){
         return 10;
