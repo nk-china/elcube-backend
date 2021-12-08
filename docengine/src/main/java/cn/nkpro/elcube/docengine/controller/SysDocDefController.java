@@ -115,7 +115,7 @@ public class SysDocDefController {
     @NkNote("8.删除配置")
     @RequestMapping("/type/delete")
     public void delete(
-            @NkNote("单据配置对象")@RequestBody DocDefHV def,@RequestParam("force") boolean force){
+            @NkNote("单据配置对象")@RequestBody DocDefHV def,@RequestParam(value="force",required = false) boolean force){
         defDocTypeService.doDelete(def,force);
     }
 
