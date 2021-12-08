@@ -108,21 +108,19 @@ export default {
         nk$editModeChanged(){
             this.fileList = [];
             if(this.value){
+
+                let item = {
+                    uid : -1,
+                    name: this.value.name,
+                    path: this.value.path,
+                    url : undefined,
+                };
+                this.fileList.push(item);
+
                 if(this.inputOptions.listType==='picture-card'){
                     this.$http.get("/api/fs/download?url="+this.value.path).then(res=>{
-                        this.fileList.push({
-                            uid : -1,
-                            name: this.value.name,
-                            url:  res.data,
-                            path: this.value.path,
-                        })
+                        item.url = res.data;
                     });
-                }else{
-                    this.fileList.push({
-                        uid : -1,
-                        name: this.value.name,
-                        path: this.value.path,
-                    })
                 }
             }
             this.progressPercent = undefined
@@ -177,6 +175,7 @@ export default {
                 path: info.file.path,
                 name: info.file.name,
             });
+            this.change();
         },
         async handlePreview(file) {
 
