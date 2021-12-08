@@ -45,14 +45,21 @@ public class NkDynamicForm extends NkDynamicBase<Map<String,Object>, NkDynamicFo
     @Override
     public Map<String,Object> afterCreate(DocHV doc, DocHV preDoc, Map<String,Object> data, DocDefIV defIV, NkDynamicFormDef d) {
         this.copyFromPre(preDoc, data, defIV, d.getItems());
-        this.processOptions(EasySingle.from(data), doc, d.getItems());
-        this.execSpEL(EasySingle.from(data), doc, d.getItems(), defIV.getCardKey(), false, null, preDoc, true);
+
+        EasySingle single = EasySingle.from(data);
+
+        this.processOptions(single, doc, d.getItems());
+        this.execSpEL(single, doc, d.getItems(), defIV.getCardKey(), false, null, preDoc, true);
+        this.processControl(single,doc,d.getItems(),defIV.getCardKey());
         return super.afterCreate(doc, preDoc, data, defIV, d);
     }
 
     @Override
     public Map<String,Object> afterGetData(DocHV doc, Map<String,Object> data, DocDefIV defIV, NkDynamicFormDef d) {
-        this.processOptions(EasySingle.from(data), doc, d.getItems());
+
+        EasySingle single = EasySingle.from(data);
+        this.processOptions(single, doc, d.getItems());
+        this.processControl(single,doc,d.getItems(),defIV.getCardKey());
         return super.afterGetData(doc, data, defIV, d);
     }
 
@@ -75,7 +82,9 @@ public class NkDynamicForm extends NkDynamicBase<Map<String,Object>, NkDynamicFo
 
     @Override
     public Map<String,Object> calculate(DocHV doc, Map<String,Object> data, DocDefIV defIV, NkDynamicFormDef d, boolean isTrigger, Object options) {
-        this.execSpEL(EasySingle.from(data), doc, d.getItems(), defIV.getCardKey(), isTrigger, (Map) options);
+        EasySingle single = EasySingle.from(data);
+        this.execSpEL(single, doc, d.getItems(), defIV.getCardKey(), isTrigger, (Map) options);
+        this.processControl(single,doc,d.getItems(),defIV.getCardKey());
         return super.calculate(doc, data, defIV, d, isTrigger, options);
     }
 

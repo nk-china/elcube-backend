@@ -58,13 +58,17 @@ public class NkDynamicGrid extends NkDynamicBase<List<Map>, NkDynamicGridDef> {
             );
         }
 
-        this.processOptions(EasySingle.from(Collections.emptyMap()), doc, d.getItems());
+        EasySingle single = EasySingle.from(Collections.emptyMap());
+        this.processOptions(single, doc, d.getItems());
+        this.processControl(single, doc,d.getItems(),defIV.getCardKey());
         return super.afterCreate(doc, preDoc, data, defIV, d);
     }
 
     @Override
     public List<Map> afterGetData(DocHV doc, List<Map> data, DocDefIV defIV, NkDynamicGridDef d) {
-        this.processOptions(EasySingle.from(Collections.emptyMap()), doc, d.getItems());
+        EasySingle single = EasySingle.from(Collections.emptyMap());
+        this.processOptions(single, doc, d.getItems());
+        this.processControl(single,doc,d.getItems(),defIV.getCardKey());
         return super.afterGetData(doc, data, defIV, d);
     }
 
@@ -75,10 +79,18 @@ public class NkDynamicGrid extends NkDynamicBase<List<Map>, NkDynamicGridDef> {
     }
 
     private void execSpEL(List<Map> data, DocHV doc, List<NkDynamicGridDefI> fields, String cardKey, boolean isTrigger, Map options){
-        if(data.isEmpty())
-            execSpEL(EasySingle.from(new HashMap()), doc, fields,cardKey, isTrigger, options);
-        else
-            data.forEach(item-> execSpEL(EasySingle.from(item), doc, fields, cardKey, isTrigger, options));
+        if(data.isEmpty()){
+            EasySingle single = EasySingle.from(new HashMap());
+            execSpEL(single, doc, fields,cardKey, isTrigger, options);
+            processControl(single, doc, fields, cardKey);
+        }
+        else{
+            data.forEach(item-> {
+                EasySingle single = EasySingle.from(item);
+                execSpEL(single, doc, fields, cardKey, isTrigger, options);
+                processControl(single, doc, fields, cardKey);
+            });
+        }
     }
 
     @Override

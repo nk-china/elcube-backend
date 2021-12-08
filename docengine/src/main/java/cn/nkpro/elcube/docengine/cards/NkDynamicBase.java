@@ -74,9 +74,14 @@ public class NkDynamicBase<DT, DDT> extends NkAbstractCard<DT, DDT> {
     }
 
 
+    protected void execSpEL(EasySingle data, DocHV doc, List<? extends NkDynamicFormDefI> fields, String cardKey, boolean isTrigger, Map options){
+        this.execSpEL(data, doc, fields, cardKey, isTrigger, options, null, false);
+
+    }
+
     protected void execSpEL(EasySingle data, DocHV doc, List<? extends NkDynamicFormDefI> fields, String cardKey, boolean isTrigger, Map options, DocHV preDoc, boolean isNewCreate){
         EvaluationContext context = spELManager.createContext(doc);
-        context.setVariable("pre", preDoc);
+        context.setVariable("$PREV", preDoc);
 
         Map<String,Object> original = new HashMap<>();
 
@@ -121,26 +126,6 @@ public class NkDynamicBase<DT, DDT> extends NkAbstractCard<DT, DDT> {
         });
 
         sortedFields.forEach( field -> {
-
-            if(StringUtils.isNotBlank(field.getSpELControl())){
-
-                if(log.isInfoEnabled())
-                    log.info("\t\t{} 执行表达式 KEY={} T=CONTROL EL={}",
-                            cardKey,
-                            field.getKey(),
-                            field.getSpELControl()
-                    );
-                try{
-                    field.setControl((Integer) spELManager.invoke(field.getSpELControl(),context));
-                }catch(Exception e){
-                    throw new NkDefineException(
-                            String.format("KEY=%s T=CONTROL %s",
-                                    field.getKey(),
-                                    e.getMessage()
-                            )
-                    );
-                }
-            }
 
             if (StringUtils.isNotBlank(field.getSpELContent())) {
 
@@ -190,9 +175,33 @@ public class NkDynamicBase<DT, DDT> extends NkAbstractCard<DT, DDT> {
         });
     }
 
-    protected void execSpEL(EasySingle data, DocHV doc, List<? extends NkDynamicFormDefI> fields, String cardKey, boolean isTrigger, Map options){
-        this.execSpEL(data, doc, fields, cardKey, isTrigger, options, null, false);
+    protected void processControl(EasySingle data, DocHV doc, List<? extends NkDynamicFormDefI> fields, String cardKey){
+        EvaluationContext context = spELManager.createContext(doc);
+        fields.forEach(field -> {
+            context.setVariable(field.getKey(), data.get(field.getKey()));
+        });
+        fields.forEach(field ->{
 
+            if(StringUtils.isNotBlank(field.getSpELControl())){
+
+                if(log.isInfoEnabled())
+                    log.info("\t\t{} 执行表达式 KEY={} T=CONTROL EL={}",
+                            cardKey,
+                            field.getKey(),
+                            field.getSpELControl()
+                    );
+                try{
+                    field.setControl((Integer) spELManager.invoke(field.getSpELControl(),context));
+                }catch(Exception e){
+                    throw new NkDefineException(
+                            String.format("KEY=%s T=CONTROL %s",
+                                    field.getKey(),
+                                    e.getMessage()
+                            )
+                    );
+                }
+            }
+        });
     }
 
     private static boolean isBlank(Object value){

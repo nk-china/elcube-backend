@@ -18,11 +18,10 @@ package cn.nkpro.elcube.docengine.cards;
 
 import cn.nkpro.elcube.annotation.NkNote;
 import cn.nkpro.elcube.co.NkCustomObjectManager;
+import cn.nkpro.elcube.co.easy.EasySingle;
 import cn.nkpro.elcube.docengine.NkField;
 import cn.nkpro.elcube.docengine.model.DocDefIV;
 import cn.nkpro.elcube.docengine.model.DocHV;
-import cn.nkpro.elcube.co.easy.EasySingle;
-import cn.nkpro.elcube.docengine.service.NkDocEngineContext;
 import cn.nkpro.elcube.exception.NkDefineException;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,20 +61,30 @@ public class NkLinkageForm extends NkDynamicBase<Map<String,Object>, NkLinkageFo
     @Override
     public Map<String,Object> afterCreate(DocHV doc, DocHV preDoc, Map<String,Object> data, DocDefIV defIV, NkLinkageFormDef d) {
         this.copyFromPre(preDoc, data, defIV, d.getItems());
-        this.processOptions(EasySingle.from(data), doc, d.getItems());
-        this.execLinkageSpEL(EasySingle.from(data), doc, d.getItems(), defIV.getCardKey(), false, null);
+
+        EasySingle single = EasySingle.from(data);
+
+        this.processOptions(single, doc, d.getItems());
+        this.execLinkageSpEL(single, doc, d.getItems(), defIV.getCardKey(), false, null);
+        this.processControl(single,doc,d.getItems(),defIV.getCardKey());
         return super.afterCreate(doc, preDoc, data, defIV, d);
     }
 
     @Override
     public Map<String,Object> afterGetData(DocHV doc, Map<String,Object> data, DocDefIV defIV, NkLinkageFormDef d) {
-        this.processOptions(EasySingle.from(data), doc, d.getItems());
+
+        EasySingle single = EasySingle.from(data);
+        this.processOptions(single, doc, d.getItems());
+        this.processControl(single,doc,d.getItems(),defIV.getCardKey());
         return super.afterGetData(doc, data, defIV, d);
     }
 
     @Override
     public Map<String, Object> calculate(DocHV doc, Map<String, Object> data, DocDefIV defIV, NkLinkageFormDef d, boolean isTrigger, Object options) {
-        this.execLinkageSpEL(EasySingle.from(data), doc, d.getItems(), defIV.getCardKey(), isTrigger, (Map) options);
+
+        EasySingle single = EasySingle.from(data);
+        this.execLinkageSpEL(single, doc, d.getItems(), defIV.getCardKey(), isTrigger, (Map) options);
+        this.processControl(single,doc,d.getItems(),defIV.getCardKey());
         return super.calculate(doc, data, defIV, d, isTrigger, options);
     }
 
@@ -118,27 +127,6 @@ public class NkLinkageForm extends NkDynamicBase<Map<String,Object>, NkLinkageFo
 
         // 执行字段计算
         sortedFields.forEach(field -> {
-
-            // 执行字段的SpEL
-            if(!skip.contains(field.getKey()) && StringUtils.isNotBlank(field.getSpELContent())){
-                if (log.isInfoEnabled())
-                    log.info("\t\t{} 执行表达式 KEY={} EL={}",
-                            cardKey,
-                            field.getKey(),
-                            field.getSpELContent()
-                    );
-
-                try {
-                    data.set(field.getKey(), spELManager.invoke(field.getSpELContent(), context));
-                } catch (Exception e) {
-                    throw new NkDefineException(
-                            String.format("KEY=%s %s",
-                                    field.getKey(),
-                                    e.getMessage()
-                            )
-                    );
-                }
-            }
 
             calculateContext.setFieldTrigger(
                     isTrigger
