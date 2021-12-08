@@ -20,7 +20,6 @@ import cn.nkpro.elcube.co.spel.NkSpELManager;
 import cn.nkpro.elcube.docengine.model.DocDefIV;
 import cn.nkpro.elcube.docengine.model.DocHV;
 import cn.nkpro.elcube.docengine.model.NkCardFormDefI;
-import cn.nkpro.elcube.docengine.service.NkDocEngineContext;
 import cn.nkpro.elcube.exception.NkDefineException;
 import com.alibaba.fastjson.JSON;
 import com.apifan.common.random.source.AreaSource;
@@ -126,8 +125,7 @@ public class NkFormCardHelper {
                         if(trigger!=null){
 
                             if(log.isInfoEnabled())
-                                log.info("{}\t\t{} 执行表达式 KEY={} T={} EL={}",
-                                        NkDocEngineContext.currLog(),
+                                log.info("\t\t{} 执行表达式 KEY={} T={} EL={}",
                                         defIV.getCardKey(),
                                         item.getKey(),
                                         trigger,
@@ -166,8 +164,7 @@ public class NkFormCardHelper {
                     if(StringUtils.isNotBlank(item.getSpELControl())){
 
                         if(log.isInfoEnabled())
-                            log.info("{}\t\t{} 执行表达式 KEY={} T=CONTROL EL={}",
-                                    NkDocEngineContext.currLog(),
+                            log.info("\t\t{} 执行表达式 KEY={} T=CONTROL EL={}",
                                     defIV.getCardKey(),
                                     item.getKey(),
                                     item.getSpELControl()
@@ -186,8 +183,7 @@ public class NkFormCardHelper {
 
                     if(StringUtils.isNotBlank(item.getOptions())){
                         if(log.isInfoEnabled())
-                            log.info("{}\t\t{} 执行表达式模版 KEY={} T=OPTIONS EL={}",
-                                    NkDocEngineContext.currLog(),
+                            log.info("\t\t{} 执行表达式模版 KEY={} T=OPTIONS EL={}",
                                     defIV.getCardKey(),
                                     item.getKey(),
                                     item.getSpELControl()

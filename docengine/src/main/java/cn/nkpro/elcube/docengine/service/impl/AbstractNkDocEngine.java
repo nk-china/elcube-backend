@@ -88,7 +88,7 @@ class AbstractNkDocEngine {
      * 获取单据的持久化对象
      */
     DocHPersistent fetchDoc(String docId){
-        if(log.isInfoEnabled())log.info("{}获取单据原始数据", NkDocEngineContext.currLog());
+        if(log.isInfoEnabled())log.info("获取单据原始数据");
 
         // 获取单据抬头和行项目数据
         final long start = System.currentTimeMillis();
@@ -114,7 +114,7 @@ class AbstractNkDocEngine {
 
         }finally {
             if(log.isInfoEnabled())
-                log.info("{}获取单据原始数据 耗时{}ms", NkDocEngineContext.currLog(), System.currentTimeMillis()-start);
+                log.info("获取单据原始数据 耗时{}ms", System.currentTimeMillis()-start);
         }
     }
 
@@ -171,7 +171,7 @@ class AbstractNkDocEngine {
                     .getCustomObject(def.getRefObjectType(), NkDocProcessor.class);
 
             if(log.isInfoEnabled())
-                log.info("{}确定单据处理器 = {}", NkDocEngineContext.currLog(), docProcessor.getBeanName());
+                log.info("确定单据处理器 = {}", docProcessor.getBeanName());
 
             return docProcessor.detail(def, docProcessor.deserialize(def, docHPersistent));
         }
@@ -193,7 +193,7 @@ class AbstractNkDocEngine {
             docHV.setBpmTask(
                     bpmTaskService.taskByBusinessAndAssignee(docHV.getDocId(), SecurityUtilz.getUser().getId())
             );
-            if(log.isInfoEnabled())log.info("{}获取单据任务", NkDocEngineContext.currLog());
+            if(log.isInfoEnabled())log.info("获取单据任务");
         }
 
         // 根据当前状态，展示可见的操作状态
@@ -207,8 +207,7 @@ class AbstractNkDocEngine {
                 });
         docHV.getDef().setStatus(new ArrayList<>(cache.values()));
         if(log.isInfoEnabled())
-            log.info("{}设置单据可用状态 状态 = {}",
-                    NkDocEngineContext.currLog(),
+            log.info("设置单据可用状态 状态 = {}",
                     docHV.getDef().getStatus()
             );
 
@@ -235,8 +234,7 @@ class AbstractNkDocEngine {
                 });
 
         if(log.isInfoEnabled())
-            log.info("{}设置单据后续操作 操作数量 = {}",
-                    NkDocEngineContext.currLog(),
+            log.info("设置单据后续操作 操作数量 = {}",
                     docHV.getDef().getNextFlows().size()
             );
 
@@ -270,7 +268,7 @@ class AbstractNkDocEngine {
         String preDocType = Optional.ofNullable(preDoc).map(DocHV::getDocType).orElse("@");
         String preDocState = Optional.ofNullable(preDoc).map(DocHV::getDocState).orElse("@");
 
-        if(log.isInfoEnabled())log.info("{}验证单据业务流 docType = {} prevDocType = {}", NkDocEngineContext.currLog(), def.getDocType(), preDocType);
+        if(log.isInfoEnabled())log.info("验证单据业务流 docType = {} prevDocType = {}", def.getDocType(), preDocType);
 
         DocDefFlowV flowV = def.getFlows()
                 .stream()
@@ -288,8 +286,7 @@ class AbstractNkDocEngine {
             }
         }
         if(log.isInfoEnabled())
-            log.info("{}验证单据业务流 docType = {} 完成 耗时{}ms",
-                    NkDocEngineContext.currLog(),
+            log.info("验证单据业务流 docType = {} 完成 耗时{}ms",
                     def.getDocType(),
                     System.currentTimeMillis() - now
             );
@@ -309,10 +306,10 @@ class AbstractNkDocEngine {
     void execDataSync(DocHV doc, DocHV original){
         long start1 = System.currentTimeMillis();
         dataSync(doc, original, false);
-        if(log.isInfoEnabled())log.info("{}保存单据 同步数据 耗时{}ms", NkDocEngineContext.currLog(), System.currentTimeMillis() - start1);
+        if(log.isInfoEnabled())log.info("保存单据 同步数据 耗时{}ms", System.currentTimeMillis() - start1);
         long start2 = System.currentTimeMillis();
         searchEngine.indexBeforeCommit(DocHES.from(doc));
-        if(log.isInfoEnabled())log.info("{}保存单据 更新索引 耗时{}ms", NkDocEngineContext.currLog(), System.currentTimeMillis() - start2);
+        if(log.isInfoEnabled())log.info("保存单据 更新索引 耗时{}ms", System.currentTimeMillis() - start2);
     }
 
     /**

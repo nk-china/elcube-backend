@@ -85,8 +85,7 @@ public class NkStandardAbstractDefCard<DT,DDT extends NkStandardDef> extends NkA
                         if (trigger != null) {
 
                             if (log.isInfoEnabled())
-                                log.info("{}\t\t{} 执行表达式 KEY={} T={} EL={}",
-                                        NkDocEngineContext.currLog(),
+                                log.info("\t\t{} 执行表达式 KEY={} T={} EL={}",
                                         cardKey,
                                         field.getKey(),
                                         trigger,

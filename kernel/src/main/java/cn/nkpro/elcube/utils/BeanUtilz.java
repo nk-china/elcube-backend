@@ -32,15 +32,15 @@ import java.util.stream.Collectors;
  */
 public interface BeanUtilz {
 
-    @SuppressWarnings("all")
-    public static <T> T cloneWithFastjson(Object source){
-        if(source==null)return null;
-        return JSON.parseObject(
-                JSON.toJSONString(source, JSON.DEFAULT_GENERATE_FEATURE | SerializerFeature.WriteClassName.getMask()),
-                (Type) source.getClass()
-        );
-    }
-
+//    @SuppressWarnings("all")
+//    public static <T> T cloneWithFastjson(Object source){
+//        if(source==null)return null;
+//        return JSON.parseObject(
+//                JSON.toJSONString(source, JSON.DEFAULT_GENERATE_FEATURE | SerializerFeature.WriteClassName.getMask()),
+//                (Type) source.getClass()
+//        );
+//    }
+//
     public static <T> T cloneWithFastjson(Object source, Type type){
         if(source==null)return null;
         return JSON.parseObject(

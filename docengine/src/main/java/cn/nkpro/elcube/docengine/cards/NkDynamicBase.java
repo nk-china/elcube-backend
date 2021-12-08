@@ -125,8 +125,7 @@ public class NkDynamicBase<DT, DDT> extends NkAbstractCard<DT, DDT> {
             if(StringUtils.isNotBlank(field.getSpELControl())){
 
                 if(log.isInfoEnabled())
-                    log.info("{}\t\t{} 执行表达式 KEY={} T=CONTROL EL={}",
-                            NkDocEngineContext.currLog(),
+                    log.info("\t\t{} 执行表达式 KEY={} T=CONTROL EL={}",
                             cardKey,
                             field.getKey(),
                             field.getSpELControl()
@@ -157,8 +156,7 @@ public class NkDynamicBase<DT, DDT> extends NkAbstractCard<DT, DDT> {
                 if (trigger != null) {
 
                     if (log.isInfoEnabled())
-                        log.info("{}\t\t{} 执行表达式 KEY={} T={} EL={}",
-                                NkDocEngineContext.currLog(),
+                        log.info("\t\t{} 执行表达式 KEY={} T={} EL={}",
                                 cardKey,
                                 field.getKey(),
                                 trigger,

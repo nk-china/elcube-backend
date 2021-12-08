@@ -214,7 +214,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
 
         long start = System.currentTimeMillis();
         if(log.isInfoEnabled())
-            log.info("{}反序列化卡片数据", NkDocEngineContext.currLog());
+            log.info("反序列化卡片数据");
 
         DocHBasis doc = BeanUtilz.copyFromObject(docHD, DocHBasis.class);
 
@@ -231,8 +231,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
             });
 
             if(log.isInfoEnabled())
-                log.info("{}\tdeserialize cardKey = {} | {}, card = {}",
-                        NkDocEngineContext.currLog(),
+                log.info("\tdeserialize cardKey = {} | {}, card = {}",
                         defIV.getCardKey(),
                         defIV.getCardName(),
                         nkCard.getBeanName()
@@ -245,8 +244,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         });
 
         if(log.isInfoEnabled())
-            log.info("{}反序列化卡片数据 docId = {}: 耗时{}ms",
-                    NkDocEngineContext.currLog(),
+            log.info("反序列化卡片数据 docId = {}: 耗时{}ms",
                     docHD.getDocId(),
                     System.currentTimeMillis() - start
             );
@@ -258,7 +256,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
     public DocHV detail(DocDefHV def, DocHBasis docHD) {
 
         long start = System.currentTimeMillis();
-        if(log.isInfoEnabled())log.info("{}获取单据内容", NkDocEngineContext.currLog());
+        if(log.isInfoEnabled())log.info("获取单据内容");
 
         DocHV doc = BeanUtilz.copyFromObject(docHD, DocHV.class);
         doc.setDef(def);
@@ -266,8 +264,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         // afterGetData单据行项目数据
         docDefService.runLoopCards(doc.getDocId(), def,false, (nkCard, defIV)-> {
             if(log.isInfoEnabled())
-                log.info("{}\tafterGetData cardKey = {} | {}, card = {}",
-                        NkDocEngineContext.currLog(),
+                log.info("\tafterGetData cardKey = {} | {}, card = {}",
                         defIV.getCardKey(),
                         defIV.getCardName(),
                         nkCard.getBeanName()
@@ -281,8 +278,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         humanize(doc);
 
         if(log.isInfoEnabled())
-            log.info("{}获取单据内容 耗时{}ms",
-                    NkDocEngineContext.currLog(),
+            log.info("获取单据内容 耗时{}ms",
                     System.currentTimeMillis() - start
             );
 
@@ -294,7 +290,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
     public DocHV doUpdate(DocHV doc, DocHV original, String optSource) {
 
         if(log.isInfoEnabled())
-            log.info("{}保存单据内容", NkDocEngineContext.currLog());
+            log.info("保存单据内容");
 
         AtomicReference<DocHV> atomic = new AtomicReference(doc);
         doc.getDynamics().clear();
@@ -314,25 +310,25 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if(log.isInfoEnabled())log.info("{}保存单据内容 开始处理单据卡片数据", NkDocEngineContext.currLog());
+        if(log.isInfoEnabled())log.info("保存单据内容 开始处理单据卡片数据");
         docDefService.runLoopCards(atomic.get().getDocId(), atomic.get().getDef(),false, (card, defIV)->
                 atomic.get().getData().put(
                         defIV.getCardKey(),
                         card.deserialize(atomic.get().getData().get(defIV.getCardKey()))
                 )
         );
-        if(log.isInfoEnabled())log.info("{}保存单据内容 反序列化数据完成", NkDocEngineContext.currLog());
+        if(log.isInfoEnabled())log.info("保存单据内容 反序列化数据完成");
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if(log.isInfoEnabled())log.info("{}保存单据内容 触发单据 beforeUpdate 接口", NkDocEngineContext.currLog());
+        if(log.isInfoEnabled())log.info("保存单据内容 触发单据 beforeUpdate 接口");
         atomic.set(processCycle(doc, DocUpdateEvent.build(NkDocCycle.beforeUpdate, original)));
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if(log.isInfoEnabled())log.info("{}保存单据内容 保存卡片数据到数据库", NkDocEngineContext.currLog());
+        if(log.isInfoEnabled())log.info("保存单据内容 保存卡片数据到数据库");
         docDefService.runLoopCards(atomic.get().getDocId(), atomic.get().getDef(),false, (card, defIV)->{
 
             boolean existsOriginal = existsOriginal(original, defIV);
@@ -378,7 +374,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if(original==null || !StringUtils.equals(atomic.get().getDocState(),original.getDocState())){
-            if(log.isInfoEnabled())log.info("{}保存单据内容 触发卡片的状态变更事件", NkDocEngineContext.currLog());
+            if(log.isInfoEnabled())log.info("保存单据内容 触发卡片的状态变更事件");
             docDefService.runLoopCards(atomic.get().getDocId(), atomic.get().getDef(),false, (card, defIV)->{
                 Object cardData = atomic.get().getData().get(defIV.getCardKey());
                 card.stateChanged(atomic.get(), original, cardData, defIV, defIV.getConfig());
@@ -391,7 +387,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
                     .filter(bpm->StringUtils.equals(atomic.get().getDocState(),bpm.getStartBy()))
                     .findFirst()
                     .ifPresent(bpm-> {
-                        if(log.isInfoEnabled())log.info("{}保存单据内容 启动工作流 key = {}", NkDocEngineContext.currLog(), bpm.getProcessKey());
+                        if(log.isInfoEnabled())log.info("保存单据内容 启动工作流 key = {}", bpm.getProcessKey());
                         atomic.get().setProcessInstanceId(bpmTaskService.start(bpm.getProcessKey(), atomic.get().getDocId()));
                     });
             }
@@ -401,7 +397,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if(log.isInfoEnabled())log.info("{}保存单据内容 准备触发卡片 afterUpdated 、updateCommitted 接口", NkDocEngineContext.currLog());
+        if(log.isInfoEnabled())log.info("保存单据内容 准备触发卡片 afterUpdated 、updateCommitted 接口");
         docDefService.runLoopCards(atomic.get().getDocId(), atomic.get().getDef(),false, (card, defIV)->{
 
             boolean existsOriginal = existsOriginal(original, defIV);
@@ -428,14 +424,14 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
                 );
             }
         });
-        if(log.isInfoEnabled())log.info("{}保存单据内容 触发卡片 afterUpdated 、updateCommitted 接口完成", NkDocEngineContext.currLog());
+        if(log.isInfoEnabled())log.info("保存单据内容 触发卡片 afterUpdated 、updateCommitted 接口完成");
 
 
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if(log.isInfoEnabled())log.info("{}保存单据内容 计算动态索引字段", NkDocEngineContext.currLog());
+        if(log.isInfoEnabled())log.info("保存单据内容 计算动态索引字段");
         EvaluationContext context = spELManager.createContext(atomic.get());
 
         //DocIIndexExample example = new DocIIndexExample();
@@ -534,7 +530,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if(log.isInfoEnabled())log.info("{}保存单据内容 对比修改内容", NkDocEngineContext.currLog());
+        if(log.isInfoEnabled())log.info("保存单据内容 对比修改内容");
         List<String> changedCard = new ArrayList<>();
         docDefService.runLoopCards(atomic.get().getDocId(), atomic.get().getDef(),false, (card, defIV)->{
             if(card.enableDataDiff()){
@@ -551,18 +547,18 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
                 }
             }
         });
-        if(log.isInfoEnabled())log.info("{}保存单据内容 对比修改内容完成 changedCard = {}", NkDocEngineContext.currLog(), changedCard);
+        if(log.isInfoEnabled())log.info("保存单据内容 对比修改内容完成 changedCard = {}", changedCard);
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if(log.isInfoEnabled())log.info("{}保存单据内容 触发单据 afterUpdated 接口", NkDocEngineContext.currLog());
+        if(log.isInfoEnabled())log.info("保存单据内容 触发单据 afterUpdated 接口");
         processCycle(atomic.get(), DocUpdateEvent.build(NkDocCycle.afterUpdated,original));
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if(log.isInfoEnabled())log.info("{}保存单据内容 保存单据抬头数据到数据库", NkDocEngineContext.currLog());
+        if(log.isInfoEnabled())log.info("保存单据内容 保存单据抬头数据到数据库");
 
         atomic.get().setIdentification(random());
         if(optionalOriginal.isPresent()){
@@ -574,7 +570,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        if(log.isInfoEnabled())log.info("{}保存单据内容 增加单据修改历史记录", NkDocEngineContext.currLog());
+        if(log.isInfoEnabled())log.info("保存单据内容 增加单据修改历史记录");
         docHistoryService.doAddVersion(atomic.get(),original,changedCard,optSource);
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -585,9 +581,8 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        final String currLog = NkDocEngineContext.currLog();
         TransactionSync.runAfterCommit("执行单据afterUpdateCommitted",()->{
-            if(log.isInfoEnabled())log.info("{}保存单据内容 触发单据 afterUpdateCommitted 接口", currLog);
+            if(log.isInfoEnabled())log.info("保存单据内容 触发单据 afterUpdateCommitted 接口");
             processCycle(atomic.get(), DocUpdateEvent.build(NkDocCycle.afterUpdateCommitted,original));
         });
 

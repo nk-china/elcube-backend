@@ -18,51 +18,18 @@ package cn.nkpro.elcube.docengine.service;
 
 import cn.nkpro.elcube.docengine.model.DocDefHV;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Stack;
 import java.util.Vector;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class NkDocEngineContext {
-    private final static ThreadLocal<Stack<String>>         threadLocalLog = new ThreadLocal<>();
     private final static ThreadLocal<List<String>>          threadLocalLock = new ThreadLocal<>();
     private final static ThreadLocal<Map<String, DocDefHV>> threadLocalDocDefs = new ThreadLocal<>();
 
-    private final static String c = "\t";
-    private final static String d = "%s %s : ";
-    private final static String e = "%s%s";
-
-    public static synchronized void startLog(String opt, String docId){
-        Stack<String> logs = threadLocalLog.get();
-        if(logs==null){
-            logs = new Stack<>();
-            threadLocalLog.set(logs);
-        }
-        logs.push(String.format(d, opt, docId));
-    }
-    public static synchronized void endLog(){
-        Stack<String> logs = threadLocalLog.get();
-        if(CollectionUtils.isNotEmpty(logs)){
-            logs.pop();
-        }
-    }
-    public static synchronized String currLog(){
-        Stack<String> logs = threadLocalLog.get();
-        if(CollectionUtils.isNotEmpty(logs)){
-            String collect = logs.stream()
-                    .map(i -> StringUtils.EMPTY)
-                    .collect(Collectors.joining(c));
-            return String.format(e,collect,logs.peek());
-        }
-        return StringUtils.EMPTY;
-    }
 
    /*
     *
@@ -110,7 +77,6 @@ public class NkDocEngineContext {
 
     public static void clear(){
         threadLocalLock.remove();
-        threadLocalLog.remove();
         threadLocalDocDefs.remove();
     }
 

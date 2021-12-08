@@ -587,8 +587,7 @@ public class NkDocDefServiceImpl implements NkDocDefService, DeployAble {
         long start = System.currentTimeMillis();
 
         if(log.isInfoEnabled())
-            log.info("{}开始获取单据配置 docType = {} ",
-                    NkDocEngineContext.currLog(),
+            log.info("开始获取单据配置 docType = {} ",
                     docType
             );
 
@@ -609,8 +608,7 @@ public class NkDocDefServiceImpl implements NkDocDefService, DeployAble {
 
         defHV.setNextFlows(getDocTypeFlows(docType));
         if(log.isInfoEnabled())
-            log.info("{}获取单据配置 docType = {} 耗时 {}ms",
-                    NkDocEngineContext.currLog(),
+            log.info("获取单据配置 docType = {} 耗时 {}ms",
                     docType,
                     System.currentTimeMillis() - start
             );
@@ -718,7 +716,7 @@ public class NkDocDefServiceImpl implements NkDocDefService, DeployAble {
 
         runLoopCards(docDefHV,true, (nkCard,item)->{
 
-            log.info("{}\tdeserializeDef docType = {} cardKey = {}",NkDocEngineContext.currLog(), docDefHV.getDocType(), item.getCardKey());
+            log.info("\tdeserializeDef docType = {} cardKey = {}",docDefHV.getDocType(), item.getCardKey());
             item.setPosition(nkCard.getPosition());
             item.setDataComponentName(nkCard.getDataComponentName());
             item.setDefComponentNames(nkCard.getAutoDefComponentNames());
@@ -733,7 +731,7 @@ public class NkDocDefServiceImpl implements NkDocDefService, DeployAble {
 
         runLoopCards(docDefHV,true, (nkCard,item)->{
 
-            log.info("{}\tdeserializeDef docType = {} cardKey = {}",NkDocEngineContext.currLog(), docDefHV.getDocType(), item.getCardKey());
+            log.info("\tdeserializeDef docType = {} cardKey = {}",docDefHV.getDocType(), item.getCardKey());
             item.setPosition(nkCard.getPosition());
             item.setDataComponentName(nkCard.getDataComponentName());
             item.setDefComponentNames(nkCard.getAutoDefComponentNames());
@@ -773,8 +771,7 @@ public class NkDocDefServiceImpl implements NkDocDefService, DeployAble {
             }
 
             if(nkCard==null){
-                log.warn("{}\tdeserializeDef error docType = {} beanName = {} not found",
-                        NkDocEngineContext.currLog(), docDefHV.getDocType(), docDefI.getBeanName());
+                log.warn("\tdeserializeDef error docType = {} beanName = {} not found",docDefHV.getDocType(), docDefI.getBeanName());
                 return;
             }
 

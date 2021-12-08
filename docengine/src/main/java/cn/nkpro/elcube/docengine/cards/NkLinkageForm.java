@@ -122,8 +122,7 @@ public class NkLinkageForm extends NkDynamicBase<Map<String,Object>, NkLinkageFo
             // 执行字段的SpEL
             if(!skip.contains(field.getKey()) && StringUtils.isNotBlank(field.getSpELContent())){
                 if (log.isInfoEnabled())
-                    log.info("{}\t\t{} 执行表达式 KEY={} EL={}",
-                            NkDocEngineContext.currLog(),
+                    log.info("\t\t{} 执行表达式 KEY={} EL={}",
                             cardKey,
                             field.getKey(),
                             field.getSpELContent()
@@ -164,8 +163,7 @@ public class NkLinkageForm extends NkDynamicBase<Map<String,Object>, NkLinkageFo
             // 执行字段的SpEL
             if(!skip.contains(field.getKey()) && StringUtils.isNotBlank(field.getSpELContent())){
                 if (log.isInfoEnabled())
-                    log.info("{}\t\t{} 执行表达式 KEY={} EL={}",
-                            NkDocEngineContext.currLog(),
+                    log.info("\t\t{} 执行表达式 KEY={} EL={}",
                             cardKey,
                             field.getKey(),
                             field.getSpELContent()
