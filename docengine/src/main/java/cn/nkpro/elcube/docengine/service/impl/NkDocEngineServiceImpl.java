@@ -154,11 +154,6 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
             //        (id)-> persistentToHV(docHPersistent)
             //);
             DocHV docHV = persistentToHV(docHPersistent);
-            persistentToHV(docHPersistent);
-            persistentToHV(docHPersistent);
-            persistentToHV(docHPersistent);
-            persistentToHV(docHPersistent);
-            persistentToHV(docHPersistent);
 
             Assert.notNull(docHV,"单据不存在");
 

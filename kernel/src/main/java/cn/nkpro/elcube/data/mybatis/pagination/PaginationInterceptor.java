@@ -87,6 +87,8 @@ public class PaginationInterceptor implements Interceptor {
 		// 没有分页控件或者page控件未设置则不进行分页
 		if (context != null) {
 
+			PaginationContext.removeContext();
+
 			int totalRows = 0;
 //			StringBuffer countSql = new StringBuffer(originalSql.length() + 100);
 //			countSql.append("select count(1) from (").append(originalSql)

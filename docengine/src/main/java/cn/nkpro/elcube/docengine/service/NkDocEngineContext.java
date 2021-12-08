@@ -34,7 +34,6 @@ public class NkDocEngineContext {
     private final static ThreadLocal<Stack<String>>         threadLocalLog = new ThreadLocal<>();
     private final static ThreadLocal<List<String>>          threadLocalLock = new ThreadLocal<>();
     private final static ThreadLocal<Map<String, DocDefHV>> threadLocalDocDefs = new ThreadLocal<>();
-    //private final static ThreadLocal<Map<String, DocHV>> threadLocalDocs = new ThreadLocal<>();
 
     private final static String c = "\t";
     private final static String d = "%s %s : ";
@@ -91,71 +90,6 @@ public class NkDocEngineContext {
        return docMap.computeIfAbsent(docType, function);
    }
 
-//    因为本地单据clone后会导致数据反序列化找不到脚本编译的Class
-//    /**
-//     * 从当前线程中获取单据，
-//     * 如果当前线程中不存在，回调function
-//     */
-//    public static synchronized DocHV getDoc(String docId, Function<String, DocHV> function){
-//
-//        if(TransactionSynchronizationManager.isSynchronizationActive()){
-//            TransactionSynchronizationManager.registerSynchronization(transactionSync);
-//        }
-//
-//        // 初始化本地线程Map
-//        Map<String, DocHV> docMap = threadLocalDocs.get();
-//        if(docMap==null){
-//            docMap = new ConcurrentHashMap<>();
-//            threadLocalDocs.set(docMap);
-//        }
-//
-//        return function.apply(docId);
-//
-//        DocHV docHV = docMap.get(docId);
-//
-//        if(docHV!=null){
-//            if(log.isInfoEnabled())
-//                log.info("{}从本地线程中获取到单据",currLog());
-//        }else{
-//            // 如果本地线程不存在单据，回调函数
-//            docHV = function.apply(docId);
-//            if(docHV!=null){
-//                // 并将回调函数返回的单据存入本地线程
-//                docMap.put(docId,docHV);
-//            }
-//        }
-//
-//        // 返回一个克隆的单据对象，避免本地线程中的单据被污染
-//        if(docHV!=null){
-//            try {
-//                return (DocHV) docHV.clone();
-//            } catch (CloneNotSupportedException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//
-//        return null;
-//    }
-
-//    public static synchronized void setDoc(DocHV doc){
-//
-//        if(TransactionSynchronizationManager.isSynchronizationActive()){
-//            TransactionSynchronizationManager.registerSynchronization(transactionSync);
-//        }
-//
-//        Map<String, DocHV> docMap = threadLocalDocs.get();
-//        if(docMap==null){
-//            docMap = new ConcurrentHashMap<>();
-//            threadLocalDocs.set(docMap);
-//        }
-//        docMap.put(doc.getDocId(),doc);
-//    }
-
-//    public static void clearDoc(String docId){
-//        if(threadLocalDocs.get()!=null)
-//            threadLocalDocs.get().remove(docId);
-//    }
-
     public static synchronized void lockDoc(String docId){
         List<String> locks = threadLocalLock.get();
         if(locks==null){
@@ -178,7 +112,6 @@ public class NkDocEngineContext {
         threadLocalLock.remove();
         threadLocalLog.remove();
         threadLocalDocDefs.remove();
-//        threadLocalDocs.remove();
     }
 
 
