@@ -14,11 +14,40 @@ import java.util.function.Function;
 @Slf4j
 public class NkDocEngineThreadLocal {
 
+    /**
+     * 线程锁 单据ID集合
+     */
     final static ThreadLocal<List<String>>          threadLocalLock = new ThreadLocal<>();
+    /**
+     * 单据配置本地变量
+     */
     final static ThreadLocal<Map<String, DocDefHV>> threadLocalDocDefs = new ThreadLocal<>();
+    /**
+     * 当前线程修改过的单据集合
+     */
     final static ThreadLocal<Map<String, DocHV>>    threadLocalDocUpdated = new ThreadLocal<>();
-
+    /**
+     * 当前线程读取过的单据集合
+     */
+    final static ThreadLocal<Map<String, DocHV>>    threadLocalDocRead = new ThreadLocal<>();
+    /**
+     * 当前线程最后处理的单据
+     */
     final static ThreadLocal<DocHV>                 threadLocalCurr = new ThreadLocal<>();
+
+    public static void enableLocalDoc(){
+        threadLocalDocRead.set(new ConcurrentHashMap<>());
+        log.info("本地线程变量-单据缓存已启用");
+        log.info("本地线程变量-请注意，单据修改时，不要启用，避免单据数据出现脏读");
+    }
+
+    public static DocHV localDoc(String docId, Function<String, DocHV> function){
+        Map<String, DocHV> docMap = threadLocalDocRead.get();
+        if(docMap==null){
+            return function.apply(docId);
+        }
+        return docMap.computeIfAbsent(docId, function);
+    }
 
     public static DocDefHV localDef(String docType, Function<String, DocDefHV> function){
         Map<String, DocDefHV> docMap = threadLocalDocDefs.get();

@@ -37,6 +37,7 @@ public class DocThreadClearAspect {
         switch (point.getSignature().getName()){
             case "detail":
             case "doUpdate":
+            case "doUpdateAgain":
             case "detailView":
             case "onBpmKilled":
                 // docId
@@ -90,6 +91,7 @@ public class DocThreadClearAspect {
                 NkDocEngineThreadLocal.threadLocalCurr.remove();
                 NkDocEngineThreadLocal.threadLocalDocDefs.remove();
                 NkDocEngineThreadLocal.threadLocalDocUpdated.remove();
+                NkDocEngineThreadLocal.threadLocalDocRead.remove();
                 log.info("**** 清理本地线程变量完成");
             }
         }

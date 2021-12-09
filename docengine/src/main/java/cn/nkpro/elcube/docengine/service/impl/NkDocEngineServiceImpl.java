@@ -87,6 +87,10 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
     @Override
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public DocHV createForView(String docType, String preDocId) {
+
+        // 启用本地线程变量
+        NkDocEngineThreadLocal.enableLocalDoc();
+
         if(log.isInfoEnabled())log.info("创建单据 开始");
 
         docPermService.assertHasDocPerm(NkDocPermService.MODE_WRITE, docType);
@@ -123,6 +127,9 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
     @Override
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public DocHV detailView(String docId, boolean edit) {
+
+        // 启用本地线程变量
+        NkDocEngineThreadLocal.enableLocalDoc();
 
         final long start = System.currentTimeMillis();
 
@@ -169,9 +176,10 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
         final long start = System.currentTimeMillis();
         try{
             if(log.isInfoEnabled())log.info("获取单据");
-            //因为本地单据clone后会导致数据反序列化找不到脚本编译的Class，所以暂时放弃这个方案
-            //return NkDocEngineContext.getDoc(docId, (id)-> persistentToHV(fetchDoc(id)));
-            return persistentToHV(fetchDoc(docId));
+
+            // 优先从本地线程变量中获取单据
+            // 本地线程变量需要显示调用NkDocEngineThreadLocal.enableLocalDoc()来启用
+            return NkDocEngineThreadLocal.localDoc(docId, (id)->persistentToHV(fetchDoc(id)));
         }finally {
             if(log.isInfoEnabled())log.info("获取单据 完成 总耗时{}ms",System.currentTimeMillis() - start);
         }

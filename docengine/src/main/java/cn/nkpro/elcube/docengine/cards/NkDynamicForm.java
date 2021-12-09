@@ -17,11 +17,10 @@
 package cn.nkpro.elcube.docengine.cards;
 
 import cn.nkpro.elcube.annotation.NkNote;
+import cn.nkpro.elcube.co.easy.EasySingle;
 import cn.nkpro.elcube.docengine.NkField;
 import cn.nkpro.elcube.docengine.model.DocDefIV;
 import cn.nkpro.elcube.docengine.model.DocHV;
-import cn.nkpro.elcube.co.easy.EasySingle;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
@@ -64,23 +63,6 @@ public class NkDynamicForm extends NkDynamicBase<Map<String,Object>, NkDynamicFo
         this.processOptions(single, doc, d.getItems());
         this.processControl(single,doc,d.getItems(),defIV.getCardKey());
         return super.afterGetData(doc, data, defIV, d);
-    }
-
-    @Override
-    public Map<String, Object> beforeUpdate(DocHV doc, Map<String, Object> data, Map<String, Object> original, DocDefIV defIV, NkDynamicFormDef d) {
-
-        d.getItems().forEach(item->{
-            if(StringUtils.isNotBlank(item.getIndexName())){
-                doc.getDynamics().put(item.getIndexName(), data.get(item.getKey()));
-            }
-        });
-
-        return super.beforeUpdate(doc, data, original, defIV, d);
-    }
-
-    @Override
-    public Map<String, Object> afterUpdated(DocHV doc, Map<String, Object> data, Map<String, Object> original, DocDefIV defIV, NkDynamicFormDef d) {
-        return super.afterUpdated(doc, data, original, defIV, d);
     }
 
     @Override
