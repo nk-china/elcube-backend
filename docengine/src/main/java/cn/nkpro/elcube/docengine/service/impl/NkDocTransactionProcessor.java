@@ -387,7 +387,14 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
                     .findFirst()
                     .ifPresent(bpm-> {
                         if(log.isInfoEnabled())log.info("保存单据内容 启动工作流 key = {}", bpm.getProcessKey());
-                        atomic.get().setProcessInstanceId(bpmTaskService.start(bpm.getProcessKey(), atomic.get().getDocId()));
+
+                        try{
+                            NkDocEngineThreadLocal.setCurr(atomic.get());
+                            String processInstanceId = bpmTaskService.start(bpm.getProcessKey(), atomic.get().getDocId());
+                            atomic.get().setProcessInstanceId(processInstanceId);
+                        }finally {
+                            NkDocEngineThreadLocal.clearCurr();
+                        }
                     });
             }
         }

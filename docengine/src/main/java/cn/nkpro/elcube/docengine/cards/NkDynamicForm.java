@@ -48,8 +48,11 @@ public class NkDynamicForm extends NkDynamicBase<Map<String,Object>, NkDynamicFo
 
         EasySingle single = EasySingle.from(data);
 
+        // 处理编辑时需要的选项
         this.processOptions(single, doc, d.getItems());
+        // 处理数据
         this.execSpEL(single, doc, d.getItems(), defIV.getCardKey(), false, null, preDoc, true);
+        // 处理显示
         this.processControl(single,doc,d.getItems(),defIV.getCardKey());
         return super.afterCreate(doc, preDoc, data, defIV, d);
     }

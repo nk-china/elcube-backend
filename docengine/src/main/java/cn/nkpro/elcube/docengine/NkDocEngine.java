@@ -34,6 +34,9 @@ public interface NkDocEngine {
     @Transactional
     DocHV doUpdate(String docId, String optSource, Function function);
 
+    @Transactional
+    DocHV doUpdateAgain(String docId, String optSource, Function function);
+
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     DocHV random(DocHV doc);
 

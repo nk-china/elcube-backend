@@ -76,13 +76,16 @@ public class NkGlobalEventHandler extends AbstractNkBpmSupport implements Histor
         Task task = processEngine.getTaskService().createTaskQuery().taskId(event.getTaskId()).singleResult();
         DocHV doc = docEngine.detail((String) variables.get("NK$BUSINESS_KEY"));
 
+        long startTime = event.getStartTime()!=null?event.getStartTime().getTime()/1000:task.getCreateTime().getTime()/1000;
+        long endTime   = event.getEndTime()!=null?event.getEndTime().getTime()/1000:System.currentTimeMillis()/1000;
+
         BpmTaskES bpmTaskES = BpmTaskES.from(doc,
                 event.getId(),
                 event.getName(),
                 event.getAssignee(),
                 variables.containsKey("NK$DELETE")?"delete":"complete",// 任务被强制删除
-                event.getStartTime().getTime()/1000,
-                event.getEndTime().getTime()/1000
+                startTime,
+                endTime
         );
 
         searchEngine.indexBeforeCommit(bpmTaskES);

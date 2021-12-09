@@ -22,8 +22,8 @@ import cn.nkpro.elcube.basic.TransactionSync;
 import cn.nkpro.elcube.co.*;
 import cn.nkpro.elcube.data.mybatis.pagination.PaginationContext;
 import cn.nkpro.elcube.data.redis.RedisSupport;
-import cn.nkpro.elcube.docengine.NkDocEngineThreadLocalAspect;
 import cn.nkpro.elcube.docengine.NkCard;
+import cn.nkpro.elcube.docengine.NkDocEngineThreadLocal;
 import cn.nkpro.elcube.docengine.NkDocProcessor;
 import cn.nkpro.elcube.docengine.datasync.NkDocDataAdapter;
 import cn.nkpro.elcube.docengine.gen.*;
@@ -91,8 +91,6 @@ public class NkDocDefServiceImpl implements NkDocDefService, DeployAble {
     private DocDefDataSyncMapper docDefDataSyncMapper;
     @Autowired
     private DocDefBpmMapper docDefBpmMapper;
-    @Autowired
-    private NkDocEngineThreadLocalAspect docEngineThreadLocal;
 
     @Override
     public PageList<DocDefH> getPage(String docClassify,
@@ -790,10 +788,10 @@ public class NkDocDefServiceImpl implements NkDocDefService, DeployAble {
     @Override
     public void runLoopCards(String docId, DocDefHV docDefHV, boolean ignoreError, Function function){
         try{
-            docEngineThreadLocal.lockDoc(docId);
+            NkDocEngineThreadLocal.lockDoc(docId);
             this.runLoopCards(docDefHV,ignoreError,function);
         }finally {
-            docEngineThreadLocal.unlockDoc(docId);
+            NkDocEngineThreadLocal.unlockDoc(docId);
         }
     }
 

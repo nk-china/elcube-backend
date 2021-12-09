@@ -22,7 +22,7 @@ import cn.nkpro.elcube.co.NkCustomObjectManager;
 import cn.nkpro.elcube.co.spel.NkSpELManager;
 import cn.nkpro.elcube.data.elasticearch.SearchEngine;
 import cn.nkpro.elcube.data.redis.RedisSupport;
-import cn.nkpro.elcube.docengine.NkDocEngineThreadLocalAspect;
+import cn.nkpro.elcube.docengine.NkDocEngineThreadLocal;
 import cn.nkpro.elcube.docengine.NkDocProcessor;
 import cn.nkpro.elcube.docengine.datasync.NkDocDataAdapter;
 import cn.nkpro.elcube.docengine.gen.*;
@@ -78,8 +78,6 @@ class AbstractNkDocEngine {
     protected DebugContextManager debugContextManager;
     @Autowired
     protected NkCustomObjectManager customObjectManager;
-    @Autowired
-    private NkDocEngineThreadLocalAspect docEngineThreadLocal;
 
     //protected void info(String message,Object... params){
     //    log.info(NkDocEngineContext.currLog() + message, params);
@@ -163,7 +161,7 @@ class AbstractNkDocEngine {
         if(docHPersistent != null){
 
             // 获取单据DEF
-            DocDefHV def = docEngineThreadLocal.localDef(
+            DocDefHV def = NkDocEngineThreadLocal.localDef(
                     docHPersistent.getDocType(),
                     (docType)->docDefService.getDocDefForRuntime(docType)
             );

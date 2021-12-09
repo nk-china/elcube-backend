@@ -1,7 +1,6 @@
 package cn.nkpro.elcube.docengine;
 
 import cn.nkpro.elcube.docengine.gen.DocH;
-import cn.nkpro.elcube.docengine.model.DocDefHV;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -10,22 +9,15 @@ import org.aspectj.lang.annotation.Pointcut;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Stack;
-import java.util.Vector;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Function;
 
 @Slf4j
 @Aspect
 @Component
-public class NkDocEngineThreadLocalAspect {
+public class DocThreadClearAspect {
 
-    private final static ThreadLocal<Boolean>       threadLocalFlag = new ThreadLocal<>();
-    private final static ThreadLocal<Stack<String>> threadLocalLogs = new ThreadLocal<>();
-    private final static ThreadLocal<List<String>>  threadLocalLock = new ThreadLocal<>();
-    private final static ThreadLocal<Map<String, DocDefHV>> threadLocalDocDefs = new ThreadLocal<>();
+    private final static ThreadLocal<Boolean>               threadLocalFlag = new ThreadLocal<>();
+    private final static ThreadLocal<Stack<String>>         threadLocalLogs = new ThreadLocal<>();
 
     @Pointcut(
         "   execution(public * cn.nkpro.elcube.docengine.NkDocEngine.*(..)) " +
@@ -46,6 +38,7 @@ public class NkDocEngineThreadLocalAspect {
             case "detail":
             case "doUpdate":
             case "detailView":
+            case "onBpmKilled":
                 // docId
                 target = (String) point.getArgs()[0];
                 break;
@@ -58,7 +51,6 @@ public class NkDocEngineThreadLocalAspect {
             case "random":
             case "doUpdateView":
             case "call":
-            case "onBpmKilled":
                 // DocH
                 target = ((DocH) point.getArgs()[0]).getDocId();
                 break;
@@ -66,7 +58,7 @@ public class NkDocEngineThreadLocalAspect {
                 // 其他方法目标不变
         }
 
-        String pop = null;
+        String pop;
         if(target!=null){
             pop = operate+':'+target;
             threadLocalLogs.get().add(pop);
@@ -91,10 +83,14 @@ public class NkDocEngineThreadLocalAspect {
             }
 
             if(isDocEngineEntrance){
+                log.info("**** 清理本地线程变量");
                 threadLocalFlag.remove();
                 threadLocalLogs.remove();
-                threadLocalLock.remove();
-                threadLocalDocDefs.remove();
+                NkDocEngineThreadLocal.threadLocalLock.remove();
+                NkDocEngineThreadLocal.threadLocalCurr.remove();
+                NkDocEngineThreadLocal.threadLocalDocDefs.remove();
+                NkDocEngineThreadLocal.threadLocalDocUpdated.remove();
+                log.info("**** 清理本地线程变量完成");
             }
         }
     }
@@ -113,33 +109,5 @@ public class NkDocEngineThreadLocalAspect {
         }
 
         MDC.put("placeholder",builder.toString());
-    }
-
-    public synchronized DocDefHV localDef(String docType, Function<String, DocDefHV> function){
-        Map<String, DocDefHV> docMap = threadLocalDocDefs.get();
-        if(docMap==null){
-            docMap = new ConcurrentHashMap<>();
-            threadLocalDocDefs.set(docMap);
-        }
-
-        return docMap.computeIfAbsent(docType, function);
-    }
-
-    public synchronized void unlockDoc(String docId){
-        List<String> locks = threadLocalLock.get();
-        if(locks!=null)
-            locks.remove(docId);
-    }
-
-    public synchronized void lockDoc(String docId){
-        List<String> locks = threadLocalLock.get();
-        if(locks==null){
-            locks = new Vector<>();
-            threadLocalLock.set(locks);
-        }
-        if(locks.contains(docId)){
-            throw new RuntimeException("禁止在组件中对当前单据进行读取与更新操作");
-        }
-        locks.add(docId);
     }
 }

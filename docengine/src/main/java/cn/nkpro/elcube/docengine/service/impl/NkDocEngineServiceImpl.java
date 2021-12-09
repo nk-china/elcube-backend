@@ -21,6 +21,7 @@ import cn.nkpro.elcube.basic.PageList;
 import cn.nkpro.elcube.basic.TransactionSync;
 import cn.nkpro.elcube.data.mybatis.pagination.PaginationContext;
 import cn.nkpro.elcube.docengine.NkDocEngine;
+import cn.nkpro.elcube.docengine.NkDocEngineThreadLocal;
 import cn.nkpro.elcube.docengine.NkDocProcessor;
 import cn.nkpro.elcube.docengine.gen.DocDefI;
 import cn.nkpro.elcube.docengine.gen.DocH;
@@ -258,7 +259,10 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
             log.info(StringUtils.EMPTY);
             log.info("2.反序列化配置");
         }
-        DocDefHV def = docDefService.deserializeDef(docHV.getDef());
+        //DocDefHV def = docDefService.deserializeDef(docHV.getDef());
+
+        docHV.setDef(runtime.getDef());
+
 
 
         // 如果单据为修改模式下，检查是否有该单据的write权限
@@ -274,7 +278,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
             log.info("3.执行更新逻辑");
         }
         docHV = execUpdate(docHV, optSource);
-        docHV.setDef(def);
+        //docHV.setDef(def);
 
 
         if (log.isInfoEnabled()){
@@ -301,6 +305,18 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
     public DocHV doUpdate(String docId, String optSource, NkDocEngine.Function function){
 
         DocHV doc = detail(docId);
+        function.apply(doc);
+        doc = execUpdate(doc, optSource);
+        doc.clearItemContent();
+
+        return doc;
+    }
+
+    @Override
+    @Transactional
+    public DocHV doUpdateAgain(String docId, String optSource, NkDocEngine.Function function){
+
+        DocHV doc = NkDocEngineThreadLocal.getUpdated(docId);
         function.apply(doc);
         doc = execUpdate(doc, optSource);
         doc.clearItemContent();
@@ -410,6 +426,8 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
 
             if(log.isInfoEnabled())log.info("保存单据 完成 总耗时{}ms", System.currentTimeMillis() - start);
         });
+
+        NkDocEngineThreadLocal.addUpdated(doc);
 
         return doc;
     }
