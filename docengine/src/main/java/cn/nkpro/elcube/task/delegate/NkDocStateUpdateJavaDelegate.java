@@ -42,7 +42,5 @@ public class NkDocStateUpdateJavaDelegate implements JavaDelegate {
                 "BPM:"+delegateExecution.getEventName(),
                 (doc)-> doc.setDocState((String) state.getValue(delegateExecution))
         );
-
-        delegateExecution.setVariable("NK$COUNTERSIGNATURE_USERS", Arrays.asList("nk-default-admin","nk-default-test"));
     }
 }
