@@ -40,6 +40,7 @@ class NkFinanceMethod02 extends NkAbstractApplyCSO {
         Double  pv = params.get("pv") as Double
         Double  fv = params.get("fv") as Double
         Long    dt = params.get("dt") as Long
+        Integer tp = params.getOrDefault("tp", 0) as Integer
 
         if (ir != null && np != null && pf != null && pv != null && fv != null && dt != null){
 
@@ -58,11 +59,11 @@ class NkFinanceMethod02 extends NkAbstractApplyCSO {
             for(int i=0;i<np;i++){
 
                 calendar.setTimeInMillis(dt*1000)
-                calendar.add(Calendar.MONTH, step*(i+1))
+                calendar.add(Calendar.MONTH, step*(i+1-tp))
                 item = new PaymentI()
                 item.setPeriod(i+1)
                 item.setExpireDate(calendar.getTimeInMillis()/1000 as Long)
-                item.setInterest(doubleValue(residual*ip))
+                item.setInterest(tp==0?doubleValue(residual*ip):0)
                 item.setPrincipal(doubleValue(pv/np))
                 item.setPay(doubleValue(item.getInterest()+item.getPrincipal()))
                 item.setResidual(doubleValue(residual-item.getPrincipal()))
