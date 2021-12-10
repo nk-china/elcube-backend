@@ -46,7 +46,10 @@ public class NkDocEngineThreadLocal {
         if(docMap==null){
             return function.apply(docId);
         }
-        return docMap.computeIfAbsent(docId, function);
+        if(!docMap.containsKey(docId)){
+            docMap.put(docId,function.apply(docId));
+        }
+        return docMap.get(docId);
     }
 
     public static DocDefHV localDef(String docType, Function<String, DocDefHV> function){

@@ -20,31 +20,51 @@ import cn.nkpro.elcube.annotation.NkNote
 import cn.nkpro.elcube.co.easy.EasyCollection
 import cn.nkpro.elcube.co.easy.EasySingle
 import cn.nkpro.elcube.docengine.NkAbstractCard
+import cn.nkpro.elcube.docengine.gen.DocIBill
+import cn.nkpro.elcube.docengine.gen.DocIBillExample
+import cn.nkpro.elcube.docengine.gen.DocIBillMapper
 import cn.nkpro.elcube.docengine.model.DocDefIV
 import cn.nkpro.elcube.docengine.model.DocHV
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.annotation.Order
 import org.springframework.stereotype.Component
 
 @Order(10002)
 @NkNote("账单")
 @Component("NkCardBills")
-class NkCardBills extends NkAbstractCard<List<BillI>,BillDef> {
+class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
+
+    @Autowired
+    private DocIBillMapper billMapper
 
     @Override
-    List<BillI> afterCreate(DocHV doc, DocHV preDoc, List<BillI> data, DocDefIV defIV, BillDef d) {
+    List<DocIBill> afterCreate(DocHV doc, DocHV preDoc, List<DocIBill> data, DocDefIV defIV, BillDef d) {
         apply(doc, data, d)
         return super.afterCreate(doc, preDoc, data, defIV, d) as List
     }
 
     @Override
-    List<BillI> calculate(DocHV doc, List<BillI> data, DocDefIV defIV, BillDef d, boolean isTrigger, Object options) {
+    List<DocIBill> calculate(DocHV doc, List<DocIBill> data, DocDefIV defIV, BillDef d, boolean isTrigger, Object options) {
         apply(doc, data, d)
-        return super.calculate(doc, data, defIV, d, isTrigger, options) as List<BillI>
+        return super.calculate(doc, data, defIV, d, isTrigger, options) as List<DocIBill>
     }
 
     @Override
-    List<BillI> beforeUpdate(DocHV doc, List<BillI> data, List<BillI> original, DocDefIV defIV, BillDef d) {
+    List<DocIBill> afterGetData(DocHV doc, List<DocIBill> data, DocDefIV defIV, BillDef d) {
+
+        DocIBillExample example = new DocIBillExample()
+        example.createCriteria()
+            .andDocIdEqualTo(doc.docId)
+            .andDiscardEqualTo(0)
+        example.setOrderByClause("EXPIRE_DATE")
+
+        return billMapper.selectByExample(example)
+
+        //return super.afterGetData(doc, data, defIV, d) as List
+    }
+
+    @Override
+    List<DocIBill> beforeUpdate(DocHV doc, List<DocIBill> data, List<DocIBill> original, DocDefIV defIV, BillDef d) {
 
         // 判断激活条件
         boolean active = false
@@ -55,10 +75,20 @@ class NkCardBills extends NkAbstractCard<List<BillI>,BillDef> {
         // 激活行项目
         data.forEach({i->i.state = active?1:0})
 
-        return super.beforeUpdate(doc, data, original, defIV, d) as List
+        data.forEach({i->
+
+            if(billMapper.selectByPrimaryKey(i)==null){
+                billMapper.insert(i)
+            }else{
+                billMapper.updateByPrimaryKey(i)
+            }
+        })
+
+        // 返回null，不使用docEngine保存数据
+        return null
     }
 
-    void apply(DocHV doc, List<BillI> data, BillDef d){
+    void apply(DocHV doc, List<DocIBill> data, BillDef d){
 
         def context = spELManager.createContext(doc)
 
@@ -73,7 +103,7 @@ class NkCardBills extends NkAbstractCard<List<BillI>,BillDef> {
                 if(i instanceof List){
                     i.forEach({ii->
                         def single = EasySingle.from(ii)
-                        appendBill(data,
+                        appendBill(doc,data,
                                 single.get("billType"),
                                 single.get("expireDate"),
                                 single.get("amount")
@@ -81,7 +111,7 @@ class NkCardBills extends NkAbstractCard<List<BillI>,BillDef> {
                     })
                 }else{
                     def single = EasySingle.from(i)
-                    appendBill(data,
+                    appendBill(doc,data,
                             single.get("billType"),
                             single.get("expireDate"),
                             single.get("amount")
@@ -100,15 +130,15 @@ class NkCardBills extends NkAbstractCard<List<BillI>,BillDef> {
                 coll.forEach({ single ->
 
                     Long expireDate = single.get("expireDate")
-                    appendBill(data, "本金", expireDate, single.get("principal"))
-                    appendBill(data, "利息", expireDate, single.get("interest"))
-                    appendBill(data, "费用", expireDate, single.get("fee"))
+                    appendBill(doc, data, "本金", expireDate, single.get("principal"))
+                    appendBill(doc, data, "利息", expireDate, single.get("interest"))
+                    appendBill(doc, data, "费用", expireDate, single.get("fee"))
                 })
             }
 
             // 将已收有值的数据强制标记为启用，避免已收丢失
             data.forEach({i->
-                i.discard = i.received>0 && i.discard==1 ? 0 : 1
+                i.discard = i.received>0 && i.discard==1 ? 0 : i.discard
             })
 
             data.sort({ a, b ->
@@ -121,18 +151,20 @@ class NkCardBills extends NkAbstractCard<List<BillI>,BillDef> {
         }
     }
 
-    static void appendBill(List<BillI> data, String billType, Long expireDate, Double amount){
+    static void appendBill(DocHV doc, List<DocIBill> data, String billType, Long expireDate, Double amount){
 
         if(!amount || amount==0)
             return
 
-        BillI exists = data.stream()
-                .find {i->i.billType ==  billType && i.expireDate == expireDate} as BillI
+        DocIBill exists = data.stream()
+                .find {i->i.billType ==  billType && i.expireDate == expireDate} as DocIBill
 
         if(!exists){
 
-            exists = new BillI()
+            exists = new DocIBill()
+            exists.docId = doc.docId
             exists.billType = billType
+            exists.billPartnerId = doc.partnerId
             exists.expireDate = expireDate
             exists.amount = 0
             exists.received = 0
@@ -152,16 +184,5 @@ class NkCardBills extends NkAbstractCard<List<BillI>,BillDef> {
         String collectSpEL
         String activeSpEL
         String paymentCardKey
-    }
-
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    static class BillI{
-        String billType
-        Long expireDate
-        Double amount
-        Double received
-        Double receivable
-        Integer state   // 0 未激活 1 激活
-        Integer discard // 0 正常 1 过期的、失效的
     }
 }

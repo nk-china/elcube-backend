@@ -24,8 +24,7 @@
                 show-overflow="tooltip"
                 size="mini"
                 border=inner
-                :data="data"
-                :max-height="data && data.length>100?500:undefined"
+                :data="list"
                 :edit-config="{trigger: 'click', mode: 'row', showIcon: editMode, showStatus: true}">
             <vxe-column field="expireDate"  width="15%" title="到期日期" formatter="nkDatetime"></vxe-column>
             <vxe-column field="billType"    width="14%" title="账单类别"></vxe-column>
@@ -34,6 +33,14 @@
             <vxe-column field="receivable"  width="20%" align="right" title="应收金额" formatter="nkCurrency"></vxe-column>
             <vxe-column field="state"       title="状态" :formatter="formatState"></vxe-column>
         </vxe-table>
+        <vxe-pager
+                size="mini"
+                :current-page="page.page"
+                :page-size="page.size"
+                :total="data.length"
+                :layouts="['PrevPage', 'JumpNumber', 'NextPage', 'Sizes', 'Total']"
+                @page-change="handlePageChange">
+        </vxe-pager>
     </nk-card>
 </template>
 
@@ -42,11 +49,31 @@
 
     export default {
         mixins:[new Mixin({})],
+        data(){
+            return {
+                page:{
+                    page:1,
+                    size:15,
+                }
+            }
+        },
+        computed:{
+            list(){
+                return this.data.slice(
+                    (this.page.page - 1) * this.page.size,
+                     this.page.page      * this.page.size
+                )
+            }
+        },
         methods:{
             formatState({row}){
                 if(row.state===1)
                     return "激活";
                 return "未激活";
+            },
+            handlePageChange({ currentPage, pageSize }){
+                this.page.page = currentPage;
+                this.page.size = pageSize;
             }
         }
     }

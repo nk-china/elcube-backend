@@ -15,7 +15,7 @@
     <nk-def-card>
         <nk-form :edit="editMode" :col="1">
             <nk-form-item title="激活条件">
-                {{def.activeSpEL}}
+                <nk-sp-el-view :el="def.activeSpEL"></nk-sp-el-view>
                 <nk-sp-el-editor slot="edit" v-model="def.activeSpEL"></nk-sp-el-editor>
             </nk-form-item>
             <nk-form-item title="还款计划卡片">
@@ -23,7 +23,7 @@
                 <a-input slot="edit" v-model="def.paymentCardKey"></a-input>
             </nk-form-item>
             <nk-form-item title="账单源">
-                {{def.collectSpEL}}
+                <nk-sp-el-view :el="def.collectSpEL"></nk-sp-el-view>
                 <nk-sp-el-editor slot="edit" v-model="def.collectSpEL"></nk-sp-el-editor>
             </nk-form-item>
         </nk-form>

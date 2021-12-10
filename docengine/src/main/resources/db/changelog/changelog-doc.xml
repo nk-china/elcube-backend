@@ -385,24 +385,51 @@
     </changeSet>
 
     <changeSet id="NK_DOC_I_INDEX-01" author="bean" context="default">
-    <preConditions onFail="MARK_RAN">
-        <not>
-            <tableExists tableName="NK_DOC_I_INDEX" />
-        </not>
-    </preConditions>
-    <comment />
-    <createTable tableName="NK_DOC_I_INDEX" remarks="">
-        <column name="DOC_ID" type="${type.desc}" remarks="" >
-            <constraints primaryKey="true" />
-        </column>
-        <column name="NAME" type="${type.desc}" remarks="" >
-            <constraints primaryKey="true" />
-        </column>
-        <column name="VALUE" type="${type.uuid}" remarks="" />
-        <column name="DATA_TYPE" type="${type.desc}" remarks="" />
-        <column name="ORDER_BY" type="${type.int}" remarks="" />
-        <column name="UPDATED_TIME" type="${type.long}" remarks="" />
-    </createTable>
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="NK_DOC_I_INDEX" />
+            </not>
+        </preConditions>
+        <comment />
+        <createTable tableName="NK_DOC_I_INDEX" remarks="">
+            <column name="DOC_ID" type="${type.desc}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="NAME" type="${type.desc}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="VALUE" type="${type.uuid}" remarks="" />
+            <column name="DATA_TYPE" type="${type.desc}" remarks="" />
+            <column name="ORDER_BY" type="${type.int}" remarks="" />
+            <column name="UPDATED_TIME" type="${type.long}" remarks="" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="NK_DOC_I_BILL-01" author="bean" context="default">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="NK_DOC_I_BILL" />
+            </not>
+        </preConditions>
+        <comment />
+        <createTable tableName="NK_DOC_I_BILL" remarks="">
+            <column name="DOC_ID" type="${type.desc}" remarks="单据ID" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="BILL_TYPE" type="${type.desc}" remarks="账单类型" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="EXPIRE_DATE" type="${type.long}" remarks="到期日期" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="BILL_PARTNER_ID" type="${type.uuid}" remarks="相关方、付款方" />
+            <column name="AMOUNT" type="${type.curr}" remarks="" />
+            <column name="RECEIVED" type="${type.curr}" remarks="" />
+            <column name="RECEIVABLE" type="${type.curr}" remarks="" />
+            <column name="STATE" type="${type.int}" remarks="0 未激活 1 激活" />
+            <column name="DISCARD" type="${type.int}" remarks="0 正常 1 过期的、失效的" />
+            <column name="UPDATED_TIME" type="${type.long}" remarks="" />
+        </createTable>
     </changeSet>
 
     <changeSet id="NK_DOC_RECORD-01" author="bean" context="default">
