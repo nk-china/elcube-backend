@@ -26,6 +26,18 @@
                 <nk-sp-el-view :el="def.collectSpEL"></nk-sp-el-view>
                 <nk-sp-el-editor slot="edit" v-model="def.collectSpEL"></nk-sp-el-editor>
             </nk-form-item>
+            <nk-form-item title="违约金账单类别">
+                {{def.overdueBillType}}
+                <a-input slot="edit" size="small" v-model="def.overdueBillType"></a-input>
+            </nk-form-item>
+            <nk-form-item title="违约金利率(%)">
+                {{def.overdueBillRate}}
+                <a-input-number slot="edit" size="small" :min="0" :max="100" v-model="def.overdueBillRate"></a-input-number>
+            </nk-form-item>
+            <nk-form-item title="计算违约金的账单类别">
+                {{def.overdueBillDefs}}
+                <a-select slot="edit" size="small" mode="tags" v-model="def.overdueBillDefs"></a-select>
+            </nk-form-item>
         </nk-form>
     </nk-def-card>
 </template>

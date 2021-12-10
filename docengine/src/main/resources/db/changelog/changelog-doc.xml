@@ -405,7 +405,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet id="NK_DOC_I_BILL-01" author="bean" context="default">
+    <changeSet id="NK_DOC_I_BILL-03" author="bean" context="default">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="NK_DOC_I_BILL" />
@@ -413,7 +413,7 @@
         </preConditions>
         <comment />
         <createTable tableName="NK_DOC_I_BILL" remarks="">
-            <column name="DOC_ID" type="${type.desc}" remarks="单据ID" >
+            <column name="DOC_ID" type="${type.uuid}" remarks="单据ID" >
                 <constraints primaryKey="true" />
             </column>
             <column name="BILL_TYPE" type="${type.desc}" remarks="账单类型" >
@@ -426,8 +426,52 @@
             <column name="AMOUNT" type="${type.curr}" remarks="" />
             <column name="RECEIVED" type="${type.curr}" remarks="" />
             <column name="RECEIVABLE" type="${type.curr}" remarks="" />
+            <column name="DETAILS" type="${type.clob}" remarks="" />
             <column name="STATE" type="${type.int}" remarks="0 未激活 1 激活" />
             <column name="DISCARD" type="${type.int}" remarks="0 正常 1 过期的、失效的" />
+            <column name="UPDATED_TIME" type="${type.long}" remarks="" />
+        </createTable>
+    </changeSet>
+
+    <changeSet id="NK_DOC_I_BILL-04" author="bean" context="default">
+        <preConditions>
+            <not>
+                <columnExists tableName="NK_DOC_I_BILL" columnName="DETAILS" />
+            </not>
+        </preConditions>
+        <addColumn tableName="NK_DOC_I_BILL">
+            <column name="DETAILS" type="${type.clob}" remarks="" afterColumn="STATE" />
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="NK_DOC_I_RECEIVED-02" author="bean" context="default">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="NK_DOC_I_RECEIVED" />
+            </not>
+        </preConditions>
+        <comment />
+        <createTable tableName="NK_DOC_I_RECEIVED" remarks="">
+            <column name="DOC_ID" type="${type.uuid}" remarks="单据ID" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="TARGET_DOC_ID" type="${type.uuid}" remarks="账单类型" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="BILL_TYPE" type="${type.desc}" remarks="账单类型" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="EXPIRE_DATE" type="${type.long}" remarks="到期日期" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="DOC_NUMBER" type="${type.desc}" remarks="" />
+            <column name="AMOUNT" type="${type.curr}" remarks="" />
+            <column name="RECEIVED" type="${type.curr}" remarks="" />
+            <column name="RECEIVABLE" type="${type.curr}" remarks="" />
+            <column name="CURR_RECEIVED" type="${type.curr}" remarks="" />
+            <column name="STATE" type="${type.int}" remarks="0 未激活 1 激活" />
+            <column name="ACCOUNT_DATE" type="${type.long}" remarks="" />
+            <column name="CREATED_TIME" type="${type.long}" remarks="" />
             <column name="UPDATED_TIME" type="${type.long}" remarks="" />
         </createTable>
     </changeSet>

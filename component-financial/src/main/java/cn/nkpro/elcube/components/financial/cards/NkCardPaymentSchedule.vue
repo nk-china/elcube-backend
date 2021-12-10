@@ -24,7 +24,7 @@
                 show-overflow="tooltip"
                 size="mini"
                 border=inner
-                :data="data"
+                :data="list"
                 :edit-config="{trigger: 'click', mode: 'row', showIcon: editMode, showStatus: true}">
             <vxe-column field="period"      width="8%"  title="期次"></vxe-column>
             <vxe-column field="expireDate"  width="12%" title="到期" formatter="nkDatetime"></vxe-column>
@@ -35,6 +35,14 @@
             <vxe-column field="residual"    width="17%" align="right" title="剩余金额" formatter="nkCurrency"></vxe-column>
             <vxe-column field="remark"      width="10%" title="备注"></vxe-column>
         </vxe-table>
+        <vxe-pager
+                size="mini"
+                :current-page="page.page"
+                :page-size="page.size"
+                :total="data.length"
+                :layouts="['PrevPage', 'JumpNumber', 'NextPage', 'Sizes', 'Total']"
+                @page-change="handlePageChange">
+        </vxe-pager>
     </nk-card>
 </template>
 
@@ -42,6 +50,28 @@
     import Mixin from "Mixin";
     export default {
         mixins:[new Mixin({})],
+        data(){
+            return {
+                page:{
+                    page:1,
+                    size:15,
+                }
+            }
+        },
+        computed:{
+            list(){
+                return this.data.slice(
+                    (this.page.page - 1) * this.page.size,
+                    this.page.page      * this.page.size
+                )
+            }
+        },
+        methods:{
+            handlePageChange({ currentPage, pageSize }){
+                this.page.page = currentPage;
+                this.page.size = pageSize;
+            }
+        }
     }
 </script>
 

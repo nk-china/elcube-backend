@@ -49,6 +49,7 @@
 		<table tableName="nk_doc_i"		 					enableDeleteByExample="false" domainObjectName="DocI"/>
 		<table tableName="nk_doc_i_index"		 			enableDeleteByExample="true"  domainObjectName="DocIIndex"/>
 		<table tableName="nk_doc_i_bill"		 			enableDeleteByExample="true"  domainObjectName="DocIBill"/>
+		<table tableName="nk_doc_i_received"		 		enableDeleteByExample="true"  domainObjectName="DocIReceived"/>
 		<table tableName="nk_doc_def_h"		 				enableDeleteByExample="false" domainObjectName="DocDefH"/>
 		<table tableName="nk_doc_def_i"		 				enableDeleteByExample="true"  domainObjectName="DocDefI"/>
 		<table tableName="nk_doc_def_state"				 	enableDeleteByExample="true"  domainObjectName="DocDefState"/>
