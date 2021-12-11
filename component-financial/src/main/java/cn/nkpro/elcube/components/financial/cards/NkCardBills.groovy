@@ -87,14 +87,49 @@ class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
         // 激活行项目
         data.forEach({i->i.state = active?1:0})
 
-        // 先删除，再增加
-        DocIBillExample example = new DocIBillExample()
-        example.createCriteria().andDocIdEqualTo(doc.getDocId())
-        billMapper.deleteByExample()
+        // 先对比再保存行项目
+        if(original){
 
-        data.forEach({i->
-            billMapper.insert(i)
-        })
+            data.forEach({i->
+
+                def exists = original.find {o->
+                    return o.expireDate == i.expireDate &&
+                            o.billType == i.billType
+                }
+
+                if(exists){
+                    if(!(exists.amount==i.amount&&
+                            exists.received==i.received&&
+                            exists.receivable==i.receivable&&
+                            exists.billPartnerId==i.billPartnerId&&
+                            exists.state==i.state&&
+                            exists.discard==i.discard&&
+                            exists.details==i.details&&
+                            exists.updatedTime==i.updatedTime
+                    )){
+                        i.updatedTime = DateTimeUtilz.nowSeconds()
+                        billMapper.updateByPrimaryKeySelective()
+                    }
+                }else{
+                    i.updatedTime = DateTimeUtilz.nowSeconds()
+                    billMapper.insert(i)
+                }
+            })
+
+            original.forEach({o->
+                def exists = data.find {i->
+                    return o.expireDate == i.expireDate &&
+                            o.billType == i.billType
+                }
+                if(!exists){
+                    billMapper.deleteByPrimaryKey(o)
+                }
+            })
+        }else{
+            data.forEach({i->
+                billMapper.insert(i)
+            })
+        }
 
         // 返回null，不使用docEngine保存数据
         return null
@@ -375,6 +410,7 @@ class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
         Double overdueBillRate
         List<String> overdueBillDefs
 
+        @SuppressWarnings("unused")
         String viewDefs
     }
 
