@@ -19,6 +19,7 @@ package cn.nkpro.elcube.platform;
 
 import cn.nkpro.elcube.co.NkComponentException;
 import cn.nkpro.elcube.exception.NkAccessDeniedException;
+import cn.nkpro.elcube.exception.NkDebugContextNotFoundException;
 import cn.nkpro.elcube.exception.NkDefineException;
 import cn.nkpro.elcube.exception.abstracts.NkCaution;
 import cn.nkpro.elcube.exception.abstracts.NkRuntimeException;
@@ -56,6 +57,10 @@ public class GlobalExceptionHandler {
         // 没有权限，拒绝访问
         codes.put(AccessDeniedException.class,403);
         codes.put(NkAccessDeniedException.class,403);
+
+
+        // 调试错误
+        codes.put(NkDebugContextNotFoundException.class,701);
 
         // 系统错误
         codes.put(NkComponentException.class,501);

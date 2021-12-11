@@ -19,6 +19,7 @@ package cn.nkpro.elcube.co;
 import cn.nkpro.elcube.annotation.Keep;
 import cn.nkpro.elcube.basic.Constants;
 import cn.nkpro.elcube.data.redis.RedisSupport;
+import cn.nkpro.elcube.exception.NkDebugContextNotFoundException;
 import cn.nkpro.elcube.exception.NkSystemException;
 import cn.nkpro.elcube.utils.GroovyUtils;
 import cn.nkpro.elcube.utils.OsUtils;
@@ -138,12 +139,12 @@ public class DebugContextManager implements ApplicationContextAware {
 
         // 如果上下文不存在 抛出错误
         if(debugContext==null){
-            throw new NkSystemException("当前调试上下文不存在");
+            throw new NkDebugContextNotFoundException("当前调试上下文不存在");
         }
 
         // 如果上下文的mac地址不一致 抛出错误
         if(!StringUtils.equals(OsUtils.getMacAddress(),debugContext.getMac())){
-            throw new NkSystemException("当前调试上下文与运行环境不一致");
+            throw new NkDebugContextNotFoundException("当前调试上下文与运行环境不一致");
         }
 
         // 检查Spring Application 是否已经启动，如果没有，则启动，并初始化debug对象
