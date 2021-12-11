@@ -35,6 +35,8 @@
                 show-overflow="tooltip"
                 size="mini"
                 border=inner
+                class="mytable-style"
+                :row-class-name="rowClassName"
                 :data="list"
                 :edit-config="{trigger: 'click', mode: 'row', showIcon: editMode, showStatus: true}">
             <vxe-column field="expireDate"  width="15%" title="到期日期" formatter="nkDatetime"></vxe-column>
@@ -50,7 +52,7 @@
             <vxe-column field="amount"      width="20%" align="right" title="账单金额" formatter="nkCurrency"></vxe-column>
             <vxe-column field="received"    width="20%" align="right" title="已收金额" formatter="nkCurrency"></vxe-column>
             <vxe-column field="receivable"  width="20%" align="right" title="应收金额" formatter="nkCurrency"></vxe-column>
-            <vxe-column field="state"       title="状态" :formatter="formatState"></vxe-column>
+            <vxe-column field="state"       title="状态" :formatter="formatState" class-name="state"></vxe-column>
         </vxe-table>
         <vxe-pager
                 size="mini"
@@ -92,6 +94,9 @@
 
 <script>
     import Mixin from "Mixin";
+    import moment from "moment";
+
+    const today = moment(0, "HH").unix();
 
     export default {
         mixins:[new Mixin({})],
@@ -138,8 +143,12 @@
         },
         methods:{
             formatState({row}){
-                if(row.state===1)
+                if(row.state===1){
+                    if(row.expireDate<today && row.receivable){
+                        return '逾期';
+                    }
                     return "激活";
+                }
                 return "未激活";
             },
             handlePageChange({ currentPage, pageSize }){
@@ -164,11 +173,22 @@
                             this.detailsVisible = true;
                         })
                 }
+            },
+            rowClassName ({ row }) {
+                if(row.expireDate<today && row.receivable){
+                    return 'overdue';
+                }
             }
         }
     }
 </script>
 
-<style scoped>
+<style scoped lang="less">
+    ::v-deep.mytable-style .overdue {
+        background-color: #fffbe6;
 
+        .state{
+            color: #f5222d;
+        }
+    }
 </style>
