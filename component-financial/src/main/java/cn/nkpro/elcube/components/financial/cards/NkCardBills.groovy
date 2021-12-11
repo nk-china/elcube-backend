@@ -108,7 +108,7 @@ class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
                             exists.updatedTime==i.updatedTime
                     )){
                         i.updatedTime = DateTimeUtilz.nowSeconds()
-                        billMapper.updateByPrimaryKeySelective()
+                        billMapper.updateByPrimaryKeySelective(i)
                     }
                 }else{
                     i.updatedTime = DateTimeUtilz.nowSeconds()
@@ -215,7 +215,7 @@ class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
             })
         }
 
-        calcOverdue(doc, data, d, null, DateTimeUtilz.todaySeconds() + 60*60*24*90)
+        calcOverdue(doc, data, d, null, null)
 
         data.sort({ a, b -> (a.expireDate <=> b.expireDate) })
     }
