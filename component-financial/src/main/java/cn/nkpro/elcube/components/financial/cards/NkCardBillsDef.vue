@@ -38,6 +38,10 @@
                 {{def.overdueBillDefs}}
                 <a-select slot="edit" size="small" mode="tags" v-model="def.overdueBillDefs"></a-select>
             </nk-form-item>
+            <nk-form-item title="账单视图">
+                <nk-sp-el-view :el="def.viewDefs"></nk-sp-el-view>
+                <nk-sp-el-template-editor slot="edit" v-model="def.viewDefs"></nk-sp-el-template-editor>
+            </nk-form-item>
         </nk-form>
     </nk-def-card>
 </template>

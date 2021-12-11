@@ -13,6 +13,17 @@
 -->
 <template>
     <nk-card>
+
+        <a-button-group v-if="views" style="margin-bottom: 16px;">
+            <a-button v-for="view in views"
+                      size="small"
+                      :key="view.name"
+                      :type="selected === view ? 'primary' : 'dashed'"
+                      @click="switchView(view)">
+                {{view.name}}
+            </a-button>
+        </a-button-group>
+
         <vxe-table
                 ref="xTable"
                 row-key
@@ -45,7 +56,7 @@
                 size="mini"
                 :current-page="page.page"
                 :page-size="page.size"
-                :total="data.length"
+                :total="viewData.length"
                 :layouts="['PrevPage', 'JumpNumber', 'NextPage', 'Sizes', 'Total']"
                 @page-change="handlePageChange">
         </vxe-pager>
@@ -91,12 +102,31 @@
                     size:15,
                 },
                 details: undefined,
-                detailsVisible: false
+                detailsVisible: false,
+
+                selectedView: undefined
             }
         },
         computed:{
+            views(){
+                if(this.def.viewDefs){
+                    return JSON.parse(this.def.viewDefs)
+                }
+            },
+            selected(){
+                return this.selectedView || this.views[0];
+            },
+            viewData(){
+                if(this.selected && this.selected.includes){
+                    return this.data.filter(i=>{
+                        return this.selected.includes.indexOf(i.billType)>-1
+                    });
+                }
+                return this.data;
+            },
             list(){
-                return this.data.slice(
+
+                return this.viewData.slice(
                     (this.page.page - 1) * this.page.size,
                      this.page.page      * this.page.size
                 )
@@ -115,6 +145,10 @@
             handlePageChange({ currentPage, pageSize }){
                 this.page.page = currentPage;
                 this.page.size = pageSize;
+            },
+            switchView(view){
+                this.selectedView = view;
+                this.page.page = 1;
             },
             openDetail(row){
                 if(row.details){

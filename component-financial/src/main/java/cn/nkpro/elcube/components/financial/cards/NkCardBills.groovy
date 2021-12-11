@@ -374,6 +374,8 @@ class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
         String overdueBillType
         Double overdueBillRate
         List<String> overdueBillDefs
+
+        String viewDefs
     }
 
     @SuppressWarnings("unused")
