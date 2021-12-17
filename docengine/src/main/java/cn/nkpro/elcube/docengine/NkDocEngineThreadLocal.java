@@ -47,7 +47,11 @@ public class NkDocEngineThreadLocal {
             return function.apply(docId);
         }
         if(!docMap.containsKey(docId)){
-            docMap.put(docId,function.apply(docId));
+            DocHV docHV = function.apply(docId);
+            if(docHV!=null){
+                docMap.put(docId,docHV);
+            }
+            return docHV;
         }
         return docMap.get(docId);
     }
