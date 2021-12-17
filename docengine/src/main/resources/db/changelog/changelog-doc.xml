@@ -434,7 +434,7 @@
     </changeSet>
 
     <changeSet id="NK_DOC_I_BILL-04" author="bean" context="default">
-        <preConditions>
+        <preConditions onFail="MARK_RAN">
             <not>
                 <columnExists tableName="NK_DOC_I_BILL" columnName="DETAILS" />
             </not>
