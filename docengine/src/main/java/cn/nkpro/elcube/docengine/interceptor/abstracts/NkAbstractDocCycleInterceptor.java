@@ -18,8 +18,12 @@ package cn.nkpro.elcube.docengine.interceptor.abstracts;
 
 import cn.nkpro.elcube.co.NkAbstractCustomScriptObject;
 import cn.nkpro.elcube.docengine.interceptor.NkDocCycleInterceptor;
+import cn.nkpro.elcube.docengine.model.DocHV;
+import cn.nkpro.elcube.docengine.model.event.AbstractDocCycleEvent;
 
 public abstract class NkAbstractDocCycleInterceptor
         extends NkAbstractCustomScriptObject
         implements NkDocCycleInterceptor {
+    @Override
+    public void apply(DocHV doc, AbstractDocCycleEvent event) {}
 }
