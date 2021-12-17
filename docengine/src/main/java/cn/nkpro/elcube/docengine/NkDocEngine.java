@@ -22,8 +22,23 @@ import org.springframework.transaction.annotation.Transactional;
 
 public interface NkDocEngine {
 
+    /**
+     * 根据单据ID获取一个单据
+     * @param docId docId
+     * @return DocHV
+     */
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     DocHV detail(String docId);
+
+    /**
+     * 根据单据类型和单据业务主键获取一个单据
+     * @param docType docType
+     * @param businessKey businessKey
+     * @see #detail(String) 
+     * @return DocHV
+     */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    DocHV detail(String docType, String businessKey);
 
     @Transactional(propagation = Propagation.REQUIRED)
     DocHV create(String docType, String preDocId, String optSource, Function function);

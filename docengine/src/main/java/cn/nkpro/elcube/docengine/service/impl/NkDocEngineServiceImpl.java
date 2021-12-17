@@ -185,6 +185,21 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
         }
     }
 
+    @Override
+    public DocHV detail(String docType, String businessKey) {
+
+        DocHExample example = new DocHExample();
+        example.createCriteria()
+                .andDocTypeEqualTo(docType)
+                .andBusinessKeyEqualTo(businessKey);
+
+        return docHMapper.selectByExample(example, new RowBounds(0, 1))
+                .stream()
+                .findFirst()
+                .map(DocH::getDocId)
+                .map(this::detail)
+                .orElse(null);
+    }
 
     /**
      *
