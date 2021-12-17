@@ -77,7 +77,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
     @Transactional(propagation = Propagation.REQUIRED)
     public DocHV create(String docType, String preDocId, String optSource, Function function) {
 
-        DocHV docHV = createForView(docType, preDocId);
+        DocHV docHV = createDocHV(docType, preDocId);
 
         function.apply(docHV);
 
@@ -95,6 +95,14 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
 
         docPermService.assertHasDocPerm(NkDocPermService.MODE_WRITE, docType);
 
+        DocHV docHV = createDocHV(docType, preDocId);
+
+        docHV.setRuntimeKey("runtime:"+ docHV.getDocId()+":"+UUID.randomUUID().toString());
+
+        return docToView(docHV);
+    }
+
+    private DocHV createDocHV(String docType, String preDocId){
         // 获取前序单据
         DocHV preDoc = StringUtils.isBlank(preDocId) || StringUtils.equalsIgnoreCase(preDocId,"@") ? null : detail(preDocId);
 
@@ -108,10 +116,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
         NkDocProcessor processor = customObjectManager.getCustomObject(def.getRefObjectType(), NkDocProcessor.class);
 
         // 创建单据
-        DocHV docHV = processor.toCreate(def, preDoc);
-        docHV.setRuntimeKey("runtime:"+ docHV.getDocId()+":"+UUID.randomUUID().toString());
-
-        return docToView(docHV);
+        return processor.toCreate(def, preDoc);
     }
 
 
