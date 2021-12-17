@@ -36,6 +36,7 @@
         <module>component-financial</module>
 
         <module>application</module>
+        <module>mybatis-generator-plugin</module>
     </modules>
 
     <build>
