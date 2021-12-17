@@ -34,7 +34,7 @@ public interface NkDocEngine {
      * 根据单据类型和单据业务主键获取一个单据
      * @param docType docType
      * @param businessKey businessKey
-     * @see #detail(String) 
+     * @see #detail(String)
      * @return DocHV
      */
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
