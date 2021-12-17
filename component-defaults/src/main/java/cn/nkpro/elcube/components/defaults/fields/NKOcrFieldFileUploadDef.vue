@@ -29,7 +29,7 @@
                 {{value.maxSize}}
                 <a-input-number size="small" slot="edit" v-model="value.maxSize" :max="1024*10"></a-input-number>
             </nk-form-item>
-            <nk-form-item title="数据源">
+            <nk-form-item title="执行ocr表达式">
                 {{value.method}}
                 <a-input  slot="edit" v-model="value.method" ></a-input>
             </nk-form-item>
