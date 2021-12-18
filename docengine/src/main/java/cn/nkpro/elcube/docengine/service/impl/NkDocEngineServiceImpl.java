@@ -37,6 +37,7 @@ import cn.nkpro.elcube.utils.BeanUtilz;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.IllegalTransactionStateException;
 import org.springframework.transaction.annotation.Propagation;
@@ -53,6 +54,8 @@ import java.util.UUID;
 @Service
 public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDocEngineFrontService {
 
+    @Autowired
+    private NkDocFinder docFinder;
 
     /**
      * 从数据库表中分页查询单据列表
@@ -204,6 +207,11 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
                 .map(DocH::getDocId)
                 .map(this::detail)
                 .orElse(null);
+    }
+
+    @Override
+    public NkDocFinder find(String... docType) {
+        return docFinder.createFinder(docType);
     }
 
     /**

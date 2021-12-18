@@ -18,6 +18,9 @@ package docengine;
 
 import cn.nkpro.elcube.ELCubeApplication;
 import cn.nkpro.elcube.data.redis.RedisSupport;
+import cn.nkpro.elcube.docengine.NkDocEngine;
+import cn.nkpro.elcube.docengine.gen.DocH;
+import com.alibaba.fastjson.JSON;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,10 +34,20 @@ import org.springframework.test.context.junit4.SpringRunner;
 @SpringBootTest(classes={ELCubeApplication.class})
 public class DocEngineTest {
     @Autowired
-    private RedisSupport<String> redisSupport;
+    private NkDocEngine docEngine;
 
     @Test
     public void test1() throws Exception {
 
+        DocH docH = docEngine.find("BR03","BR04")
+                .dynamicBetween("payment_keyword", 1, 3)
+                .dynamicEquals("createdTime_keyword", 1639207678)
+                .dynamicIn("payment_keyword", 1,2,3,4,5)
+                .dynamicExists("payment_keyword")
+                .dynamicNotExists("payment_keyword1")
+                .orderByDesc("DOC_ID")
+                .singleResult();
+
+        System.out.println(JSON.toJSONString(docH));
     }
 }

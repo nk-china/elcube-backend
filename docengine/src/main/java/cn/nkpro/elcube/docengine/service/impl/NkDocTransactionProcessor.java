@@ -59,6 +59,7 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
 
 @Order(0)
 @Slf4j
@@ -440,72 +441,83 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         if(log.isInfoEnabled())log.info("保存单据内容 计算动态索引字段");
         EvaluationContext context = spELManager.createContext(atomic.get());
 
-        //DocIIndexExample example = new DocIIndexExample();
-        //example.createCriteria().andDocIdEqualTo(atomic.get().getDocId());
-        //docIIndexMapper.deleteByExample(example);
-
-        if(MapUtils.isNotEmpty(doc.getDynamics())){
-            doc.getDynamics().forEach((name,value)->{
-                if(value!=null){
-                    int i = name.lastIndexOf("_");
-
-                    if(i==-1||i==name.length()-1){
-                        throw new NkDefineException("索引名不合法");
-                    }
-
-                    DocIIndex index = new DocIIndex();
-                    index.setDocId(atomic.get().getDocId());
-                    index.setName(name);
-                    index.setValue(JSON.toJSONString(value));
-                    index.setDataType(name.substring(i+1));
-                    index.setOrderBy(doc.getDynamics().size());
-                    index.setUpdatedTime(DateTimeUtilz.nowSeconds());
-
-                    if(optionalOriginal.isPresent()&&original.getDynamics().containsKey(name)){
-                        docIIndexMapper.updateByPrimaryKey(index);
-                    }else{
-                        docIIndexMapper.insert(index);
-                    }
-                }
-            });
-        }
+        DocIIndexExample example = new DocIIndexExample();
+        example.createCriteria().andDocIdEqualTo(atomic.get().getDocId());
+        docIIndexMapper.deleteByExample(example);
+        //
+        //if(MapUtils.isNotEmpty(doc.getDynamics())){
+        //    doc.getDynamics().forEach((name,value)->{
+        //        if(value!=null){
+        //            int i = name.lastIndexOf("_");
+        //
+        //            if(i==-1||i==name.length()-1){
+        //                throw new NkDefineException("索引名不合法");
+        //            }
+        //
+        //            DocIIndex index = new DocIIndex();
+        //            index.setDocId(atomic.get().getDocId());
+        //            index.setName(name);
+        //            index.setValue(JSON.toJSONString(value));
+        //            index.setDataType(name.substring(i+1));
+        //            index.setOrderBy(doc.getDynamics().size());
+        //            index.setUpdatedTime(DateTimeUtilz.nowSeconds());
+        //
+        //            if(optionalOriginal.isPresent()&&original.getDynamics().containsKey(name)){
+        //                docIIndexMapper.updateByPrimaryKey(index);
+        //            }else{
+        //                docIIndexMapper.insert(index);
+        //            }
+        //        }
+        //    });
+        //}
         if(atomic.get().getDef().getIndexRules()!=null)
             atomic.get().getDef()
                 .getIndexRules()
                 .forEach(rule->{
                     String name = String.format("%s_%s",rule.getIndexName(),rule.getIndexType());
                     Object value = spELManager.invoke(rule.getRuleSpEL(),context);
-                    String type = value==null?Void.class.getName():value.getClass().getName();
-                    atomic.get().getDynamics().put(
-                            name,
-                            spELManager.invoke(rule.getRuleSpEL(),context)
-                    );
 
-                    DocIIndex index = new DocIIndex();
-                    index.setDocId(atomic.get().getDocId());
-                    index.setName(name);
-                    index.setValue(JSON.toJSONString(value));
-                    index.setDataType(type);
-                    index.setOrderBy(doc.getDynamics().size()+rule.getOrderBy());
-                    index.setUpdatedTime(DateTimeUtilz.nowSeconds());
-
-                    if(optionalOriginal.isPresent()&&original.getDynamics().containsKey(name)){
-                        docIIndexMapper.updateByPrimaryKey(index);
+                    List<Object> list = new ArrayList<>();
+                    if(value == null){
+                        list.add(null);
+                    }else if(value instanceof List){
+                        list.addAll((List) value);
+                    }else if(value.getClass().isArray()){
+                        list.addAll(Arrays.asList((Object[])value));
                     }else{
-                        docIIndexMapper.insert(index);
+                        list.add(value);
                     }
+
+                    atomic.get().getDynamics().put(name,value);
+
+                    list.forEach(item->{
+
+                        String type = item==null?Void.class.getName():item.getClass().getName();
+
+                        DocIIndex index = new DocIIndex();
+                        index.setDocId(atomic.get().getDocId());
+                        index.setName(name);
+                        index.setSeq(list.indexOf(item));
+                        index.setValue(JSON.toJSONString(item));
+                        index.setDataType(type);
+                        index.setOrderBy(doc.getDynamics().size()+rule.getOrderBy());
+                        index.setUpdatedTime(DateTimeUtilz.nowSeconds());
+
+                        docIIndexMapper.insert(index);
+
+                    });
                 });
 
 
         // 删除已过时的索引
-        optionalOriginal.ifPresent(o -> o.getDynamics().forEach((k, v) -> {
-            if (!atomic.get().getDynamics().containsKey(k)) {
-                DocIIndexKey key = new DocIIndexKey();
-                key.setDocId(atomic.get().getDocId());
-                key.setName(k);
-                docIIndexMapper.deleteByPrimaryKey(key);
-            }
-        }));
+        //optionalOriginal.ifPresent(o -> o.getDynamics().forEach((k, v) -> {
+        //    if (!atomic.get().getDynamics().containsKey(k)) {
+        //        DocIIndexKey key = new DocIIndexKey();
+        //        key.setDocId(atomic.get().getDocId());
+        //        key.setName(k);
+        //        docIIndexMapper.deleteByPrimaryKey(key);
+        //    }
+        //}));
 
         // 业务主键
         atomic.get().setBusinessKey(StringUtils.EMPTY);

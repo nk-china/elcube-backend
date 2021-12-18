@@ -22,6 +22,7 @@ import cn.nkpro.elcube.annotation.Keep;
  * @author badqiu
  */
 @Keep
+@SuppressWarnings("unused")
 public class OracleDialect extends Dialect{
 	
 	public boolean supportsLimit() {
@@ -40,7 +41,7 @@ public class OracleDialect extends Dialect{
 			isForUpdate = true;
 		}
 		
-		StringBuffer pagingSelect = new StringBuffer( sql.length()+100 );
+		StringBuilder pagingSelect = new StringBuilder( sql.length()+100 );
 		if (offset > 0) {
 			pagingSelect.append("select * from ( select row_.*, rownum rownum_ from ( ");
 		}
@@ -51,10 +52,10 @@ public class OracleDialect extends Dialect{
 		if (offset > 0) {
 //			int end = offset+limit;
 			String endString = offsetPlaceholder+"+"+limitPlaceholder;
-			pagingSelect.append(" ) row_ ) where rownum_ <= " + endString + " and rownum_ > " + offsetPlaceholder);
+			pagingSelect.append(" ) row_ ) where rownum_ <= ").append(endString).append(" and rownum_ > ").append(offsetPlaceholder);
 		}
 		else {
-			pagingSelect.append(" ) where rownum <= " + limitPlaceholder);
+			pagingSelect.append(" ) where rownum <= ").append(limitPlaceholder);
 		}
 
 		if ( isForUpdate ) {

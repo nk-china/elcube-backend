@@ -17,6 +17,7 @@
 package cn.nkpro.elcube.docengine;
 
 import cn.nkpro.elcube.docengine.model.DocHV;
+import cn.nkpro.elcube.docengine.service.impl.NkDocFinder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,6 +40,9 @@ public interface NkDocEngine {
      */
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     DocHV detail(String docType, String businessKey);
+
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    NkDocFinder find(String... docType);
 
     @Transactional(propagation = Propagation.REQUIRED)
     DocHV create(String docType, String preDocId, String optSource, Function function);

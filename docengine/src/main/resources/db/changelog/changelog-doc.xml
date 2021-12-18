@@ -384,7 +384,7 @@
         </createTable>
     </changeSet>
 
-    <changeSet id="NK_DOC_I_INDEX-01" author="bean" context="default">
+    <changeSet id="NK_DOC_I_INDEX-02" author="bean" context="default">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="NK_DOC_I_INDEX" />
@@ -396,6 +396,9 @@
                 <constraints primaryKey="true" />
             </column>
             <column name="NAME" type="${type.desc}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="SEQ" type="${type.int}" remarks="" >
                 <constraints primaryKey="true" />
             </column>
             <column name="VALUE" type="${type.uuid}" remarks="" />

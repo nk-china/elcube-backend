@@ -140,13 +140,34 @@ class AbstractNkDocEngine {
                 .andDocIdEqualTo(docId);
         iIndexExample.setOrderByClause("ORDER_BY");
 
-        docIIndexMapper.selectByExample(iIndexExample).forEach(docIIndex -> {
-            try {
-                doc.getDynamics().put(docIIndex.getName(), JSON.parseObject(docIIndex.getValue(),Class.forName(docIIndex.getDataType())));
-            } catch (ClassNotFoundException ex) {
-                doc.getDynamics().put(docIIndex.getName(),null);
+        Map<String,List<Object>> dynamics = new HashMap<>();
+        docIIndexMapper.selectByExample(iIndexExample)
+                .forEach(docIIndex ->
+                    dynamics.compute(docIIndex.getName(),(key,value)->{
+                        if(value==null)
+                            value = new ArrayList<>();
+                        try {
+                            value.add(JSON.parseObject(docIIndex.getValue(),Class.forName(docIIndex.getDataType())));
+                        } catch (ClassNotFoundException ignored) {
+                        }
+                        return value;
+                    })
+                );
+        dynamics.forEach((k,v)->{
+            if(v.size()>1){
+                doc.getDynamics().put(k,v);
+            }else{
+                doc.getDynamics().put(k,v.get(0));
             }
         });
+
+//        docIIndexMapper.selectByExample(iIndexExample).forEach(docIIndex -> {
+//            try {
+//                doc.getDynamics().put(docIIndex.getName(), JSON.parseObject(docIIndex.getValue(),Class.forName(docIIndex.getDataType())));
+//            } catch (ClassNotFoundException ex) {
+//                doc.getDynamics().put(docIIndex.getName(),null);
+//            }
+//        });
 
         return doc;
     }
