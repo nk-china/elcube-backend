@@ -42,8 +42,8 @@ public class NkDocFinder implements InitializingBean {
     NkDocFinder createFinder(String... value){
         Assert.notEmpty(value);
 
+        args.set(new ArrayList<>());
         where.set(new ArrayList<>());
-         args.set(new ArrayList<>());
         order.set(new ArrayList<>());
 
         if(value.length==1){
@@ -390,14 +390,32 @@ public class NkDocFinder implements InitializingBean {
     };
 
     public List<DocH> listResult(int offset, int limit){
-        return jdbcTemplate.query(build(offset, limit), args.get().toArray(), rowMapper);
+        try{
+            return jdbcTemplate.query(build(offset, limit), args.get().toArray(), rowMapper);
+        }finally {
+            args.remove();
+            where.remove();
+            order.remove();
+        }
     }
 
     public List<DocH> listResult(){
-        return jdbcTemplate.query(build(null,null), args.get().toArray(), rowMapper);
+        try{
+            return jdbcTemplate.query(build(null,null), args.get().toArray(), rowMapper);
+        }finally {
+            args.remove();
+            where.remove();
+            order.remove();
+        }
     }
 
     public DocH singleResult(){
-        return jdbcTemplate.queryForObject(build(0,1), args.get().toArray(), rowMapper);
+        try{
+            return jdbcTemplate.queryForObject(build(0,1), args.get().toArray(), rowMapper);
+        }finally {
+            args.remove();
+            where.remove();
+            order.remove();
+        }
     }
 }

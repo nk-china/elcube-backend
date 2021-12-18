@@ -41,6 +41,11 @@ public interface NkDocEngine {
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     DocHV detail(String docType, String businessKey);
 
+    /**
+     * 构建一个查询器，通过索引字段检索单据
+     * @param docType 查询的单据类型
+     * @return NkDocFinder
+     */
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     NkDocFinder find(String... docType);
 
