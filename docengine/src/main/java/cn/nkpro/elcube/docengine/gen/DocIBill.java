@@ -7,13 +7,6 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DocIBill extends DocIBillKey implements Serializable {
-    /**
-     * 相关方、付款方
-     *
-     * @mbggenerated
-     */
-    private String billPartnerId;
-
     private Double amount;
 
     private Double received;
@@ -45,29 +38,6 @@ public class DocIBill extends DocIBillKey implements Serializable {
      * @mbggenerated
      */
     private static final long serialVersionUID = 1L;
-
-    /**
-     * 获取 相关方、付款方
-     *
-     * @return 相关方、付款方
-     *
-     * @mbggenerated
-     */
-    @cn.nkpro.elcube.annotation.CodeFieldNotes("相关方、付款方")
-    public String getBillPartnerId() {
-        return billPartnerId;
-    }
-
-    /**
-     * 设置 相关方、付款方
-     *
-     * @return 相关方、付款方
-     *
-     * @mbggenerated
-     */
-    public void setBillPartnerId(String billPartnerId) {
-        this.billPartnerId = billPartnerId;
-    }
 
     @cn.nkpro.elcube.annotation.CodeFieldNotes("")
     public Double getAmount() {

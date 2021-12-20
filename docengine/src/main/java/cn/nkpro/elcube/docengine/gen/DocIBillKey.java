@@ -3,7 +3,16 @@ package cn.nkpro.elcube.docengine.gen;
 import java.io.Serializable;
 
 public class DocIBillKey implements Serializable {
+    /**
+     * 相关方、付款方
+     *
+     * @mbggenerated
+     */
+    private String billPartnerId;
+
     private String billType;
+
+    private String cardKey;
 
     private String docId;
 
@@ -17,6 +26,29 @@ public class DocIBillKey implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
+    /**
+     * 获取 相关方、付款方
+     *
+     * @return 相关方、付款方
+     *
+     * @mbggenerated
+     */
+    @cn.nkpro.elcube.annotation.CodeFieldNotes("相关方、付款方")
+    public String getBillPartnerId() {
+        return billPartnerId;
+    }
+
+    /**
+     * 设置 相关方、付款方
+     *
+     * @return 相关方、付款方
+     *
+     * @mbggenerated
+     */
+    public void setBillPartnerId(String billPartnerId) {
+        this.billPartnerId = billPartnerId;
+    }
+
     @cn.nkpro.elcube.annotation.CodeFieldNotes("")
     public String getBillType() {
         return billType;
@@ -24,6 +56,15 @@ public class DocIBillKey implements Serializable {
 
     public void setBillType(String billType) {
         this.billType = billType;
+    }
+
+    @cn.nkpro.elcube.annotation.CodeFieldNotes("")
+    public String getCardKey() {
+        return cardKey;
+    }
+
+    public void setCardKey(String cardKey) {
+        this.cardKey = cardKey;
     }
 
     @cn.nkpro.elcube.annotation.CodeFieldNotes("")

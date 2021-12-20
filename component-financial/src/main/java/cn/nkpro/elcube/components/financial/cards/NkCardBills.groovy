@@ -49,15 +49,16 @@ class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
     @Autowired
     private DocIReceivedMapper receivedMapper
 
+
     @Override
     List<DocIBill> afterCreate(DocHV doc, DocHV preDoc, List<DocIBill> data, DocDefIV defIV, BillDef d) {
-        apply(doc, data, d)
+        apply(doc, defIV, data, d)
         return super.afterCreate(doc, preDoc, data, defIV, d) as List
     }
 
     @Override
     List<DocIBill> calculate(DocHV doc, List<DocIBill> data, DocDefIV defIV, BillDef d, boolean isTrigger, Object options) {
-        apply(doc, data, d)
+        apply(doc, defIV, data, d)
         return super.calculate(doc, data, defIV, d, isTrigger, options) as List<DocIBill>
     }
 
@@ -94,7 +95,8 @@ class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
 
                 def exists = original.find {o->
                     return o.expireDate == i.expireDate &&
-                            o.billType == i.billType
+                            o.billType == i.billType &&
+                            o.cardKey == i.cardKey
                 }
 
                 if(exists){
@@ -119,7 +121,8 @@ class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
             original.forEach({o->
                 def exists = data.find {i->
                     return o.expireDate == i.expireDate &&
-                            o.billType == i.billType
+                            o.billType == i.billType &&
+                            o.cardKey == i.cardKey
                 }
                 if(!exists){
                     billMapper.deleteByPrimaryKey(o)
@@ -142,6 +145,7 @@ class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
 
         DocIBillKey key = new DocIBillKey()
         key.setDocId(doc.getDocId())
+        key.setCardKey(defIV.getCardKey())
         key.setBillType(single.get("billType"))
         key.setExpireDate(single.get("expireDate"))
 
@@ -153,7 +157,7 @@ class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
      * @param data
      * @param d
      */
-    void apply(DocHV doc, List<DocIBill> data, BillDef d){
+    void apply(DocHV doc, DocDefIV defIV, List<DocIBill> data, BillDef d){
 
         def context = spELManager.createContext(doc)
 
@@ -168,7 +172,7 @@ class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
                 if(i instanceof List){
                     i.forEach({ii->
                         def single = EasySingle.from(ii)
-                        appendBill(doc,data,
+                        appendBill(doc, defIV,data,
                                 single.get("billType"),
                                 single.get("expireDate"),
                                 single.get("amount")
@@ -176,7 +180,7 @@ class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
                     })
                 }else{
                     def single = EasySingle.from(i)
-                    appendBill(doc,data,
+                    appendBill(doc, defIV,data,
                             single.get("billType"),
                             single.get("expireDate"),
                             single.get("amount")
@@ -195,9 +199,9 @@ class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
                 coll.forEach({ single ->
 
                     Long expireDate = single.get("expireDate")
-                    appendBill(doc, data, "本金", expireDate, single.get("principal"))
-                    appendBill(doc, data, "利息", expireDate, single.get("interest"))
-                    appendBill(doc, data, "费用", expireDate, single.get("fee"))
+                    appendBill(doc, defIV, data, "本金", expireDate, single.get("principal"))
+                    appendBill(doc, defIV, data, "利息", expireDate, single.get("interest"))
+                    appendBill(doc, defIV, data, "费用", expireDate, single.get("fee"))
                 })
             }
 
@@ -215,7 +219,7 @@ class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
             })
         }
 
-        calcOverdue(doc, data, d, null, null)
+        calcOverdue(doc, defIV, data, d, null, null)
 
         data.sort({ a, b -> (a.expireDate <=> b.expireDate) })
     }
@@ -234,7 +238,7 @@ class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
      * @param startDate 计算日期（即重算开始日期）默认为需要计算滞纳金的第一条应收日期
      * @param endDate   截止日期（一般为系统日期today）默认为系统日期
      */
-    void calcOverdue(DocHV doc, List<DocIBill> data, BillDef d, Long startDate, Long endDate){
+    void calcOverdue(DocHV doc, DocDefIV defIV, List<DocIBill> data, BillDef d, Long startDate, Long endDate){
 
         if(data.size() == 0 || d.overdueBillDefs==null || d.overdueBillDefs.size() == 0)
             return
@@ -340,7 +344,7 @@ class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
             log.info("-{}: overdue fine = {}",formattedDate,subtotal)
 
             // 添加一个账单项目
-            DocIBill overdueBill = appendBill(doc, data, d.overdueBillType, startDate, subtotal)
+            DocIBill overdueBill = appendBill(doc, defIV, data, d.overdueBillType, startDate, subtotal)
 
             if(overdueBill){
                 overdueBill.setDetails(JSON.toJSONString(details))
@@ -372,7 +376,7 @@ class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
      * @param expireDate
      * @param amount
      */
-    static DocIBill appendBill(DocHV doc, List<DocIBill> data, String billType, Long expireDate, Double amount){
+    static DocIBill appendBill(DocHV doc, DocDefIV defIV, List<DocIBill> data, String billType, Long expireDate, Double amount){
 
         DocIBill exists = data.stream()
                 .find {i->i.billType ==  billType && i.expireDate == expireDate} as DocIBill
@@ -384,6 +388,7 @@ class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
 
             exists = new DocIBill()
             exists.docId = doc.docId
+            exists.cardKey = defIV.cardKey
             exists.billType = billType
             exists.billPartnerId = doc.partnerId
             exists.expireDate = expireDate
