@@ -24,7 +24,7 @@ class NkCardAccount extends NkAbstractCard<Data,Map> {
 
         if(SecurityUtilz.hasAnyAuthority('*:*','SETTINGS:*','SETTINGS:AUTH')){
 
-            if(original.account != null && (data.account != original.account)){
+            if(original != null && (data.account != original.account)){
 
                 if(original.account){
                     def account = userAccountService.getAccount(original.account, false)
