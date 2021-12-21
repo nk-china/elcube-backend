@@ -41,8 +41,8 @@ class NkFieldPercent extends NkAbstractField implements NkDynamicFormField, NkDy
         def value = card.get(field.getKey())
 
         // 如果字段被指定来options，先校验value是否合法
-        if(field.getInputOptions().containsKey("options")){
-            JSONArray array = field.getInputOptions().get("options") as JSONArray
+        if(field.getInputOptions().containsKey("optionsObject")){
+            JSONArray array = field.getInputOptions().get("optionsObject") as JSONArray
             if(array){
                 def find = array.stream().find {i-> value==i}
                 if(!find){
@@ -50,6 +50,18 @@ class NkFieldPercent extends NkAbstractField implements NkDynamicFormField, NkDy
                     card.set(field.getKey(), value)
                 }
             }
+        }else if(field.getInputOptions().containsKey("options")){
+            // 因为 NkFieldSelect 等选项的表达式字段是options，为了避免切换以后导致options会变成字符串，所以需要捕获一下异常
+            try{
+                JSONArray array = field.getInputOptions().get("options") as JSONArray
+                if(array){
+                    def find = array.stream().find {i-> value==i}
+                    if(!find){
+                        value = array.size()>0?array[0]:null
+                        card.set(field.getKey(), value)
+                    }
+                }
+            }catch(Exception ignored){}
         }
         if(field.getInputOptions().containsKey("min")){
             def min = field.getInputOptions().get("min") as Double
