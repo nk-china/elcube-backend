@@ -256,7 +256,7 @@ ELCube Backend 为ELCube模型的服务端部分，需要配合ELCube的WEB前�
 
 [ELCube 演示系统-搭建中]
 
-[ELCube 指南-逐步完善中](http://docs.elcube.nkpro.cn/guide/)
+[ELCube 指南-逐步完善中](http://docs.elcube.cn/guide/)
 
 [ELCube Front Gitee仓库](https://gitee.com/newcorenet/elcube-front)
 
