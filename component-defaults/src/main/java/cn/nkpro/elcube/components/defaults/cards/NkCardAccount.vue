@@ -16,7 +16,23 @@
         <nk-form :edit="editMode" :col="2">
             <nk-form-item title="关联用户账号">
                 <router-link v-if="data.account" :to="`/apps/settings/auth/accounts/detail/${data.account}`">{{data.account}}</router-link>
-                <a-input v-model="data.account" slot="edit"></a-input>
+                <a-select
+                    show-search
+                    :value="data.account"
+                    placeholder="input search text"
+                    style="width: 200px"
+                    :default-active-first-option="false"
+                    :show-arrow="false"
+                    :filter-option="false"
+                    :not-found-content="null"
+                    @search="handleSearch"
+                    @change="handleChange"
+                    slot="edit"
+                >
+                    <a-select-option v-for="d in accountList" :key="d.value">
+                      {{ d.text }}
+                    </a-select-option>
+                </a-select>
             </nk-form-item>
         </nk-form>
     </nk-card>
@@ -26,5 +42,29 @@
     import Mixin from "Mixin";
     export default {
         mixins:[Mixin()],
+        data(){
+          return{
+            accountList:[]
+          }
+        },
+        methods:{
+          handleSearch(value){
+            this.nk$call(value).then(res =>{
+              let accounts = [];
+              res.forEach(function (element, index, array) {
+                let obj = {
+                  text: element.username,
+                  value: element.username
+                }
+                accounts.push(obj);
+              });
+              this.accountList = accounts;
+              this.data.account = value;
+            })
+          },
+          handleChange(value){
+            this.data.account = value;
+          }
+        }
     }
 </script>

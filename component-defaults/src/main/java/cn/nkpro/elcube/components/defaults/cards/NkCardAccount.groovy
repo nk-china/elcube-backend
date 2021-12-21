@@ -5,8 +5,10 @@ import cn.nkpro.elcube.docengine.NkAbstractCard
 import cn.nkpro.elcube.docengine.model.DocDefIV
 import cn.nkpro.elcube.docengine.model.DocHV
 import cn.nkpro.elcube.exception.NkOperateNotAllowedCaution
+import cn.nkpro.elcube.platform.gen.UserAccount
 import cn.nkpro.elcube.security.SecurityUtilz
 import cn.nkpro.elcube.security.UserAccountService
+import cn.nkpro.elcube.security.UserAuthorizationService
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
@@ -19,12 +21,24 @@ class NkCardAccount extends NkAbstractCard<Data,Map> {
     @Autowired
     private UserAccountService userAccountService
 
+    @Autowired
+    private UserAuthorizationService permService;
+
+    @Override
+    List<UserAccount> call(DocHV doc, Data data, DocDefIV defIV, Map d, Object options) {
+        return this.permService.accounts(options.toString());
+    }
+
     @Override
     Data beforeUpdate(DocHV doc, Data data, Data original, DocDefIV defIV, Map d) {
 
         if(SecurityUtilz.hasAnyAuthority('*:*','SETTINGS:*','SETTINGS:AUTH')){
 
-            if(original != null && (data.account != original.account)){
+            if(original == null){
+                original = new Data()
+            }
+
+            if(data.account != original.account){
 
                 if(original.account){
                     def account = userAccountService.getAccount(original.account, false)
