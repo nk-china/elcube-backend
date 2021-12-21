@@ -22,8 +22,10 @@
                  style="cursor: pointer; max-width: 300px;"
                  :value="value && value.docName"
         ></a-input>
+        <div ref="modalContainer" style="display: block;width: 0;height: 0;"></div>
         <nk-doc-select-modal v-model="docSelectModalVisible"
                              :modal="inputOptions.optionsObject"
+                             :getContainer="getContainer"
                              @select="docSelected"
         ></nk-doc-select-modal>
     </div>
@@ -45,6 +47,7 @@ export default {
         }
     },
     data(){
+        console.log(456)
         return {
             docSelectModalVisible:false,
         }
@@ -57,6 +60,9 @@ export default {
             });
             this.$emit('input', value);
             this.$emit('change',{});
+        },
+        getContainer(){
+            return this.$refs.modalContainer
         }
     }
 }

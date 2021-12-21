@@ -28,8 +28,8 @@
 
                     :max="inputOptions.max"
                     :min="inputOptions.min"
-                    :precision="inputOptions.digits"
-                    :step="inputOptions.step"
+                    :precision="inputOptions.digits||0"
+                    :step="inputOptions.step||1"
     ></a-input-number>
 </template>
 
