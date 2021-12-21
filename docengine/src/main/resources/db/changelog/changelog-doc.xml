@@ -384,7 +384,15 @@
         </createTable>
     </changeSet>
 
-    <changeSet id="NK_DOC_I_INDEX-02" author="bean" context="default">
+    <!-- TODO 待稳定后删除 -->
+    <changeSet id="NK_DOC_I_INDEX-03" author="bean" context="default">
+        <preConditions onFail="MARK_RAN">
+            <tableExists tableName="NK_DOC_I_INDEX" />
+        </preConditions>
+        <dropTable tableName="NK_DOC_I_INDEX" />
+    </changeSet>
+
+    <changeSet id="NK_DOC_I_INDEX-04" author="bean" context="default">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="NK_DOC_I_INDEX" />
