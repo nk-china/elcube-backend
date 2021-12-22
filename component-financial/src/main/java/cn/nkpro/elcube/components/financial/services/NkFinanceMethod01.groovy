@@ -68,7 +68,11 @@ class NkFinanceMethod01 extends NkAbstractApplyCSO{
                 item.setPeriod(i+1)
                 item.setExpireDate(calendar.getTimeInMillis()/1000 as Long)
                 item.setPay(pay)
-                item.setInterest(tp==0?doubleValue(pv*ip):0)
+                if(tp == 1){
+                    item.setInterest(i==0?0:doubleValue(pv*ip))
+                }else{
+                    item.setInterest(doubleValue(pv*ip))
+                }
                 item.setPrincipal(doubleValue(pay-item.getInterest()))
                 item.setResidual(doubleValue(pv-item.getPrincipal()))
                 item.setFee(0d)
