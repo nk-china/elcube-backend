@@ -37,6 +37,7 @@ import cn.nkpro.elcube.docengine.model.DocDefStateV;
 import cn.nkpro.elcube.docengine.service.NkDocDefService;
 import cn.nkpro.elcube.exception.NkDefineException;
 import cn.nkpro.elcube.platform.DeployAble;
+import cn.nkpro.elcube.security.SecurityUtilz;
 import cn.nkpro.elcube.utils.BeanUtilz;
 import cn.nkpro.elcube.utils.DateTimeUtilz;
 import com.alibaba.fastjson.JSONArray;
@@ -400,7 +401,10 @@ public class NkDocDefServiceImpl implements NkDocDefService, DeployAble {
         docDefHV.setDocClassify(docProcessor.classify().name());
         docDefHV.setMarkdownFlag(StringUtils.isBlank(docDefHV.getMarkdown())?0:1);
         docDefHV.setUpdatedTime(DateTimeUtilz.nowSeconds());
+        docDefHV.setUpdatedAccount(SecurityUtilz.getUser().getUsername());
         if(docDefHMapper.selectByPrimaryKey(docDefHV)==null){
+            docDefHV.setCreatedTime(DateTimeUtilz.nowSeconds());
+            docDefHV.setCreatedAccount(SecurityUtilz.getUser().getUsername());
             docDefHMapper.insertSelective(docDefHV);
         }else{
             docDefHMapper.updateByPrimaryKeySelective(docDefHV);

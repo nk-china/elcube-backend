@@ -8,6 +8,13 @@ import java.io.Serializable;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DocDefH extends DocDefHKey implements Serializable {
     /**
+     * 版本描述
+     *
+     * @mbggenerated
+     */
+    private String versionDesc;
+
+    /**
      * 暂时不启用
      *
      * @mbggenerated
@@ -54,6 +61,27 @@ public class DocDefH extends DocDefHKey implements Serializable {
      */
     private Long updatedTime;
 
+    /**
+     * 创建时间秒数
+     *
+     * @mbggenerated
+     */
+    private Long createdTime;
+
+    /**
+     * 创建人
+     *
+     * @mbggenerated
+     */
+    private String createdAccount;
+
+    /**
+     * 修改人
+     *
+     * @mbggenerated
+     */
+    private String updatedAccount;
+
     private String markdown;
 
     /**
@@ -63,6 +91,29 @@ public class DocDefH extends DocDefHKey implements Serializable {
      * @mbggenerated
      */
     private static final long serialVersionUID = 1L;
+
+    /**
+     * 获取 版本描述
+     *
+     * @return 版本描述
+     *
+     * @mbggenerated
+     */
+    @cn.nkpro.elcube.annotation.CodeFieldNotes("版本描述")
+    public String getVersionDesc() {
+        return versionDesc;
+    }
+
+    /**
+     * 设置 版本描述
+     *
+     * @return 版本描述
+     *
+     * @mbggenerated
+     */
+    public void setVersionDesc(String versionDesc) {
+        this.versionDesc = versionDesc;
+    }
 
     /**
      * 获取 暂时不启用
@@ -231,6 +282,75 @@ public class DocDefH extends DocDefHKey implements Serializable {
      */
     public void setUpdatedTime(Long updatedTime) {
         this.updatedTime = updatedTime;
+    }
+
+    /**
+     * 获取 创建时间秒数
+     *
+     * @return 创建时间秒数
+     *
+     * @mbggenerated
+     */
+    @cn.nkpro.elcube.annotation.CodeFieldNotes("创建时间秒数")
+    public Long getCreatedTime() {
+        return createdTime;
+    }
+
+    /**
+     * 设置 创建时间秒数
+     *
+     * @return 创建时间秒数
+     *
+     * @mbggenerated
+     */
+    public void setCreatedTime(Long createdTime) {
+        this.createdTime = createdTime;
+    }
+
+    /**
+     * 获取 创建人
+     *
+     * @return 创建人
+     *
+     * @mbggenerated
+     */
+    @cn.nkpro.elcube.annotation.CodeFieldNotes("创建人")
+    public String getCreatedAccount() {
+        return createdAccount;
+    }
+
+    /**
+     * 设置 创建人
+     *
+     * @return 创建人
+     *
+     * @mbggenerated
+     */
+    public void setCreatedAccount(String createdAccount) {
+        this.createdAccount = createdAccount;
+    }
+
+    /**
+     * 获取 修改人
+     *
+     * @return 修改人
+     *
+     * @mbggenerated
+     */
+    @cn.nkpro.elcube.annotation.CodeFieldNotes("修改人")
+    public String getUpdatedAccount() {
+        return updatedAccount;
+    }
+
+    /**
+     * 设置 修改人
+     *
+     * @return 修改人
+     *
+     * @mbggenerated
+     */
+    public void setUpdatedAccount(String updatedAccount) {
+        this.updatedAccount = updatedAccount;
     }
 
     @cn.nkpro.elcube.annotation.CodeFieldNotes("")

@@ -17,6 +17,8 @@
 package cn.nkpro.elcube.co.spel;
 
 import cn.nkpro.elcube.platform.service.PlatformRegistryService;
+import cn.nkpro.elcube.security.SecurityUtilz;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -29,5 +31,10 @@ public class NkDefaultSpEL implements NkSpELInjection {
     @SuppressWarnings("unused")
     public Object dict(String key){
         return registryService.getJSON("@DICT",key);
+    }
+
+    @SuppressWarnings("unused")
+    public Object account(){
+        return SecurityUtilz.getUser().getObjectId();
     }
 }
