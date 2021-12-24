@@ -26,6 +26,8 @@ public class DocIReceived extends DocIReceivedKey implements Serializable {
 
     private Long accountDate;
 
+    private Integer orderBy;
+
     private Long createdTime;
 
     private Long updatedTime;
@@ -113,6 +115,15 @@ public class DocIReceived extends DocIReceivedKey implements Serializable {
 
     public void setAccountDate(Long accountDate) {
         this.accountDate = accountDate;
+    }
+
+    @cn.nkpro.elcube.annotation.CodeFieldNotes("")
+    public Integer getOrderBy() {
+        return orderBy;
+    }
+
+    public void setOrderBy(Integer orderBy) {
+        this.orderBy = orderBy;
     }
 
     @cn.nkpro.elcube.annotation.CodeFieldNotes("")

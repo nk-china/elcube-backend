@@ -605,7 +605,7 @@ public class NkDocDefServiceImpl implements NkDocDefService, DeployAble {
 
         deserializeDefFromContent(defHV);
 
-        runLoopCards(defHV,false, (nkCard,item)->{
+        runLoopCards(defHV, false,false, (nkCard,item)->{
                 item.setDebug(nkCard.isDebug());
                 item.setConfig(nkCard.afterGetDef(defHV, item, item.getConfig()));
         });
@@ -718,7 +718,7 @@ public class NkDocDefServiceImpl implements NkDocDefService, DeployAble {
     @Override
     public DocDefHV deserializeDef(DocDefHV docDefHV) {
 
-        runLoopCards(docDefHV,true, (nkCard,item)->{
+        runLoopCards(docDefHV, false,true, (nkCard,item)->{
 
             log.info("\tdeserializeDef docType = {} cardKey = {}",docDefHV.getDocType(), item.getCardKey());
             item.setPosition(nkCard.getPosition());
@@ -733,7 +733,7 @@ public class NkDocDefServiceImpl implements NkDocDefService, DeployAble {
 
     private DocDefHV deserializeDefFromContent(DocDefHV docDefHV) {
 
-        runLoopCards(docDefHV,true, (nkCard,item)->{
+        runLoopCards(docDefHV, false,true, (nkCard,item)->{
 
             log.info("\tdeserializeDef docType = {} cardKey = {}",docDefHV.getDocType(), item.getCardKey());
             item.setPosition(nkCard.getPosition());
@@ -754,46 +754,57 @@ public class NkDocDefServiceImpl implements NkDocDefService, DeployAble {
 
         customObjectManager.getCustomObject(docDefHV.getRefObjectType(), NkCustomObject.class);
 
-        runLoopCards(docDefHV,false,(card, docDefIV)->{
+        runLoopCards(docDefHV, false,false,(card, docDefIV)->{
 
         });
     }
 
-    private void runLoopCards(DocDefHV docDefHV, boolean ignoreError, Function function){
+    private void runLoopCards(DocDefHV docDefHV, boolean reCalc, boolean ignoreError, Function function){
 
         List<DocDefIV> cards = docDefHV.getCards()
                 .stream()
                 .sorted(Comparator.comparing(DocDefI::getCalcOrder))
                 .collect(Collectors.toList());
 
-        for(DocDefIV docDefI : cards){
-            // 找到对应的组件实现类
-            NkCard nkCard = customObjectManager.getCustomObjectIfExists(docDefI.getBeanName(), NkCard.class);
+        int times = 1;
 
-            if(nkCard==null && !ignoreError){
-                throw new NkDefineException(String.format("自定义对象[%s]不存在",docDefI.getBeanName()));
-            }
+        do{
+            for(DocDefIV docDefI : cards){
+                // 找到对应的组件实现类
+                NkCard nkCard = customObjectManager.getCustomObjectIfExists(docDefI.getBeanName(), NkCard.class);
 
-            if(nkCard==null){
-                log.warn("\tdeserializeDef error docType = {} beanName = {} not found",docDefHV.getDocType(), docDefI.getBeanName());
-                return;
-            }
+                if(nkCard==null && !ignoreError){
+                    throw new NkDefineException(String.format("自定义对象[%s]不存在",docDefI.getBeanName()));
+                }
 
-            try {
-                function.run(nkCard, docDefI);
-            }catch (Exception e){
-                log.error(e.getMessage(),e);
-                if(!ignoreError){
-                    throw new NkComponentException(nkCard,e);
+                if(nkCard==null){
+                    log.warn("\tdeserializeDef error docType = {} beanName = {} not found",docDefHV.getDocType(), docDefI.getBeanName());
+                    return;
+                }
+
+                try {
+                    function.run(nkCard, docDefI);
+                }catch (Exception e){
+                    log.error(e.getMessage(),e);
+                    if(!ignoreError){
+                        throw new NkComponentException(nkCard,e);
+                    }
                 }
             }
-        }
+            times ++;
+
+            int finalTimes = times;
+            cards = cards.stream()
+                    .filter(c->c.getCalcTimes()>= finalTimes)
+                    .collect(Collectors.toList());
+        }while (reCalc && !cards.isEmpty());
+
     }
     @Override
-    public void runLoopCards(String docId, DocDefHV docDefHV, boolean ignoreError, Function function){
+    public void runLoopCards(String docId, DocDefHV docDefHV, boolean reCalc, boolean ignoreError, Function function){
         try{
             NkDocEngineThreadLocal.lockDoc(docId);
-            this.runLoopCards(docDefHV,ignoreError,function);
+            this.runLoopCards(docDefHV, reCalc,ignoreError,function);
         }finally {
             NkDocEngineThreadLocal.unlockDoc(docId);
         }

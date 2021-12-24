@@ -136,7 +136,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         atomic.set(processCycle(atomic.get(), DocCreateEvent
                 .build(NkDocCycle.beforeCreate, preDoc)));
 
-        docDefService.runLoopCards(atomic.get().getDocId(), def,false, (card, defIV)->
+        docDefService.runLoopCards(atomic.get().getDocId(), def,true,false, (card, defIV)->
                 atomic.get().getData().put(
                 defIV.getCardKey(),
                 card.afterCreate(atomic.get(),preDoc,card.deserialize(null), defIV, defIV.getConfig())
@@ -149,7 +149,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
     @Override
     public Object call(DocHV doc, String fromCard, String method, Object options) {
 
-        docDefService.runLoopCards(doc.getDocId(), doc.getDef(),false, (card, defIV)->
+        docDefService.runLoopCards(doc.getDocId(), doc.getDef(),false,false, (card, defIV)->
                 doc.getData().put(
                         defIV.getCardKey(),
                         card.deserialize(doc.getData().get(defIV.getCardKey()))
@@ -181,7 +181,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
 
         AtomicReference<DocHV> atomic = new AtomicReference(doc);
 
-        docDefService.runLoopCards(atomic.get().getDocId(), atomic.get().getDef(),false, (card, defIV)->
+        docDefService.runLoopCards(atomic.get().getDocId(), atomic.get().getDef(),false,false, (card, defIV)->
                 atomic.get().getData().put(
                     defIV.getCardKey(),
                     card.deserialize(atomic.get().getData().get(defIV.getCardKey()))
@@ -190,7 +190,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
 
         atomic.set(processCycle(atomic.get(), DocCalculateEvent.build(NkDocCycle.beforeCalculate)));
 
-        docDefService.runLoopCards(atomic.get().getDocId(), atomic.get().getDef(),false, (card, defIV)->{
+        docDefService.runLoopCards(atomic.get().getDocId(), atomic.get().getDef(),true,false, (card, defIV)->{
 
             // 是否为触发计算的卡片
             boolean isTrigger = StringUtils.equals(fromCard,defIV.getCardKey());
@@ -219,7 +219,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         DocHBasis doc = BeanUtilz.copyFromObject(docHD, DocHBasis.class);
 
         // 解析单据行项目数据
-        docDefService.runLoopCards(doc.getDocId(), def,false, (nkCard, defIV)->{
+        docDefService.runLoopCards(doc.getDocId(), def,false,false, (nkCard, defIV)->{
 
             // 获取行项目数据
             DocI docI = doc.getItems().computeIfAbsent(defIV.getCardKey(),(key)->{
@@ -262,7 +262,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         doc.setDef(def);
 
         // afterGetData单据行项目数据
-        docDefService.runLoopCards(doc.getDocId(), def,false, (nkCard, defIV)-> {
+        docDefService.runLoopCards(doc.getDocId(), def,false,false, (nkCard, defIV)-> {
             if(log.isInfoEnabled())
                 log.info("\tafterGetData cardKey = {} | {}, card = {}",
                         defIV.getCardKey(),
@@ -311,7 +311,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if(log.isInfoEnabled())log.info("保存单据内容 开始处理单据卡片数据");
-        docDefService.runLoopCards(atomic.get().getDocId(), atomic.get().getDef(),false, (card, defIV)->
+        docDefService.runLoopCards(atomic.get().getDocId(), atomic.get().getDef(),false,false, (card, defIV)->
                 atomic.get().getData().put(
                         defIV.getCardKey(),
                         card.deserialize(atomic.get().getData().get(defIV.getCardKey()))
@@ -329,7 +329,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if(log.isInfoEnabled())log.info("保存单据内容 保存卡片数据到数据库");
-        docDefService.runLoopCards(atomic.get().getDocId(), atomic.get().getDef(),false, (card, defIV)->{
+        docDefService.runLoopCards(atomic.get().getDocId(), atomic.get().getDef(),false,false, (card, defIV)->{
 
             boolean existsOriginal = existsOriginal(original, defIV);
 
@@ -375,7 +375,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if(original==null || !StringUtils.equals(atomic.get().getDocState(),original.getDocState())){
             if(log.isInfoEnabled())log.info("保存单据内容 触发卡片的状态变更事件");
-            docDefService.runLoopCards(atomic.get().getDocId(), atomic.get().getDef(),false, (card, defIV)->{
+            docDefService.runLoopCards(atomic.get().getDocId(), atomic.get().getDef(),false,false, (card, defIV)->{
                 Object cardData = atomic.get().getData().get(defIV.getCardKey());
                 card.stateChanged(atomic.get(), original, cardData, defIV, defIV.getConfig());
             });
@@ -405,7 +405,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if(log.isInfoEnabled())log.info("保存单据内容 准备触发卡片 afterUpdated 、updateCommitted 接口");
-        docDefService.runLoopCards(atomic.get().getDocId(), atomic.get().getDef(),false, (card, defIV)->{
+        docDefService.runLoopCards(atomic.get().getDocId(), atomic.get().getDef(),false,false, (card, defIV)->{
 
             boolean existsOriginal = existsOriginal(original, defIV);
 
@@ -550,7 +550,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if(log.isInfoEnabled())log.info("保存单据内容 对比修改内容");
         List<String> changedCard = new ArrayList<>();
-        docDefService.runLoopCards(atomic.get().getDocId(), atomic.get().getDef(),false, (card, defIV)->{
+        docDefService.runLoopCards(atomic.get().getDocId(), atomic.get().getDef(),false,false, (card, defIV)->{
             if(card.enableDataDiff()){
                 if(optionalOriginal.isPresent()){
 
@@ -634,7 +634,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         doc.setPartnerName(PersonInfoSource.getInstance().randomChineseName());
 
         AtomicReference<DocHV> atomic = new AtomicReference(doc);
-        docDefService.runLoopCards(atomic.get().getDocId(), atomic.get().getDef(),false, (card, defIV)->
+        docDefService.runLoopCards(atomic.get().getDocId(), atomic.get().getDef(),false,false, (card, defIV)->
             atomic.get().getData().put(
                     defIV.getCardKey(),
                     card.random(atomic.get(), defIV, defIV.getConfig())

@@ -894,6 +894,66 @@ public class DocIReceivedExample {
             return (Criteria) this;
         }
 
+        public Criteria andOrderByIsNull() {
+            addCriterion("ORDER_BY is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderByIsNotNull() {
+            addCriterion("ORDER_BY is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderByEqualTo(Integer value) {
+            addCriterion("ORDER_BY =", value, "orderBy");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderByNotEqualTo(Integer value) {
+            addCriterion("ORDER_BY <>", value, "orderBy");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderByGreaterThan(Integer value) {
+            addCriterion("ORDER_BY >", value, "orderBy");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderByGreaterThanOrEqualTo(Integer value) {
+            addCriterion("ORDER_BY >=", value, "orderBy");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderByLessThan(Integer value) {
+            addCriterion("ORDER_BY <", value, "orderBy");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderByLessThanOrEqualTo(Integer value) {
+            addCriterion("ORDER_BY <=", value, "orderBy");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderByIn(List<Integer> values) {
+            addCriterion("ORDER_BY in", values, "orderBy");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderByNotIn(List<Integer> values) {
+            addCriterion("ORDER_BY not in", values, "orderBy");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderByBetween(Integer value1, Integer value2) {
+            addCriterion("ORDER_BY between", value1, value2, "orderBy");
+            return (Criteria) this;
+        }
+
+        public Criteria andOrderByNotBetween(Integer value1, Integer value2) {
+            addCriterion("ORDER_BY not between", value1, value2, "orderBy");
+            return (Criteria) this;
+        }
+
         public Criteria andCreatedTimeIsNull() {
             addCriterion("CREATED_TIME is null");
             return (Criteria) this;

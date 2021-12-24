@@ -65,7 +65,7 @@ public interface NkDocDefService {
 
     Object callDef(Object def, String fromCard, Object options);
 
-    void runLoopCards(String docId, DocDefHV docDefHV, boolean ignoreError, Function function);
+    void runLoopCards(String docId, DocDefHV docDefHV, boolean reCalc, boolean ignoreError, Function function);
 
     DocDefHV getDocDefLatestActive(String docType);
 

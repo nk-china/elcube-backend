@@ -196,44 +196,48 @@ public abstract class NkAbstractCard<DT,DDT> extends NkAbstractCustomScriptObjec
     protected final Object parse(Object obj, Type targetType) {
 
         if(targetType!=null){
-            if(obj==null){
 
-                Class<?> clazz = null;
-                if(targetType instanceof ParameterizedType){
-                    clazz = (Class<?>) ((ParameterizedType) targetType).getRawType();
-                }else if(targetType instanceof Class){
-                    clazz = (Class)targetType;
-                }else{
-                    throw NkSystemException.of("未知的参数类型："+targetType);
-                }
-
-                if(clazz.isInterface()){
-                    if(List.class.isAssignableFrom(clazz)){
-                        return new ArrayList<>();
+            if(obj!=null){
+                try{
+                    // 简单判断一下，因为先转成string再parse效率会比较低
+                    if(obj instanceof String){
+                        return JSON.parseObject((String)obj,targetType);
+                    }else if(obj instanceof List){
+                        return new JSONArray((List) obj).toJavaObject(targetType);
+                    }else if(obj instanceof Map){
+                        return new JSONObject((Map) obj).toJavaObject(targetType);
                     }
-                    if(Map.class.isAssignableFrom(clazz)){
-                        return new HashMap<>();
-                    }
-                    throw new NkDefineException("卡片数据类型不支持 "+clazz.getName());
-                }else{
-                    try {
-                        return ((Class)targetType).getConstructor().newInstance();
-                    } catch (Exception e) {
-                        throw new NkDefineException("卡片数据类型必须声明空构造方法 "+e.getMessage(),e);
-                    }
+                    return JSON.parseObject(JSON.toJSONString(obj),targetType);
+                }catch (Exception e){
+                    log.warn("卡片["+getClass()+"]数据解析错误："+e.getMessage(),e);
                 }
-
-            }else{
-                // 简单判断一下，因为先转成string再parse效率会比较低
-                if(obj instanceof String){
-                    return JSON.parseObject((String)obj,targetType);
-                }else if(obj instanceof List){
-                    return new JSONArray((List) obj).toJavaObject(targetType);
-                }else if(obj instanceof Map){
-                    return new JSONObject((Map) obj).toJavaObject(targetType);
-                }
-                return JSON.parseObject(JSON.toJSONString(obj),targetType);
             }
+
+            Class<?> clazz = null;
+            if(targetType instanceof ParameterizedType){
+                clazz = (Class<?>) ((ParameterizedType) targetType).getRawType();
+            }else if(targetType instanceof Class){
+                clazz = (Class)targetType;
+            }else{
+                throw NkSystemException.of("未知的参数类型："+targetType);
+            }
+
+            if(clazz.isInterface()){
+                if(List.class.isAssignableFrom(clazz)){
+                    return new ArrayList<>();
+                }
+                if(Map.class.isAssignableFrom(clazz)){
+                    return new HashMap<>();
+                }
+                throw new NkDefineException("卡片数据类型不支持 "+clazz.getName());
+            }else{
+                try {
+                    return ((Class)targetType).getConstructor().newInstance();
+                } catch (Exception e) {
+                    throw new NkDefineException("卡片数据类型必须声明空构造方法 "+e.getMessage(),e);
+                }
+            }
+
         }
         throw new NkDefineException("不能解析卡片对象["+getClass()+"]的数据类型");
     }
