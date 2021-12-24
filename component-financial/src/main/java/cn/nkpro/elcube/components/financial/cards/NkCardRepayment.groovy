@@ -18,6 +18,7 @@ package cn.nkpro.elcube.components.financial.cards
 
 import cn.nkpro.elcube.annotation.NkNote
 import cn.nkpro.elcube.co.spel.NkSpELManager
+import cn.nkpro.elcube.data.redis.RedisSupport
 import cn.nkpro.elcube.docengine.NkAbstractCard
 import cn.nkpro.elcube.docengine.NkDocEngine
 import cn.nkpro.elcube.docengine.gen.*
@@ -30,6 +31,7 @@ import com.alibaba.fastjson.TypeReference
 import org.apache.ibatis.session.RowBounds
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.annotation.Order
+import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Component
 
 import java.util.stream.Collectors
@@ -46,15 +48,26 @@ class NkCardRepayment extends NkAbstractCard<List<DocIReceivedI>,Def> {
     @Autowired
     private DocIReceivedMapper receivedMapper
     @Autowired
+    private JdbcTemplate jdbcTemplate
+    @Autowired
     private NkSpELManager spELManager
     @Autowired
     private NkDocEngine docEngine
+    @Autowired
+    private RedisSupport redisSupport
+
+    private static String sql =
+            "update nk_doc_i_bill " +
+                    "   set received = received + ? , " +
+                    "       receivable = receivable - ? " +
+                    " where doc_id = ? " +
+                    "   and card_key = ? " +
+                    "   and bill_type = ? " +
+                    "   and expire_date = ? " +
+                    "   and bill_partner_id = ?"
 
     @Override
     List<DocIReceivedI> afterCreate(DocHV doc, DocHV preDoc, List<DocIReceivedI> data, DocDefIV defIV, Def d) {
-
-        this.init(doc, data, new Def())
-
         return super.afterCreate(doc, preDoc, data, defIV, d) as List
     }
 
@@ -96,7 +109,7 @@ class NkCardRepayment extends NkAbstractCard<List<DocIReceivedI>,Def> {
                 spELManager.invoke(d.repaymentSpEL+"="+repayment,context)
             }
         }else{
-            this.init(doc, data, new Def())
+            this.init(doc, data, d)
         }
 
         return super.calculate(doc, data, defIV, d, isTrigger, options) as List
@@ -183,6 +196,7 @@ class NkCardRepayment extends NkAbstractCard<List<DocIReceivedI>,Def> {
                                 DocIReceivedI received = new DocIReceivedI()
                                 // 原始账单信息
                                 received.targetDocId = bill.docId
+                                received.cardKey     = bill.cardKey
                                 received.amount      = bill.amount
                                 received.billType    = bill.billType
                                 received.expireDate  = bill.expireDate
@@ -223,32 +237,97 @@ class NkCardRepayment extends NkAbstractCard<List<DocIReceivedI>,Def> {
     @Override
     List<DocIReceivedI> beforeUpdate(DocHV doc, List<DocIReceivedI> data, List<DocIReceivedI> original, DocDefIV defIV, Def d) {
 
-        long    now         = DateTimeUtilz.nowSeconds()
+
+        boolean active = d.activeSpEL ? spELManager.invoke(d.activeSpEL, doc) as boolean : false
+        long    now    = DateTimeUtilz.nowSeconds()
+
+        List<Object[]> args = new ArrayList<>()
 
         data.removeIf({ received -> !received.checked})
-        data.forEach({ received ->
 
-            // 系统字段
-            received.docId       = doc.docId
-            received.updatedTime = now
-            received.state       = 0 // todo
-            received.orderBy     = data.indexOf(received)
+
+        // 更新时，需要锁定被偿还的账单单据
+        Set<String> docIds = data.stream().map({ i -> i.getDocId() }).distinct().collect(Collectors.toSet())
+        if(original){
+            docIds.addAll(original.stream().map({ i -> i.getDocId() }).distinct().collect(Collectors.toSet()))
+        }
+        Map<String,String> locked = new HashMap<>()
+        if(docIds.size()>0){
+            docIds.forEach({ id ->
+                locked.put(id,redisSupport.lock(id, 600))
+            })
+        }
+        try{
+
+            data.forEach({ received ->
+
+                def state = received.state ?: 0
+
+                // 系统字段
+                received.docId       = doc.docId
+                received.updatedTime = now
+                received.state       = active ? 1 : 0
+                received.orderBy     = data.indexOf(received)
+
+                if(original && original.find {
+                    o-> o.billType==received.billType &&
+                            o.targetDocId == received.targetDocId &&
+                            o.expireDate == received.expireDate
+                }){
+                    receivedMapper.updateByPrimaryKey(received)
+                }else{
+                    received.createdTime = now
+                    receivedMapper.insert(received)
+                }
+
+                if(active && state == 0){
+                    // 更新账单, 增加实收
+                    args.add([received.currReceived,
+                              received.currReceived,
+                              received.targetDocId,
+                              received.cardKey,
+                              received.billType,
+                              received.expireDate,
+                              doc.partnerId
+                    ] as Object[])
+                }else if(!active && state == 1){
+                    // 更新账单，减少实收
+                    args.add([-received.currReceived,
+                              -received.currReceived,
+                              received.targetDocId,
+                              received.cardKey,
+                              received.billType,
+                              received.expireDate,
+                              doc.partnerId
+                    ] as Object[])
+                }
+            })
 
             if(original){
-                if(original.find {o-> o.billType==received.billType && o.targetDocId == received.targetDocId && o.expireDate == received.expireDate}){
-                    receivedMapper.updateByPrimaryKey(received)
-                    return
-                }
+                original.forEach({ o ->
+                    if(!data.find { received->  o.billType==received.billType &&
+                            o.targetDocId == received.targetDocId &&
+                            o.expireDate == received.expireDate}){
+                        receivedMapper.deleteByPrimaryKey(o)
+                        if(o.state == 1){
+                            args.add([-o.currReceived,
+                                      -o.currReceived,
+                                      o.targetDocId,
+                                      o.cardKey,
+                                      o.billType,
+                                      o.expireDate,
+                                      doc.partnerId
+                            ] as Object[])
+                        }
+                    }
+                })
             }
-            received.createdTime = now
-            receivedMapper.insert(received)
-        })
 
-        if(original){
-            original.forEach({ o ->
-                if(!data.find {received-> o.billType==received.billType && o.targetDocId == received.targetDocId && o.expireDate == received.expireDate}){
-                    receivedMapper.deleteByPrimaryKey(o)
-                }
+            if(!args.isEmpty())
+                jdbcTemplate.batchUpdate(sql, args)
+        }finally{
+            locked.forEach({ id,value ->
+                redisSupport.unlock(id, value)
             })
         }
 
@@ -256,25 +335,11 @@ class NkCardRepayment extends NkAbstractCard<List<DocIReceivedI>,Def> {
     }
 
     static class Def{
-        String availableAmountSpEL = "data.summary.amount"
-        String accountDateSpEL = "data.base.receiptDate"
-        String repaymentSpEL = "data.summary.repayment"
-        String repaymentRuleGroup = "[\n" +
-                "\t[\n" +
-                "\t\t{\n" +
-                "\t\t\t\"billType\": \"滞纳金\",\n" +
-                "\t\t\t\"condition\" : \"#bill.expireDate < #\$accountDate\"\n" +
-                "\t\t}\n" +
-                "\t],\n" +
-                "\t[\n" +
-                "\t\t{\n" +
-                "\t\t\t\"billType\": \"利息\"\n" +
-                "\t\t},\n" +
-                "\t\t{\n" +
-                "\t\t\t\"billType\": \"本金\"\n" +
-                "\t\t}\n" +
-                "\t]\n" +
-                "]"
+        String activeSpEL
+        String availableAmountSpEL
+        String accountDateSpEL
+        String repaymentSpEL
+        String repaymentRuleGroup
     }
 
     static class Rule{

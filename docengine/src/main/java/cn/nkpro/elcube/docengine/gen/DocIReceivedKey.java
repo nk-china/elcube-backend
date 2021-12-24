@@ -5,6 +5,8 @@ import java.io.Serializable;
 public class DocIReceivedKey implements Serializable {
     private String billType;
 
+    private String cardKey;
+
     private String docId;
 
     private Long expireDate;
@@ -26,6 +28,15 @@ public class DocIReceivedKey implements Serializable {
 
     public void setBillType(String billType) {
         this.billType = billType;
+    }
+
+    @cn.nkpro.elcube.annotation.CodeFieldNotes("")
+    public String getCardKey() {
+        return cardKey;
+    }
+
+    public void setCardKey(String cardKey) {
+        this.cardKey = cardKey;
     }
 
     @cn.nkpro.elcube.annotation.CodeFieldNotes("")

@@ -264,6 +264,76 @@ public class DocIReceivedExample {
             return (Criteria) this;
         }
 
+        public Criteria andCardKeyIsNull() {
+            addCriterion("CARD_KEY is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyIsNotNull() {
+            addCriterion("CARD_KEY is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyEqualTo(String value) {
+            addCriterion("CARD_KEY =", value, "cardKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyNotEqualTo(String value) {
+            addCriterion("CARD_KEY <>", value, "cardKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyGreaterThan(String value) {
+            addCriterion("CARD_KEY >", value, "cardKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyGreaterThanOrEqualTo(String value) {
+            addCriterion("CARD_KEY >=", value, "cardKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyLessThan(String value) {
+            addCriterion("CARD_KEY <", value, "cardKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyLessThanOrEqualTo(String value) {
+            addCriterion("CARD_KEY <=", value, "cardKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyLike(String value) {
+            addCriterion("CARD_KEY like", value, "cardKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyNotLike(String value) {
+            addCriterion("CARD_KEY not like", value, "cardKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyIn(List<String> values) {
+            addCriterion("CARD_KEY in", values, "cardKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyNotIn(List<String> values) {
+            addCriterion("CARD_KEY not in", values, "cardKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyBetween(String value1, String value2) {
+            addCriterion("CARD_KEY between", value1, value2, "cardKey");
+            return (Criteria) this;
+        }
+
+        public Criteria andCardKeyNotBetween(String value1, String value2) {
+            addCriterion("CARD_KEY not between", value1, value2, "cardKey");
+            return (Criteria) this;
+        }
+
         public Criteria andDocIdIsNull() {
             addCriterion("DOC_ID is null");
             return (Criteria) this;
