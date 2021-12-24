@@ -119,7 +119,7 @@
                 }
             },
             selected(){
-                return this.selectedView || this.views[0];
+                return this.selectedView || (this.views && this.views[0]);
             },
             viewData(){
                 if(this.selected && this.selected.includes){
