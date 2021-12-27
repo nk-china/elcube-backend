@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component
 @Order(11)
 @NkNote("交易伙伴抬头")
 @Component("NkCardHeaderPartner")
-class NkCardHeaderPartner extends NkAbstractCard<Map,Map> {
+public class NkCardHeaderPartner extends NkAbstractCard<Map,Map> {
 
     @Override
     String getPosition() {
