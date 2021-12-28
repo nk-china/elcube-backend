@@ -87,6 +87,7 @@ class NkCardPaymentSchedule extends NkAbstractCard<List<PaymentI>,Def> {
 //        String dtSpEL   // 计息日期
     }
 
+    @SuppressWarnings("unused")
     static class PaymentI{
         Integer period
         Long expireDate
