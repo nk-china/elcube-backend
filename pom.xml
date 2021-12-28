@@ -318,7 +318,7 @@
                     <dependency>
                         <groupId>cn.nkpro.elcube</groupId>
                         <artifactId>mybatis-generator-plugin</artifactId>
-                        <version>2.0</version>
+                        <version>${project.version}</version>
                     </dependency>
                     <dependency>
                         <groupId>com.oracle.database.jdbc</groupId>
