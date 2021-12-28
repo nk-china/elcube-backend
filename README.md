@@ -5,6 +5,16 @@ ELCube（逻辑魔方），解决企业变更曲线与软件跟随曲线不匹�
 而不是用技术堆砌的方式绑定企业。
 
 
+### 相关链接
+
+[ELCube 演示系统](http://demo.elcube.cn)
+
+[ELCube 指南-逐步完善中](http://docs.elcube.cn/guide/)
+
+[ELCube Front Gitee仓库](https://gitee.com/newcorenet/elcube-front)
+
+[ELCube Front Github仓库](https://github.com/nk-china/elcube-front)
+
 ### 权利声明
 
 ![agpl-v3](http://www.gnu.org/graphics/agplv3-88x31.png)
@@ -251,16 +261,6 @@ ELCube业务流，是单据引擎的一部分，负责将多个单据，根据�
 
 ### 使用概要
 ELCube Backend 为ELCube模型的服务端部分，需要配合ELCube的WEB前端服务一起使用
-
-相关链接：
-
-[ELCube 演示系统-搭建中]
-
-[ELCube 指南-逐步完善中](http://docs.elcube.cn/guide/)
-
-[ELCube Front Gitee仓库](https://gitee.com/newcorenet/elcube-front)
-
-[ELCube Front Github仓库](https://github.com/nk-china/elcube-front)
 
 ### 软件架构
 
