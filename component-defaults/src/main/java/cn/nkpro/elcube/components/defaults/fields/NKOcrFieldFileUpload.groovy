@@ -47,15 +47,17 @@ class NKOcrFieldFileUpload extends NkAbstractField implements NkDynamicFormField
             //取出卡片的spel表达式对应的调用三方
             String method = field.getInputOptions().get("method");
 
-            //执行三方获取结果
-            def jSONObject = JSON.toJSON(spELManager.invoke(method, context));
+            if(StringUtils.isNotBlank(method)) {
+                //执行三方获取结果
+                def jSONObject = JSON.toJSON(spELManager.invoke(method, context));
 
-            if (StringUtils.isNotBlank(dataMappings)) {
-                //数据映射成想要的格式
-                def result = JSON.parseObject(spELManager.convert(dataMappings, jSONObject))
-                result.forEach({ k, v ->
-                    card.set(k, v)
-                })
+                if (StringUtils.isNotBlank(dataMappings)) {
+                    //数据映射成想要的格式
+                    def result = JSON.parseObject(spELManager.convert(dataMappings, jSONObject))
+                    result.forEach({ k, v ->
+                        card.set(k, v)
+                    })
+                }
             }
         }
     }
