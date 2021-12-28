@@ -102,7 +102,9 @@ logging:
 mybatis:
   dialect: cn.nkpro.elcube.data.mybatis.pagination.dialect.MySQLDialect
   configuration:
+    # 禁用缓存
     cache-enabled: false
+    # 禁用MyBatis的一级缓存，避免数据对比时数据被覆盖
     local-cache-scope: statement
     # 查询时，关闭关联对象即时加载以提高性能
     lazy-loading-enabled: true
