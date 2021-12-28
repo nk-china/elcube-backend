@@ -9,7 +9,7 @@ ELCube（逻辑魔方），解决企业变更曲线与软件跟随曲线不匹�
 
 [ELCube 演示系统](http://demo.elcube.cn)
 
-[ELCube 指南-逐步完善中](http://docs.elcube.cn/guide/)
+[ELCube 指南](http://docs.elcube.cn/guide/)[逐步完善]
 
 [ELCube Front Gitee仓库](https://gitee.com/newcorenet/elcube-front)
 
