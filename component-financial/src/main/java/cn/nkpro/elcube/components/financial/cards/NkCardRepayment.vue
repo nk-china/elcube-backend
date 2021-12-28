@@ -27,11 +27,15 @@
                 :scroll-y="{enabled: false}"
                 :data="list"
                 :edit-config="{trigger: 'click', mode: 'row', showIcon: editMode, showStatus: true}"
-                :checkbox-config="{checkField: 'checked', trigger: 'row', visibleMethod, showHeader: editMode}"
+                :checkbox-config="{checkField: 'checked', trigger: 'row', checkMethod, visibleMethod, showHeader: editMode}"
                 @checkbox-change="checkboxChange"
                 @checkbox-all="checkboxAll"
         >
-            <vxe-column field="docNumber"     width="18%" title="单据编号"></vxe-column>
+            <vxe-column field="docNumber"     width="18%" title="单据编号">
+                <template v-slot="{row}">
+                    <nk-doc-link :doc="{docId:row.targetDocId}">{{row.docNumber}}</nk-doc-link>
+                </template>
+            </vxe-column>
             <vxe-column field="expireDate"    width="15%" title="到期日期" formatter="nkDatetime"></vxe-column>
             <vxe-column field="billType"      width="12%" title="账单类别"></vxe-column>
             <vxe-column field="amount"        width="12%" align="right" title="账单金额" formatter="nkCurrency"></vxe-column>
@@ -107,6 +111,9 @@
                 this.page.size = pageSize;
             },
             visibleMethod(){
+                return this.editMode
+            },
+            checkMethod(){
                 return this.editMode
             }
         }
