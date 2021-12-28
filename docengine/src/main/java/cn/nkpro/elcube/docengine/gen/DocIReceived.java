@@ -7,6 +7,8 @@ import java.io.Serializable;
 @JsonIgnoreProperties(ignoreUnknown = true)
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class DocIReceived extends DocIReceivedKey implements Serializable {
+    private String billPartnerId;
+
     private String docNumber;
 
     private Double amount;
@@ -39,6 +41,15 @@ public class DocIReceived extends DocIReceivedKey implements Serializable {
      * @mbggenerated
      */
     private static final long serialVersionUID = 1L;
+
+    @cn.nkpro.elcube.annotation.CodeFieldNotes("")
+    public String getBillPartnerId() {
+        return billPartnerId;
+    }
+
+    public void setBillPartnerId(String billPartnerId) {
+        this.billPartnerId = billPartnerId;
+    }
 
     @cn.nkpro.elcube.annotation.CodeFieldNotes("")
     public String getDocNumber() {

@@ -290,10 +290,11 @@ class NkCardRepayment extends NkAbstractCard<List<DocIReceivedI>,Def> {
             def state = received.state ?: 0
 
             // 系统字段
-            received.docId       = doc.docId
-            received.updatedTime = now
-            received.state       = active ? 1 : 0
-            received.orderBy     = data.indexOf(received)
+            received.docId         = doc.docId
+            received.updatedTime   = now
+            received.state         = active ? 1 : 0
+            received.orderBy       = data.indexOf(received)
+            received.billPartnerId = doc.partnerId
 
             // 根据原始数据判断 update 还是 insert
             if(original && original.find {
@@ -301,7 +302,7 @@ class NkCardRepayment extends NkAbstractCard<List<DocIReceivedI>,Def> {
                         o.targetDocId == received.targetDocId &&
                         o.expireDate == received.expireDate
             }){
-                receivedMapper.updateByPrimaryKey(received)
+                receivedMapper.updateByPrimaryKeySelective(received)
             }else{
                 received.createdTime = now
                 receivedMapper.insert(received)

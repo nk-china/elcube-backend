@@ -157,13 +157,33 @@ class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
 
         def single = EasySingle.from(options)
 
-        DocIBillKey key = new DocIBillKey()
-        key.setDocId(doc.getDocId())
-        key.setCardKey(defIV.getCardKey())
-        key.setBillType(single.get("billType"))
-        key.setExpireDate(single.get("expireDate"))
+        if(single.get("operator") == 'details'){
 
-        return billMapper.selectByPrimaryKey(key)
+            DocIBillKey key = new DocIBillKey()
+            key.setDocId(doc.getDocId())
+            key.setCardKey(defIV.getCardKey())
+            key.setBillPartnerId(single.get("billPartnerId"))
+            key.setBillType(single.get("billType"))
+            key.setExpireDate(single.get("expireDate"))
+
+            return billMapper.selectByPrimaryKey(key)
+        }
+
+        if(single.get("operator") == 'repayments'){
+            DocIReceivedExample example = new DocIReceivedExample()
+            example.createCriteria()
+                    .andTargetDocIdEqualTo(doc.getDocId())
+                    .andCardKeyEqualTo(defIV.getCardKey())
+                    .andBillTypeEqualTo(single.get("billType"))
+                    .andExpireDateEqualTo(single.get("expireDate"))
+                    .andBillPartnerIdEqualTo(single.get("billPartnerId"))
+                    .andStateEqualTo(1)
+            example.setOrderByClause("CREATED_TIME, ORDER_BY")
+
+            return receivedMapper.selectByExample(example)
+        }
+
+        return null
     }
 
 
@@ -353,18 +373,22 @@ class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
                                 .collect(Collectors.summingDouble({ r -> r.currReceived }))
 
                         double receivable = baseAmount - receivedAmount
-                        // 计算出滞纳金
-                        double overdueAmount = (baseAmount - receivedAmount) * d.overdueBillRate / 100
 
-                        OverdueDetail detail = BeanUtilz.copyFromObject(item, OverdueDetail.class)
-                        detail.received = receivedAmount
-                        detail.receivable = receivable
-                        detail.overdueAmount = overdueAmount
+                        if(receivable>0){
 
-                        details.add(detail)
+                            // 计算出滞纳金
+                            double overdueAmount = (baseAmount - receivedAmount) * d.overdueBillRate / 100
 
-                        // 四舍五入后计入小计
-                        subtotal += BigDecimal.valueOf(overdueAmount).setScale(2, RoundingMode.HALF_EVEN).doubleValue()
+                            OverdueDetail detail = BeanUtilz.copyFromObject(item, OverdueDetail.class)
+                            detail.received = receivedAmount
+                            detail.receivable = receivable
+                            detail.overdueAmount = overdueAmount
+
+                            details.add(detail)
+
+                            // 四舍五入后计入小计
+                            subtotal += BigDecimal.valueOf(overdueAmount).setScale(2, RoundingMode.HALF_EVEN).doubleValue()
+                        }
                     })
             log.info("-{}: overdue fine = {}",formattedDate,subtotal)
 

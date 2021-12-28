@@ -534,6 +534,76 @@ public class DocIReceivedExample {
             return (Criteria) this;
         }
 
+        public Criteria andBillPartnerIdIsNull() {
+            addCriterion("BILL_PARTNER_ID is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBillPartnerIdIsNotNull() {
+            addCriterion("BILL_PARTNER_ID is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBillPartnerIdEqualTo(String value) {
+            addCriterion("BILL_PARTNER_ID =", value, "billPartnerId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBillPartnerIdNotEqualTo(String value) {
+            addCriterion("BILL_PARTNER_ID <>", value, "billPartnerId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBillPartnerIdGreaterThan(String value) {
+            addCriterion("BILL_PARTNER_ID >", value, "billPartnerId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBillPartnerIdGreaterThanOrEqualTo(String value) {
+            addCriterion("BILL_PARTNER_ID >=", value, "billPartnerId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBillPartnerIdLessThan(String value) {
+            addCriterion("BILL_PARTNER_ID <", value, "billPartnerId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBillPartnerIdLessThanOrEqualTo(String value) {
+            addCriterion("BILL_PARTNER_ID <=", value, "billPartnerId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBillPartnerIdLike(String value) {
+            addCriterion("BILL_PARTNER_ID like", value, "billPartnerId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBillPartnerIdNotLike(String value) {
+            addCriterion("BILL_PARTNER_ID not like", value, "billPartnerId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBillPartnerIdIn(List<String> values) {
+            addCriterion("BILL_PARTNER_ID in", values, "billPartnerId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBillPartnerIdNotIn(List<String> values) {
+            addCriterion("BILL_PARTNER_ID not in", values, "billPartnerId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBillPartnerIdBetween(String value1, String value2) {
+            addCriterion("BILL_PARTNER_ID between", value1, value2, "billPartnerId");
+            return (Criteria) this;
+        }
+
+        public Criteria andBillPartnerIdNotBetween(String value1, String value2) {
+            addCriterion("BILL_PARTNER_ID not between", value1, value2, "billPartnerId");
+            return (Criteria) this;
+        }
+
         public Criteria andDocNumberIsNull() {
             addCriterion("DOC_NUMBER is null");
             return (Criteria) this;

@@ -553,6 +553,16 @@
             <column name="UPDATED_TIME" type="${type.long}" remarks="" />
         </createTable>
     </changeSet>
+    <changeSet id="NK_DOC_I_RECEIVED-06" author="bean" context="default">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="NK_DOC_I_RECEIVED" columnName="BILL_PARTNER_ID" />
+            </not>
+        </preConditions>
+        <addColumn tableName="NK_DOC_I_RECEIVED">
+            <column name="BILL_PARTNER_ID" type="${type.uuid}" afterColumn="EXPIRE_DATE" />
+        </addColumn>
+    </changeSet>
 
     <changeSet id="NK_DOC_RECORD-01" author="bean" context="default">
         <preConditions onFail="MARK_RAN">
