@@ -62,6 +62,14 @@ class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
         return super.calculate(doc, data, defIV, d, isTrigger, options) as List<DocIBill>
     }
 
+    /**
+     * 从数据库表中获取账单数据，不通过docEngine管理
+     * @param doc
+     * @param data
+     * @param defIV
+     * @param d
+     * @return
+     */
     @Override
     List<DocIBill> afterGetData(DocHV doc, List<DocIBill> data, DocDefIV defIV, BillDef d) {
 
@@ -72,21 +80,26 @@ class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
         example.setOrderByClause("EXPIRE_DATE")
 
         return billMapper.selectByExample(example)
-
         //return super.afterGetData(doc, data, defIV, d) as List
     }
 
+    /**
+     * 不使用docEngine保存数据
+     * @param doc
+     * @param data
+     * @param original
+     * @param defIV
+     * @param d
+     * @return
+     */
     @Override
     List<DocIBill> beforeUpdate(DocHV doc, List<DocIBill> data, List<DocIBill> original, DocDefIV defIV, BillDef d) {
 
         // 判断激活条件
-        boolean active = false
-        if(d.activeSpEL){
-            active = spELManager.invoke(d.activeSpEL, doc) as Boolean
-        }
+        boolean active = d.activeSpEL && spELManager.invoke(d.activeSpEL, doc) as Boolean
 
         // 激活行项目
-        data.forEach({i->i.state = active?1:0})
+        data.forEach({i->i.state = active ? 1 : 0 })
 
         // 先对比再保存行项目
         if(original){
@@ -129,6 +142,7 @@ class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
                 }
             })
         }else{
+            // 如果原始数据不存在，插入数据
             data.forEach({i->
                 billMapper.insert(i)
             })
@@ -151,7 +165,9 @@ class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
 
         return billMapper.selectByPrimaryKey(key)
     }
-/**
+
+
+    /**
      * 创建账单
      * @param doc
      * @param data
@@ -161,13 +177,15 @@ class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
 
         def context = spELManager.createContext(doc)
 
-        // 将所有账单项目标记为废弃
+        // 先将所有账单项目标记为废弃
         data.forEach({i->i.discard=1})
 
+        // 如果指定了账单表达式
         if(d.collectSpEL){
             def invoke = spELManager.invoke(d.collectSpEL, context)
             assert invoke instanceof List
 
+            // 将账单表达式的结果数据添加到账单中
             invoke.forEach({i->
                 if(i instanceof List){
                     i.forEach({ii->
@@ -189,15 +207,13 @@ class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
             })
         }
 
-
+        // 如果指定了还款计划卡片
         if(d.paymentCardKey){
             def payments = doc.getData()["payment"]
             if(payments){
 
-                EasyCollection coll = EasyCollection.from(payments)
-
-                coll.forEach({ single ->
-
+                // 将还款计划卡片的结果数据添加到账单中
+                EasyCollection.from(payments).forEach({ single ->
                     Long expireDate = single.get("expireDate")
                     appendBill(doc, defIV, data, "本金", expireDate, single.get("principal"))
                     appendBill(doc, defIV, data, "利息", expireDate, single.get("interest"))
@@ -205,11 +221,14 @@ class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
                 })
             }
 
-            // 将已收有值的数据强制标记为启用，避免已收丢失
+            // 因为账单卡片的数据会变更
+            // 难免会出现变更以后实收大于应收的情况
+            // 所以，将已收金额大于 0 的数据 强制标记为启用，避免已收丢失
             data.forEach({i->
                 i.discard = i.received>0 && i.discard==1 ? 0 : i.discard
             })
 
+            // 按到期日期排序
             data.sort({ a, b ->
                 if(a.expireDate==null)
                     return -1
@@ -219,8 +238,10 @@ class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
             })
         }
 
+        // 计算罚息
         calcOverdue(doc, defIV, data, d, null, null)
 
+        // 按到期日期排序
         data.sort({ a, b -> (a.expireDate <=> b.expireDate) })
     }
 
@@ -302,6 +323,8 @@ class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
         log.info("Loop:")
 
         while(startDate <= endDate){
+            // 开始循环计算每一天的罚息
+            // startDate 为循环的当前日
 
             def formattedDate = DateTimeUtilz.format(startDate,"yyyy-MM-dd")
 
@@ -312,7 +335,9 @@ class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
 
             // 每天对所有的应收项目计算一次
             calculativeBills.stream()
-                    .filter({ item -> item.expireDate < startDate })
+                    // 到期日期 <= 当前计算日期
+                    // 注意：当前计算日期当天是需要计算罚息的，但是资金分解时，不分解到账日期当天的罚息
+                    .filter({ item -> item.expireDate <= startDate })
                     .forEach({ item ->
 
                         // 条目的应收
@@ -361,9 +386,9 @@ class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
 
         // 3、清理无效的滞纳金数据
         data.removeIf({item ->
-            item.billType == d.overdueBillType &&
-                    item.expireDate > endDate &&
-                    item.received == 0
+                item.billType == d.overdueBillType &&   // 罚息类型
+                item.expireDate > endDate &&            // 到期日期在endDate之后
+                item.received == 0                      // 实收为0
         })
 
     }
