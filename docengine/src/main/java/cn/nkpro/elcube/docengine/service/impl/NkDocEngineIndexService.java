@@ -104,7 +104,7 @@ public class NkDocEngineIndexService {
     @Data
     @NoArgsConstructor
     @AllArgsConstructor
-    static class ReindexInfo{
+    public static class ReindexInfo{
         boolean finished;
         long total;
         long totalS;

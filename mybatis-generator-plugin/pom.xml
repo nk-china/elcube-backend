@@ -6,7 +6,6 @@
         <artifactId>parent</artifactId>
         <groupId>cn.nkpro.elcube</groupId>
         <version>2.0-SNAPSHOT</version>
-        <relativePath/>
     </parent>
     <artifactId>mybatis-generator-plugin</artifactId>
     <build>
