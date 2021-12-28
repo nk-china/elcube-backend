@@ -216,10 +216,10 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
 
     /**
      *
-     * @throws IllegalTransactionStateException 在无transaction状态下执行；如果当前已有transaction，则抛出异常
+     * @throws IllegalTransactionStateException 在只读transaction状态下执行；
      */
     @Override
-    @Transactional(propagation = Propagation.NEVER)
+    @Transactional(propagation = Propagation.REQUIRED, readOnly = true)
     public DocHV calculate(DocHV doc, String fromCard, Object options) {
         if(log.isInfoEnabled())log.info("开始单据计算");
         try{

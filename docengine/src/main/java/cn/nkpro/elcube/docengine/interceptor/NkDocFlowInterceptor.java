@@ -17,6 +17,7 @@
 package cn.nkpro.elcube.docengine.interceptor;
 
 import cn.nkpro.elcube.co.NkCustomScriptObject;
+import cn.nkpro.elcube.docengine.gen.DocDefFlow;
 import cn.nkpro.elcube.docengine.model.DocHV;
 import lombok.Getter;
 
@@ -25,7 +26,7 @@ import lombok.Getter;
  *
  * <p>这个拦截器用于自定义处理业务流可见性
  *
- * @see #apply(DocHV)
+ * @see #apply(DocHV,DocDefFlow)
  *
  * @author bean 2021-12-03
  */
@@ -47,7 +48,7 @@ public interface NkDocFlowInterceptor extends NkCustomScriptObject {
      * @param docHV 活动单据或前序单据
      * @return 业务流描述
      */
-    default FlowDescribe apply(DocHV docHV){return FlowDescribe.visible();}
+    default FlowDescribe apply(DocHV docHV, DocDefFlow flow){return FlowDescribe.visible();}
 
     class FlowDescribe{
 

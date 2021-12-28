@@ -17,9 +17,16 @@
 package cn.nkpro.elcube.docengine.interceptor.abstracts;
 
 import cn.nkpro.elcube.co.NkAbstractCustomScriptObject;
+import cn.nkpro.elcube.docengine.gen.DocDefFlow;
 import cn.nkpro.elcube.docengine.interceptor.NkDocFlowInterceptor;
+import cn.nkpro.elcube.docengine.model.DocHV;
 
 public abstract class NkAbstractDocFlowInterceptor
         extends NkAbstractCustomScriptObject
         implements NkDocFlowInterceptor {
+
+    @Override
+    public FlowDescribe apply(DocHV docHV, DocDefFlow flow) {
+        return FlowDescribe.visible();
+    }
 }

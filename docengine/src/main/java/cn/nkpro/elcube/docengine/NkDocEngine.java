@@ -52,7 +52,7 @@ public interface NkDocEngine {
     @Transactional(propagation = Propagation.REQUIRED)
     DocHV create(String docType, String preDocId, String optSource, Function function);
 
-    @Transactional(propagation = Propagation.NEVER)
+    @Transactional(propagation = Propagation.REQUIRED, readOnly = true)
     DocHV calculate(DocHV doc, String fromCard, Object options);
 
     @Transactional

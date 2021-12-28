@@ -17,9 +17,15 @@
 package cn.nkpro.elcube.docengine.interceptor.abstracts;
 
 import cn.nkpro.elcube.co.NkAbstractCustomScriptObject;
+import cn.nkpro.elcube.docengine.gen.DocDefState;
 import cn.nkpro.elcube.docengine.interceptor.NkDocStateInterceptor;
+import cn.nkpro.elcube.docengine.model.DocHV;
 
 public abstract class NkAbstractDocStateInterceptor
         extends NkAbstractCustomScriptObject
         implements NkDocStateInterceptor {
+    @Override
+    public boolean apply(DocHV doc, DocDefState state) {
+        return true;
+    }
 }

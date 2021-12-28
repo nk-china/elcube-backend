@@ -27,6 +27,7 @@ import cn.nkpro.elcube.docengine.NkDocProcessor;
 import cn.nkpro.elcube.docengine.datasync.NkDocDataAdapter;
 import cn.nkpro.elcube.docengine.gen.*;
 import cn.nkpro.elcube.docengine.interceptor.NkDocFlowInterceptor;
+import cn.nkpro.elcube.docengine.interceptor.NkDocStateInterceptor;
 import cn.nkpro.elcube.docengine.model.*;
 import cn.nkpro.elcube.docengine.model.es.DocHES;
 import cn.nkpro.elcube.docengine.service.NkDocDefService;
@@ -206,6 +207,12 @@ class AbstractNkDocEngine {
      */
     DocHV docToView(DocHV docHV){
 
+        // 每一次操作，都延长单据运行时缓存的有效期
+        if(StringUtils.isNotBlank(docHV.getRuntimeKey())){
+            redisRuntime.set(docHV.getRuntimeKey(),docHV);
+            redisRuntime.expire(docHV.getRuntimeKey(),60 * 60);//1小时
+        }
+
         // 根据权限过滤单据数据与配置
         docPermService.filterDocCards(null, docHV);
 
@@ -224,6 +231,16 @@ class AbstractNkDocEngine {
                 .forEach(state->{
                     if(StringUtils.equalsAny(docHV.getDocState(),state.getPreDocState(),state.getDocState())){
                         cache.putIfAbsent(state.getDocState(),state);
+                    }
+                });
+        cache.values()
+                .forEach(state->{
+                    state.setVisible(true);
+                    if(StringUtils.isNotBlank(state.getRefObjectType())){
+                        state.setVisible(
+                            customObjectManager.getCustomObject(state.getRefObjectType(), NkDocStateInterceptor.class)
+                                .apply(docHV, state)
+                        );
                     }
                 });
         docHV.getDef().setStatus(new ArrayList<>(cache.values()));
@@ -245,8 +262,9 @@ class AbstractNkDocEngine {
 
                     // 处理 单据业务流的自定义条件
                     if(visibleState && StringUtils.isNotBlank(flow.getRefObjectType())){
-                        NkDocFlowInterceptor.FlowDescribe flowDescribe = applyDocFlowInterceptor(flow.getRefObjectType(), docHV);
+                        NkDocFlowInterceptor.FlowDescribe flowDescribe = applyDocFlowInterceptor(flow, docHV);
                         if(!flowDescribe.isVisible()){
+                            visibleState = false;
                             flow.setVisibleDesc(flowDescribe.getVisibleDesc());
                         }
                     }
@@ -258,12 +276,6 @@ class AbstractNkDocEngine {
             log.info("设置单据后续操作 操作数量 = {}",
                     docHV.getDef().getNextFlows().size()
             );
-
-        // 每一次操作，都延长单据运行时缓存的有效期
-        if(StringUtils.isNotBlank(docHV.getRuntimeKey())){
-            redisRuntime.set(docHV.getRuntimeKey(),docHV);
-            redisRuntime.expire(docHV.getRuntimeKey(),60 * 60);//1小时
-        }
 
         return docHV;
     }
@@ -301,7 +313,7 @@ class AbstractNkDocEngine {
             throw new NkDefineException("状态不满足条件");
         }
         if(StringUtils.isNotBlank(flowV.getRefObjectType())){
-            NkDocFlowInterceptor.FlowDescribe flowDescribe = applyDocFlowInterceptor(flowV.getRefObjectType(), preDoc);
+            NkDocFlowInterceptor.FlowDescribe flowDescribe = applyDocFlowInterceptor(flowV, preDoc);
             if(!flowDescribe.isVisible()){
                 throw new NkDefineException(flowDescribe.getVisibleDesc());
             }
@@ -313,9 +325,9 @@ class AbstractNkDocEngine {
             );
     }
 
-    private NkDocFlowInterceptor.FlowDescribe applyDocFlowInterceptor(String docFlowInterceptor, DocHV docHV){
-        return customObjectManager.getCustomObject(docFlowInterceptor, NkDocFlowInterceptor.class)
-                .apply(docHV);
+    private NkDocFlowInterceptor.FlowDescribe applyDocFlowInterceptor(DocDefFlow flow, DocHV docHV){
+        return customObjectManager.getCustomObject(flow.getRefObjectType(), NkDocFlowInterceptor.class)
+                .apply(docHV, flow);
     }
 
     void validate(DocHV doc){

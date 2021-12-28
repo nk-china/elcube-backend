@@ -231,6 +231,14 @@ public class NkDocFinder implements InitializingBean {
         args.get().add(value);
         return this;
     }
+    public NkDocFinder docStateIn(String... value){
+        Assert.notEmpty(value);
+
+        String collect = Arrays.stream(value).map(i -> "?").collect(Collectors.joining(", "));
+        where.get().add(String.format("h.doc_state IN (%s)", collect));
+        args.get().addAll(Arrays.asList(value));
+        return this;
+    }
     public NkDocFinder prevIdEquals(String value){
         where.get().add("h.pre_doc_id = ?");
         args.get().add(value);
@@ -367,6 +375,30 @@ public class NkDocFinder implements InitializingBean {
         return sql;
     }
 
+
+    private String buildCount(){
+        String sql = String.format(
+                "SELECT COUNT(1) " +
+                        "\n  FROM nk_doc_h AS h" +
+                        "\n WHERE %s " +
+                        "\n %s",
+                String.join("\n   AND ", where.get()),
+                order.get().isEmpty()?
+                        StringUtils.EMPTY:
+                        order.get().stream().collect(Collectors.joining(", ","ORDER BY ", StringUtils.EMPTY))
+        );
+
+        if(log.isInfoEnabled())
+            log.info(
+                    "执行DocFinder查找单据: \n"+
+                            sql+
+                            "\nWith Parameters: "+
+                            args.get().stream().map(i->i==null?null:i.toString()).collect(Collectors.joining(", "))
+            );
+
+        return sql;
+    }
+
     private RowMapper<DocH> rowMapper = (resultSet, i) -> {
         DocH doc = new DocH();
         doc.setDocId(resultSet.getString("DOC_ID"));
@@ -412,6 +444,17 @@ public class NkDocFinder implements InitializingBean {
     public DocH singleResult(){
         try{
             return jdbcTemplate.queryForObject(build(0,1), args.get().toArray(), rowMapper);
+        }finally {
+            args.remove();
+            where.remove();
+            order.remove();
+        }
+    }
+
+    public long countResult(){
+        try{
+            Long count = jdbcTemplate.queryForObject(buildCount(), args.get().toArray(), Long.class);
+            return count == null ? 0 : count;
         }finally {
             args.remove();
             where.remove();

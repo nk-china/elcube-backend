@@ -733,6 +733,76 @@ public class DocDefFlowExample {
             addCriterion("ORDER_BY not between", value1, value2, "orderBy");
             return (Criteria) this;
         }
+
+        public Criteria andRefObjectParamsIsNull() {
+            addCriterion("REF_OBJECT_PARAMS is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefObjectParamsIsNotNull() {
+            addCriterion("REF_OBJECT_PARAMS is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefObjectParamsEqualTo(String value) {
+            addCriterion("REF_OBJECT_PARAMS =", value, "refObjectParams");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefObjectParamsNotEqualTo(String value) {
+            addCriterion("REF_OBJECT_PARAMS <>", value, "refObjectParams");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefObjectParamsGreaterThan(String value) {
+            addCriterion("REF_OBJECT_PARAMS >", value, "refObjectParams");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefObjectParamsGreaterThanOrEqualTo(String value) {
+            addCriterion("REF_OBJECT_PARAMS >=", value, "refObjectParams");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefObjectParamsLessThan(String value) {
+            addCriterion("REF_OBJECT_PARAMS <", value, "refObjectParams");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefObjectParamsLessThanOrEqualTo(String value) {
+            addCriterion("REF_OBJECT_PARAMS <=", value, "refObjectParams");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefObjectParamsLike(String value) {
+            addCriterion("REF_OBJECT_PARAMS like", value, "refObjectParams");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefObjectParamsNotLike(String value) {
+            addCriterion("REF_OBJECT_PARAMS not like", value, "refObjectParams");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefObjectParamsIn(List<String> values) {
+            addCriterion("REF_OBJECT_PARAMS in", values, "refObjectParams");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefObjectParamsNotIn(List<String> values) {
+            addCriterion("REF_OBJECT_PARAMS not in", values, "refObjectParams");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefObjectParamsBetween(String value1, String value2) {
+            addCriterion("REF_OBJECT_PARAMS between", value1, value2, "refObjectParams");
+            return (Criteria) this;
+        }
+
+        public Criteria andRefObjectParamsNotBetween(String value1, String value2) {
+            addCriterion("REF_OBJECT_PARAMS not between", value1, value2, "refObjectParams");
+            return (Criteria) this;
+        }
     }
 
     /**

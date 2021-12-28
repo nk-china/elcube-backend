@@ -149,6 +149,18 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="NK_DOC_DEF_FLOW-02" author="bean" context="default">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="NK_DOC_DEF_FLOW" columnName="REF_OBJECT_PARAMS" />
+            </not>
+        </preConditions>
+        <addColumn tableName="NK_DOC_DEF_FLOW">
+            <column name="REF_OBJECT_PARAMS" type="${type.var2}" />
+        </addColumn>
+    </changeSet>
+
+
     <changeSet id="NK_DOC_DEF_H-01" author="bean" context="default">
         <preConditions onFail="MARK_RAN">
             <not>

@@ -18,20 +18,19 @@ package cn.nkpro.elcube.docengine.interceptor;
 
 
 import cn.nkpro.elcube.co.NkCustomObject;
+import cn.nkpro.elcube.docengine.gen.DocDefState;
 import cn.nkpro.elcube.docengine.model.DocHV;
 
 /**
- *
- * <b>注意：当前接口尚未实际应用
- *
- * <h3>状态变化拦截器
- * <p>这个拦截器用于处理单据状态变化事件
- * <p>当一个单据被保存时，如果 {@link DocHV#getDocState()} 值发生变化，将触发 {@link #apply()} 方法
+ * *
+ * <h3>状态变化拦截器</h3>
+ * <p>这个拦截器用于处理状态可见行</p>
+ * <p>返回true则状态可见</p>
  *
  * @author bean 2021-12-03
  * @since v2.0
  *
  */
 public interface NkDocStateInterceptor extends NkCustomObject {
-    default void apply(){}
+    default boolean apply(DocHV doc, DocDefState state){return true;}
 }
