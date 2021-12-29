@@ -16,6 +16,7 @@
  */
 package cn.nkpro.elcube.task.impl;
 
+import cn.nkpro.elcube.docengine.NkDocEngineThreadLocal;
 import cn.nkpro.elcube.docengine.model.DocHV;
 import cn.nkpro.elcube.task.model.BpmTaskES;
 import org.camunda.bpm.engine.impl.context.Context;
@@ -55,7 +56,10 @@ public class NkGlobalEventHandler extends AbstractNkBpmSupport implements Histor
     // 任务被创建
     private void onTaskCreate(HistoricTaskInstanceEventEntity event){
 
-        DocHV doc = docEngine.detail(Context.getBpmnExecutionContext().getProcessInstance().getBusinessKey());
+        DocHV doc = NkDocEngineThreadLocal.getCurr();
+        if(doc==null){
+            doc = docEngine.detail(Context.getBpmnExecutionContext().getProcessInstance().getBusinessKey());
+        }
 
         BpmTaskES bpmTaskES = BpmTaskES.from(doc,
                 event.getId(),
