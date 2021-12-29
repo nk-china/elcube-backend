@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component
 class NkCardBpm extends NkAbstractCard<BpmData,BpmDef> {
 
     @SuppressWarnings("unused")
-    class BpmData{
+    static class BpmData{
         private String processKey
 
         String getProcessKey() {
@@ -43,7 +43,7 @@ class NkCardBpm extends NkAbstractCard<BpmData,BpmDef> {
     }
 
     @SuppressWarnings("unused")
-    class BpmDef{
+    static class BpmDef{
 
         private String processKey
         private String startBy
