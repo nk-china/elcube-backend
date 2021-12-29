@@ -16,8 +16,10 @@
  */
 package cn.nkpro.elcube.security;
 
+import cn.nkpro.elcube.platform.gen.UserAccount;
+
 import java.util.Collections;
 
 public interface UserBusinessAdapter {
-    default Object getUser(String key){return Collections.emptyMap();}
+    default Object getUser(UserAccount account){return Collections.emptyMap();}
 }

@@ -33,7 +33,7 @@ public interface UserAuthorizationService {
     Integer GROUP_TO_PERM = 1;
 
 
-    List<GrantedAuthority> buildGrantedPerms(String accountId, String partnerId);
+    List<GrantedAuthority> buildGrantedPerms(UserAccount account);
 
     List<AuthLimit> getLimits(String[] limitIds);
 

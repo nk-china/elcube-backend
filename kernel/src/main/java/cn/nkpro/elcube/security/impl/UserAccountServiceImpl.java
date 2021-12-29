@@ -100,7 +100,7 @@ public class UserAccountServiceImpl implements UserAccountService {
                 .findAny()
                 .map(sysAccount -> {
                     UserAccountBO ud = BeanUtilz.copyFromObject(sysAccount, UserAccountBO.class);
-                    ud.setAuthorities(authorizationService.buildGrantedPerms(sysAccount.getId(),sysAccount.getObjectId()));
+                    ud.setAuthorities(authorizationService.buildGrantedPerms(sysAccount));
                     return ud;
                 })
                 .orElse(null);
