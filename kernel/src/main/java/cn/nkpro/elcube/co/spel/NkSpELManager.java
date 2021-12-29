@@ -30,6 +30,8 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.stereotype.Component;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -144,5 +146,22 @@ public class NkSpELManager {
         }
 
         return input;
+    }
+
+   /* public Map<String, Object> getSpELMap(){
+        Map<String, NkSpELInjection> map = customObjectManager.getCustomObjects(NkSpELInjection.class);
+        Map<String, NkSpELInjection> mapNew = new HashMap<>();
+        for(String key:map.keySet()){
+            mapNew.put(key.substring(4), map.get(key));
+        }
+        return mapNew;
+    }*/
+    public Map<String, Object> getSpELMap(){
+        Map<String, NkSpELInjection> map = customObjectManager.getCustomObjects(NkSpELInjection.class);
+        Map<String, Object> mapNew = new HashMap<>();
+        for(String key:map.keySet()){
+            mapNew.put(key.substring(4), map.get(key));
+        }
+        return mapNew;
     }
 }
