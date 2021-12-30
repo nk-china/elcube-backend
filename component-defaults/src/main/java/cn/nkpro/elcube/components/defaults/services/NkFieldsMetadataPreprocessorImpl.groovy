@@ -1,7 +1,7 @@
-package cn.nkpro.elcube.components.defaults.util
+package cn.nkpro.elcube.components.defaults.services
 
+import cn.nkpro.elcube.docengine.interceptor.abstracts.NkAbstractFieldsMetadataPreprocessor
 import cn.nkpro.elcube.docengine.model.DocHV
-import cn.nkpro.elcube.platform.gen.UserAccount
 import fr.opensagres.xdocreport.document.IXDocReport
 import fr.opensagres.xdocreport.template.IContext
 import fr.opensagres.xdocreport.template.formatter.FieldsMetadata
@@ -10,36 +10,36 @@ import org.springframework.stereotype.Component
 import java.util.stream.Collectors
 
 /**
- *@description:word的域 循环数据
- *@Author:YF
- *@date:2021/7/14 18:13
- *@param:
- *@return:
+ *@description:word的域 循环数据的处理
  **/
-@Component
-
-class FieldsMetadataPreprocessorPlansImpl implements FieldsMetadataPreprocessor {
+@Component("NkFieldsMetadataPreprocessorImpl")
+class NkFieldsMetadataPreprocessorImpl extends NkAbstractFieldsMetadataPreprocessor{
 
     @Override
-    void processMeta(IXDocReport report){
+     void processMeta(IXDocReport report){
 
         FieldsMetadata metadata = new FieldsMetadata()
-        metadata.addFieldAsList("plans.username")
-        metadata.addFieldAsList("plans.createdTime")
+        metadata.addFieldAsList("certList.username")
+        metadata.addFieldAsList("certList.createdTime")
         report.setFieldsMetadata(metadata)
     }
 
     @Override
     void processData(DocHV doc, IContext context) {
-        List<TestBo> plans = new ArrayList<>()
+        List<TestBo> certList = new ArrayList<>()
         TestBo userAccount = new TestBo()
         userAccount.setUsername("11")
         userAccount.setCreatedTime("1233")
-        plans.add(userAccount)
-        if(plans!=null){
-            context.put("plans", plans
+        certList.add(userAccount)
+        if(certList!=null){
+            context.put("certList", certList
                     .stream()
                     .collect(Collectors.toList()))
         }
+
+    }
+    static class TestBo{
+        String username
+        String createdTime
     }
 }

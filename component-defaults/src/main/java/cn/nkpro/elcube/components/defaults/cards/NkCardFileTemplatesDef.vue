@@ -67,7 +67,7 @@
 </template>
 
 <script>
-    import {MixinDef, MixinSortable} from "nk";
+    import {MixinDef, MixinSortable,NkUtil} from "nk";
     export default {
         mixins: [new MixinDef({}), MixinSortable()],
         data() {
@@ -100,7 +100,6 @@
                 this.$refs.xTable.loadData(this.def.items).then(() => this.$refs.xTable.setActiveRow(newItem));
             },
             beforeUpload(file) {
-                console.log("this.file",file)
                 const reader = new FileReader();
                 const self = this;
                 reader.readAsDataURL(file);
@@ -108,25 +107,29 @@
                     self.row.templateBase64 = this.result;
                     self.row.templateFileName = file.name;
                 }
-                console.log("this.row",this.row)
                 return false;
             },
             exportFile(row) {
                 this.nk$callDef(row.templateCode)
                     .then(res => {this.pathUrl = res});
                 this.$http.get("/api/fs/download?url="+this.pathUrl).then(res => {
-                    console.log("res",res)
                     this.$refs.iframe.src = res.data;
                 });
-
-               /* this.nk$callDef(row.templateCode)
-                    .then(res => {
-                        this.$http.get("/api/fs/download?url="+res).then(res => {
-                            console.log("res",res)
-                            this.$refs.iframe.src = res.data;
-                        });
-                        console.log(res)
-                    });*/
+            },
+             hasError() {
+                if(NkUtil.hasBlack(this.def.items,['templateCode'])) {
+                    return this.$message.error("模板不能为空，请检查后再次提交");
+                }
+                if(NkUtil.isRepeat(this.def.items,['templateCode'])) {
+                    this.$message.error("模板定义重复，请检查后再次提交");
+                    return false;
+                }
+                if(NkUtil.hasBlack(this.def.items,['templateBase64'])) {
+                    return this.$message.error("文件不能为空，请检查后再次提交");
+                }
+                if(NkUtil.hasBlack(this.def.items,['templateDesc'])) {
+                    return this.$message.error("描述不能为空，请检查后再次提交");
+                }
             }
         }
     }

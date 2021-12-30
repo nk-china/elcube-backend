@@ -1,4 +1,4 @@
-<template @expand="$nkSortableVxeTable">
+<template>
     <nk-card  :edit-mode="editMode">
         <vxe-table
                 ref="xTable"
@@ -10,14 +10,14 @@
                 show-overflow="tooltip"
                 size="mini"
                 border=inner
-                :data="data"
+                :data="def.items"
                 :loading="loading"
                 :edit-config="{trigger: 'click', mode: 'row', showIcon: editMode, activeMethod: xTableActiveMethod, showStatus: true}"
                 :sort-config="{trigger: 'cell', remote: false,showIcon: !editMode, orders: ['desc', 'asc', null]}"
                 :class="editMode&&'edit-table'">
             <vxe-table-column title="模版项"           field="templateCode" />
             <vxe-table-column title="描述"             field="templateDesc"  />
-            <vxe-table-column title="Action"          field=""  >
+            <vxe-table-column title="Action"          field="" v-if="!editMode" >
                 <template v-slot="{row}">
                     <a-button type="link"
                               size="small"
