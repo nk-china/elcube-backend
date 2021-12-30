@@ -50,6 +50,7 @@ class NkCardFileTemplates extends NkAbstractCard<Map, NkCardFileTemplateDefBO> {
     @Autowired
     private NkCustomObjectManager nkCustomObjectManager
 
+
     @Override
     Object callDef(NkCardFileTemplateDefBO nkCardFileTemplateDefBO, Object options) {
         //获取导出处理程序的方法
@@ -60,22 +61,23 @@ class NkCardFileTemplates extends NkAbstractCard<Map, NkCardFileTemplateDefBO> {
         List<NkCardFileTemplateDefTBO> items = nkCardFileTemplateDefBO.getItems()
         NkCardFileTemplateDefTBO nkCardFileTemplateDefTBO = items.stream().filter { i -> StringUtils.equals(i.getTemplateCode(), options as String) }
                 .findFirst().orElse(null)
-        if (nkCardFileTemplateDefTBO != null && StringUtils.isNotBlank(nkCardFileTemplateDefTBO.getTemplateBase64())) {
-            String base64str = nkCardFileTemplateDefTBO.getTemplateBase64().substring(nkCardFileTemplateDefTBO.getTemplateBase64().indexOf("base64,") + 7)
-            byte[] bytes = Base64.getDecoder().decode(base64str)
-            if (bytes == null) {
-                return ""
-            }
-            String url = String.join(File.separator, ".NkCardFileTemplates", format.format(new Date()), UUID.randomUUID().toString(), nkCardFileTemplateDefTBO.getTemplateFileName()).replace("\\", "/")
-            String path = String.join(File.separator, properties.getFileRootPath(), url).replace("\\", "/")
-            File targetFile = new File(path)
-            if (targetFile.getParentFile().mkdirs()) {
-                FileOutputStream fos = new FileOutputStream(targetFile)
-                fos.write(bytes, 0, bytes.length)
-                fos.flush()
-                fos.close()
-                return url
-            }
+        if (nkCardFileTemplateDefTBO == null || StringUtils.isBlank(nkCardFileTemplateDefTBO.getTemplateBase64())) {
+            return ""
+        }
+        String base64str = nkCardFileTemplateDefTBO.getTemplateBase64().substring(nkCardFileTemplateDefTBO.getTemplateBase64().indexOf("base64,") + 7)
+        byte[] bytes = Base64.getDecoder().decode(base64str)
+        if (bytes == null) {
+            return ""
+        }
+        String url = String.join(File.separator, ".NkCardFileTemplates", format.format(new Date()), UUID.randomUUID().toString(), nkCardFileTemplateDefTBO.getTemplateFileName()).replace("\\", "/")
+        String path = String.join(File.separator, properties.getFileRootPath(), url).replace("\\", "/")
+        File targetFile = new File(path)
+        if (targetFile.getParentFile().mkdirs()) {
+            FileOutputStream fos = new FileOutputStream(targetFile)
+            fos.write(bytes, 0, bytes.length)
+            fos.flush()
+            fos.close()
+            return url
         }
         return super.callDef(nkCardFileTemplateDefBO, options)
     }
@@ -96,7 +98,7 @@ class NkCardFileTemplates extends NkAbstractCard<Map, NkCardFileTemplateDefBO> {
             }
             String fileNm = nkCardFileTemplateDefTBO.getTemplateFileName()
             int i = fileNm.lastIndexOf(".")
-            String wordFileName = nkCardFileTemplateDefTBO.getTemplateDesc() + fileNm.substring(i)
+            String wordFileName = StringUtils.isNotBlank(nkCardFileTemplateDefTBO.getTemplateDesc()) ? nkCardFileTemplateDefTBO.getTemplateDesc() : fileNm.substring(0, fileNm.indexOf(".")) + fileNm.substring(i)
             String wordUrl = String.join(File.separator, ".NkCardFileTemplates", format.format(new Date()), UUID.randomUUID().toString(), wordFileName as String).replace("\\", "/")
             String wordPath = String.join(File.separator, properties.getFileRootPath(), wordUrl).replace("\\", "/")
             File targetFile = new File(wordPath)
