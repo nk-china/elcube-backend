@@ -55,6 +55,11 @@
     </dependencyManagement>
 
     <dependencies>
+        <dependency>
+            <groupId>cn.nkpro.elcube</groupId>
+            <artifactId>web-front-resources</artifactId>
+            <version>${parent.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>cn.nkpro.elcube</groupId>
