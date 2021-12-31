@@ -46,7 +46,10 @@ class NkCardPaymentSchedule extends NkAbstractCard<List<PaymentI>,Def> {
             if(preData instanceof List){
                 data = BeanUtilz.copyFromList(preData, PaymentI.class)
             }
+        }else{
+            data = calculate(doc, data, defIV, d, true, "");
         }
+
         return super.afterCreate(doc, preDoc, data, defIV, d) as List
     }
 
