@@ -98,7 +98,7 @@ class NkCardFileTemplates extends NkAbstractCard<Map, NkCardFileTemplateDefBO> {
             }
             String fileNm = nkCardFileTemplateDefTBO.getTemplateFileName()
             int i = fileNm.lastIndexOf(".")
-            String wordFileName = StringUtils.isNotBlank(nkCardFileTemplateDefTBO.getTemplateDesc()) ? nkCardFileTemplateDefTBO.getTemplateDesc() : fileNm.substring(0, fileNm.indexOf(".")) + fileNm.substring(i)
+            String wordFileName = StringUtils.isNotBlank(nkCardFileTemplateDefTBO.getTemplateDesc()) ? nkCardFileTemplateDefTBO.getTemplateDesc()+fileNm.substring(i) : fileNm.substring(0, fileNm.indexOf(".")) + fileNm.substring(i)
             String wordUrl = String.join(File.separator, ".NkCardFileTemplates", format.format(new Date()), UUID.randomUUID().toString(), wordFileName as String).replace("\\", "/")
             String wordPath = String.join(File.separator, properties.getFileRootPath(), wordUrl).replace("\\", "/")
             File targetFile = new File(wordPath)
@@ -146,7 +146,7 @@ class NkCardFileTemplates extends NkAbstractCard<Map, NkCardFileTemplateDefBO> {
             }
             IContext context = report.createContext()
             context.putMap(spELManager.getSpELMap())
-            context.put("doc", doc)
+            context.put("\$doc", doc)
             if (preprocessors) {
                 preprocessors.processData(doc, context)
             }

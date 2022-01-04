@@ -12,7 +12,7 @@ import java.util.stream.Collectors
 /**
  *@description:word的域 循环数据的处理
  **/
-@Component("NkFileTemplateMetadataPreprocessor")
+@Component("NkFileTemplateMetadataPreprocessorImpl")
 class NkFileTemplateMetadataPreprocessorImpl extends NkAbstractFileTemplateMetadataPreprocessor{
 
     @Override
