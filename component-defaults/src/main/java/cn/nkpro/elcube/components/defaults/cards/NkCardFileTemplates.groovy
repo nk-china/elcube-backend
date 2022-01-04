@@ -20,7 +20,7 @@ import cn.nkpro.elcube.annotation.NkNote
 import cn.nkpro.elcube.basic.NkProperties
 import cn.nkpro.elcube.co.NkCustomObjectManager
 import cn.nkpro.elcube.docengine.NkAbstractCard
-import cn.nkpro.elcube.docengine.interceptor.NkFieldsMetadataPreprocessor
+import cn.nkpro.elcube.docengine.interceptor.NkFileTemplateMetadataPreprocessor
 import cn.nkpro.elcube.docengine.model.DocDefIV
 import cn.nkpro.elcube.docengine.model.DocHV
 import cn.nkpro.elcube.exception.NkDefineException
@@ -55,7 +55,7 @@ class NkCardFileTemplates extends NkAbstractCard<Map, NkCardFileTemplateDefBO> {
     Object callDef(NkCardFileTemplateDefBO nkCardFileTemplateDefBO, Object options) {
         //获取导出处理程序的方法
         if (StringUtils.equals("findHandlerClassOp", options as String)) {
-            return nkCustomObjectManager.getCustomObjectDescriptionList(NkFieldsMetadataPreprocessor.class, true, null)
+            return nkCustomObjectManager.getCustomObjectDescriptionList(NkFileTemplateMetadataPreprocessor.class, true, null)
         }
         //下载模板文件
         List<NkCardFileTemplateDefTBO> items = nkCardFileTemplateDefBO.getItems()
@@ -133,9 +133,9 @@ class NkCardFileTemplates extends NkAbstractCard<Map, NkCardFileTemplateDefBO> {
     }
 
     private byte[] convert(DocHV doc, byte[] template, NkCardFileTemplateDefTBO nkCardFileTemplateDefTBO) throws NkSystemException {
-        NkFieldsMetadataPreprocessor preprocessors
+        NkFileTemplateMetadataPreprocessor preprocessors
         if (StringUtils.isNotBlank(nkCardFileTemplateDefTBO.getHandler())) {
-            preprocessors = nkCustomObjectManager.getCustomObject(nkCardFileTemplateDefTBO.getHandler(), NkFieldsMetadataPreprocessor.class)
+            preprocessors = nkCustomObjectManager.getCustomObject(nkCardFileTemplateDefTBO.getHandler(), NkFileTemplateMetadataPreprocessor.class)
         }
         InputStream input = new ByteArrayInputStream(template)
         ByteArrayOutputStream out = new ByteArrayOutputStream()

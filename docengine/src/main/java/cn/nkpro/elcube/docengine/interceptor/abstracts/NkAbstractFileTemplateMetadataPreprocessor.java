@@ -17,14 +17,14 @@
 package cn.nkpro.elcube.docengine.interceptor.abstracts;
 
 import cn.nkpro.elcube.co.NkAbstractCustomScriptObject;
-import cn.nkpro.elcube.docengine.interceptor.NkFieldsMetadataPreprocessor;
+import cn.nkpro.elcube.docengine.interceptor.NkFileTemplateMetadataPreprocessor;
 import cn.nkpro.elcube.docengine.model.DocHV;
 import fr.opensagres.xdocreport.document.IXDocReport;
 import fr.opensagres.xdocreport.template.IContext;
 
-public abstract class NkAbstractFieldsMetadataPreprocessor
+public abstract class NkAbstractFileTemplateMetadataPreprocessor
         extends NkAbstractCustomScriptObject
-        implements NkFieldsMetadataPreprocessor {
+        implements NkFileTemplateMetadataPreprocessor {
     @Override
     public void processMeta(IXDocReport report) {
 

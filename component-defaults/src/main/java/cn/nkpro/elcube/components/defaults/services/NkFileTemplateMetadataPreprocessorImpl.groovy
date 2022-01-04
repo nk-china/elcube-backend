@@ -1,6 +1,6 @@
 package cn.nkpro.elcube.components.defaults.services
 
-import cn.nkpro.elcube.docengine.interceptor.abstracts.NkAbstractFieldsMetadataPreprocessor
+import cn.nkpro.elcube.docengine.interceptor.abstracts.NkAbstractFileTemplateMetadataPreprocessor
 import cn.nkpro.elcube.docengine.model.DocHV
 import fr.opensagres.xdocreport.document.IXDocReport
 import fr.opensagres.xdocreport.template.IContext
@@ -12,8 +12,8 @@ import java.util.stream.Collectors
 /**
  *@description:word的域 循环数据的处理
  **/
-@Component("NkFieldsMetadataPreprocessorImpl")
-class NkFieldsMetadataPreprocessorImpl extends NkAbstractFieldsMetadataPreprocessor{
+@Component("NkFileTemplateMetadataPreprocessor")
+class NkFileTemplateMetadataPreprocessorImpl extends NkAbstractFileTemplateMetadataPreprocessor{
 
     @Override
      void processMeta(IXDocReport report){

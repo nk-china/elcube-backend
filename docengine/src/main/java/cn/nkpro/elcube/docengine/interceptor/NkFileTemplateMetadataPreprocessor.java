@@ -8,7 +8,7 @@ import fr.opensagres.xdocreport.template.IContext;
 /**
   *@description:文件模板导出关于循环数据的处理接口
  **/
-public interface NkFieldsMetadataPreprocessor extends NkCustomObject {
+public interface NkFileTemplateMetadataPreprocessor extends NkCustomObject {
     void processMeta(IXDocReport report);
     void processData(DocHV doc, IContext context);
 }
