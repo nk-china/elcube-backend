@@ -115,21 +115,6 @@
                 this.$http.get("/api/fs/download?url="+this.pathUrl).then(res => {
                     this.$refs.iframe.src = res.data;
                 });
-            },
-             hasError() {
-                if(NkUtil.hasBlack(this.def.items,['templateCode'])) {
-                    return this.$message.error("模板不能为空，请检查后再次提交");
-                }
-                if(NkUtil.isRepeat(this.def.items,['templateCode'])) {
-                    this.$message.error("模板定义重复，请检查后再次提交");
-                    return false;
-                }
-                if(NkUtil.hasBlack(this.def.items,['templateBase64'])) {
-                    return this.$message.error("文件不能为空，请检查后再次提交");
-                }
-                if(NkUtil.hasBlack(this.def.items,['templateDesc'])) {
-                    return this.$message.error("描述不能为空，请检查后再次提交");
-                }
             }
         }
     }
