@@ -1,7 +1,6 @@
 package cn.nkpro.elcube.components.financial.services
 
 import cn.nkpro.elcube.co.easy.EasyCollection
-import cn.nkpro.elcube.components.financial.cards.NkCardPaymentSchedule
 import cn.nkpro.elcube.docengine.interceptor.abstracts.NkAbstractFileTemplateMetadataPreprocessor
 import cn.nkpro.elcube.docengine.model.DocHV
 import fr.opensagres.xdocreport.document.IXDocReport
@@ -32,7 +31,7 @@ class NkFileTemplateMetadataPlansPreprocessorImpl extends NkAbstractFileTemplate
 
     @Override
     void processData(DocHV doc, IContext context) {
-        List<NkCardPaymentSchedule.PaymentI> paymentIList = new ArrayList<>()
+        List<Object> paymentIList = new ArrayList<>()
         EasyCollection collection = doc.fetchList("payment")
         collection.forEach({ l ->
             paymentIList.add(l.target())
