@@ -464,6 +464,66 @@ public class DocIIndexExample {
             return (Criteria) this;
         }
 
+        public Criteria andNumberValueIsNull() {
+            addCriterion("NUMBER_VALUE is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNumberValueIsNotNull() {
+            addCriterion("NUMBER_VALUE is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andNumberValueEqualTo(Double value) {
+            addCriterion("NUMBER_VALUE =", value, "numberValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andNumberValueNotEqualTo(Double value) {
+            addCriterion("NUMBER_VALUE <>", value, "numberValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andNumberValueGreaterThan(Double value) {
+            addCriterion("NUMBER_VALUE >", value, "numberValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andNumberValueGreaterThanOrEqualTo(Double value) {
+            addCriterion("NUMBER_VALUE >=", value, "numberValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andNumberValueLessThan(Double value) {
+            addCriterion("NUMBER_VALUE <", value, "numberValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andNumberValueLessThanOrEqualTo(Double value) {
+            addCriterion("NUMBER_VALUE <=", value, "numberValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andNumberValueIn(List<Double> values) {
+            addCriterion("NUMBER_VALUE in", values, "numberValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andNumberValueNotIn(List<Double> values) {
+            addCriterion("NUMBER_VALUE not in", values, "numberValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andNumberValueBetween(Double value1, Double value2) {
+            addCriterion("NUMBER_VALUE between", value1, value2, "numberValue");
+            return (Criteria) this;
+        }
+
+        public Criteria andNumberValueNotBetween(Double value1, Double value2) {
+            addCriterion("NUMBER_VALUE not between", value1, value2, "numberValue");
+            return (Criteria) this;
+        }
+
         public Criteria andDataTypeIsNull() {
             addCriterion("DATA_TYPE is null");
             return (Criteria) this;

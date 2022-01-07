@@ -147,10 +147,19 @@ class AbstractNkDocEngine {
                     dynamics.compute(docIIndex.getName(),(key,value)->{
                         if(value==null)
                             value = new ArrayList<>();
-                        try {
-                            value.add(JSON.parseObject(docIIndex.getValue(),Class.forName(docIIndex.getDataType())));
-                        } catch (ClassNotFoundException ignored) {
+
+                        if(String.class.getName().equals(docIIndex.getDataType())){
+                            value.add(docIIndex.getValue());
+                        }else if(Number.class.getName().equals(docIIndex.getDataType())){
+                            value.add(docIIndex.getNumberValue());
+                        }else{
+                            value.add(null);
                         }
+
+//                        try {
+//                            value.add(JSON.parseObject(docIIndex.getValue(),Class.forName(docIIndex.getDataType())));
+//                        } catch (ClassNotFoundException ignored) {
+//                        }
                         return value;
                     })
                 );

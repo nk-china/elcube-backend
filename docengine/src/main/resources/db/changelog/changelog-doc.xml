@@ -441,14 +441,14 @@
     </changeSet>
 
     <!-- TODO 待稳定后删除 -->
-    <changeSet id="NK_DOC_I_INDEX-06" author="bean" context="default">
+    <changeSet id="NK_DOC_I_INDEX-08" author="bean" context="default">
         <preConditions onFail="MARK_RAN">
             <tableExists tableName="NK_DOC_I_INDEX" />
         </preConditions>
         <dropTable tableName="NK_DOC_I_INDEX" />
     </changeSet>
 
-    <changeSet id="NK_DOC_I_INDEX-07" author="bean" context="default">
+    <changeSet id="NK_DOC_I_INDEX-09" author="bean" context="default">
         <preConditions onFail="MARK_RAN">
             <not>
                 <tableExists tableName="NK_DOC_I_INDEX" />
@@ -466,6 +466,7 @@
                 <constraints primaryKey="true" />
             </column>
             <column name="VALUE" type="${type.uuid}" remarks="" />
+            <column name="NUMBER_VALUE" type="${type.num}" remarks="" />
             <column name="DATA_TYPE" type="${type.desc}" remarks="" />
             <column name="ORDER_BY" type="${type.int}" remarks="" />
             <column name="UPDATED_TIME" type="${type.long}" remarks="" />
