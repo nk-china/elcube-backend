@@ -79,6 +79,19 @@ public class NkDocFinder implements InitializingBean {
         args.get().add(value);
         return this;
     }
+    public NkDocFinder dynamicEquals(String key, Number value){
+        where.get().add(String.format(
+                "EXISTS (" +
+                        "\n         SELECT i.doc_id FROM nk_doc_i_index AS i " +
+                        "\n          WHERE i.doc_id = h.doc_id " +
+                        "\n            AND i.name   = '%s' " +
+                        "\n            AND i.value  = ?" +
+                        "\n       )",
+                key
+        ));
+        args.get().add(value);
+        return this;
+    }
     public NkDocFinder dynamicStartWiths(String key, String value){
         where.get().add(String.format(
                 "EXISTS (" +
@@ -160,25 +173,12 @@ public class NkDocFinder implements InitializingBean {
         return this;
     }
     public NkDocFinder dynamicIn(String key, String... value){
-
-        Assert.notEmpty(value);
-
-        String collect = Arrays.stream(value).map(i -> "?").collect(Collectors.joining(", "));
-
-        where.get().add(String.format(
-                "EXISTS (" +
-                        "\n         SELECT i.doc_id FROM nk_doc_i_index AS i " +
-                        "\n          WHERE i.doc_id = h.doc_id " +
-                        "\n            AND i.name   = '%s' " +
-                        "\n            AND i.value  IN (%s)" +
-                        "\n       )",
-                key,
-                collect
-        ));
-        args.get().addAll(Arrays.asList(value));
-        return this;
+        return dynamicIn(key,Arrays.asList(value));
     }
-    public NkDocFinder dynamicIn(String key, List<String> value){
+    public NkDocFinder dynamicIn(String key, Number... value){
+        return dynamicIn(key,Arrays.asList(value));
+    }
+    public NkDocFinder dynamicIn(String key, List<Object> value){
 
         Assert.notEmpty(value);
 
