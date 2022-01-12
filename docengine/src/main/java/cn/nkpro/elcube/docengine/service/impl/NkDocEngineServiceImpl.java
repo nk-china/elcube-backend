@@ -34,6 +34,7 @@ import cn.nkpro.elcube.docengine.model.es.DocHES;
 import cn.nkpro.elcube.docengine.service.NkDocEngineFrontService;
 import cn.nkpro.elcube.docengine.service.NkDocPermService;
 import cn.nkpro.elcube.utils.BeanUtilz;
+import cn.nkpro.elcube.utils.UUIDHexGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
@@ -48,7 +49,6 @@ import org.springframework.util.Assert;
 
 import java.util.Comparator;
 import java.util.Optional;
-import java.util.UUID;
 
 @Slf4j
 @Service
@@ -100,7 +100,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
 
         DocHV docHV = createDocHV(docType, preDocId);
 
-        docHV.setRuntimeKey("runtime:"+ docHV.getDocId()+":"+UUID.randomUUID().toString());
+        docHV.setRuntimeKey("runtime:"+ docHV.getDocId()+":"+UUIDHexGenerator.generate());
 
         return docToView(docHV);
     }
@@ -493,7 +493,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
             docHVRuntime = detail(doc.getDocId());
             Assert.notNull(docHVRuntime,"原始单据不存在");
 
-            doc.setRuntimeKey("runtime:"+ doc.getDocId()+":"+UUID.randomUUID().toString());
+            doc.setRuntimeKey("runtime:"+ doc.getDocId()+":"+ UUIDHexGenerator.generate());
         }
 
         // 将运行时数据填充到用户单据中，使单据数据完整

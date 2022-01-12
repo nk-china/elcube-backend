@@ -47,7 +47,6 @@ export default {
         }
     },
     data(){
-        console.log(456)
         return {
             docSelectModalVisible:false,
         }

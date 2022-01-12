@@ -69,7 +69,7 @@ class NkCardFileTemplates extends NkAbstractCard<Map, NkCardFileTemplateDefBO> {
         if (bytes == null) {
             return ""
         }
-        String url = String.join(File.separator, ".NkCardFileTemplates", format.format(new Date()), UUID.randomUUID().toString(), nkCardFileTemplateDefTBO.getTemplateFileName()).replace("\\", "/")
+        String url = String.join(File.separator, ".NkCardFileTemplates", format.format(new Date()), UUIDHexGenerator.generate(), nkCardFileTemplateDefTBO.getTemplateFileName()).replace("\\", "/")
         String path = String.join(File.separator, properties.getFileRootPath(), url).replace("\\", "/")
         File targetFile = new File(path)
         if (targetFile.getParentFile().mkdirs()) {
@@ -99,7 +99,7 @@ class NkCardFileTemplates extends NkAbstractCard<Map, NkCardFileTemplateDefBO> {
             String fileNm = nkCardFileTemplateDefTBO.getTemplateFileName()
             int i = fileNm.lastIndexOf(".")
             String wordFileName = StringUtils.isNotBlank(nkCardFileTemplateDefTBO.getTemplateDesc()) ? nkCardFileTemplateDefTBO.getTemplateDesc()+fileNm.substring(i) : fileNm.substring(0, fileNm.indexOf(".")) + fileNm.substring(i)
-            String wordUrl = String.join(File.separator, ".NkCardFileTemplates", format.format(new Date()), UUID.randomUUID().toString(), wordFileName as String).replace("\\", "/")
+            String wordUrl = String.join(File.separator, ".NkCardFileTemplates", format.format(new Date()), UUIDHexGenerator.generate(), wordFileName as String).replace("\\", "/")
             String wordPath = String.join(File.separator, properties.getFileRootPath(), wordUrl).replace("\\", "/")
             File targetFile = new File(wordPath)
             if (targetFile.getParentFile().mkdirs()) {
@@ -112,7 +112,7 @@ class NkCardFileTemplates extends NkAbstractCard<Map, NkCardFileTemplateDefBO> {
                 String pdfFileName = nkCardFileTemplateDefTBO.getTemplateDesc() + ".pdf"
                 try {
                     XWPFDocument document = new XWPFDocument(new FileInputStream(new File(wordPath)))
-                    String pdfUrl = String.join(File.separator, ".NkCardFileTemplates", format.format(new Date()), UUID.randomUUID().toString(), pdfFileName as String).replace("\\", "/")
+                    String pdfUrl = String.join(File.separator, ".NkCardFileTemplates", format.format(new Date()), UUIDHexGenerator.generate(), pdfFileName as String).replace("\\", "/")
                     String pdfPath = String.join(File.separator, properties.getFileRootPath(), pdfUrl).replace("\\", "/")
                     File outFile = new File(pdfPath)
                     if (outFile.getParentFile().mkdirs()) {

@@ -32,6 +32,7 @@ import cn.nkpro.elcube.security.bo.UserAccountBO;
 import cn.nkpro.elcube.security.bo.UserDetails;
 import cn.nkpro.elcube.utils.BeanUtilz;
 import cn.nkpro.elcube.utils.DateTimeUtilz;
+import cn.nkpro.elcube.utils.UUIDHexGenerator;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -256,7 +257,7 @@ public class UserAccountServiceImpl implements UserAccountService {
 
             Assert.isTrue(userAccountMapper.countByExample(example)==0,"用户名已存在，请更换");
 
-            account.setId(UUID.randomUUID().toString());
+            account.setId(UUIDHexGenerator.generate());
             account.setLocked(0);
             account.setCreatedTime(DateTimeUtilz.nowSeconds());
             account.setUpdatedTime(DateTimeUtilz.nowSeconds());

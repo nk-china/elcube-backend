@@ -21,6 +21,7 @@ import cn.nkpro.elcube.docengine.gen.DocH;
 import cn.nkpro.elcube.docengine.gen.DocHMapper;
 import cn.nkpro.elcube.docengine.model.es.DocExtES;
 import cn.nkpro.elcube.docengine.utils.RandomUtils;
+import cn.nkpro.elcube.utils.UUIDHexGenerator;
 import com.apifan.common.random.constant.CompetitionType;
 import com.apifan.common.random.constant.CreditCardType;
 import com.apifan.common.random.source.*;
@@ -35,7 +36,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @Component
 public class RandomDocCreator {
@@ -65,7 +65,7 @@ public class RandomDocCreator {
                     try{
                         DocH doc = hes.get(NumberSource.getInstance().randomInt(0, hes.size()));
 
-                        c.setCustomId(UUID.randomUUID().toString());
+                        c.setCustomId(UUIDHexGenerator.generate());
                         c.setCustomType("ES:TEST");
                         c.setDocNumber(doc.getDocNumber());
                         c.setDocName(RandomUtils.randomText());

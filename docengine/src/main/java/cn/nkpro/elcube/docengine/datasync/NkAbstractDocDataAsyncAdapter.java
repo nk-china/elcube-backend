@@ -25,6 +25,7 @@ import cn.nkpro.elcube.docengine.gen.DocAsyncQueueMapper;
 import cn.nkpro.elcube.docengine.gen.DocAsyncQueueWithBLOBs;
 import cn.nkpro.elcube.docengine.gen.DocDefDataSync;
 import cn.nkpro.elcube.utils.DateTimeUtilz;
+import cn.nkpro.elcube.utils.UUIDHexGenerator;
 import com.alibaba.fastjson.JSON;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -85,7 +86,7 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
         }
 
         DocAsyncQueueWithBLOBs queue = new DocAsyncQueueWithBLOBs();
-        queue.setAsyncId(UUID.randomUUID().toString());
+        queue.setAsyncId(UUIDHexGenerator.generate());
         queue.setAsyncObjectRef(this.getBeanName());
         queue.setAsyncJson(JSON.toJSONString(asyncData));
         queue.setAsyncRetry(0);

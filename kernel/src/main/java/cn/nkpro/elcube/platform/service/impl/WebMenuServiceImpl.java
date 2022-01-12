@@ -17,16 +17,17 @@
 package cn.nkpro.elcube.platform.service.impl;
 
 import cn.nkpro.elcube.basic.Constants;
+import cn.nkpro.elcube.data.redis.RedisSupport;
+import cn.nkpro.elcube.platform.DeployAble;
 import cn.nkpro.elcube.platform.gen.PlatformMenu;
 import cn.nkpro.elcube.platform.gen.PlatformMenuExample;
 import cn.nkpro.elcube.platform.gen.PlatformMenuMapper;
 import cn.nkpro.elcube.platform.model.WebMenuBO;
-import cn.nkpro.elcube.data.redis.RedisSupport;
-import cn.nkpro.elcube.security.SecurityUtilz;
-import cn.nkpro.elcube.platform.DeployAble;
 import cn.nkpro.elcube.platform.service.WebMenuService;
+import cn.nkpro.elcube.security.SecurityUtilz;
 import cn.nkpro.elcube.utils.BeanUtilz;
 import cn.nkpro.elcube.utils.DateTimeUtilz;
+import cn.nkpro.elcube.utils.UUIDHexGenerator;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
@@ -39,7 +40,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -126,12 +126,12 @@ public class WebMenuServiceImpl implements WebMenuService, DeployAble,Initializi
         menus.forEach(menu->{
             menu.setParentId(null);
             menu.setOrderBy((menus.indexOf(menu)+1) * 10000);
-            menu.setMenuId(StringUtils.defaultIfBlank(menu.getMenuId(), UUID.randomUUID().toString()));
+            menu.setMenuId(StringUtils.defaultIfBlank(menu.getMenuId(), UUIDHexGenerator.generate()));
             update(menu,updateTime);
             if(menu.getChildren()!=null){
                     menu.getChildren().forEach(m->{
                         m.setParentId(menu.getMenuId());
-                        m.setMenuId(StringUtils.defaultIfBlank(m.getMenuId(), UUID.randomUUID().toString()));
+                        m.setMenuId(StringUtils.defaultIfBlank(m.getMenuId(), UUIDHexGenerator.generate()));
                         m.setOrderBy(menu.getOrderBy()+menu.getChildren().indexOf(m));
                         update(m,updateTime);
                     });

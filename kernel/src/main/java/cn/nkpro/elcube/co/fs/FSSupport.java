@@ -17,17 +17,16 @@
 package cn.nkpro.elcube.co.fs;
 
 import cn.nkpro.elcube.basic.NkProperties;
+import cn.nkpro.elcube.utils.UUIDHexGenerator;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.UUID;
 
 public interface FSSupport<T> {
 
     default String defaultPath(String rootPath, NkProperties tfmsProperties){
         String path = rootPath + tfmsProperties.getEnvKey();
         path += path.endsWith("/")?(".nk_temp/"):("/.nk_temp/");
-        path += UUID.randomUUID().toString()+'/';
+        path += UUIDHexGenerator.generate()+'/';
         return path;
     }
 
