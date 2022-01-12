@@ -25,6 +25,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotNull;
 import java.util.Collections;
 
 @Component
@@ -34,7 +35,7 @@ public class NkSecurityRunner {
     @Autowired@SuppressWarnings("all")
     private UserDetailsService userDetailsService;
 
-    public void runAsUser(String username,Function function){
+    public void runAsUser(@NotNull String username, Function function){
         UserDetails details = userDetailsService.loadUserByUsername(username);
 
         GrantedAuthority authority = new GrantedAuthority();

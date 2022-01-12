@@ -65,7 +65,7 @@ class NkCardAccount extends NkAbstractCard<Data,Map> {
                 }
             }
         }else{
-            data.account = original.account
+            data.account = original?.account
         }
 
         return super.beforeUpdate(doc, data, original, defIV, d) as Data
