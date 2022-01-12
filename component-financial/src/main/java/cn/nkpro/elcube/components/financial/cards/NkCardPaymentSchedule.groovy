@@ -23,6 +23,7 @@ import cn.nkpro.elcube.docengine.NkAbstractCard
 import cn.nkpro.elcube.docengine.model.DocDefIV
 import cn.nkpro.elcube.docengine.model.DocHV
 import cn.nkpro.elcube.utils.BeanUtilz
+import com.alibaba.fastjson.JSON
 import org.apache.commons.lang3.StringUtils
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.annotation.Order
@@ -60,20 +61,24 @@ class NkCardPaymentSchedule extends NkAbstractCard<List<PaymentI>,Def> {
             def context = spELManager.createContext(doc)
 
             String  mt = spELManager.invoke(d.getMtSpEL(), context)
-            def params  = spELManager.invoke(d.getMtOptions(), context) as Map
+            def params  = JSON.parseObject(spELManager.convert(d.getMtOptions(), context)) as Map
 
-            def apply = customObjectManager.getCustomObject(mt, NkApplyCSO.class)
-                .apply(params) as List
+            if(mt){
 
-            if(apply!=null){
-                data = apply.stream()
-                    .map({ item ->
+                def apply = customObjectManager.getCustomObject(mt, NkApplyCSO.class)
+                        .apply(params) as List
+
+                if(apply!=null){
+                    data = apply.stream()
+                            .map({ item ->
                         return BeanUtilz.copyFromObject(item, PaymentI.class)
                     }).collect(Collectors.toList()) as List<PaymentI>
+                }else{
+                    data = Collections.emptyList()
+                }
             }else{
                 data = Collections.emptyList()
             }
-
         }
 
         return super.calculate(doc, data, defIV, d, isTrigger, options) as List
