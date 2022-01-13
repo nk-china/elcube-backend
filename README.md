@@ -4,11 +4,12 @@ ELCube（逻辑魔方），解决企业变更曲线与软件跟随曲线不匹�
 容易的企业级模型方案，让企业更从容，让程序员走出困境。用业务建模的方式解决业务问题，
 而不是用技术堆砌的方式绑定企业。
 
+### 权利声明
 
-### 加入社区群
+![agpl-v3](http://www.gnu.org/graphics/agplv3-88x31.png)
 
-![加入社区](./joinchat.jpeg)
-
+ELCube 遵照AGPL-3.0协议开放源代码，在遵照协议约束条件下，您可以自由传播和修改。
+协议原文见LICENSE文件，或查阅 http://www.gnu.org/licenses/agpl-3.0.html
 
 ### 相关链接
 
@@ -20,12 +21,9 @@ ELCube（逻辑魔方），解决企业变更曲线与软件跟随曲线不匹�
 
 [ELCube Front Github仓库](https://github.com/nk-china/elcube-front)
 
-### 权利声明
+### 加入社区群
 
-![agpl-v3](http://www.gnu.org/graphics/agplv3-88x31.png)
-
-ELCube 遵照AGPL-3.0协议开放源代码，在遵照协议约束条件下，您可以自由传播和修改。
-协议原文见LICENSE文件，或查阅 http://www.gnu.org/licenses/agpl-3.0.html
+![加入社区](./joinchat.jpeg)
 
 ### 功能概览
 
