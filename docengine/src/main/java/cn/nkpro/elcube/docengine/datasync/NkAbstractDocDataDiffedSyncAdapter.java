@@ -85,12 +85,12 @@ public abstract class NkAbstractDocDataDiffedSyncAdapter<K> extends NkAbstractDo
                 context2.setVariable("row",dataOriginalUnmapping);
                 K key2 = (K) spELManager.invoke(def.getKeySpEL(),context2);
                 if(key2!=null && !Objects.equals(key1,key2)){
-                    this.onRemove(Collections.singletonMap(key2, (Map)dataOriginalUnmapping), def);
+                    this.onRemove(mapping(Collections.singletonMap(key2, (Map)dataOriginalUnmapping),def.getMappingSpEL(), context2), def);
                 }
             }
 
             // update
-            this.onModify(Collections.singletonMap(key1, (Map)dataUnmapping), def);
+            this.onModify(mapping(Collections.singletonMap(key1, (Map)dataUnmapping),def.getMappingSpEL(),context1), def);
         }
     }
 
