@@ -27,6 +27,7 @@ import cn.nkpro.elcube.docengine.service.NkDocHistoryService;
 import cn.nkpro.elcube.security.SecurityUtilz;
 import cn.nkpro.elcube.utils.BeanUtilz;
 import cn.nkpro.elcube.utils.TextUtils;
+import cn.nkpro.elcube.utils.UUIDHexGenerator;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import io.jsonwebtoken.lang.Assert;
@@ -37,6 +38,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class NkDocHistoryServiceImpl implements NkDocHistoryService {
@@ -54,7 +56,7 @@ public class NkDocHistoryServiceImpl implements NkDocHistoryService {
         example.createCriteria().andDocIdEqualTo(doc.getDocId());
 
         DocRecord record = new DocRecord();
-        record.setId(guid.nextId(DocRecord.class));
+        record.setId(UUIDHexGenerator.generate());
         record.setDocId(doc.getDocId());
         record.setState(doc.getDocState());
         record.setStateOriginal(original==null?null:original.getDocState());

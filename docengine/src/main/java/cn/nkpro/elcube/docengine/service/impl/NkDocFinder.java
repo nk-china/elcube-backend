@@ -66,7 +66,7 @@ public class NkDocFinder implements InitializingBean {
         return this;
     }
 
-    public NkDocFinder dynamicEquals(String key, Object value){
+    public NkDocFinder dynamicEquals(String key, String value){
         where.get().add(String.format(
                 "EXISTS (" +
                         "\n         SELECT i.doc_id FROM nk_doc_i_index AS i " +
@@ -79,7 +79,20 @@ public class NkDocFinder implements InitializingBean {
         args.get().add(value);
         return this;
     }
-    public NkDocFinder dynamicStartWiths(String key, Object value){
+    public NkDocFinder dynamicEquals(String key, Number value){
+        where.get().add(String.format(
+                "EXISTS (" +
+                        "\n         SELECT i.doc_id FROM nk_doc_i_index AS i " +
+                        "\n          WHERE i.doc_id = h.doc_id " +
+                        "\n            AND i.name   = '%s' " +
+                        "\n            AND i.value  = ?" +
+                        "\n       )",
+                key
+        ));
+        args.get().add(value);
+        return this;
+    }
+    public NkDocFinder dynamicStartWiths(String key, String value){
         where.get().add(String.format(
                 "EXISTS (" +
                         "\n         SELECT i.doc_id FROM nk_doc_i_index AS i " +
@@ -92,65 +105,66 @@ public class NkDocFinder implements InitializingBean {
         args.get().add(value+"%");
         return this;
     }
-    public NkDocFinder dynamicGreater(String key, Object value){
+    
+    public NkDocFinder dynamicGreater(String key, Number value){
         where.get().add(String.format(
                 "EXISTS (" +
                         "\n         SELECT i.doc_id FROM nk_doc_i_index AS i " +
                         "\n          WHERE i.doc_id = h.doc_id " +
                         "\n            AND i.name   = '%s' " +
-                        "\n            AND i.value  > ?" +
+                        "\n            AND i.number_value  > ?" +
                         "\n       )",
                 key
         ));
         args.get().add(value);
         return this;
     }
-    public NkDocFinder dynamicGreaterEquals(String key, Object value){
+    public NkDocFinder dynamicGreaterEquals(String key, Number value){
         where.get().add(String.format(
                 "EXISTS (" +
                         "\n         SELECT i.doc_id FROM nk_doc_i_index AS i " +
                         "\n          WHERE i.doc_id = h.doc_id " +
                         "\n            AND i.name   = '%s' " +
-                        "\n            AND i.value  >= ?" +
+                        "\n            AND i.number_value  >= ?" +
                         "\n       )",
                 key
         ));
         args.get().add(value);
         return this;
     }
-    public NkDocFinder dynamicLess(String key, Object value){
+    public NkDocFinder dynamicLess(String key, Number value){
         where.get().add(String.format(
                 "EXISTS (" +
                         "\n         SELECT i.doc_id FROM nk_doc_i_index AS i " +
                         "\n          WHERE i.doc_id = h.doc_id " +
                         "\n            AND i.name   = '%s' " +
-                        "\n            AND i.value  < ?" +
+                        "\n            AND i.number_value  < ?" +
                         "\n       )",
                 key
         ));
         args.get().add(value);
         return this;
     }
-    public NkDocFinder dynamicLessEquals(String key, Object value){
+    public NkDocFinder dynamicLessEquals(String key, Number value){
         where.get().add(String.format(
                 "EXISTS (" +
                         "\n         SELECT i.doc_id FROM nk_doc_i_index AS i " +
                         "\n          WHERE i.doc_id = h.doc_id " +
                         "\n            AND i.name   = '%s' " +
-                        "\n            AND i.value  <= ?" +
+                        "\n            AND i.number_value  <= ?" +
                         "\n       )",
                 key
         ));
         args.get().add(value);
         return this;
     }
-    public NkDocFinder dynamicBetween(String key, Object begin, Object end){
+    public NkDocFinder dynamicBetween(String key, Number begin, Number end){
         where.get().add(String.format(
                 "EXISTS (" +
                         "\n         SELECT i.doc_id FROM nk_doc_i_index AS i " +
                         "\n          WHERE i.doc_id = h.doc_id " +
                         "\n            AND i.name   = '%s' " +
-                        "\n            AND i.value  BETWEEN ? AND ?" +
+                        "\n            AND i.number_value  BETWEEN ? AND ?" +
                         "\n       )",
                 key
         ));
@@ -158,24 +172,11 @@ public class NkDocFinder implements InitializingBean {
         args.get().add(end);
         return this;
     }
-    public NkDocFinder dynamicIn(String key, Object... value){
-
-        Assert.notEmpty(value);
-
-        String collect = Arrays.stream(value).map(i -> "?").collect(Collectors.joining(", "));
-
-        where.get().add(String.format(
-                "EXISTS (" +
-                        "\n         SELECT i.doc_id FROM nk_doc_i_index AS i " +
-                        "\n          WHERE i.doc_id = h.doc_id " +
-                        "\n            AND i.name   = '%s' " +
-                        "\n            AND i.value  IN (%s)" +
-                        "\n       )",
-                key,
-                collect
-        ));
-        args.get().addAll(Arrays.asList(value));
-        return this;
+    public NkDocFinder dynamicIn(String key, String... value){
+        return dynamicIn(key,Arrays.asList(value));
+    }
+    public NkDocFinder dynamicIn(String key, Number... value){
+        return dynamicIn(key,Arrays.asList(value));
     }
     public NkDocFinder dynamicIn(String key, List<Object> value){
 

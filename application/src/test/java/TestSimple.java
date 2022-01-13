@@ -11,7 +11,7 @@ public class TestSimple {
 
         System.out.println(String.format("%012d",1));
         String plain =
-                "{id:'"+ UUID.randomUUID().toString().replaceAll("-","").toUpperCase()+"',name:'纽扣互联（北京）科技有限公司',expire:'20991231'}";
+                "{id:'"+ UUIDHexGenerator.generate().replaceAll("-","").toUpperCase()+"',name:'纽扣互联（北京）科技有限公司',expire:'20991231'}";
 
         System.out.println(plain);
         String str = DesCbcUtil.encode(plain,"b2c17b46e2b1415392aab5a82869856c",

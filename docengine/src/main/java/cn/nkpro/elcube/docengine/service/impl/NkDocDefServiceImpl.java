@@ -40,6 +40,7 @@ import cn.nkpro.elcube.platform.DeployAble;
 import cn.nkpro.elcube.security.SecurityUtilz;
 import cn.nkpro.elcube.utils.BeanUtilz;
 import cn.nkpro.elcube.utils.DateTimeUtilz;
+import cn.nkpro.elcube.utils.UUIDHexGenerator;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.extern.slf4j.Slf4j;
@@ -194,7 +195,7 @@ public class NkDocDefServiceImpl implements NkDocDefService, DeployAble {
     public DocDefHV doBreach(DocDefHV docDefHV){
 
         // 从未激活的版本创建分支，从当前版本 增加Minor
-        docDefHV.setVersion(UUID.randomUUID().toString());
+        docDefHV.setVersion(UUIDHexGenerator.generate());
         docDefHV.setState("InActive");
 
         return doUpdate(docDefHV,false);
@@ -224,7 +225,7 @@ public class NkDocDefServiceImpl implements NkDocDefService, DeployAble {
         if(StringUtils.isBlank(docDefHV.getVersion())){
             // 如果版本号为空，表示新创建的一个单据类型，需要检查是否已存在
             Assert.isTrue(force  || lastUpdatedVersion==null, String.format("单据类型%s已存在",docDefHV.getDocType()));
-            docDefHV.setVersion(UUID.randomUUID().toString());
+            docDefHV.setVersion(UUIDHexGenerator.generate());
         }
 
         deserializeDef(docDefHV);

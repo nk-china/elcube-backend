@@ -16,10 +16,11 @@
  */
 package cn.nkpro.elcube.docengine.controller;
 
+import cn.nkpro.elcube.annotation.NkNote;
+import cn.nkpro.elcube.data.elasticearch.SearchEngine;
 import cn.nkpro.elcube.docengine.NkDocSearchService;
 import cn.nkpro.elcube.docengine.service.impl.NkDocEngineIndexService;
-import cn.nkpro.elcube.data.elasticearch.SearchEngine;
-import cn.nkpro.elcube.annotation.NkNote;
+import cn.nkpro.elcube.utils.UUIDHexGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,7 +28,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
-import java.util.UUID;
 
 /**
  * Created by bean on 2020/7/17.
@@ -55,7 +55,7 @@ public class DevOpsDataSyncController {
     @NkNote("2.立即执行同步")
     @RequestMapping(value = "/redo")
     public String reIndex(Boolean dropFirst, String docType) throws IOException {
-        String asyncTaskId = UUID.randomUUID().toString();
+        String asyncTaskId = UUIDHexGenerator.generate();
         docEngineIndexService.reindex(asyncTaskId, dropFirst, docType);
         return asyncTaskId;
     }

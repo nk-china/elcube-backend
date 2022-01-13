@@ -17,6 +17,7 @@
 package cn.nkpro.elcube.co;
 
 import cn.nkpro.elcube.data.redis.RedisSupport;
+import cn.nkpro.elcube.utils.UUIDHexGenerator;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
@@ -51,7 +52,7 @@ public class DebugContextConfigurer implements WebMvcConfigurer {
         public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
             String debugId = request.getHeader("NK-Debug");
             if(StringUtils.isNotBlank(debugId)){
-                response.setHeader("NK-Debug-Log", UUID.randomUUID().toString());
+                response.setHeader("NK-Debug-Log", UUIDHexGenerator.generate());
                 applicationContextManager.startThreadLocal(debugId);
             }
             return true;

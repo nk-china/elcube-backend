@@ -30,6 +30,7 @@ import cn.nkpro.elcube.platform.service.NkScriptManager;
 import cn.nkpro.elcube.utils.BeanUtilz;
 import cn.nkpro.elcube.utils.DateTimeUtilz;
 import cn.nkpro.elcube.utils.TextUtils;
+import cn.nkpro.elcube.utils.UUIDHexGenerator;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import lombok.SneakyThrows;
@@ -47,7 +48,6 @@ import org.springframework.util.Assert;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -183,7 +183,7 @@ public class NkScriptManagerImpl implements NkScriptManager, DeployAble {
     public PlatformScript doBreach(NkScriptV scriptDefH){
 
         scriptDefH.setState("InActive");
-        scriptDefH.setVersion(UUID.randomUUID().toString());
+        scriptDefH.setVersion(UUIDHexGenerator.generate());
         scriptDefH.setCreatedTime(DateTimeUtilz.nowSeconds());
         scriptDefH.setUpdatedTime(DateTimeUtilz.nowSeconds());
         doUpdate(scriptDefH,false);
@@ -260,7 +260,7 @@ public class NkScriptManagerImpl implements NkScriptManager, DeployAble {
 
         // 激活脚本后，更新随机值，并清空脚本缓存
 
-        this.scriptRandom = UUID.randomUUID().toString();
+        this.scriptRandom = UUIDHexGenerator.generate();
         redisSupportString.set(Constants.CACHE_DEF_SCRIPT_RANDOM,this.scriptRandom);
         redisSupportString.delete(Constants.CACHE_DEF_SCRIPT);
 

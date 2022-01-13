@@ -9,6 +9,8 @@ import java.io.Serializable;
 public class DocIIndex extends DocIIndexKey implements Serializable {
     private String value;
 
+    private Double numberValue;
+
     private String dataType;
 
     private Integer orderBy;
@@ -30,6 +32,15 @@ public class DocIIndex extends DocIIndexKey implements Serializable {
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    @cn.nkpro.elcube.annotation.CodeFieldNotes("")
+    public Double getNumberValue() {
+        return numberValue;
+    }
+
+    public void setNumberValue(Double numberValue) {
+        this.numberValue = numberValue;
     }
 
     @cn.nkpro.elcube.annotation.CodeFieldNotes("")

@@ -16,11 +16,10 @@
  */
 package cn.nkpro.elcube.data.redis.defaults;
 
-import cn.nkpro.elcube.basic.TransactionSync;
-import cn.nkpro.elcube.exception.NkSystemException;
-import cn.nkpro.elcube.exception.abstracts.NkRuntimeException;
 import cn.nkpro.elcube.data.redis.EnvRedisTemplate;
 import cn.nkpro.elcube.data.redis.RedisSupport;
+import cn.nkpro.elcube.exception.abstracts.NkRuntimeException;
+import cn.nkpro.elcube.utils.UUIDHexGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +27,6 @@ import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.util.Assert;
 
-import javax.validation.constraints.NotNull;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -249,7 +247,7 @@ public class DefaultRedisSupportImpl<T> implements RedisSupport<T> {
 
     @Override
     public String lock(String id, int expireSeconds){
-        String value = UUID.randomUUID().toString();
+        String value = UUIDHexGenerator.generate();
         ValueOperations<String, String> ops = stringRedisTemplate.opsForValue();
         Boolean setIfAbsent = ops.setIfAbsent("LOCK:" + id, value);
         if(setIfAbsent!=null && setIfAbsent){

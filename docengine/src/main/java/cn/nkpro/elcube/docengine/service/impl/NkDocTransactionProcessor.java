@@ -477,35 +477,44 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
                     String name = String.format("%s_%s",rule.getIndexName(),rule.getIndexType());
                     Object value = spELManager.invoke(rule.getRuleSpEL(),context);
 
-                    List<Object> list = new ArrayList<>();
-                    if(value == null){
-                        list.add(null);
-                    }else if(value instanceof List){
-                        list.addAll((List) value);
-                    }else if(value.getClass().isArray()){
-                        list.addAll(Arrays.asList((Object[])value));
-                    }else{
-                        list.add(value);
+                    if(value!=null){
+
+                        atomic.get().getDynamics().put(name,value);
+
+                        List<Object> list = new ArrayList<>();
+                        if(value instanceof List){
+                            list.addAll((List) value);
+                        }else if(value.getClass().isArray()){
+                            list.addAll(Arrays.asList((Object[])value));
+                        }else{
+                            list.add(value);
+                        }
+                        list.forEach(item->{
+
+                            DocIIndex index = new DocIIndex();
+                            index.setDocId(atomic.get().getDocId());
+                            index.setName(name);
+                            index.setSeq(list.indexOf(item));
+                            index.setOrderBy(doc.getDynamics().size()+rule.getOrderBy());
+                            index.setUpdatedTime(DateTimeUtilz.nowSeconds());
+
+                            if(item == null){
+                                index.setDataType(Void.class.getName());
+                                index.setValue(null);
+                            }else
+                            if(item instanceof Number){
+                                index.setDataType(Number.class.getName());
+                                index.setNumberValue(((Number) item).doubleValue());
+                            }else
+                            if(item instanceof String){
+                                index.setDataType(item.getClass().getName());
+                                index.setValue(item.toString());
+                            }
+
+                            docIIndexMapper.insert(index);
+
+                        });
                     }
-
-                    atomic.get().getDynamics().put(name,value);
-
-                    list.forEach(item->{
-
-                        String type = item==null?Void.class.getName():item.getClass().getName();
-
-                        DocIIndex index = new DocIIndex();
-                        index.setDocId(atomic.get().getDocId());
-                        index.setName(name);
-                        index.setSeq(list.indexOf(item));
-                        index.setValue(JSON.toJSONString(item));
-                        index.setDataType(type);
-                        index.setOrderBy(doc.getDynamics().size()+rule.getOrderBy());
-                        index.setUpdatedTime(DateTimeUtilz.nowSeconds());
-
-                        docIIndexMapper.insert(index);
-
-                    });
                 });
 
 

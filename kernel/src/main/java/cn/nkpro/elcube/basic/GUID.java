@@ -16,6 +16,8 @@
  */
 package cn.nkpro.elcube.basic;
 
+import cn.nkpro.elcube.utils.UUIDHexGenerator;
+
 import java.util.UUID;
 
 /**
@@ -29,7 +31,7 @@ import java.util.UUID;
 public interface GUID {
 
     default String nextId(Class type) {
-        return UUID.randomUUID().toString();
+        return UUIDHexGenerator.generate();
     }
     default String nextId(Class type,String docType){
         return nextId(type);

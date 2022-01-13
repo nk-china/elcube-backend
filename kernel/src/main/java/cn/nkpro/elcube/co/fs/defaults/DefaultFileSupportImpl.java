@@ -16,11 +16,12 @@
  */
 package cn.nkpro.elcube.co.fs.defaults;
 
-import cn.nkpro.elcube.co.fs.FSConfig;
-import cn.nkpro.elcube.co.fs.FileUploadStatus;
 import cn.nkpro.elcube.basic.NkProperties;
+import cn.nkpro.elcube.co.fs.FSConfig;
 import cn.nkpro.elcube.co.fs.FSSupport;
+import cn.nkpro.elcube.co.fs.FileUploadStatus;
 import cn.nkpro.elcube.security.UserAccountService;
+import cn.nkpro.elcube.utils.UUIDHexGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.HttpHeaders;
@@ -35,7 +36,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public class DefaultFileSupportImpl implements FSSupport<Map<String, Object>> {
 
@@ -74,7 +74,7 @@ public class DefaultFileSupportImpl implements FSSupport<Map<String, Object>> {
             String url = String.join(
                     File.separator,
                     format.format(new Date()),
-                    UUID.randomUUID().toString(),
+                    UUIDHexGenerator.generate(),
                     file.getOriginalFilename()
             ).replace("\\","/");
             String path = String.join(

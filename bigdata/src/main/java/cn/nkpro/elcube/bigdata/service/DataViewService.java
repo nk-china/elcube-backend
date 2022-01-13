@@ -21,6 +21,7 @@ import cn.nkpro.elcube.bigdata.gen.DataViewExample;
 import cn.nkpro.elcube.bigdata.gen.DataViewMapper;
 import cn.nkpro.elcube.bigdata.gen.DataViewWithBLOBs;
 import cn.nkpro.elcube.security.SecurityUtilz;
+import cn.nkpro.elcube.utils.UUIDHexGenerator;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class DataViewService {
@@ -69,7 +69,7 @@ public class DataViewService {
     @Transactional
     public void doUpdate(DataViewWithBLOBs view){
         if(StringUtils.isBlank(view.getId())){
-            view.setId(UUID.randomUUID().toString());
+            view.setId(UUIDHexGenerator.generate());
             view.setAccountId(SecurityUtilz.getUser().getId());
             dataViewMapper.insert(view);
         }else{

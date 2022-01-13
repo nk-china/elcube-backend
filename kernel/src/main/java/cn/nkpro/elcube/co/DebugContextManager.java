@@ -23,6 +23,7 @@ import cn.nkpro.elcube.exception.NkDebugContextNotFoundException;
 import cn.nkpro.elcube.exception.NkSystemException;
 import cn.nkpro.elcube.utils.GroovyUtils;
 import cn.nkpro.elcube.utils.OsUtils;
+import cn.nkpro.elcube.utils.UUIDHexGenerator;
 import groovy.lang.GroovyObject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -96,7 +97,7 @@ public class DebugContextManager implements ApplicationContextAware {
      * 创建上下文
      */
     public String createContext(String desc,String username){
-        String debugId = UUID.randomUUID().toString();
+        String debugId = UUIDHexGenerator.generate();
 
         // 创建Spring上下文
 

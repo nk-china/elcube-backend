@@ -20,13 +20,13 @@ import cn.nkpro.elcube.platform.gen.*;
 import cn.nkpro.elcube.platform.model.SysUserDashboardBO;
 import cn.nkpro.elcube.security.SecurityUtilz;
 import cn.nkpro.elcube.utils.DateTimeUtilz;
+import cn.nkpro.elcube.utils.UUIDHexGenerator;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class DashboardService {
@@ -64,7 +64,7 @@ public class DashboardService {
         refs.forEach(item->{
 
             if(StringUtils.isBlank(item.getId())){
-                item.setId(UUID.randomUUID().toString());
+                item.setId(UUIDHexGenerator.generate());
                 item.setOrderBy(refs.indexOf(item));
                 item.setAccountId(SecurityUtilz.getUser().getId());
                 userDashboardRefMapper.insert(item);
@@ -94,7 +94,7 @@ public class DashboardService {
     @Transactional
     public void doUpdate(UserDashboard dashboard){
         if(StringUtils.isBlank(dashboard.getId())){
-            dashboard.setId(UUID.randomUUID().toString());
+            dashboard.setId(UUIDHexGenerator.generate());
             dashboard.setAccountId(SecurityUtilz.getUser().getId());
             userDashboardMapper.insert(dashboard);
 
