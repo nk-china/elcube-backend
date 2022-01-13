@@ -1,7 +1,6 @@
 import cn.nkpro.elcube.basic.secret.DesCbcUtil;
+import cn.nkpro.elcube.utils.UUIDHexGenerator;
 import org.junit.Test;
-
-import java.util.UUID;
 
 public class TestSimple {
 
