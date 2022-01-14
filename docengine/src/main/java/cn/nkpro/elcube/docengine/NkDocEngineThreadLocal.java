@@ -110,4 +110,17 @@ public class NkDocEngineThreadLocal {
         }
         return doc;
     }
+
+
+    /**
+     * @author 吴俊（wujun@newcore.net.cn）
+     * 创建日期: 2022-01-13
+     * used to: 判断是否存在更新的单据
+     */
+    public static Boolean existUpdated(String docId){
+        DocHV doc = threadLocalDocUpdated.get()!=null ? threadLocalDocUpdated.get().get(docId) : null;
+        //不存在更新的单据
+        return doc != null;
+    }
+
 }
