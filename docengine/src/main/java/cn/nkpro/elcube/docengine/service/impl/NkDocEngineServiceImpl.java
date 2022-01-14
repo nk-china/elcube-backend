@@ -463,8 +463,6 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
             if(log.isInfoEnabled())log.info("保存单据 完成 总耗时{}ms", System.currentTimeMillis() - start);
         });
 
-        NkDocEngineThreadLocal.addUpdated(doc);
-
         return doc;
     }
 
