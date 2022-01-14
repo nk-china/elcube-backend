@@ -49,6 +49,8 @@ public interface NkDocDefService {
 
     DocDefHV doRun(DocDefHV docDefHV, boolean run);
 
+    List<DocDefFlowV> getDocTypeFlows(String docType);
+
     DocDefHV getDocDefForRuntime(String docType);
 
     DocDefHV getDocDefForEdit(String docType, String version);

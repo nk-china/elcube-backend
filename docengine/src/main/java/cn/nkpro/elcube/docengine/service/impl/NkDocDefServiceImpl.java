@@ -532,7 +532,8 @@ public class NkDocDefServiceImpl implements NkDocDefService, DeployAble {
                 .collect(Collectors.toList());
     }
 
-    private List<DocDefFlowV> getDocTypeFlows(String docType){
+    @Override
+    public List<DocDefFlowV> getDocTypeFlows(String docType){
         // 从缓存中获取已激活的单据业务流
         Map<String, List<DocDefFlowV>> docTypeFlows = redisSupportFlows.getHashIfAbsent(Constants.CACHE_DEF_DOC_FLOWS, () -> {
 
@@ -573,7 +574,7 @@ public class NkDocDefServiceImpl implements NkDocDefService, DeployAble {
         docTypeFlows.values()
                 .forEach(list->
                         flows.addAll(list.stream()
-                                .filter(item->StringUtils.equalsAny(docType,item.getPreDocType()))
+                                .filter(item->StringUtils.isBlank(docType) || StringUtils.equalsAny(docType,item.getPreDocType()))
                                 .collect(Collectors.toList()))
                 );
 

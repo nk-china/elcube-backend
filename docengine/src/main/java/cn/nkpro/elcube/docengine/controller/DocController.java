@@ -75,6 +75,12 @@ public class DocController {
         return docDefService.getEntrance(classify);
     }
 
+    @NkNote("2.1.拉取单据业务流")
+    @RequestMapping(value = "/bizFlows",method = RequestMethod.GET)
+    public List<DocDefFlowV> getEntrance(){
+        return docDefService.getDocTypeFlows(null);
+    }
+
     @NkNote("3.拉取交易详情")
     @RequestMapping(value = "/detail/{docId}",method = RequestMethod.GET)
     public DocHV get(@PathVariable("docId") String docId,@RequestParam(value = "edit",required = false,defaultValue = "false") Boolean edit) {
