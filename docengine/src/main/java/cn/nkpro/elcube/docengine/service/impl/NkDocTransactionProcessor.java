@@ -668,10 +668,17 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
             if(StringUtils.equals(doc.getDocId(),doc.getPartnerId())){
                 doc.setPartnerName(doc.getDocName());
             }else{
-                doc.setPartnerName(
-                    docEngine.detail(doc.getPartnerId())
-                        .getDocName()
-                );
+                if(NkDocEngineThreadLocal.existUpdated(doc.getPartnerId())){
+                    doc.setPartnerName(
+                            NkDocEngineThreadLocal.getUpdated(doc.getPartnerId())
+                                    .getDocName()
+                    );
+                }else{
+                    doc.setPartnerName(
+                            docEngine.detail(doc.getPartnerId())
+                                    .getDocName()
+                    );
+                }
             }
         }
 

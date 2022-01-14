@@ -20,15 +20,13 @@ import cn.nkpro.elcube.annotation.NkNote;
 import cn.nkpro.elcube.basic.NkProperties;
 import cn.nkpro.elcube.platform.gen.UserSavedQuery;
 import cn.nkpro.elcube.platform.model.WebMenuBO;
+import cn.nkpro.elcube.platform.service.NkMobileService;
 import cn.nkpro.elcube.platform.service.PlatformRegistryService;
 import cn.nkpro.elcube.platform.service.UserQueryService;
 import cn.nkpro.elcube.platform.service.WebMenuService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -49,8 +47,11 @@ public class UserAppController {
 
     @Autowired@SuppressWarnings("all")
     private UserQueryService userQueryService;
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private PlatformRegistryService constantService;
+
+    @Autowired@SuppressWarnings("all")
+    private NkMobileService nkMobileService;
 
 
     @NkNote("1.获取环境名称")
@@ -93,6 +94,13 @@ public class UserAppController {
     @RequestMapping("/user/saved/query/delete")
     public void delete(String queryId){
         userQueryService.delete(queryId);
+    }
+
+
+    @NkNote("4.App端发送手机验证码")
+    @RequestMapping("/app/send_verification_code")
+    public String sendVerificationCode(@RequestParam("phone") String phone){
+        return nkMobileService.sendVerificationCode(phone);
     }
 
 }

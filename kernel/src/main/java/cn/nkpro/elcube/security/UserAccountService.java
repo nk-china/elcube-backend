@@ -54,4 +54,6 @@ public interface UserAccountService extends UserDetailsService {
     UserAccountBO update(UserAccountBO account);
 
     void clearLoginLock(UserAccountBO user);
+
+    Map<String,Object> appLogin(String phone, String verCode, String openId, String appleId);
 }
