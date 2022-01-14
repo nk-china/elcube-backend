@@ -214,7 +214,7 @@ public class UserAccountServiceImpl implements UserAccountService {
         }
 
         return new PageList<>(
-                userAccountMapper.selectByExample(example,new RowBounds(0,10))
+                userAccountMapper.selectByExample(example,new RowBounds(0,size))
                         .stream()
                         .peek(a -> a.setPassword(null))
                         .collect(Collectors.toList()),
