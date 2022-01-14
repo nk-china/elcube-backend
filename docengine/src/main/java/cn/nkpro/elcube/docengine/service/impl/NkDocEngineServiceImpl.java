@@ -107,8 +107,15 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
 
     private DocHV createDocHV(String docType, String preDocId){
         // 获取前序单据
-        DocHV preDoc = StringUtils.isBlank(preDocId) || StringUtils.equalsIgnoreCase(preDocId,"@") ? null : detail(preDocId);
-
+        //DocHV preDoc = StringUtils.isBlank(preDocId) || StringUtils.equalsIgnoreCase(preDocId,"@") ? null : detail(preDocId);
+        DocHV preDoc = null;
+        if(StringUtils.isNotBlank(preDocId) && !StringUtils.equalsIgnoreCase(preDocId,"@")){
+            if(NkDocEngineThreadLocal.existUpdated(preDocId)){
+                preDoc = NkDocEngineThreadLocal.getUpdated(preDocId);
+            }else{
+                preDoc = detail(preDocId);
+            }
+        }
         // 获取单据配置
         DocDefHV def = docDefService.getDocDefForRuntime(docType);
 
