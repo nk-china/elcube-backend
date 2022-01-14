@@ -24,5 +24,6 @@ package cn.nkpro.elcube.security.validate;
 public enum NkAppSource {
     weChat,
     ios,
-    android
+    android,
+    elcube
 }
