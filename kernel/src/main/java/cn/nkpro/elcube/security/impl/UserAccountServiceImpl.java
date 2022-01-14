@@ -24,6 +24,8 @@ import cn.nkpro.elcube.data.redis.RedisSupport;
 import cn.nkpro.elcube.platform.gen.UserAccount;
 import cn.nkpro.elcube.platform.gen.UserAccountExample;
 import cn.nkpro.elcube.platform.gen.UserAccountMapper;
+import cn.nkpro.elcube.platform.service.NkAbstractDocOperation;
+import cn.nkpro.elcube.platform.service.NkAccountOperationService;
 import cn.nkpro.elcube.security.HashUtil;
 import cn.nkpro.elcube.security.JwtHelper;
 import cn.nkpro.elcube.security.UserAccountService;
@@ -65,6 +67,12 @@ public class UserAccountServiceImpl implements UserAccountService {
 
     @Autowired@SuppressWarnings("all")
     private UserAuthorizationService authorizationService;
+
+    @Autowired@SuppressWarnings("all")
+    private NkAbstractDocOperation nkAbstractDocOperation;
+
+    @Autowired@SuppressWarnings("all")
+    private NkAccountOperationService nkAccountOperationService;
 
     @Override
     public UserAccount getAccountById(String id){
@@ -270,5 +278,22 @@ public class UserAccountServiceImpl implements UserAccountService {
     @Override
     public void clearLoginLock(UserAccountBO user) {
         redisTemplate.delete(Constants.CACHE_AUTH_ERROR+user.getUsername());
+    }
+
+    @Override
+    public Map<String,Object> appLogin(String phone, String verCode, String openId, String appleId) {
+        // 新建用户
+        UserAccountBO user = nkAccountOperationService.createAccount(phone);
+        update(user);
+        // 用户授权
+        nkAccountOperationService.addAccountFromGroup(user.getId());
+        // 保存客户信息到单据
+        Map<String,String> dataMap = new HashMap<>();
+        dataMap.put("phone",phone);
+        dataMap.put("verCode",verCode);
+        dataMap.put("openId",openId);
+        dataMap.put("appleId",appleId);
+        Object obj = nkAbstractDocOperation.createDoc(dataMap);
+        return createToken();
     }
 }
