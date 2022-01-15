@@ -440,7 +440,17 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
             // 检查单据是否符合业务流控制
             // 获取单据配置
             DocDefHV def = docDefService.deserializeDef(doc.getDef());
-            validateFlow(def, detail(doc.getPreDocId()));
+
+            DocHV preDoc = null;
+            if(StringUtils.isNotBlank(doc.getPreDocId()) && !StringUtils.equalsIgnoreCase(doc.getPreDocId(),"@")){
+                if(NkDocEngineThreadLocal.existUpdated(doc.getPreDocId())){
+                    preDoc = NkDocEngineThreadLocal.getUpdated(doc.getPreDocId());
+                }else{
+                    preDoc = detail(doc.getPreDocId());
+                }
+            }
+            validateFlow(def, preDoc);
+            //validateFlow(def, detail(doc.getPreDocId()));
         }
 
         // 获取单据处理器 并执行
