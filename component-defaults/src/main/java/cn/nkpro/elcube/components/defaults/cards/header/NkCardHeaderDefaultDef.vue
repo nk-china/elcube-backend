@@ -22,6 +22,10 @@
                 {{def.partnerNameSpEL}}
                 <nk-sp-el-editor slot="edit" v-model="def.partnerNameSpEL"></nk-sp-el-editor>
             </nk-form-item>
+            <nk-form-item title="交易编号SpEL">
+                {{def.docNumberSpEL}}
+                <nk-sp-el-editor slot="edit" v-model="def.docNumberSpEL"></nk-sp-el-editor>
+            </nk-form-item>
         </nk-form>
     </nk-def-card>
 </template>
