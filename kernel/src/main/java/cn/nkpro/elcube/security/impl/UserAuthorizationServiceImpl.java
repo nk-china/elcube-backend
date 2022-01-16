@@ -21,6 +21,7 @@ import cn.nkpro.elcube.basic.GUID;
 import cn.nkpro.elcube.co.spel.NkSpELManager;
 import cn.nkpro.elcube.data.redis.RedisSupport;
 import cn.nkpro.elcube.exception.NkDefineException;
+import cn.nkpro.elcube.exception.NkException;
 import cn.nkpro.elcube.exception.NkInputFailedCaution;
 import cn.nkpro.elcube.platform.DeployAble;
 import cn.nkpro.elcube.platform.gen.UserAccount;
@@ -36,6 +37,7 @@ import cn.nkpro.elcube.utils.BeanUtilz;
 import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -400,6 +402,22 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService, D
 
         return group;
     }
+
+    @SneakyThrows
+    @Override
+    public UserGroupBO getGroupDetailByKey(String groupKey) {
+        AuthGroupExample authGroupExample = new AuthGroupExample();
+        authGroupExample.createCriteria().andGroupKeyEqualTo(groupKey);
+        List<AuthGroup> authGroups = authGroupMapper.selectByExample(authGroupExample);
+        if(authGroups.isEmpty()) throw new NkException("当前用户组id为null,请检查");
+        if(authGroups.size() == 1){
+            AuthGroup authGroup = authGroups.get(0);
+            return getGroupDetail(authGroup.getGroupId());
+        }
+        return null;
+    }
+
+    @SneakyThrows
     @Override
     public void updateGroup(UserGroupBO group){
 
@@ -411,6 +429,9 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService, D
             group.setGroupId(guid.nextId(AuthGroup.class));
             authGroupMapper.insert(group);
         }else{
+            if(!checkGroupKey(group)){
+                throw new NkException("用户组id不能重复，请重新填写");
+            }
             authGroupMapper.updateByPrimaryKey(group);
 
             AuthGroupRefExample example = new AuthGroupRefExample();
@@ -446,6 +467,14 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService, D
         authGroupMapper.deleteByPrimaryKey(groupId);
 
         redisSupport.deleteHash(Constants.CACHE_AUTH_GROUP,groupId);
+    }
+
+    @Override
+    public Boolean checkGroupKey(UserGroupBO group) {
+        AuthGroupExample authGroupExample = new AuthGroupExample();
+        authGroupExample.createCriteria().andGroupIdNotEqualTo(group.getGroupId()).andGroupKeyEqualTo(group.getGroupKey());
+        List<AuthGroup> authGroups = authGroupMapper.selectByExample(authGroupExample);
+        return authGroups.isEmpty();
     }
 
     @Override

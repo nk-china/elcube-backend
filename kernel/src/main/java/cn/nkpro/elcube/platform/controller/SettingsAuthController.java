@@ -109,6 +109,11 @@ public class SettingsAuthController {
         permService.removeGroup(groupId);
     }
 
+    @RequestMapping("/group/check")
+    public Boolean groupCheck(@RequestBody UserGroupBO group){
+        return permService.checkGroupKey(group);
+    }
+
     @RequestMapping("/group/remove/account")
     public AuthGroup groupRemoveAccount(String groupId,String accountId){
         permService.removeAccountFromGroup(groupId,accountId);

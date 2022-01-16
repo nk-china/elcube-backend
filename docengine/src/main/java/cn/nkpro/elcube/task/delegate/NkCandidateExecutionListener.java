@@ -16,21 +16,34 @@
  */
 package cn.nkpro.elcube.task.delegate;
 
+import cn.nkpro.elcube.platform.gen.UserAccount;
+import cn.nkpro.elcube.security.UserAuthorizationService;
+import cn.nkpro.elcube.security.bo.UserGroupBO;
 import lombok.Setter;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.el.FixedValue;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component("NkCandidateExecutionListener")
 public class NkCandidateExecutionListener implements ExecutionListener {
+
     @Setter
-    private FixedValue var;
+    private FixedValue groupKey;
+
+    @Autowired@SuppressWarnings("all")
+    private UserAuthorizationService permService;
+
     @Override
     public void notify(DelegateExecution delegateExecution) {
-        String varValue = (String) var.getValue(delegateExecution);
-        delegateExecution.setVariableLocal(varValue, Arrays.asList("nk-default-admin","nk-default-test"));
+        String groupKeyValue = (String) groupKey.getValue(delegateExecution);
+        UserGroupBO groupDetail = permService.getGroupDetailByKey(groupKeyValue);
+        List<UserAccount> accounts = groupDetail.getAccounts();
+        List<String> collect = accounts.stream().map(UserAccount::getId).collect(Collectors.toList());
+        delegateExecution.setVariableLocal(groupKeyValue, collect);
     }
 }

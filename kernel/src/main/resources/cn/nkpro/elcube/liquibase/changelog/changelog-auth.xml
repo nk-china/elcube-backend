@@ -31,6 +31,13 @@
         </createTable>
     </changeSet>
 
+    <changeSet id="NK_AUTH_GROUP-02" author="WuJun" context="default">
+        <preConditions onFail="MARK_RAN"><not><columnExists columnName="GROUP_KEY" tableName="NK_AUTH_GROUP"/></not></preConditions>
+        <addColumn tableName="NK_AUTH_GROUP">
+            <column name="GROUP_KEY" type="${type.desc}"/>
+        </addColumn>
+    </changeSet>
+
     <changeSet id="NK_AUTH_GROUP_REF-01" author="bean" context="default">
         <preConditions onFail="MARK_RAN"><not><tableExists tableName="NK_AUTH_GROUP_REF" /></not></preConditions>
         <comment />

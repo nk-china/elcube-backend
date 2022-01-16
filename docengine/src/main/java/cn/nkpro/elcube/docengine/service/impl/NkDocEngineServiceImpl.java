@@ -357,6 +357,18 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
 
     @Override
     @Transactional
+    public DocHV doUpdate(String docType, String businessKey, String optSource, NkDocEngine.Function function){
+
+        DocHV doc = detail(docType,businessKey);
+        function.apply(doc);
+        doc = execUpdate(doc, optSource);
+        doc.clearItemContent();
+
+        return doc;
+    }
+
+    @Override
+    @Transactional
     public DocHV doUpdateAgain(String docId, String optSource, NkDocEngine.Function function){
 
         DocHV doc = NkDocEngineThreadLocal.getUpdated(docId);

@@ -57,13 +57,18 @@ public interface UserAuthorizationService {
 
     UserGroupBO getGroupDetail(String groupId);
 
+    UserGroupBO getGroupDetailByKey(String groupKey);
+
     void updateGroup(UserGroupBO group);
 
     void removeGroup(String groupId);
+
+    Boolean checkGroupKey(UserGroupBO group);
 
     void removeAccountFromGroup(String groupId, String accountId);
 
     void addAccountFromGroup(String groupId, String accountId);
 
     List<UserAccount> accounts(String keyword);
+
 }

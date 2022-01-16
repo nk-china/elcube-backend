@@ -59,6 +59,9 @@ public interface NkDocEngine {
     DocHV doUpdate(String docId, String optSource, Function function);
 
     @Transactional
+    DocHV doUpdate(String docType, String businessKey, String optSource, Function function);
+
+    @Transactional
     DocHV doUpdateAgain(String docId, String optSource, Function function);
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)

@@ -24,12 +24,12 @@ public class NkNumberCreateSpEL implements NkSpELInjection{
         Date date = new Date();
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMdd");
         String format = simpleDateFormat.format(date);
-        Boolean key = redisTemplate.hasKey(format);
+        Boolean key = redisTemplate.hasKey(prefix + format);
         Long increment = 1L;
         if(Boolean.TRUE.equals(key)){
             increment = redisTemplate.opsForValue().increment(format, 1L);
         }else{
-            redisTemplate.opsForValue().set(format,increment,1L, TimeUnit.DAYS);
+            redisTemplate.opsForValue().set(prefix + format,increment,1L, TimeUnit.DAYS);
         }
         return prefix + format + increment + "";
     }
