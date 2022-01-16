@@ -59,11 +59,11 @@
 
 		<property name="javaFileEncoding" value="UTF-8"/>
 
-		<plugin type="cn.nkpro.elcube.mybatis.generator.MySQLPaginationPlugin2" />
-		<plugin type="cn.nkpro.elcube.mybatis.generator.WsDocPlugin">
+		<plugin type="cn.nkpro.elcube.mybatis.generator.plugin.MySQLPaginationPlugin2" />
+		<plugin type="cn.nkpro.elcube.mybatis.generator.plugin.WsDocPlugin">
 			<property name="annotationType" value="cn.nkpro.elcube.annotation.CodeFieldNotes" />
 		</plugin>
-		<plugin type="cn.nkpro.elcube.mybatis.generator.ZJsonIgnorePropertiesPlugin" />
+		<plugin type="cn.nkpro.elcube.mybatis.generator.plugin.ZJsonIgnorePropertiesPlugin" />
 		<plugin type="org.mybatis.generator.plugins.SerializablePlugin" />
 
 		<commentGenerator type="cn.nkpro.elcube.mybatis.generator.WsDocCommentGenerator">
