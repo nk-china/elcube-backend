@@ -223,7 +223,7 @@ class AbstractNkDocEngine {
         }
 
         // 根据权限过滤单据数据与配置
-        docPermService.filterDocCards(null, docHV);
+        docPermService.filterDocCards("READ", docHV);
 
         // 加载活动的bpm任务实例
         if(StringUtils.isNotBlank(docHV.getProcessInstanceId())){
