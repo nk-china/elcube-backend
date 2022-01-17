@@ -65,10 +65,6 @@ class NkCardHeaderDefault extends NkAbstractCard<Map,Def> {
             doc.setPartnerName(spELManager.invoke(d.getPartnerNameSpEL(), context) as String)
         }
 
-        if(StringUtils.isNotBlank(d.getDocNumberSpEL())){
-            doc.setDocNumber(spELManager.invoke(d.getDocNumberSpEL(), context) as String)
-        }
-
         return super.afterCreate(doc, preDoc, data, defIV, d) as Map
     }
 
@@ -107,6 +103,5 @@ class NkCardHeaderDefault extends NkAbstractCard<Map,Def> {
     static class Def{
         String partnerIdSpEL
         String partnerNameSpEL
-        String docNumberSpEL
     }
 }

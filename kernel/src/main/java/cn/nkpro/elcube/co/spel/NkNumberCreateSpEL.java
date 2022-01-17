@@ -27,7 +27,7 @@ public class NkNumberCreateSpEL implements NkSpELInjection{
         Boolean key = redisTemplate.hasKey(prefix + format);
         Long increment = 1L;
         if(Boolean.TRUE.equals(key)){
-            increment = redisTemplate.opsForValue().increment(format, 1L);
+            increment = redisTemplate.opsForValue().increment(prefix + format, 1L);
         }else{
             redisTemplate.opsForValue().set(prefix + format,increment,1L, TimeUnit.DAYS);
         }
