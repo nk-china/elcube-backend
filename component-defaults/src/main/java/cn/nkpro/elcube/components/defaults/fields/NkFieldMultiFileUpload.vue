@@ -13,18 +13,18 @@
 -->
 <template>
     <div style="width: 90%;">
-        <div  v-if="!editMode" style="display: flex">
+        <div  v-if="!editMode" class="uploads">
             <template v-if="inputOptions.listType==='picture-card'">
-                <div v-for="item in fileList" :key="item.uid" class="avatar-border" @click="handlePreview(item)">
+                <div v-for="item in fileList" :key="'key1' + item.uid" class="avatar-border" @click="handlePreview(item)">
                     <a-avatar :src="item.url" shape="square" :size="84"></a-avatar>
                 </div>
             </template>
             <template v-else>
-                <a v-for="item in fileList" :key="item.uid" @click="handlePreview(item)">{{item.name}}</a>
+                <a v-for="item in fileList" :key="'key2' + item.uid" @click="handlePreview(item)">{{item.name}}</a>
             </template>
         </div>
         <div v-else style="display: flex;align-items: center;">
-            <a-upload v-if="editMode && fileList"
+            <a-upload v-if="show && editMode && fileList"
                       :accept    ="inputOptions.accept"
                       class     ="uploader"
                       :default-file-list="fileList"
@@ -66,7 +66,7 @@ function getBase64(file) {
 
 export default {
     props:{
-        value: {},
+        value: [],
         editMode: {
             type: Boolean,
             default:false
@@ -84,19 +84,27 @@ export default {
             progressPercent:undefined,
             progressStatus:undefined,
 
-            fileList:undefined,
+            fileList:[],
             downloadUrl:undefined,
 
             previewVisible: false,
             previewImage: '',
+            show: true,
         }
     },
     watch:{
-        // 待解决问题：a-upload的组件如果设置file-list属性，导致文件上传总是不回调
-        // 因此
-        // 考虑要不要坚挺value变化，以达到其他字段可以更改文件上传字段的效果
-        // value(e){
-        // }
+        value:{
+            deep:true,
+            handler: function (n,o){
+                if(n && (o ? n.length !== o.length : true)){
+                    this.show=false;
+                    this.$nextTick(()=>{
+                        this.nk$editModeChanged();
+                        this.show = true;
+                    })
+                }
+            }
+        }
     },
     mounted(){
         this.nk$editModeChanged(this.editMode);
@@ -104,21 +112,20 @@ export default {
     methods:{
         nk$editModeChanged(){
             this.fileList = [];
-            if(this.value){
-
-                let item = {
-                    uid : -1,
-                    name: this.value.name,
-                    path: this.value.path,
-                    url : undefined,
-                };
-                this.fileList.push(item);
-
-                if(this.inputOptions.listType==='picture-card'){
-                    this.$http.get("/api/fs/download?url="+this.value.path).then(res=>{
+            if(this.value && this.value.length){
+                this.value.forEach(async (valueData,index) =>{
+                    let item = {
+                        uid: index,
+                        name: valueData.name,
+                        path: valueData.path,
+                        url : undefined,
+                    };
+                    this.fileList.push(item);
+                    if(this.inputOptions.listType==='picture-card'){
+                        const res = await this.$http.get("/api/fs/download?url="+valueData.path);
                         item.url = res.data;
-                    });
-                }
+                    }
+                })
             }
             this.progressPercent = undefined
         },
@@ -157,21 +164,29 @@ export default {
                     this.fileUploaded(info);
                     break;
                 case 'removed':
+                    // info.fileList.forEach((item,index)=>{
+                    //     let obj = {
+                    //         uid: index,
+                    //         path: item.path,
+                    //         name: item.name
+                    //     }
+                    //     this.fileList.push(obj);
+                    // })
                     this.fileList = info.fileList;
-                    this.$emit('input',undefined);
+                    this.$emit('input',this.fileList);
                     break;
             }
         },
         fileUploaded(info){
 
             info.file.path = info.file.response.url||(this.config.path+(this.config.filename||info.file.name));
-            this.fileList = [];
-            this.fileList.push(info.file);
-
-            this.$emit('input',{
+            this.fileList.push({
+                uid: this.fileList.length ? this.fileList.length + 1 : 0,
                 path: info.file.path,
                 name: info.file.name,
             });
+
+            this.$emit('input',this.fileList);
             this.change();
         },
         async handlePreview(file) {
@@ -198,17 +213,24 @@ export default {
             }
         },
         change(){
-            this.$emit('change',{});
+            this.$emit('change',[]);
         }
     }
 }
 </script>
+<style scoped>
 
-<style scoped lang="less">
+</style>
+<style scoped>
     .avatar-border{
         padding: 8px;
         border: 1px solid #d9d9d9;
         border-radius: 4px;
         cursor: pointer;
+        overflow: hidden;
+    }
+    .uploads{
+      overflow-y: hidden;
+      overflow-x: scroll;
     }
 </style>
