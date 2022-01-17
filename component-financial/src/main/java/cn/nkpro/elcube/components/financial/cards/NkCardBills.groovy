@@ -245,7 +245,13 @@ class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
             // 难免会出现变更以后实收大于应收的情况
             // 所以，将已收金额大于 0 的数据 强制标记为启用，避免已收丢失
             data.forEach({i->
-                i.discard = i.received>0 && i.discard==1 ? 0 : i.discard
+                if(i.discard==1){
+                    i.amount = 0
+                    i.receivable = 0
+                    if(i.received > 0){
+                        i.discard = 0
+                    }
+                }
             })
 
             // 按到期日期排序
@@ -439,13 +445,13 @@ class NkCardBills extends NkAbstractCard<List<DocIBill>,BillDef> {
             exists.docId = doc.docId
             exists.cardKey = defIV.cardKey
             exists.billType = billType
-            exists.billPartnerId = doc.partnerId
             exists.expireDate = expireDate
             exists.received = 0
 
             data.add(exists)
         }
 
+        exists.billPartnerId = doc.partnerId
         exists.amount = amount
         exists.receivable = exists.amount - exists.received
 

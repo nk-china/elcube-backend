@@ -113,9 +113,12 @@ class NkFinanceMethod01 extends NkAbstractApplyCSO{
                 while(true){
                     retry ++
 
-
+                    // 上期剩余本金
                     prevResidual = pv
+                    // 正常还款的期数
                     int count = 0
+                    // 上期结余利息（即还款金额小于利息金额的部分）
+                    double prevOpenedInterest = 0d
 
                     list.forEach({i->
 
@@ -124,9 +127,20 @@ class NkFinanceMethod01 extends NkAbstractApplyCSO{
                                 .findFirst()
                                 .orElse(null)
 
-                        i.interest = tp == 1 && i.period == 1 ? 0 : doubleValue(prevResidual*ip)
+                        i.interest = tp == 1 && i.period == 1 ? 0 : doubleValue((prevResidual + prevOpenedInterest)*ip + prevOpenedInterest)
+                        prevOpenedInterest = 0d
                         if(rule){
-                            i.pay = Math.max(rule.pay, i.interest)
+                            i.pay = rule.pay
+                            if(i.interest > rule.pay){
+                                // 如果是最后一期
+                                if(list.indexOf(i)==list.size()-1){
+                                    i.pay = i.interest
+                                }else{
+                                    prevOpenedInterest = doubleValue(i.interest - rule.pay)
+                                    i.interest = i.pay
+                                }
+                            }
+
                         }else{
                             i.pay = doubleValue(i.pay + X)
                             count ++

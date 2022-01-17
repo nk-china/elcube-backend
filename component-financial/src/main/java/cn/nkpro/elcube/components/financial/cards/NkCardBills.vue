@@ -166,13 +166,12 @@
             viewData(){
                 if(this.selected && this.selected.includes){
                     return this.data.filter(i=>{
-                        return this.selected.includes.indexOf(i.billType)>-1
+                        return i.discard===0 && this.selected.includes.indexOf(i.billType)>-1
                     });
                 }
-                return this.data;
+                return this.data.filter(i=>i.discard===0);
             },
             list(){
-
                 return this.viewData.slice(
                     (this.page.page - 1) * this.page.size,
                      this.page.page      * this.page.size

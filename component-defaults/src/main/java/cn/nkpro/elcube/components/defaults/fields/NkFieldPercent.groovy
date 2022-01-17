@@ -77,11 +77,15 @@ class NkFieldPercent extends NkAbstractField implements NkDynamicFormField, NkDy
         }
 
         if(value !=null ){
-            card.set(field.getKey(),
-                new BigDecimal(value as double)
-                    .setScale(field.getInputOptions().getOrDefault('digits', 6) as int, RoundingMode.HALF_UP)
-                    .doubleValue()
-            )
+            if(value == Double.NaN){
+                card.set(field.getKey(),null)
+            }else{
+                card.set(field.getKey(),
+                        new BigDecimal(value as double)
+                                .setScale(field.getInputOptions().getOrDefault('digits', 6) as int, RoundingMode.HALF_UP)
+                                .doubleValue()
+                )
+            }
         }
 
         super.afterCalculate(field, context, card, calculateContext)
