@@ -109,7 +109,7 @@
         </addColumn>
     </changeSet>
 
-    <changeSet id="NK_PLATFORM$INSERT-05" author="bean" context="default">
+    <changeSet id="NK_PLATFORM$INSERT-06" author="bean" context="default">
         <preConditions onFail="MARK_RAN">
             <sqlCheck expectedResult="0">
                 SELECT COUNT(1) FROM NK_PLATFORM_MENU
@@ -126,11 +126,12 @@
             insert into nk_platform_menu ( MENU_ID, TITLE, SUB_TITLE, PARENT_ID, ORDER_BY, URL, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, UPDATED_TIME) values ( 'data-discover', '发现', null, 'bigdata', '50000', '/apps/data/discover', '', null, null, '1637255334');
             insert into nk_platform_menu ( MENU_ID, TITLE, SUB_TITLE, PARENT_ID, ORDER_BY, URL, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, UPDATED_TIME) values ( 'data-visualize', '可视化', null, 'bigdata', '50001', '/apps/data/visualize', null, null, null, '1637255334');
             insert into nk_platform_menu ( MENU_ID, TITLE, SUB_TITLE, PARENT_ID, ORDER_BY, URL, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, UPDATED_TIME) values ( 'def-base', '基础配置', null, 'dev', '70000', '/apps/def/base', null, null, 'DEF:CONSTANT', '1637255334');
-            insert into nk_platform_menu ( MENU_ID, TITLE, SUB_TITLE, PARENT_ID, ORDER_BY, URL, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, UPDATED_TIME) values ( 'def-bpm', '流程定义', null, 'dev', '70003', '/apps/def/bpm/process/definitions', null, null, 'DEF:BPM', '1637255334');
             insert into nk_platform_menu ( MENU_ID, TITLE, SUB_TITLE, PARENT_ID, ORDER_BY, URL, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, UPDATED_TIME) values ( 'def-component', '组件', null, 'dev', '70001', '/apps/def/component', null, null, 'DEF:COMPONENT', '1637255334');
-            insert into nk_platform_menu ( MENU_ID, TITLE, SUB_TITLE, PARENT_ID, ORDER_BY, URL, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, UPDATED_TIME) values ( 'def-deploy', '部署', null, 'dev', '70005', '/apps/def/deploy', null, null, 'DEF:DEPLOY', '1637255334');
-            insert into nk_platform_menu ( MENU_ID, TITLE, SUB_TITLE, PARENT_ID, ORDER_BY, URL, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, UPDATED_TIME) values ( 'def-dmn', '决策定义', null, 'dev', '70004', '/apps/def/dmn/definitions', null, null, 'DEF:DMN', '1637255334');
             insert into nk_platform_menu ( MENU_ID, TITLE, SUB_TITLE, PARENT_ID, ORDER_BY, URL, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, UPDATED_TIME) values ( 'def-doc', '单据类型', null, 'dev', '70002', '/apps/def/doc', null, null, 'DEF:DOC', '1637255334');
+            insert into nk_platform_menu ( MENU_ID, TITLE, SUB_TITLE, PARENT_ID, ORDER_BY, URL, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, UPDATED_TIME) values ( 'def-bizFlow', '业务流', null, 'dev', '70003', '/apps/def/bizFlow', null, null, 'DEF:DOC', '1637255334');
+            insert into nk_platform_menu ( MENU_ID, TITLE, SUB_TITLE, PARENT_ID, ORDER_BY, URL, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, UPDATED_TIME) values ( 'def-bpm', '流程定义', null, 'dev', '70004', '/apps/def/bpm/process/definitions', null, null, 'DEF:BPM', '1637255334');
+            insert into nk_platform_menu ( MENU_ID, TITLE, SUB_TITLE, PARENT_ID, ORDER_BY, URL, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, UPDATED_TIME) values ( 'def-dmn', '决策定义', null, 'dev', '70005', '/apps/def/dmn/definitions', null, null, 'DEF:DMN', '1637255334');
+            insert into nk_platform_menu ( MENU_ID, TITLE, SUB_TITLE, PARENT_ID, ORDER_BY, URL, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, UPDATED_TIME) values ( 'def-deploy', '部署', null, 'dev', '70006', '/apps/def/deploy', null, null, 'DEF:DEPLOY', '1637255334');
             insert into nk_platform_menu ( MENU_ID, TITLE, SUB_TITLE, PARENT_ID, ORDER_BY, URL, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, UPDATED_TIME) values ( 'dev', '开发', null, null, '70000', '/apps/dev', 'deployment-unit', null, null, '1637255334');
             insert into nk_platform_menu ( MENU_ID, TITLE, SUB_TITLE, PARENT_ID, ORDER_BY, URL, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, UPDATED_TIME) values ( 'devOps', '运维', null, null, '80000', '/apps/devOps', 'tool', null, null, '1637255334');
             insert into nk_platform_menu ( MENU_ID, TITLE, SUB_TITLE, PARENT_ID, ORDER_BY, URL, ICON, MENU_OPTIONS, AUTHORITY_OPTIONS, UPDATED_TIME) values ( 'divider-1', '-', null, null, '60000', '-', null, null, null, '1637255334');
