@@ -18,6 +18,10 @@
                 {{value.maxLength}}
                 <a-input-number size="small" slot="edit" :min="1" :max="100" v-model="value.maxLength"></a-input-number>
             </nk-form-item>
+          <nk-form-item title="正则校验表达式">
+            {{value.pattern}}
+            <a-input size="small" slot="edit" :min="1" :max="100" v-model="value.pattern"></a-input>
+          </nk-form-item>
         </nk-form>
     </div>
 </template>
