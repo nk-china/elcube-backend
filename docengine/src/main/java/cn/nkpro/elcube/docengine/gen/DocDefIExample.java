@@ -973,6 +973,76 @@ public class DocDefIExample {
             addCriterion("COPY_FROM_REF not between", value1, value2, "copyFromRef");
             return (Criteria) this;
         }
+
+        public Criteria andVisibleSpELIsNull() {
+            addCriterion("VISIBLE_SP_E_L is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andVisibleSpELIsNotNull() {
+            addCriterion("VISIBLE_SP_E_L is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andVisibleSpELEqualTo(String value) {
+            addCriterion("VISIBLE_SP_E_L =", value, "visibleSpEL");
+            return (Criteria) this;
+        }
+
+        public Criteria andVisibleSpELNotEqualTo(String value) {
+            addCriterion("VISIBLE_SP_E_L <>", value, "visibleSpEL");
+            return (Criteria) this;
+        }
+
+        public Criteria andVisibleSpELGreaterThan(String value) {
+            addCriterion("VISIBLE_SP_E_L >", value, "visibleSpEL");
+            return (Criteria) this;
+        }
+
+        public Criteria andVisibleSpELGreaterThanOrEqualTo(String value) {
+            addCriterion("VISIBLE_SP_E_L >=", value, "visibleSpEL");
+            return (Criteria) this;
+        }
+
+        public Criteria andVisibleSpELLessThan(String value) {
+            addCriterion("VISIBLE_SP_E_L <", value, "visibleSpEL");
+            return (Criteria) this;
+        }
+
+        public Criteria andVisibleSpELLessThanOrEqualTo(String value) {
+            addCriterion("VISIBLE_SP_E_L <=", value, "visibleSpEL");
+            return (Criteria) this;
+        }
+
+        public Criteria andVisibleSpELLike(String value) {
+            addCriterion("VISIBLE_SP_E_L like", value, "visibleSpEL");
+            return (Criteria) this;
+        }
+
+        public Criteria andVisibleSpELNotLike(String value) {
+            addCriterion("VISIBLE_SP_E_L not like", value, "visibleSpEL");
+            return (Criteria) this;
+        }
+
+        public Criteria andVisibleSpELIn(List<String> values) {
+            addCriterion("VISIBLE_SP_E_L in", values, "visibleSpEL");
+            return (Criteria) this;
+        }
+
+        public Criteria andVisibleSpELNotIn(List<String> values) {
+            addCriterion("VISIBLE_SP_E_L not in", values, "visibleSpEL");
+            return (Criteria) this;
+        }
+
+        public Criteria andVisibleSpELBetween(String value1, String value2) {
+            addCriterion("VISIBLE_SP_E_L between", value1, value2, "visibleSpEL");
+            return (Criteria) this;
+        }
+
+        public Criteria andVisibleSpELNotBetween(String value1, String value2) {
+            addCriterion("VISIBLE_SP_E_L not between", value1, value2, "visibleSpEL");
+            return (Criteria) this;
+        }
     }
 
     /**

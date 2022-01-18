@@ -286,6 +286,41 @@ class AbstractNkDocEngine {
                     docHV.getDef().getNextFlows().size()
             );
 
+        EvaluationContext context = spELManager.createContext(docHV);
+
+        // 处理自定义卡片的显示逻辑
+        docHV.getDef()
+                .getCards()
+                .removeIf(defIV -> {
+                    if(StringUtils.isNotBlank(defIV.getVisibleSpEL())){
+                        Boolean visible = (Boolean) spELManager.invoke(defIV.getVisibleSpEL(), context);
+                        if(visible!=null && !visible){
+                            if(log.isInfoEnabled())
+                                        log.info("设置卡片{} 不显示",
+                                        defIV.getCardKey()
+                                );
+                            return true;
+                        }
+                    }
+                    return false;
+                });
+
+        // 处理自定义卡片的编辑逻辑
+        docHV.getDef()
+                .getCards()
+                .forEach(defIV -> {
+                    if(StringUtils.isNotBlank(defIV.getEditableSpEL())){
+                        Boolean editable = (Boolean) spELManager.invoke(defIV.getEditableSpEL(), context);
+                        if(editable!=null && !editable){
+                            if(log.isInfoEnabled())
+                                log.info("设置卡片{} 只读",
+                                        defIV.getCardKey()
+                                );
+                            defIV.setWriteable(false);
+                        }
+                    }
+                });
+
         return docHV;
     }
 

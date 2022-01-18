@@ -297,6 +297,17 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="NK_DOC_DEF_I-04" author="bean" context="default">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="NK_DOC_DEF_I" columnName="VISIBLE_SP_E_L" />
+            </not>
+        </preConditions>
+        <addColumn tableName="NK_DOC_DEF_I">
+            <column name="VISIBLE_SP_E_L" type="${type.var}" remarks="是否显示表达式" beforeColumn="MARKDOWN_FLAG" />
+        </addColumn>
+    </changeSet>
+
     <changeSet id="NK_DOC_DEF_INDEX_CUSTOM-01" author="bean" context="default">
         <preConditions onFail="MARK_RAN">
             <not>
