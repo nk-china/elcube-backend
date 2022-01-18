@@ -24,8 +24,8 @@ import org.springframework.stereotype.Component
 @Component("NkCardSidebarDocInfo")
 class NkCardSidebarDocInfo extends NkAbstractCard<Map,Map> {
 
-    @Override
-    String getPosition() {
-        return POSITION_SIDEBAR
-    }
+    //@Override
+    //String getPosition() {
+    //    return POSITION_SIDEBAR
+    //}
 }

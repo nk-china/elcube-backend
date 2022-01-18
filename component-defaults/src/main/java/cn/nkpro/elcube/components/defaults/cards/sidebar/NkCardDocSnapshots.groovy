@@ -32,10 +32,10 @@ class NkCardDocSnapshots extends NkAbstractCard<List<DocRecord>,Map> {
     @Autowired@SuppressWarnings("all")
     private NkDocHistoryService docHistoryService
 
-    @Override
-    String getPosition() {
-        return POSITION_SIDEBAR
-    }
+    //@Override
+    //String getPosition() {
+    //    return POSITION_SIDEBAR
+    //}
 
     @Override
     boolean enableDataDiff() {
