@@ -472,7 +472,11 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService, D
     @Override
     public Boolean checkGroupKey(UserGroupBO group) {
         AuthGroupExample authGroupExample = new AuthGroupExample();
-        authGroupExample.createCriteria().andGroupIdNotEqualTo(group.getGroupId()).andGroupKeyEqualTo(group.getGroupKey());
+        AuthGroupExample.Criteria criteria = authGroupExample.createCriteria();
+        criteria.andGroupKeyEqualTo(group.getGroupKey());
+        if(group.getGroupId() != null){
+            criteria.andGroupIdNotEqualTo(group.getGroupId());
+        }
         List<AuthGroup> authGroups = authGroupMapper.selectByExample(authGroupExample);
         return authGroups.isEmpty();
     }
