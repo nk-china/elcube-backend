@@ -28,4 +28,6 @@ public interface NkBpmTaskService {
     void complete(BpmTaskComplete bpmTask);
 
     BpmTask taskByBusinessAndAssignee(String businessKey, String assignee);
+
+    boolean isDocAssignee(String businessKey, String assignee);
 }

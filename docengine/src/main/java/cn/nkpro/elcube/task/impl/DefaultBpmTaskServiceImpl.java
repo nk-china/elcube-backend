@@ -37,4 +37,9 @@ public class DefaultBpmTaskServiceImpl implements NkBpmTaskService {
     public BpmTask taskByBusinessAndAssignee(String businessKey, String assignee) {
         throw new NkSystemException("操作不支持");
     }
+
+    @Override
+    public boolean isDocAssignee(String businessKey, String assignee) {
+        throw new NkSystemException("操作不支持");
+    }
 }

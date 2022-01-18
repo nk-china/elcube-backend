@@ -21,28 +21,40 @@ import cn.nkpro.elcube.data.elasticearch.ESPageList;
 import cn.nkpro.elcube.data.elasticearch.SearchEngine;
 import cn.nkpro.elcube.docengine.NkDocSearchService;
 import cn.nkpro.elcube.docengine.model.SearchParams;
+import cn.nkpro.elcube.security.SecurityUtilz;
+import cn.nkpro.elcube.task.NkBpmDefService;
+import cn.nkpro.elcube.task.NkBpmTaskService;
+import cn.nkpro.elcube.task.model.BpmTaskComplete;
 import cn.nkpro.elcube.task.model.BpmTaskES;
+import cn.nkpro.elcube.task.model.ResourceDefinition;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
+import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 
 /**
  * Created by bean on 2020/7/21.
  */
+@PreAuthorize("authenticated")
 @NkNote("7.工作流")
 @RestController
 @RequestMapping("/task")
 public class TaskController {
 
-    @Autowired
-    private NkDocSearchService searchService;
-    @Autowired
+    @Autowired@SuppressWarnings("all")
     private SearchEngine searchEngine;
+
+    @Autowired@SuppressWarnings("all")
+    private NkDocSearchService searchService;
+
+    @Autowired@SuppressWarnings("all")
+    private NkBpmTaskService bpmTaskService;
+
+    @Autowired@SuppressWarnings("all")
+    private NkBpmDefService defBpmService;
 
     @NkNote("1、拉取交易列表数据")
     @RequestMapping(value = "/tasks",method = RequestMethod.POST)
@@ -51,9 +63,24 @@ public class TaskController {
         params.setOrderField(StringUtils.defaultIfBlank(params.getOrderField(),"updatedTime"));
         return searchService.queryList(
                 searchEngine.parseDocument(BpmTaskES.class),
-                null,//QueryBuilders.termQuery("assignee",SecurityUtilz.getUser().getId())
-                params
+                QueryBuilders.termQuery("assignee", SecurityUtilz.getUser().getId()),
+                params,
+                false
         );
+    }
+
+    @NkNote("2.执行任务")
+    @RequestMapping(value = "/instance/complete")
+    @ResponseBody
+    public void processCompleteTask(
+            @NkNote("任务Id")@RequestBody BpmTaskComplete taskComplete) {
+        bpmTaskService.complete(taskComplete);
+    }
+
+    @NkNote("3.拉取定义详情")
+    @RequestMapping(value = "/process/definition/detail")
+    public ResourceDefinition processDefinitionDetail(String definitionId){
+        return defBpmService.getProcessDefinition(definitionId);
     }
 
 //    @WsDocNote("2、检查任务是否结束")

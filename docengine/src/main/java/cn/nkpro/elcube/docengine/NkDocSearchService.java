@@ -98,7 +98,7 @@ public class NkDocSearchService {
             QueryBuilder preQueryBuilder,
             SearchParams params
     ){
-        return this.queryList("document", preQueryBuilder, params);
+        return this.queryList("document", preQueryBuilder, params, false);
     }
 
 
@@ -164,7 +164,8 @@ public class NkDocSearchService {
     public ESPageList<JSONObject> queryList(
             String indexName,
             QueryBuilder preQueryBuilder,
-            SearchParams params
+            SearchParams params,
+            boolean filterByDocPerm
     ){
 
         BoolQueryBuilder postQueryBuilder = QueryBuilders.boolQuery();
@@ -180,9 +181,11 @@ public class NkDocSearchService {
             );
         }
 
-        QueryBuilder permQuery = docPermService.buildDocFilter(NkDocPermService.MODE_READ, null, null, false);
-        if(permQuery!=null)
-            postQueryBuilder.must(permQuery);
+        if(filterByDocPerm){
+            QueryBuilder permQuery = docPermService.buildDocFilter(NkDocPermService.MODE_READ, null, null, false);
+            if(permQuery!=null)
+                postQueryBuilder.must(permQuery);
+        }
 
         // 构造检索语句
         SearchSourceBuilder sourceBuilder = new SearchSourceBuilder()

@@ -33,6 +33,9 @@ import cn.nkpro.elcube.docengine.model.DocState;
 import cn.nkpro.elcube.docengine.model.es.DocHES;
 import cn.nkpro.elcube.docengine.service.NkDocEngineFrontService;
 import cn.nkpro.elcube.docengine.service.NkDocPermService;
+import cn.nkpro.elcube.exception.NkAccessDeniedException;
+import cn.nkpro.elcube.security.SecurityUtilz;
+import cn.nkpro.elcube.task.model.BpmTask;
 import cn.nkpro.elcube.utils.BeanUtilz;
 import cn.nkpro.elcube.utils.UUIDHexGenerator;
 import lombok.extern.slf4j.Slf4j;
@@ -159,7 +162,13 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
 
             // 检查READ权限
             if(!debugContextManager.isDebug()) {
-                docPermService.assertHasDocPerm(NkDocPermService.MODE_READ, docId, docHPersistent.getDocType());
+                // 检查单据权限
+                if(!docPermService.hasDocPerm(NkDocPermService.MODE_READ, docId, docHPersistent.getDocType())){
+                    // 检查用户是否被单据工作流指派
+                    if(!(StringUtils.isNotBlank(docHPersistent.getProcessInstanceId())&&bpmTaskService.isDocAssignee(docId, SecurityUtilz.getUser().getId()))){
+                        throw new NkAccessDeniedException(String.format("没有单据[%s:%s]-查看的访问权限", docHPersistent.getDocType(), docId));
+                    }
+                }
             }
 
             // 尝试先从本地线程中获取单据对象

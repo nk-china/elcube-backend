@@ -64,6 +64,8 @@ public class NkBpmTaskServiceImpl extends AbstractNkBpmSupport implements NkBpmT
                 .singleResult();
         Assert.notNull(task,"任务不存在");
 
+        // todo 判断用户是否有管理权限，或为assignee
+
         String comment = bpmTask.getTransition().getName() + (StringUtils.isNotBlank(bpmTask.getComment())?(" | "+ bpmTask.getComment()):"");
         processEngine.getTaskService().setAssignee(bpmTask.getTaskId(),SecurityUtilz.getUser().getId());
         processEngine.getTaskService().createComment(bpmTask.getTaskId(),task.getProcessInstanceId(),comment);
@@ -99,5 +101,17 @@ public class NkBpmTaskServiceImpl extends AbstractNkBpmSupport implements NkBpmT
         }
 
         return null;
+    }
+
+    @Override
+    public boolean isDocAssignee(String businessKey, String assignee) {
+        return processEngine.getTaskService()
+                .createTaskQuery()
+                .processInstanceBusinessKey(businessKey)
+                .active()
+                .or()
+                .taskCandidateUser(assignee)
+                .taskAssignee(assignee)
+                .endOr().count()>0;
     }
 }

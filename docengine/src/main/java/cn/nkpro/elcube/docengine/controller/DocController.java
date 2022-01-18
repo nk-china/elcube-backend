@@ -59,7 +59,7 @@ public class DocController {
     @NkNote("1.拉取交易列表数据")
     @RequestMapping(value = "/list/{index}",method = RequestMethod.POST)
     public ESPageList<JSONObject> list(@RequestBody SearchParams params, @PathVariable String index) {
-        return searchService.queryList(index, null, params);
+        return searchService.queryList(index, null, params, true);
     }
 
     @NkNote("1.拉取交易列表搜索提示")
