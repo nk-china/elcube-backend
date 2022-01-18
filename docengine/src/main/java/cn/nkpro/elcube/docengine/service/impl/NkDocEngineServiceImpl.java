@@ -210,6 +210,7 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
     }
 
     @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public DocHV detail(String docType, String businessKey) {
 
         DocHExample example = new DocHExample();

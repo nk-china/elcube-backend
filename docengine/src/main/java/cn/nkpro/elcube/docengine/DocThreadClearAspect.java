@@ -1,5 +1,6 @@
 package cn.nkpro.elcube.docengine;
 
+import cn.nkpro.elcube.basic.TransactionSync;
 import cn.nkpro.elcube.docengine.gen.DocH;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -36,6 +37,9 @@ public class DocThreadClearAspect {
         String target  = null;
         switch (point.getSignature().getName()){
             case "detail":
+                // docId or docType , businessKey
+                target = (String) point.getArgs()[point.getArgs().length-1];
+                break;
             case "doUpdate":
             case "doUpdateAgain":
             case "detailView":
@@ -84,15 +88,17 @@ public class DocThreadClearAspect {
             }
 
             if(isDocEngineEntrance){
-                log.info("**** 清理本地线程变量");
-                threadLocalFlag.remove();
-                threadLocalLogs.remove();
-                NkDocEngineThreadLocal.threadLocalLock.remove();
-                NkDocEngineThreadLocal.threadLocalCurr.remove();
-                NkDocEngineThreadLocal.threadLocalDocDefs.remove();
-                NkDocEngineThreadLocal.threadLocalDocUpdated.remove();
-                NkDocEngineThreadLocal.threadLocalDocRead.remove();
-                log.info("**** 清理本地线程变量完成");
+                TransactionSync.runAfterCompletionLast("解除Redis锁",(status)->{
+                    log.info("**** 清理本地线程变量");
+                    threadLocalFlag.remove();
+                    threadLocalLogs.remove();
+                    NkDocEngineThreadLocal.threadLocalLock.remove();
+                    NkDocEngineThreadLocal.threadLocalCurr.remove();
+                    NkDocEngineThreadLocal.threadLocalDocDefs.remove();
+                    NkDocEngineThreadLocal.threadLocalDocUpdated.remove();
+                    NkDocEngineThreadLocal.threadLocalDocRead.remove();
+                    log.info("**** 清理本地线程变量完成");
+                });
             }
         }
     }
