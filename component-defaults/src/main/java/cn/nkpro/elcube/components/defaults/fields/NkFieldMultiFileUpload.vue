@@ -16,14 +16,14 @@
         <div  v-if="!editMode" class="uploads">
             <template v-if="inputOptions.listType==='picture-card'">
                 <div v-for="item in fileList" :key="'key1' + item.uid" class="avatar-border" @click="handlePreview(item)">
-                    <a-avatar :src="item.url" shape="square" :size="84"></a-avatar>
+                    <a-avatar :src="item.url" shape="square" :size="48"></a-avatar>
                 </div>
             </template>
             <template v-else>
                 <a v-for="item in fileList" :key="'key2' + item.uid" @click="handlePreview(item)">{{item.name}}</a>
             </template>
         </div>
-        <div v-else style="display: flex;align-items: center;">
+        <div v-else>
             <a-upload v-if="show && editMode && fileList"
                       :accept    ="inputOptions.accept"
                       class     ="uploader"
@@ -164,14 +164,6 @@ export default {
                     this.fileUploaded(info);
                     break;
                 case 'removed':
-                    // info.fileList.forEach((item,index)=>{
-                    //     let obj = {
-                    //         uid: index,
-                    //         path: item.path,
-                    //         name: item.name
-                    //     }
-                    //     this.fileList.push(obj);
-                    // })
                     this.fileList = info.fileList;
                     this.$emit('input',this.fileList);
                     break;
@@ -227,10 +219,11 @@ export default {
         border: 1px solid #d9d9d9;
         border-radius: 4px;
         cursor: pointer;
-        overflow: hidden;
     }
     .uploads{
-      overflow-y: hidden;
-      overflow-x: scroll;
+        display: flex;
+        justify-content: flex-start;
+        overflow-y: hidden;
+        overflow-x: auto;
     }
 </style>
