@@ -14,27 +14,18 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with ELCube.  If not, see <https://www.gnu.org/licenses/>.
  */
-package cn.nkpro.elcube.task;
+package cn.nkpro.elcube.task.model;
 
-import cn.nkpro.elcube.task.model.BpmTask;
-import cn.nkpro.elcube.task.model.BpmTaskComplete;
-import cn.nkpro.elcube.task.model.BpmTaskForward;
-import org.springframework.transaction.annotation.Transactional;
+import com.alibaba.fastjson.JSONObject;
+import lombok.Data;
 
-public interface NkBpmTaskService {
-    @Transactional
-    String start(String key, String docId);
-
-    @Transactional
-    void complete(BpmTaskComplete bpmTask);
-
-    @Transactional
-    void forward(BpmTaskForward taskForward);
-
-    @Transactional
-    void delegate(BpmTaskForward bpmTask);
-
-    BpmTask taskByBusinessAndAssignee(String businessKey, String assignee);
-
-    boolean isDocAssignee(String businessKey, String assignee);
+/**
+ * Created by bean on 2020/7/22.
+ */
+@Data
+public class BpmTaskForward {
+    private String taskId;
+    private String comment;
+    private String accountId;
+    private JSONObject variables = new JSONObject();
 }

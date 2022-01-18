@@ -20,6 +20,7 @@ import cn.nkpro.elcube.exception.NkSystemException;
 import cn.nkpro.elcube.task.NkBpmTaskService;
 import cn.nkpro.elcube.task.model.BpmTask;
 import cn.nkpro.elcube.task.model.BpmTaskComplete;
+import cn.nkpro.elcube.task.model.BpmTaskForward;
 
 
 public class DefaultBpmTaskServiceImpl implements NkBpmTaskService {
@@ -30,6 +31,16 @@ public class DefaultBpmTaskServiceImpl implements NkBpmTaskService {
 
     @Override
     public void complete(BpmTaskComplete bpmTask) {
+        throw new NkSystemException("操作不支持");
+    }
+
+    @Override
+    public void forward(BpmTaskForward taskForward) {
+        throw new NkSystemException("操作不支持");
+    }
+
+    @Override
+    public void delegate(BpmTaskForward bpmTask) {
         throw new NkSystemException("操作不支持");
     }
 

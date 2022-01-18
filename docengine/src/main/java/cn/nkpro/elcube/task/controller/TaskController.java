@@ -26,6 +26,7 @@ import cn.nkpro.elcube.task.NkBpmDefService;
 import cn.nkpro.elcube.task.NkBpmTaskService;
 import cn.nkpro.elcube.task.model.BpmTaskComplete;
 import cn.nkpro.elcube.task.model.BpmTaskES;
+import cn.nkpro.elcube.task.model.BpmTaskForward;
 import cn.nkpro.elcube.task.model.ResourceDefinition;
 import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
@@ -63,21 +64,37 @@ public class TaskController {
         params.setOrderField(StringUtils.defaultIfBlank(params.getOrderField(),"updatedTime"));
         return searchService.queryList(
                 searchEngine.parseDocument(BpmTaskES.class),
-                QueryBuilders.termQuery("assignee", SecurityUtilz.getUser().getId()),
+                QueryBuilders.termQuery("taskAssignee", SecurityUtilz.getUser().getId()),
                 params,
                 false
         );
     }
 
     @NkNote("2.执行任务")
-    @RequestMapping(value = "/instance/complete")
+    @RequestMapping(value = "/complete")
     @ResponseBody
-    public void processCompleteTask(
+    public void completeTask(
             @NkNote("任务Id")@RequestBody BpmTaskComplete taskComplete) {
         bpmTaskService.complete(taskComplete);
     }
 
-    @NkNote("3.拉取定义详情")
+    @NkNote("3.转办任务")
+    @RequestMapping(value = "/forward")
+    @ResponseBody
+    public void forwardTask(
+            @NkNote("任务Id")@RequestBody BpmTaskForward taskForward) {
+        bpmTaskService.forward(taskForward);
+    }
+
+    @NkNote("4.委派任务")
+    @RequestMapping(value = "/delegate")
+    @ResponseBody
+    public void delegateTask(
+            @NkNote("任务Id")@RequestBody BpmTaskForward taskForward) {
+        bpmTaskService.delegate(taskForward);
+    }
+
+    @NkNote("5.拉取定义详情")
     @RequestMapping(value = "/process/definition/detail")
     public ResourceDefinition processDefinitionDetail(String definitionId){
         return defBpmService.getProcessDefinition(definitionId);

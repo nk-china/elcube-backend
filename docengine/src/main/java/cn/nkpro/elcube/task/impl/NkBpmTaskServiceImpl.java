@@ -20,9 +20,13 @@ import cn.nkpro.elcube.security.SecurityUtilz;
 import cn.nkpro.elcube.task.NkBpmTaskService;
 import cn.nkpro.elcube.task.model.BpmTask;
 import cn.nkpro.elcube.task.model.BpmTaskComplete;
+import cn.nkpro.elcube.task.model.BpmTaskES;
+import cn.nkpro.elcube.task.model.BpmTaskForward;
 import cn.nkpro.elcube.utils.BeanUtilz;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,7 +73,70 @@ public class NkBpmTaskServiceImpl extends AbstractNkBpmSupport implements NkBpmT
         String comment = bpmTask.getTransition().getName() + (StringUtils.isNotBlank(bpmTask.getComment())?(" | "+ bpmTask.getComment()):"");
         processEngine.getTaskService().setAssignee(bpmTask.getTaskId(),SecurityUtilz.getUser().getId());
         processEngine.getTaskService().createComment(bpmTask.getTaskId(),task.getProcessInstanceId(),comment);
-        processEngine.getTaskService().complete(bpmTask.getTaskId(), Collections.singletonMap("NK$TRANSITION_ID",bpmTask.getTransition().getId()));
+
+        if(task.getDelegationState() == DelegationState.PENDING){
+            processEngine.getTaskService().resolveTask(bpmTask.getTaskId(), Collections.singletonMap("NK$TRANSITION_ID",bpmTask.getTransition().getId()));
+        }else{
+            processEngine.getTaskService().complete(bpmTask.getTaskId(), Collections.singletonMap("NK$TRANSITION_ID",bpmTask.getTransition().getId()));
+        }
+    }
+
+    @Override
+    @Transactional
+    public void forward(BpmTaskForward bpmTask) {
+        // 委派和转办的区别
+        //https://blog.csdn.net/Azhuzhu_chaste/article/details/98037753
+        Assert.notNull(bpmTask.getTaskId(),     "任务ID不能为空");
+        Assert.notNull(bpmTask.getAccountId(), "转办人员ID不能为空");
+
+        Task task = processEngine.getTaskService()
+                .createTaskQuery()
+                .taskId(bpmTask.getTaskId())
+                .singleResult();
+        Assert.notNull(task,"任务不存在");
+
+        // todo 判断用户是否有管理权限，或为assignee
+
+        String comment = SecurityUtilz.getUser().getRealname() + " | 转办 " + (StringUtils.isNotBlank(bpmTask.getComment())?(" : "+ bpmTask.getComment()):"");
+        processEngine.getTaskService().createComment(bpmTask.getTaskId(),task.getProcessInstanceId(),comment);
+        processEngine.getTaskService().setAssignee(bpmTask.getTaskId(),bpmTask.getAccountId());
+
+        ProcessInstance processInstance = processEngine.getRuntimeService().createProcessInstanceQuery()
+                .processInstanceId(task.getProcessInstanceId())
+                .singleResult();
+
+        // 因为转办不会走全局事件更新索引，所以这里需要手动更新任务索引
+        BpmTaskES bpmTaskES = BpmTaskES.from(docEngine.detail(processInstance.getBusinessKey()),
+                task.getId(),
+                task.getName(),
+                bpmTask.getAccountId(),
+                "create",// 任务被强制删除
+                task.getCreateTime().getTime()/1000,
+                null
+        );
+
+        searchEngine.indexBeforeCommit(bpmTaskES);
+    }
+
+    @Override
+    @Transactional
+    public void delegate(BpmTaskForward bpmTask) {
+        // 委派和转办的区别
+        //https://blog.csdn.net/Azhuzhu_chaste/article/details/98037753
+        Assert.notNull(bpmTask.getTaskId(),     "任务ID不能为空");
+        Assert.notNull(bpmTask.getAccountId(), "转办人员ID不能为空");
+
+        Task task = processEngine.getTaskService()
+                .createTaskQuery()
+                .taskId(bpmTask.getTaskId())
+                .singleResult();
+        Assert.notNull(task,"任务不存在");
+
+        // todo 判断用户是否有管理权限，或为assignee
+
+        String comment = SecurityUtilz.getUser().getRealname() + (StringUtils.isNotBlank(bpmTask.getComment())?(" : "+ bpmTask.getComment()):"");
+        processEngine.getTaskService().createComment(bpmTask.getTaskId(),task.getProcessInstanceId(),comment);
+        processEngine.getTaskService().delegateTask(bpmTask.getTaskId(), bpmTask.getAccountId());
     }
 
     @Override
