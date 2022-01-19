@@ -16,16 +16,32 @@
  */
 package cn.nkpro.elcube.task.delegate;
 
+import cn.nkpro.elcube.platform.gen.UserAccount;
+import cn.nkpro.elcube.security.UserAuthorizationService;
+import cn.nkpro.elcube.security.bo.UserGroupBO;
+import lombok.Setter;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.impl.el.FixedValue;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Component("NkCountersignatureJavaDelegate")
 public class NkCountersignatureJavaDelegate implements JavaDelegate {
+    @Setter
+    private FixedValue groupKey;
+    @Autowired
+    private UserAuthorizationService permService;
+
     @Override
-    public void execute(DelegateExecution delegateExecution) {
-        delegateExecution.setVariable("NK$COUNTERSIGNATURE_USERS", Arrays.asList("nk-default-admin","nk-default-test"));
+    public void execute(DelegateExecution execution) throws Exception {
+        String groupKeyValue = (String)this.groupKey.getValue(execution);
+        UserGroupBO groupDetail = this.permService.getGroupDetailByKey(groupKeyValue);
+        List<UserAccount> accounts = groupDetail.getAccounts();
+        List<String> collect = accounts.stream().map(UserAccount::getId).collect(Collectors.toList());
+        execution.setVariableLocal(groupKeyValue, collect);
     }
 }

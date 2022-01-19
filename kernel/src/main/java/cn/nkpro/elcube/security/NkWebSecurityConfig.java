@@ -59,7 +59,7 @@ public class NkWebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) {
         auth.authenticationProvider(new NkUsernamePasswordAuthenticationProvider(userDetailsService,redisSupport));
         auth.authenticationProvider(new NkUsernamePasswordVerCodeAuthenticationProvider(userDetailsService,redisSupport));
-        //auth.authenticationProvider(new NkAppLoginAuthenticationProvider(userDetailsService,redisSupport));
+        auth.authenticationProvider(new NkAppLoginAuthenticationProvider(userDetailsService,redisSupport));
     }
 
 
@@ -76,7 +76,7 @@ public class NkWebSecurityConfig extends WebSecurityConfigurerAdapter {
             .addFilterBefore(new NkTokenAuthenticationFilter(authenticationManager(),nkAuthenticationEntryPoint), UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(new BasicAuthenticationFilter(authenticationManager(),nkAuthenticationEntryPoint), UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(new NkUsernamePasswordVerCodeAuthenticationFilter(authenticationManager(),nkAuthenticationEntryPoint), UsernamePasswordAuthenticationFilter.class)
-            //.addFilterBefore(new NkAppLoginAuthenticationFilter(authenticationManager(),nkAuthenticationEntryPoint), UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(new NkAppLoginAuthenticationFilter(authenticationManager(),nkAuthenticationEntryPoint), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling()
                 .accessDeniedHandler(new NkAccessDeniedHandler())
                 .authenticationEntryPoint(nkAuthenticationEntryPoint)

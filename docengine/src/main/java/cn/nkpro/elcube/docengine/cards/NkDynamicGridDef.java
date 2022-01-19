@@ -29,4 +29,6 @@ public class NkDynamicGridDef {
     private Boolean sortable;
     private String preSpEL;
     private List<NkDynamicGridDefI> items = new ArrayList<>();
+    private Boolean disabledEdit;
+    private Boolean disabledRemove;
 }

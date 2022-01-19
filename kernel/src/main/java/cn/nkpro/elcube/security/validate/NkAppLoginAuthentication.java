@@ -16,6 +16,7 @@
  */
 package cn.nkpro.elcube.security.validate;
 
+import cn.nkpro.elcube.security.bo.AuthMobileTerminal;
 import lombok.Getter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 
@@ -46,7 +47,11 @@ public class NkAppLoginAuthentication extends AbstractAuthenticationToken {
     }
 
     @Override
-    public Object getPrincipal() {
-        return null;
+    public AuthMobileTerminal getPrincipal() {
+        AuthMobileTerminal authMobileTerminal = new AuthMobileTerminal();
+        authMobileTerminal.setPhone(phone);
+        authMobileTerminal.setOpenId(openId);
+        authMobileTerminal.setAppleId(appleId);
+        return authMobileTerminal;
     }
 }

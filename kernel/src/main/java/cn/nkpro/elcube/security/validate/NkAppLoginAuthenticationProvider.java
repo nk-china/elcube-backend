@@ -44,41 +44,43 @@ public class NkAppLoginAuthenticationProvider implements AuthenticationProvider 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         NkAppLoginAuthentication nkAuthentication = (NkAppLoginAuthentication) authentication;
-        UserDetails details = null;
+        UserDetails details;
         switch (NkAppSource.valueOf(nkAuthentication.getNkAppSource())){
             case weChat:
                 if(StringUtils.isNoneBlank(nkAuthentication.getOpenId())){
                     // todo 校验openId合法性
 
-                    //todo 判断openId是否已绑定账号
-
+                }else if(StringUtils.isNoneBlank(nkAuthentication.getPhone())){
                     // 校验验证码
                     Object code = redisSupport.get(nkAuthentication.getPhone());
 
-                    if(code==null)
+                    if(null==code)
                         throw new BadCredentialsException("验证码已过期");
 
                     if(!Objects.equals(code, nkAuthentication.getVerCode())){
                         throw new BadCredentialsException("验证码不正确");
                     }
-                    //todo 根据手机号获取用户
-                    details = (UserDetails) userDetailsService.loadUserByUsername(nkAuthentication.getPhone());
+
                 }else{
                     throw new BadCredentialsException("openId为空");
                 }
+
                 break;
             case ios:
                 break;
             case android:
                 break;
             default:
-                break;
+                return null;
         }
 
-        if(details==null){
+        // 根据手机号、openId、appleId 获取用户
+        details = userDetailsService.getAccountByMobileTerminal(nkAuthentication.getPhone(), nkAuthentication.getOpenId(), nkAuthentication.getAppleId());
+
+        if(null==details){
             throw new UsernameNotFoundException("账号没有找到");
         }
-        if(details.getLocked()!=null && details.getLocked()==1){
+        if(null!=details.getLocked() && details.getLocked()==1){
             throw new BadCredentialsException("账号已禁用");
         }
 

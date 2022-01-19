@@ -52,6 +52,7 @@
 		<table tableName="nk_user_saved_query"			 	enableDeleteByExample="false"	domainObjectName="UserSavedQuery"/>
 		<table tableName="nk_user_dashboard"			 	enableDeleteByExample="false"	domainObjectName="UserDashboard"/>
 		<table tableName="nk_user_dashboard_ref"			enableDeleteByExample="true"	domainObjectName="UserDashboardRef"/>
+		<table tableName="nk_user_account_extend"			enableDeleteByExample="false"	domainObjectName="UserAccountExtend"/>
 
 	</context>
 

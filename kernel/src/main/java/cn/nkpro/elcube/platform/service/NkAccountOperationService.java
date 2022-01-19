@@ -27,10 +27,12 @@ public interface NkAccountOperationService {
 
     /**
      * 创建用户账号
-     * @param obj
+     * @param phone
+     * @param openId
+     * @param appleId
      * @return
      */
-    UserAccountBO createAccount(Object obj);
+    UserAccountBO createAccount(String phone, String openId, String appleId);
 
     /**
      * 用户组添加用户账号

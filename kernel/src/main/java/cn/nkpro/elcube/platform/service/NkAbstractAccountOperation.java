@@ -26,7 +26,7 @@ import cn.nkpro.elcube.security.bo.UserAccountBO;
 public class NkAbstractAccountOperation implements NkAccountOperationService {
 
     @Override
-    public UserAccountBO createAccount(Object obj) {
+    public UserAccountBO createAccount(String phone, String openId, String appleId) {
         return null;
     }
 

@@ -16,6 +16,8 @@
  */
 package cn.nkpro.elcube.platform.service;
 
+import java.util.Map;
+
 /**
  * @Author: wf
  * @Description 单据操作抽象类
@@ -23,12 +25,12 @@ package cn.nkpro.elcube.platform.service;
  */
 public abstract class NkAbstractDocOperation implements NkDocOperationService {
 
-    /**
-     * 创建单据
-     * @param obj
-     * @return
-     */
     public Object createDoc(Object obj){
         return null;
     };
+
+    @Override
+    public Object getDocByDocContent(Map map) {
+        return null;
+    }
 }

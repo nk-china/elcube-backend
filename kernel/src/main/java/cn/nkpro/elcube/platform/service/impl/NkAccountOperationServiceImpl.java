@@ -16,10 +16,13 @@
  */
 package cn.nkpro.elcube.platform.service.impl;
 
+import cn.nkpro.elcube.platform.gen.UserAccountExtend;
 import cn.nkpro.elcube.platform.service.NkAbstractAccountOperation;
+import cn.nkpro.elcube.security.UserAccountExtendService;
 import cn.nkpro.elcube.security.UserAuthorizationService;
 import cn.nkpro.elcube.security.bo.UserAccountBO;
 import cn.nkpro.elcube.utils.DateTimeUtilz;
+import cn.nkpro.elcube.utils.UUIDHexGenerator;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -29,15 +32,16 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class NkAccountOperationServiceImpl extends NkAbstractAccountOperation {
 
-    @Autowired
-    @SuppressWarnings("all")
+    @Autowired @SuppressWarnings("all")
     private UserAuthorizationService authorizationService;
 
+    @Autowired@SuppressWarnings("all")
+    private UserAccountExtendService userAccountExtendService;
+
     @Override
-    public UserAccountBO createAccount(Object obj) {
-        String phone = (String) obj;
+    public UserAccountBO createAccount(String phone, String openId, String appleId) {
         UserAccountBO user = new UserAccountBO();
-        user.setId(phone);
+        user.setId(UUIDHexGenerator.generate());
         user.setUsername(phone);
         //todo 生成随机包含大小写，数字或符号的密码
         user.setPassword("Wsad123$");
@@ -46,7 +50,16 @@ public class NkAccountOperationServiceImpl extends NkAbstractAccountOperation {
         user.setValidFrom("00000000");
         user.setValidTo("20991231");
         user.setRealname("移动端用户");
-        return super.createAccount(obj);
+
+        UserAccountExtend userAccountExtend = new UserAccountExtend();
+        userAccountExtend.setId(UUIDHexGenerator.generate());
+        userAccountExtend.setAccountId(user.getId());
+        userAccountExtend.setPhone(phone);
+        userAccountExtend.setOpenid(openId);
+        userAccountExtend.setAppleid(appleId);
+        userAccountExtend.setCreatedTime(DateTimeUtilz.nowSeconds());
+        userAccountExtendService.addUserAccountExtend(userAccountExtend);
+        return user;
     }
 
     @Override

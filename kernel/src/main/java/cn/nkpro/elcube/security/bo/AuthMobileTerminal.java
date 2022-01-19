@@ -14,29 +14,25 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with ELCube.  If not, see <https://www.gnu.org/licenses/>.
  */
-package cn.nkpro.elcube.platform.service;
+package cn.nkpro.elcube.security.bo;
 
-import java.util.Map;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * @Author: wf
- * @Description 单据操作接口
- * @date 2022/1/14 10:44
+ * @Description 移动端权限验证对象
+ * @date 2022/1/17 18:01
  */
-public interface NkDocOperationService {
+public class AuthMobileTerminal {
 
-    /**
-     * 创建单据
-     * @param obj
-     * @return
-     */
-    Object createDoc(Object obj);
+    @Getter@Setter
+    private String phone;
 
-    /**
-     * 查询单据
-     * @param map
-     * @return
-     */
-    Object getDocByDocContent(Map map);
+    @Getter@Setter
+    private String openId;
+
+    @Getter@Setter
+    private String appleId;
 
 }
