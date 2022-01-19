@@ -17,6 +17,7 @@
 package cn.nkpro.elcube.docengine.service.impl;
 
 import cn.nkpro.elcube.basic.Constants;
+import cn.nkpro.elcube.basic.TransactionSync;
 import cn.nkpro.elcube.co.DebugContextManager;
 import cn.nkpro.elcube.co.NkCustomObjectManager;
 import cn.nkpro.elcube.co.spel.NkSpELManager;
@@ -33,10 +34,11 @@ import cn.nkpro.elcube.docengine.model.es.DocHES;
 import cn.nkpro.elcube.docengine.service.NkDocDefService;
 import cn.nkpro.elcube.docengine.service.NkDocPermService;
 import cn.nkpro.elcube.exception.NkDefineException;
+import cn.nkpro.elcube.exception.NkOperateNotAllowedCaution;
+import cn.nkpro.elcube.exception.NkSystemException;
 import cn.nkpro.elcube.security.SecurityUtilz;
 import cn.nkpro.elcube.task.NkBpmTaskService;
 import cn.nkpro.elcube.utils.BeanUtilz;
-import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -45,6 +47,7 @@ import org.springframework.expression.EvaluationContext;
 import org.springframework.util.Assert;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -410,6 +413,43 @@ class AbstractNkDocEngine {
                     }
                 }
             });
+        }
+    }
+
+    DocHV lockDocDo(String docId, Function<String,DocHV> function){
+        String lockedValue;
+
+        // 尝试锁定单据1小时
+        int i = 0;
+        do{
+            lockedValue = redisSupport.lock(docId, 3600);
+
+            if(lockedValue!=null)
+                break;
+
+            log.debug("尝试获取锁[{}]失败，{}ms后重试", docId, 1000);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new NkSystemException(e.getMessage(),e);
+            }
+        }while (++i <= 10);
+
+        // 获取锁失败
+        if(lockedValue==null){
+            log.warn("单据{} 被其他用户锁定，请稍后再试", docId);
+            throw new NkOperateNotAllowedCaution("单据被其他用户锁定，请稍后再试");
+        }
+
+        // 获取锁成功
+        try{
+            return function.apply(docId);
+        }finally {
+            String finalDocId = docId;
+            String finalLockedValue = lockedValue;
+            TransactionSync.runAfterCompletionLast("解除Redis锁",(status)->
+                    redisSupport.unlock(finalDocId, finalLockedValue)
+            );
         }
     }
 }

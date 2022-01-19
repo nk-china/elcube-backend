@@ -355,25 +355,33 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
     @Override
     @Transactional
     public DocHV doUpdate(String docId, String optSource, NkDocEngine.Function function){
+//
+//        DocHV doc = detail(docId);
+//        function.apply(doc);
+//        doc = execUpdate(doc, optSource);
+//        doc.clearItemContent();
+//
+//        return doc;
 
-        DocHV doc = detail(docId);
-        function.apply(doc);
-        doc = execUpdate(doc, optSource);
-        doc.clearItemContent();
-
-        return doc;
+        return lockDocDo(docId,(id)->{
+            DocHV doc = detail(docId);
+            function.apply(doc);
+            doc = execUpdate(doc, optSource);
+            doc.clearItemContent();
+            return doc;
+        });
     }
 
     @Override
     @Transactional
     public DocHV doUpdate(String docType, String businessKey, String optSource, NkDocEngine.Function function){
-
-        DocHV doc = detail(docType,businessKey);
-        function.apply(doc);
-        doc = execUpdate(doc, optSource);
-        doc.clearItemContent();
-
-        return doc;
+        DocHV d = detail(docType,businessKey);
+        return lockDocDo(d.getDocId(),(docId)->{
+            function.apply(d);
+            DocHV doc = execUpdate(d, optSource);
+            doc.clearItemContent();
+            return doc;
+        });
     }
 
     @Override
@@ -410,11 +418,21 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
     @Transactional
     @Override
     public void onBpmKilled(String docId, String processKey, String optSource) {
-        DocHV docHV = detail(docId);
-        customObjectManager.getCustomObject(docHV.getDef().getRefObjectType(), NkDocProcessor.class)
-                .doOnBpmKilled(docHV, processKey, optSource);
-        // 事务提交后清空缓存
-        TransactionSync.runAfterCommit("清除单据缓存"+docId, ()-> redisSupport.deleteHash(Constants.CACHE_DOC, docId));
+
+        lockDocDo(docId,(id)->{
+            DocHV docHV = detail(docId);
+            customObjectManager.getCustomObject(docHV.getDef().getRefObjectType(), NkDocProcessor.class)
+                    .doOnBpmKilled(docHV, processKey, optSource);
+            // 事务提交后清空缓存
+            TransactionSync.runAfterCommit("清除单据缓存"+docId, ()-> redisSupport.deleteHash(Constants.CACHE_DOC, docId));
+            return docHV;
+        });
+
+//        DocHV docHV = detail(docId);
+//        customObjectManager.getCustomObject(docHV.getDef().getRefObjectType(), NkDocProcessor.class)
+//                .doOnBpmKilled(docHV, processKey, optSource);
+//        // 事务提交后清空缓存
+//        TransactionSync.runAfterCommit("清除单据缓存"+docId, ()-> redisSupport.deleteHash(Constants.CACHE_DOC, docId));
     }
 
 
