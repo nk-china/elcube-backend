@@ -17,7 +17,6 @@
 package cn.nkpro.elcube;
 
 import cn.nkpro.elcube.basic.NkProperties;
-import cn.nkpro.elcube.components.defaults.services.NkInputSimpleProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -28,7 +27,7 @@ import org.springframework.context.annotation.FullyQualifiedAnnotationBeanNameGe
  * Created by bean on 2021/9/17.
  */
 @SpringBootApplication
-@EnableConfigurationProperties({NkProperties.class, NkInputSimpleProperties.class})
+@EnableConfigurationProperties(NkProperties.class)
 @ComponentScan(nameGenerator = FullyQualifiedAnnotationBeanNameGenerator.class,
         basePackages = {"cn.nkpro.elcube"}
 )
