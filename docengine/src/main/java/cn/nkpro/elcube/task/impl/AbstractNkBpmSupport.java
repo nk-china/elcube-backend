@@ -29,9 +29,12 @@ import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
+import org.camunda.bpm.engine.task.IdentityLink;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -47,6 +50,17 @@ public abstract class AbstractNkBpmSupport {
     protected ProcessEngine processEngine;
     @Autowired@Lazy
     protected SearchEngine searchEngine;
+
+    protected List<String> assignee(String taskId,String assignee){
+        if(StringUtils.isNotBlank(assignee)){
+            return Collections.singletonList(assignee);
+        }
+        return processEngine.getTaskService().getIdentityLinksForTask(taskId)
+                .stream()
+                .filter(identityLink -> StringUtils.equals(identityLink.getType(),"candidate"))
+                .map(IdentityLink::getUserId)
+                .collect(Collectors.toList());
+    }
 
     void indexDocTask(HistoricTaskInstance taskInstance, DocHV doc){
         Map<String, Object> variables = getHistoricVariables(taskInstance.getProcessInstanceId());
@@ -68,7 +82,7 @@ public abstract class AbstractNkBpmSupport {
         BpmTaskES bpmTaskES = BpmTaskES.from(doc,
                 taskInstance.getId(),
                 taskInstance.getName(),
-                taskInstance.getAssignee(),
+                assignee(taskInstance.getId(), taskInstance.getAssignee()),
                 state,
                 startTime,
                 endTime

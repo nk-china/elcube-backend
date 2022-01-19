@@ -16,29 +16,31 @@
  */
 package cn.nkpro.elcube.task.impl;
 
+import cn.nkpro.elcube.platform.gen.UserAccount;
 import cn.nkpro.elcube.security.SecurityUtilz;
+import cn.nkpro.elcube.security.UserAccountService;
 import cn.nkpro.elcube.task.NkBpmTaskService;
-import cn.nkpro.elcube.task.model.BpmTask;
-import cn.nkpro.elcube.task.model.BpmTaskComplete;
-import cn.nkpro.elcube.task.model.BpmTaskES;
-import cn.nkpro.elcube.task.model.BpmTaskForward;
+import cn.nkpro.elcube.task.model.*;
 import cn.nkpro.elcube.utils.BeanUtilz;
 import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Comment;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class NkBpmTaskServiceImpl extends AbstractNkBpmSupport implements NkBpmTaskService {
+
+    @Autowired
+    private UserAccountService accountService;
 
     @Override
     @Transactional
@@ -59,23 +61,19 @@ public class NkBpmTaskServiceImpl extends AbstractNkBpmSupport implements NkBpmT
     @Override
     @Transactional
     public void complete(BpmTaskComplete bpmTask){
-        Assert.notNull(bpmTask.getTaskId(),     "任务ID不能为空");
         Assert.notNull(bpmTask.getTransition(), "任务流转不能为空");
 
-        Task task = processEngine.getTaskService()
-                .createTaskQuery()
-                .taskId(bpmTask.getTaskId())
-                .singleResult();
-        Assert.notNull(task,"任务不存在");
+        Task task = getTask(bpmTask.getTaskId());
 
-        // todo 判断用户是否有管理权限，或为assignee
+        if(StringUtils.isBlank(task.getAssignee()))
+            processEngine.getTaskService().claim(bpmTask.getTaskId(),SecurityUtilz.getUser().getId());
 
         String comment = bpmTask.getTransition().getName() + (StringUtils.isNotBlank(bpmTask.getComment())?(" | "+ bpmTask.getComment()):"");
-        processEngine.getTaskService().setAssignee(bpmTask.getTaskId(),SecurityUtilz.getUser().getId());
+        processEngine.getIdentityService().setAuthenticatedUserId(SecurityUtilz.getUser().getId());
         processEngine.getTaskService().createComment(bpmTask.getTaskId(),task.getProcessInstanceId(),comment);
-
         if(task.getDelegationState() == DelegationState.PENDING){
             processEngine.getTaskService().resolveTask(bpmTask.getTaskId(), Collections.singletonMap("NK$TRANSITION_ID",bpmTask.getTransition().getId()));
+            reindex(task, task.getOwner());
         }else{
             processEngine.getTaskService().complete(bpmTask.getTaskId(), Collections.singletonMap("NK$TRANSITION_ID",bpmTask.getTransition().getId()));
         }
@@ -84,23 +82,56 @@ public class NkBpmTaskServiceImpl extends AbstractNkBpmSupport implements NkBpmT
     @Override
     @Transactional
     public void forward(BpmTaskForward bpmTask) {
-        // 委派和转办的区别
-        //https://blog.csdn.net/Azhuzhu_chaste/article/details/98037753
-        Assert.notNull(bpmTask.getTaskId(),     "任务ID不能为空");
         Assert.notNull(bpmTask.getAccountId(), "转办人员ID不能为空");
 
-        Task task = processEngine.getTaskService()
-                .createTaskQuery()
-                .taskId(bpmTask.getTaskId())
-                .singleResult();
-        Assert.notNull(task,"任务不存在");
+        Task task = getTask(bpmTask.getTaskId());
 
-        // todo 判断用户是否有管理权限，或为assignee
+        if(StringUtils.isBlank(task.getAssignee()))
+            processEngine.getTaskService().claim(bpmTask.getTaskId(),SecurityUtilz.getUser().getId());
 
-        String comment = SecurityUtilz.getUser().getRealname() + " | 转办 " + (StringUtils.isNotBlank(bpmTask.getComment())?(" : "+ bpmTask.getComment()):"");
+
+        String comment = "转办" + (StringUtils.isNotBlank(bpmTask.getComment())?(" | "+ bpmTask.getComment()):"");
+        processEngine.getIdentityService().setAuthenticatedUserId(SecurityUtilz.getUser().getId());
         processEngine.getTaskService().createComment(bpmTask.getTaskId(),task.getProcessInstanceId(),comment);
         processEngine.getTaskService().setAssignee(bpmTask.getTaskId(),bpmTask.getAccountId());
 
+        reindex(task, bpmTask.getAccountId());
+    }
+
+    @Override
+    @Transactional
+    public void delegate(BpmTaskForward bpmTask) {
+        Assert.notNull(bpmTask.getAccountId(), "转办人员ID不能为空");
+
+        Task task = getTask(bpmTask.getTaskId());
+
+        if(StringUtils.isBlank(task.getAssignee()))
+            processEngine.getTaskService().claim(bpmTask.getTaskId(),SecurityUtilz.getUser().getId());
+
+        String comment =  "委派" + (StringUtils.isNotBlank(bpmTask.getComment())?(" | "+ bpmTask.getComment()):"");
+        processEngine.getIdentityService().setAuthenticatedUserId(SecurityUtilz.getUser().getId());
+        processEngine.getTaskService().createComment(bpmTask.getTaskId(),task.getProcessInstanceId(),comment);
+        processEngine.getTaskService().delegateTask(bpmTask.getTaskId(), bpmTask.getAccountId());
+
+        reindex(task, bpmTask.getAccountId());
+    }
+
+    private Task getTask(String taskId){
+        Assert.notNull(taskId,     "任务ID不能为空");
+        Task task = processEngine.getTaskService()
+                .createTaskQuery()
+                .taskId(taskId)
+                .or()
+                .taskCandidateUser(SecurityUtilz.getUser().getId())
+                .taskAssignee(SecurityUtilz.getUser().getId())
+                .endOr()
+                .singleResult();
+
+        Assert.notNull(task,     "任务不存在");
+        return task;
+    }
+
+    private void reindex(Task task, String assignee){
         ProcessInstance processInstance = processEngine.getRuntimeService().createProcessInstanceQuery()
                 .processInstanceId(task.getProcessInstanceId())
                 .singleResult();
@@ -109,34 +140,13 @@ public class NkBpmTaskServiceImpl extends AbstractNkBpmSupport implements NkBpmT
         BpmTaskES bpmTaskES = BpmTaskES.from(docEngine.detail(processInstance.getBusinessKey()),
                 task.getId(),
                 task.getName(),
-                bpmTask.getAccountId(),
+                Collections.singletonList(assignee),
                 "create",// 任务被强制删除
                 task.getCreateTime().getTime()/1000,
                 null
         );
 
         searchEngine.indexBeforeCommit(bpmTaskES);
-    }
-
-    @Override
-    @Transactional
-    public void delegate(BpmTaskForward bpmTask) {
-        // 委派和转办的区别
-        //https://blog.csdn.net/Azhuzhu_chaste/article/details/98037753
-        Assert.notNull(bpmTask.getTaskId(),     "任务ID不能为空");
-        Assert.notNull(bpmTask.getAccountId(), "转办人员ID不能为空");
-
-        Task task = processEngine.getTaskService()
-                .createTaskQuery()
-                .taskId(bpmTask.getTaskId())
-                .singleResult();
-        Assert.notNull(task,"任务不存在");
-
-        // todo 判断用户是否有管理权限，或为assignee
-
-        String comment = SecurityUtilz.getUser().getRealname() + (StringUtils.isNotBlank(bpmTask.getComment())?(" : "+ bpmTask.getComment()):"");
-        processEngine.getTaskService().createComment(bpmTask.getTaskId(),task.getProcessInstanceId(),comment);
-        processEngine.getTaskService().delegateTask(bpmTask.getTaskId(), bpmTask.getAccountId());
     }
 
     @Override
@@ -164,6 +174,30 @@ public class NkBpmTaskServiceImpl extends AbstractNkBpmSupport implements NkBpmT
             // 当前任务节点的对外连接线
             bpmTask.setTransitions(getTaskTransition(activities, task.getTaskDefinitionKey()));
 
+
+            // 设置实例的备注
+            List<Comment> processInstanceComments = processEngine.getTaskService()
+                    .getProcessInstanceComments(task.getProcessInstanceId());
+
+            Map<String, String> accounts = processInstanceComments.stream().map(Comment::getUserId).filter(Objects::nonNull).distinct()
+                    .map(accountService::getAccountById)
+                    .collect(Collectors.toMap(UserAccount::getId, UserAccount::getRealname));
+
+            bpmTask.setInstanceComments(
+                    processInstanceComments
+                    .stream()
+                    .map(comment -> {
+                        BpmComment bpmComment = new BpmComment();
+                        bpmComment.setComment(comment.getFullMessage());
+                        bpmComment.setId(comment.getId());
+                        bpmComment.setTime(comment.getTime().getTime()/1000);
+                        bpmComment.setUserId(comment.getUserId());
+                        bpmComment.setUser(accounts.getOrDefault(comment.getUserId(),comment.getUserId()));
+                        return bpmComment;
+                    })
+                    .sorted(Comparator.comparing(BpmComment::getTime))
+                    .collect(Collectors.toList()));
+
             return bpmTask;
         }
 
@@ -177,8 +211,8 @@ public class NkBpmTaskServiceImpl extends AbstractNkBpmSupport implements NkBpmT
                 .processInstanceBusinessKey(businessKey)
                 .active()
                 .or()
-                .taskCandidateUser(assignee)
-                .taskAssignee(assignee)
+                    .taskCandidateUser(assignee)
+                    .taskAssignee(assignee)
                 .endOr().count()>0;
     }
 }

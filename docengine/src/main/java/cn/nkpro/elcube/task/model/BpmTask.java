@@ -60,6 +60,8 @@ public class BpmTask implements Cloneable{
     // variables
     private Map<String, Object> bpmVariables;
 
+    private List<BpmComment> instanceComments;
+
     @Override
     public Object clone() throws CloneNotSupportedException {
         return super.clone();

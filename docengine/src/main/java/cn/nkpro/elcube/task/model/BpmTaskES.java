@@ -26,6 +26,8 @@ import cn.nkpro.elcube.utils.BeanUtilz;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.List;
+
 /**
  * Created by bean on 2020/7/6.
  */
@@ -42,7 +44,7 @@ public class BpmTaskES extends AbstractBaseES {
     private String taskName;
 
     @ESField(type= ESFieldType.Keyword)
-    private String taskAssignee;
+    private List<String> taskAssignee;
 
     @ESField(type= ESFieldType.Keyword)
     private String taskState;
@@ -56,7 +58,7 @@ public class BpmTaskES extends AbstractBaseES {
     @ESField(type= ESFieldType.Keyword)
     private String docId;
 
-    public static BpmTaskES from(DocHV doc, String taskId, String taskName, String taskAssignee, String taskState, Long taskStartTime, Long taskEndTime){
+    public static BpmTaskES from(DocHV doc, String taskId, String taskName, List<String> taskAssignee, String taskState, Long taskStartTime, Long taskEndTime){
         BpmTaskES bpmTaskES = BeanUtilz.copyFromObject(doc, BpmTaskES.class);
 
         bpmTaskES.setTaskId(taskId);

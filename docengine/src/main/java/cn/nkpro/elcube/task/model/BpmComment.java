@@ -24,4 +24,5 @@ public class BpmComment {
     private String comment;
     private String userId;
     private String user;
+    private Long time;
 }

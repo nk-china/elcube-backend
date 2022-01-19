@@ -17,11 +17,15 @@
 package cn.nkpro.elcube.task.controller;
 
 import cn.nkpro.elcube.annotation.NkNote;
+import cn.nkpro.elcube.basic.PageList;
 import cn.nkpro.elcube.data.elasticearch.ESPageList;
 import cn.nkpro.elcube.data.elasticearch.SearchEngine;
 import cn.nkpro.elcube.docengine.NkDocSearchService;
 import cn.nkpro.elcube.docengine.model.SearchParams;
+import cn.nkpro.elcube.platform.gen.UserAccount;
 import cn.nkpro.elcube.security.SecurityUtilz;
+import cn.nkpro.elcube.security.UserAccountService;
+import cn.nkpro.elcube.security.UserAuthorizationService;
 import cn.nkpro.elcube.task.NkBpmDefService;
 import cn.nkpro.elcube.task.NkBpmTaskService;
 import cn.nkpro.elcube.task.model.BpmTaskComplete;
@@ -34,6 +38,8 @@ import org.elasticsearch.index.query.QueryBuilders;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 /**
@@ -56,6 +62,9 @@ public class TaskController {
 
     @Autowired@SuppressWarnings("all")
     private NkBpmDefService defBpmService;
+
+    @Autowired@SuppressWarnings("all")
+    private UserAuthorizationService permService;
 
     @NkNote("1、拉取交易列表数据")
     @RequestMapping(value = "/tasks",method = RequestMethod.POST)
@@ -98,6 +107,11 @@ public class TaskController {
     @RequestMapping(value = "/process/definition/detail")
     public ResourceDefinition processDefinitionDetail(String definitionId){
         return defBpmService.getProcessDefinition(definitionId);
+    }
+
+    @RequestMapping("/accounts")
+    public List<UserAccount> accounts(String keyword){
+        return permService.accounts(keyword);
     }
 
 //    @WsDocNote("2、检查任务是否结束")

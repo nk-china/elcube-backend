@@ -21,7 +21,7 @@ import cn.nkpro.elcube.docengine.service.impl.NkDocOperationServiceImpl;
 import cn.nkpro.elcube.docengine.service.sequences.DefaultSequenceSupportImpl;
 import cn.nkpro.elcube.platform.service.NkAbstractDocOperation;
 import cn.nkpro.elcube.task.NkBpmTaskService;
-import cn.nkpro.elcube.task.impl.DefaultBpmTaskServiceImpl;
+import cn.nkpro.elcube.task.DefaultBpmTaskServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;

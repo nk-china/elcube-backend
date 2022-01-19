@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with ELCube.  If not, see <https://www.gnu.org/licenses/>.
  */
-package cn.nkpro.elcube.task.impl;
+package cn.nkpro.elcube.task;
 
 import cn.nkpro.elcube.exception.NkSystemException;
 import cn.nkpro.elcube.task.NkBpmTaskService;

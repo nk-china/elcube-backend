@@ -19,16 +19,22 @@ package cn.nkpro.elcube.task.impl;
 import cn.nkpro.elcube.docengine.NkDocEngineThreadLocal;
 import cn.nkpro.elcube.docengine.model.DocHV;
 import cn.nkpro.elcube.task.model.BpmTaskES;
+import io.jsonwebtoken.lang.Assert;
+import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.history.event.HistoricIdentityLinkLogEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.event.HistoryEventTypes;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
+import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.Task;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @SuppressWarnings("all")
 @Component
@@ -44,16 +50,53 @@ public class NkGlobalEventHandler extends AbstractNkBpmSupport implements Histor
 
         if(historyEvent instanceof HistoricTaskInstanceEventEntity){
 
+            if(HistoryEventTypes.TASK_INSTANCE_UPDATE.getEventName().equals(historyEvent.getEventType())){
+                //onTaskUpdate((HistoricTaskInstanceEventEntity) historyEvent);
+            }else
             if(HistoryEventTypes.TASK_INSTANCE_CREATE.getEventName().equals(historyEvent.getEventType())){
                 onTaskCreate((HistoricTaskInstanceEventEntity) historyEvent);
             }else
             if(HistoryEventTypes.TASK_INSTANCE_COMPLETE.getEventName().equals(historyEvent.getEventType())){
                 onTaskComplete((HistoricTaskInstanceEventEntity) historyEvent);
             }
+        }else if(historyEvent instanceof HistoricIdentityLinkLogEventEntity){
+            if(HistoryEventTypes.IDENTITY_LINK_ADD.getEventName().equals(historyEvent.getEventType())){
+                //onTaskCreate((HistoricIdentityLinkLogEventEntity) historyEvent);
+            }
         }
     }
 
-    // 任务被创建
+    private void onTaskUpdate(HistoricTaskInstanceEventEntity event){
+
+        DocHV doc = NkDocEngineThreadLocal.getCurr();
+        if(doc==null){
+            String businessKey = Context.getBpmnExecutionContext()!=null
+                    ? Context.getBpmnExecutionContext().getProcessInstance().getBusinessKey()
+                    : null;
+            if(StringUtils.isBlank(businessKey)){
+                Map<String, Object> variables = processEngine.getRuntimeService().getVariables(event.getProcessInstanceId());
+                businessKey = (String) variables.get("NK$BUSINESS_KEY");
+            }
+            Assert.notNull(businessKey,"工作流关联单据没有找到");
+            doc = docEngine.detail(businessKey);
+        }
+        Task task = processEngine.getTaskService().createTaskQuery().taskId(event.getTaskId()).singleResult();
+
+        Long startTime = task.getCreateTime().getTime()/1000;
+
+        BpmTaskES bpmTaskES = BpmTaskES.from(doc,
+                event.getId(),
+                event.getName(),
+                assignee(event.getId(),event.getAssignee()),
+                "create",
+                startTime,
+                null
+        );
+
+        searchEngine.indexBeforeCommit(bpmTaskES);
+    }
+
+    // 任务被指派
     private void onTaskCreate(HistoricTaskInstanceEventEntity event){
 
         DocHV doc = NkDocEngineThreadLocal.getCurr();
@@ -61,10 +104,20 @@ public class NkGlobalEventHandler extends AbstractNkBpmSupport implements Histor
             doc = docEngine.detail(Context.getBpmnExecutionContext().getProcessInstance().getBusinessKey());
         }
 
+        List<String> identityLinks = processEngine.getTaskService().getIdentityLinksForTask(event.getId())
+                .stream()
+                .filter(identityLink -> StringUtils.equals(identityLink.getType(),"candidate"))
+                .map(IdentityLink::getUserId)
+                .collect(Collectors.toList());
+
+        if(StringUtils.isNotBlank(event.getAssignee()))
+            identityLinks.add(event.getAssignee());
+
+
         BpmTaskES bpmTaskES = BpmTaskES.from(doc,
                 event.getId(),
                 event.getName(),
-                event.getAssignee(),
+                assignee(event.getId(),event.getAssignee()),
                 "create",
                 event.getStartTime().getTime()/1000,
                 null
@@ -86,7 +139,7 @@ public class NkGlobalEventHandler extends AbstractNkBpmSupport implements Histor
         BpmTaskES bpmTaskES = BpmTaskES.from(doc,
                 event.getId(),
                 event.getName(),
-                event.getAssignee(),
+                assignee(event.getId(),event.getAssignee()),
                 variables.containsKey("NK$DELETE")?"delete":"complete",// 任务被强制删除
                 startTime,
                 endTime

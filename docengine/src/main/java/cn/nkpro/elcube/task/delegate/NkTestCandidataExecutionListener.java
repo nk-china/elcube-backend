@@ -22,16 +22,18 @@ import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.el.FixedValue;
 import org.springframework.stereotype.Component;
 
+import java.util.Arrays;
+
 /**
  * 仅测试用
  */
-@Component("NkAssigneeExecutionListener")
-public class NkAssigneeExecutionListener implements ExecutionListener {
+@Component("NkTestCandidataExecutionListener")
+public class NkTestCandidataExecutionListener implements ExecutionListener {
     @Setter
     private FixedValue var;
     @Override
     public void notify(DelegateExecution delegateExecution) {
         String varValue = (String) var.getValue(delegateExecution);
-        delegateExecution.setVariableLocal(varValue,"nk-default-admin");
+        delegateExecution.setVariableLocal(varValue, Arrays.asList("nk-default-admin","1","2"));
     }
 }
