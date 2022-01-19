@@ -308,6 +308,17 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="NK_DOC_DEF_I-05" author="bean" context="default">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="NK_DOC_DEF_I" columnName="GROUP_NAME" />
+            </not>
+        </preConditions>
+        <addColumn tableName="NK_DOC_DEF_I">
+            <column name="GROUP_NAME" type="${type.desc}" remarks="卡片分组" beforeColumn="CARD_CONTENT" />
+        </addColumn>
+    </changeSet>
+
     <changeSet id="NK_DOC_DEF_INDEX_CUSTOM-01" author="bean" context="default">
         <preConditions onFail="MARK_RAN">
             <not>

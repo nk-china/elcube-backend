@@ -76,7 +76,8 @@ public class NkDocHistoryServiceImpl implements NkDocHistoryService {
         example.createCriteria().andDocIdEqualTo(docId);
         example.setOrderByClause("UPDATED_TIME DESC");
 
-        return logDocRecordMapper.selectByExample(example,new RowBounds(offset,6));
+//        return logDocRecordMapper.selectByExample(example,new RowBounds(offset,6));
+        return logDocRecordMapper.selectByExample(example);
     }
 
     @Override
