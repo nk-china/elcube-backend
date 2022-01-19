@@ -14,29 +14,21 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with ELCube.  If not, see <https://www.gnu.org/licenses/>.
  */
-package cn.nkpro.elcube.platform.service;
+package cn.nkpro.elcube.security;
 
-import java.util.Map;
+import cn.nkpro.elcube.platform.gen.UserAccountExtend;
+import cn.nkpro.elcube.platform.gen.UserAccountExtendExample;
+
+import java.util.List;
 
 /**
  * @Author: wf
- * @Description 单据操作接口
- * @date 2022/1/14 10:44
+ * @Description 账号扩展信息
+ * @date 2022/1/17 15:05
  */
-public interface NkDocOperationService {
+public interface UserAccountExtendService {
 
-    /**
-     * 创建单据
-     * @param obj
-     * @return
-     */
-    Object createDoc(Object obj);
+    void addUserAccountExtend(UserAccountExtend userAccountExtend);
 
-    /**
-     * 查询单据
-     * @param map
-     * @return
-     */
-    Object getDocByDocContent(Map map);
-
+    List<UserAccountExtend> selectByExample(UserAccountExtendExample example);
 }

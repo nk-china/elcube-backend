@@ -57,4 +57,9 @@ public class NkDocOperationServiceImpl extends NkAbstractDocOperation {
         docEngine.doUpdate(doc.getDocId(),"移动端创建客户", (d)->{});
         return doc;
     }
+
+    @Override
+    public Object getDocByDocContent(Map map) {
+        return docEngine.find("TP02").dynamicEquals(map);
+    }
 }

@@ -112,4 +112,23 @@
         </sql>
     </changeSet>
 
+    <changeSet id="NK_USER_ACCOUNT_EXTEND-01" author="wf" context="default">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <tableExists tableName="NK_USER_ACCOUNT_EXTEND" />
+            </not>
+        </preConditions>
+        <comment />
+        <createTable tableName="NK_USER_ACCOUNT_EXTEND" remarks="">
+            <column name="ID" type="${type.uuid}" remarks="" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="PHONE" type="${type.uuid}" remarks="" />
+            <column name="OPENID" type="${type.uuid}" remarks="" />
+            <column name="APPLEID" type="${type.uuid}" remarks="" />
+            <column name="ACCOUNT_ID" type="${type.uuid}" remarks="" />
+            <column name="CREATED_TIME" type="${type.long}" remarks="" />
+            <column name="UPDATED_TIME" type="${type.long}" remarks="" />
+        </createTable>
+    </changeSet>
 </databaseChangeLog>

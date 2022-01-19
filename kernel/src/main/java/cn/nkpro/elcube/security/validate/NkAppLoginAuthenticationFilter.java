@@ -61,7 +61,7 @@ public class NkAppLoginAuthenticationFilter extends GenericFilterBean  {
                 String verCode;
                 String openId;
                 String appleId;
-                if (StringUtils.isNoneBlank(nkApp)) {
+                if (StringUtils.isNoneBlank(nkApp) && NkAppSource.valueOf(nkApp)!=NkAppSource.elcube) {
                     if(StringUtils.isNoneBlank(tokenStr)){
                         // token验证
                         Claims token = JwtHelper.verifyJwt(tokenStr);

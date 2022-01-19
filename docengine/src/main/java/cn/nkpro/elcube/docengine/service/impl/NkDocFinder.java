@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -79,6 +80,23 @@ public class NkDocFinder implements InitializingBean {
         args.get().add(value);
         return this;
     }
+
+    public NkDocFinder dynamicEquals(Map map){
+        map.forEach((key,value)->{
+            where.get().add(String.format(
+                    "EXISTS (" +
+                            "\n         SELECT i.doc_id FROM nk_doc_i_index AS i " +
+                            "\n          WHERE i.doc_id = h.doc_id " +
+                            "\n            AND i.name   = '%s' " +
+                            "\n            AND i.value  = ?" +
+                            "\n       )",
+                    key
+            ));
+            args.get().add(value);
+        });
+        return this;
+    }
+
     public NkDocFinder dynamicEquals(String key, Number value){
         where.get().add(String.format(
                 "EXISTS (" +
