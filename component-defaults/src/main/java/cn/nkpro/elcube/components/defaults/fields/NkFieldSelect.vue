@@ -20,6 +20,23 @@
             {{value | nkFromList(inputOptions.optionsObject)}}
         </template>
     </span>
+
+    <a-checkbox-group
+            size="small"
+            v-else-if="inputOptions.selectMode==='checkbox'"
+            v-model="val"
+            :options="inputOptions.optionsObject"
+            :value="['Pear']"
+            @change="change">
+    </a-checkbox-group>
+    <a-radio-group
+            size="small"
+            v-else-if="inputOptions.selectMode==='radio'"
+            v-model="val"
+            :options="inputOptions.optionsObject"
+            :value="['Pear']"
+            @change="change">
+    </a-radio-group>
     <a-select size="small"
               v-else
               v-model="val"

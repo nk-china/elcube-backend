@@ -23,7 +23,9 @@
                 <a-select slot="edit" size="small" v-model="value.selectMode" mode="default" >
                     <a-select-option key="default">default</a-select-option>
                     <a-select-option key="multiple">multiple</a-select-option>
-                    <a-select-option key="tags" disabled>tags</a-select-option>
+                    <a-select-option key="radio">radio</a-select-option>
+                    <a-select-option key="checkbox">checkbox</a-select-option>
+<!--                    <a-select-option key="tags" disabled>tags</a-select-option>-->
                 </a-select>
             </nk-form-item>
             <nk-form-item title="Tag颜色">
