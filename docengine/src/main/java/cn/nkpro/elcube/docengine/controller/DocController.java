@@ -35,8 +35,10 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by bean on 2020/6/9.
@@ -135,21 +137,28 @@ public class DocController {
             HttpServletRequest request,
             @NkNote(value="单据JSON") @RequestBody DocHV doc) {
 
+        List<String> builder = new ArrayList<>();
         String userAgent = request.getHeader("User-Agent");
-        String info = userAgent;
         if(userAgent!=null){
-            Browser browser = UserAgent.parseUserAgentString(userAgent).getBrowser();
-            if(browser!=null){
-                Version version = browser.getVersion(userAgent);
-                if(version != null){
-                    info = browser.getName() + "/" + version.getVersion();
+            try{
+                if(userAgent.contains("MicroMessenger")){
+                    builder.add("微信");
+                }else if(userAgent.contains("iPhone")){
+                    builder.add("iPhone");
+                }else if(userAgent.contains("Android")){
+                    builder.add("Android");
                 }
-            }
-        }else{
-            info = "Unknown App";
+                Browser browser = UserAgent.parseUserAgentString(userAgent).getBrowser();
+                if(browser!=null){
+                    Version version = browser.getVersion(userAgent);
+                    builder.add(browser.getName() + (version !=null ? version.getVersion() : ""));
+                }
+            }catch (Exception ignored){}
         }
-
-        return docEngine.doUpdateView(doc, info);
+        if(builder.isEmpty()){
+            builder.add("其他来源");
+        }
+        return docEngine.doUpdateView(doc, String.join(" / ", builder));
     }
 
     @NkNote("B、新建单据后，检查单据索引的情况")
