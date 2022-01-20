@@ -136,14 +136,18 @@ public class DocController {
             @NkNote(value="单据JSON") @RequestBody DocHV doc) {
 
         String userAgent = request.getHeader("User-Agent");
-        String info = userAgent != null ? Arrays.stream(userAgent.split(" "))
-            .filter(s->s.contains("MicroMessenger"))
-            .findFirst()
-            .orElseGet(()->{
-                Browser browser = UserAgent.parseUserAgentString(userAgent).getBrowser();
+        String info = userAgent;
+        if(userAgent!=null){
+            Browser browser = UserAgent.parseUserAgentString(userAgent).getBrowser();
+            if(browser!=null){
                 Version version = browser.getVersion(userAgent);
-                return browser.getName() + "/" + version.getVersion();
-            }) : "Unknown Browser";
+                if(version != null){
+                    info = browser.getName() + "/" + version.getVersion();
+                }
+            }
+        }else{
+            info = "Unknown App";
+        }
 
         return docEngine.doUpdateView(doc, info);
     }
