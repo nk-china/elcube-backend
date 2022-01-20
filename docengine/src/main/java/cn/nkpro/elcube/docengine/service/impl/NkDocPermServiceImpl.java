@@ -109,7 +109,7 @@ public class NkDocPermServiceImpl implements NkDocPermService {
 
         // 设置单据WRITE权限
         if(defHV.getCards().stream().anyMatch(DocDefIV::getWriteable)){
-            docHV.setWriteable(hasDocPerm(NkDocPermService.MODE_WRITE, docHV.getDocId(), docHV.getDocType()));
+            docHV.setWriteable(docHV.isNewCreate()||hasDocPerm(NkDocPermService.MODE_WRITE, docHV.getDocId(), docHV.getDocType()));
         }else{
             // 如果所有卡片的写权限都没有，那么直接设置成不可write
             docHV.setWriteable(false);
