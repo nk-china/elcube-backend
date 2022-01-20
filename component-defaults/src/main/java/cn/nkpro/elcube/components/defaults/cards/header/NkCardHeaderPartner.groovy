@@ -26,7 +26,7 @@ import org.springframework.stereotype.Component
 @Order(11)
 @NkNote("交易伙伴抬头")
 @Component("NkCardHeaderPartner")
-public class NkCardHeaderPartner extends NkAbstractCard<Map,Map> {
+public class NkCardHeaderPartner extends NkAbstractCard<Map,Def> {
 
     @Override
     String getPosition() {
@@ -34,10 +34,14 @@ public class NkCardHeaderPartner extends NkAbstractCard<Map,Map> {
     }
 
     @Override
-    Map afterGetData(DocHV doc, Map data, DocDefIV defIV, Map d) {
+    Map afterGetData(DocHV doc, Map data, DocDefIV defIV, Def d) {
 
         doc.setPartnerName(doc.getDocName())
 
         return super.afterGetData(doc, data, defIV, d) as Map
+    }
+
+    static class Def{
+        Boolean docNumberVisible
     }
 }

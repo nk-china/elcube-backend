@@ -60,6 +60,12 @@ public class NkDateSpEL implements NkSpELInjection {
         return DateTimeUtilz.todaySeconds();
     }
 
+    public Long diff(Long date1, Long date2){
+        date1 = date1 == null ? 0 : date1;
+        date2 = date2 == null ? 0 : date2;
+        return (date1 - date2) / 86400;
+    }
+
     /**
      * @author 吴俊
      * @Email wujun@newcore.net.cn

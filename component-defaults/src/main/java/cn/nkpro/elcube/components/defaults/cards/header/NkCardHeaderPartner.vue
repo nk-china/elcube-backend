@@ -13,13 +13,16 @@
 -->
 <template>
     <nk-form ref="form" size="small" :col="2" :edit="editMode" >
-        <nk-form-item v-if="doc" term="交易类型" :col="2">
+        <nk-form-item v-if="doc" term="单据类型" :col="def.docNumberVisible?1:2">
             {{doc && doc.docType}} | {{doc.def && doc.def.docName}}
+        </nk-form-item>
+        <nk-form-item v-if="doc && def.docNumberVisible" term="单据编号">
+            {{doc && doc.docNumber}}
         </nk-form-item>
         <nk-form-item term="名称"
                       :validateFor="doc.docName"
                       :required="true"
-                      message="请输入交易伙伴名称" :col="2">
+                      message="请输入伙伴名称" :col="2">
             {{doc.docName}}
             <a-input slot="edit" size="small" v-model="doc.docName" allowClear style="max-width: 180px;"></a-input>
         </nk-form-item>
@@ -46,7 +49,6 @@
         },
         methods:{
             hasError(){
-                console.log(this.$refs.form.hasError())
                 return this.$refs.form.hasError()
             }
         }
@@ -56,3 +58,7 @@
 <style scoped>
 
 </style>
+
+<docs>
+    asdff
+</docs>

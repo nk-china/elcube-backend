@@ -13,10 +13,12 @@
 -->
 <template>
     <a-card :title="`${card.cardName}配置`">
-        <nk-edit-slot :edit-mode="editMode" :options="{style:{width:'100%'}}">
-            {{def}}
-            <a-input slot="edit" type="textarea" v-model="json"></a-input>
-        </nk-edit-slot>
+        <nk-form :col="1" :edit="editMode">
+            <nk-form-item title="显示单据编号">
+                {{def.docNumberVisible}}
+                <a-switch slot="edit" v-model="def.docNumberVisible"></a-switch>
+            </nk-form-item>
+        </nk-form>
     </a-card>
 </template>
 

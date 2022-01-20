@@ -13,7 +13,7 @@
 -->
 <template>
     <nk-form ref="form" :col="2" :edit="editMode">
-        <nk-form-item term="交易类型">
+        <nk-form-item term="单据类型">
             {{doc.def && doc.def.docType}} | {{doc.def && doc.def.docName}}
         </nk-form-item>
         <nk-form-item term="交易伙伴">
@@ -21,16 +21,16 @@
             <span v-else-if="doc.partnerName">{{doc.partnerName}}</span>
             <span v-else style="color: rgba(0, 0, 0, 0.45);">&lt;未选择&gt;</span>
         </nk-form-item>
-        <nk-form-item term="交易编号">
+        <nk-form-item term="单据编号">
             <span v-if="doc.docNumber">{{doc.docNumber}}</span>
             <span v-else style="color: rgba(0, 0, 0, 0.45);">&lt;未编号&gt;</span>
         </nk-form-item>
-        <nk-form-item term="交易描述"
+        <nk-form-item term="单据描述"
                       :validateFor="doc.docName"
-                      :message="`请输入交易描述`"
+                      :message="`请输入单据描述`"
                       len
                       :max="20"
-                      :lenMessage="`交易描述1-20个字`">
+                      :lenMessage="`单据描述1-20个字`">
             {{doc.docName}}
             <a-input v-model="doc.docName" slot="edit" allowClear ></a-input>
         </nk-form-item>
