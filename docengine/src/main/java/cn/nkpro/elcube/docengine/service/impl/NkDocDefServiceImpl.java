@@ -646,7 +646,7 @@ public class NkDocDefServiceImpl implements NkDocDefService, DeployAble {
 
         DocDefH docDefH = docDefHMapper.selectByPrimaryKey(key);
         Assert.notNull(docDefH,String.format("单据类型[%s]的配置没有找到",docType));
-        docDefH.setMarkdown(null);
+        //docDefH.setMarkdown(null);
 
         DocDefHV def = BeanUtilz.copyFromObject(docDefH,DocDefHV.class);
 
