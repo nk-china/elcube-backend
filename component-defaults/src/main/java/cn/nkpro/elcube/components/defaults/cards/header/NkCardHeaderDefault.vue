@@ -28,7 +28,6 @@
         <nk-form-item term="交易描述"
                       :validateFor="doc.docName"
                       :message="`请输入交易描述`"
-                      required
                       len
                       :max="20"
                       :lenMessage="`交易描述1-20个字`">

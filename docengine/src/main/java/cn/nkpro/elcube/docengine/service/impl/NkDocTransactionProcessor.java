@@ -116,7 +116,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         doc.setDocId(guid.nextId(DocH.class));
         doc.setClassify(def.getDocClassify());
         doc.setDocType(def.getDocType());
-        doc.setDocName(def.getDocName());
+        //doc.setDocName(def.getDocName()); 由抬头卡片自行设置单据名称
         doc.setDocState(def.getStatus().get(0).getDocState());
 
         // 关联字段

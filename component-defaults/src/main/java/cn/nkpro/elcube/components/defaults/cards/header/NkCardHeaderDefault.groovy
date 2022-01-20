@@ -43,8 +43,7 @@ class NkCardHeaderDefault extends NkAbstractCard<Map,Def> {
     @Override
     Map afterGetData(DocHV doc, Map data, DocDefIV defIV, Def d) {
 
-        if(StringUtils.isBlank(d.getPartnerIdSpEL())
-                && StringUtils.isNotBlank(d.getPartnerNameSpEL())){
+        if(StringUtils.isBlank(d.getPartnerIdSpEL()) && StringUtils.isNotBlank(d.getPartnerNameSpEL())){
             if(StringUtils.isBlank(doc.getPartnerName())){
                 def context = spELManager.createContext(doc)
                 doc.setPartnerName(spELManager.invoke(d.getPartnerNameSpEL(), context) as String)
@@ -56,36 +55,23 @@ class NkCardHeaderDefault extends NkAbstractCard<Map,Def> {
 
     @Override
     Map afterCreate(DocHV doc, DocHV preDoc, Map data, DocDefIV defIV, Def d) {
-
-        def context = spELManager.createContext(doc)
-
-        if(StringUtils.isNotBlank(d.getPartnerIdSpEL())){
-            doc.setPartnerId(spELManager.invoke(d.getPartnerIdSpEL(), context) as String)
-        }else if(StringUtils.isNotBlank(d.getPartnerNameSpEL())){
-            doc.setPartnerName(spELManager.invoke(d.getPartnerNameSpEL(), context) as String)
-        }
-
+        apply(doc,d)
         return super.afterCreate(doc, preDoc, data, defIV, d) as Map
     }
 
     @Override
     Map calculate(DocHV doc, Map data, DocDefIV defIV, Def d, boolean isTrigger, Object options) {
-
-        def context = spELManager.createContext(doc)
-
-        if(StringUtils.isNotBlank(d.getPartnerIdSpEL())){
-            doc.setPartnerId(spELManager.invoke(d.getPartnerIdSpEL(), context) as String)
-        }
-
-        if(StringUtils.isNotBlank(d.getPartnerNameSpEL())){
-            doc.setPartnerName(spELManager.invoke(d.getPartnerNameSpEL(), context) as String)
-        }
-
+        apply(doc,d)
         return super.calculate(doc, data, defIV, d, isTrigger, options) as Map
     }
 
     @Override
     Map beforeUpdate(DocHV doc, Map data, Map original, DocDefIV defIV, Def d) {
+        apply(doc,d)
+        return data
+    }
+
+    void apply(DocHV doc, Def d){
 
         def context = spELManager.createContext(doc)
 
@@ -97,11 +83,21 @@ class NkCardHeaderDefault extends NkAbstractCard<Map,Def> {
             doc.setPartnerName(spELManager.invoke(d.getPartnerNameSpEL(), context) as String)
         }
 
-        return data
+        if(StringUtils.isNotBlank(d.docNameSpEL)){
+            doc.setDocName(spELManager.invoke(d.docNameSpEL, context) as String)
+        }else if(!doc.docName){
+            if(StringUtils.isNotBlank(d.docNameDefaultSpEL)){
+                doc.docName = spELManager.invoke(d.docNameDefaultSpEL, context) as String
+            }else{
+                doc.docName = doc.def.docName
+            }
+        }
     }
 
     static class Def{
         String partnerIdSpEL
         String partnerNameSpEL
+        String docNameDefaultSpEL
+        String docNameSpEL
     }
 }

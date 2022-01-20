@@ -227,6 +227,9 @@ class AbstractNkDocEngine {
 
         // 根据权限过滤单据数据与配置
         docPermService.filterDocCards("READ", docHV);
+        if(debugContextManager.isDebug()){
+            docHV.setWriteable(true);
+        }
 
         // 加载活动的bpm任务实例
         if(StringUtils.isNotBlank(docHV.getProcessInstanceId())){

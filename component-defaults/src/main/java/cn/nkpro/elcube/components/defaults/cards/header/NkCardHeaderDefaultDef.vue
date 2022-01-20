@@ -14,11 +14,19 @@
 <template>
     <nk-def-card>
         <nk-form :col="1" :edit="editMode">
-            <nk-form-item title="伙伴ID SpEL">
+            <nk-form-item title="单据默认名称EL" :width="140">
+                {{def.docNameDefaultSpEL}}
+                <nk-sp-el-editor slot="edit" v-model="def.docNameDefaultSpEL"></nk-sp-el-editor>
+            </nk-form-item>
+            <nk-form-item title="单据名称EL" :width="140">
+                {{def.docNameSpEL}}
+                <nk-sp-el-editor slot="edit" v-model="def.docNameSpEL"></nk-sp-el-editor>
+            </nk-form-item>
+            <nk-form-item title="伙伴ID EL" :width="140">
                 {{def.partnerIdSpEL}}
                 <nk-sp-el-editor slot="edit" v-model="def.partnerIdSpEL"></nk-sp-el-editor>
             </nk-form-item>
-            <nk-form-item title="伙伴名称SpEL">
+            <nk-form-item title="伙伴名称EL" :width="140">
                 {{def.partnerNameSpEL}}
                 <nk-sp-el-editor slot="edit" v-model="def.partnerNameSpEL"></nk-sp-el-editor>
             </nk-form-item>
