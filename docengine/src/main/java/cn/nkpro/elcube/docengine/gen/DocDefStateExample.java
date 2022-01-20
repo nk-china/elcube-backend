@@ -1063,6 +1063,66 @@ public class DocDefStateExample {
             addCriterion("OPERATOR_NAME not between", value1, value2, "operatorName");
             return (Criteria) this;
         }
+
+        public Criteria andIgnoreVerifyIsNull() {
+            addCriterion("IGNORE_VERIFY is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIgnoreVerifyIsNotNull() {
+            addCriterion("IGNORE_VERIFY is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andIgnoreVerifyEqualTo(Integer value) {
+            addCriterion("IGNORE_VERIFY =", value, "ignoreVerify");
+            return (Criteria) this;
+        }
+
+        public Criteria andIgnoreVerifyNotEqualTo(Integer value) {
+            addCriterion("IGNORE_VERIFY <>", value, "ignoreVerify");
+            return (Criteria) this;
+        }
+
+        public Criteria andIgnoreVerifyGreaterThan(Integer value) {
+            addCriterion("IGNORE_VERIFY >", value, "ignoreVerify");
+            return (Criteria) this;
+        }
+
+        public Criteria andIgnoreVerifyGreaterThanOrEqualTo(Integer value) {
+            addCriterion("IGNORE_VERIFY >=", value, "ignoreVerify");
+            return (Criteria) this;
+        }
+
+        public Criteria andIgnoreVerifyLessThan(Integer value) {
+            addCriterion("IGNORE_VERIFY <", value, "ignoreVerify");
+            return (Criteria) this;
+        }
+
+        public Criteria andIgnoreVerifyLessThanOrEqualTo(Integer value) {
+            addCriterion("IGNORE_VERIFY <=", value, "ignoreVerify");
+            return (Criteria) this;
+        }
+
+        public Criteria andIgnoreVerifyIn(List<Integer> values) {
+            addCriterion("IGNORE_VERIFY in", values, "ignoreVerify");
+            return (Criteria) this;
+        }
+
+        public Criteria andIgnoreVerifyNotIn(List<Integer> values) {
+            addCriterion("IGNORE_VERIFY not in", values, "ignoreVerify");
+            return (Criteria) this;
+        }
+
+        public Criteria andIgnoreVerifyBetween(Integer value1, Integer value2) {
+            addCriterion("IGNORE_VERIFY between", value1, value2, "ignoreVerify");
+            return (Criteria) this;
+        }
+
+        public Criteria andIgnoreVerifyNotBetween(Integer value1, Integer value2) {
+            addCriterion("IGNORE_VERIFY not between", value1, value2, "ignoreVerify");
+            return (Criteria) this;
+        }
     }
 
     /**

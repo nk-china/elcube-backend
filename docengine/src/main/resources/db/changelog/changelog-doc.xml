@@ -412,6 +412,17 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="NK_DOC_DEF_STATE-04" author="bean" context="default">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="NK_DOC_DEF_STATE" columnName="IGNORE_VERIFY" />
+            </not>
+        </preConditions>
+        <addColumn tableName="NK_DOC_DEF_STATE">
+            <column name="IGNORE_VERIFY" type="${type.int}" remarks="忽略校验" beforeColumn="SYS_STATE" />
+        </addColumn>
+    </changeSet>
+
     <changeSet id="NK_DOC_H-01" author="bean" context="default">
         <preConditions onFail="MARK_RAN">
             <not>

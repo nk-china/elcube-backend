@@ -102,18 +102,13 @@
             render(config){
                 this.load(config).then(res=>{
                     if(res.data[0]){
-                        console.log(res.data)
-                        console.log(res.data[0])
-                        console.log(Object.keys(res.data[0]))
                         this.statistic = Object.keys(res.data[0])
                             .map(key=>{
                                 return {
                                     key,
                                     value: res.data[0][key]
                                 }
-                            })
-
-                        console.log(this.statistic)
+                            });
                     }
                 });
             },

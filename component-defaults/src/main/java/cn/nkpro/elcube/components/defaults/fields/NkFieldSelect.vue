@@ -26,7 +26,6 @@
             v-else-if="inputOptions.selectMode==='checkbox'"
             v-model="val"
             :options="inputOptions.optionsObject"
-            :value="['Pear']"
             @change="change">
     </a-checkbox-group>
     <a-radio-group
@@ -34,7 +33,6 @@
             v-else-if="inputOptions.selectMode==='radio'"
             v-model="val"
             :options="inputOptions.optionsObject"
-            :value="['Pear']"
             @change="change">
     </a-radio-group>
     <a-select size="small"
@@ -66,6 +64,11 @@ export default {
         },
         val:{
             get(){
+                if(this.inputOptions.selectMode==='checkbox' || this.inputOptions.selectMode==='multiple'){
+                    if(!this.value || !this.value instanceof Array){
+                        return [];
+                    }
+                }
                 return this.value;
             },
             set(value){
