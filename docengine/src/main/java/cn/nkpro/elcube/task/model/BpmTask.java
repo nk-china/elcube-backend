@@ -35,7 +35,7 @@ public class BpmTask implements Cloneable{
     private String processInstanceId;
     private String activityInstanceId;
     private String executionId;
-    private String createTime;
+    private Long createTime;
     private String assignee;
     private List<String> candidate;
 

@@ -197,6 +197,7 @@ public class NkBpmTaskServiceImpl extends AbstractNkBpmSupport implements NkBpmT
                     taskList.stream()
                         .map(t->{
                             BpmTask bpmHisTask = BeanUtilz.copyFromObject(task, BpmTask.class);
+                            bpmHisTask.setCreateTime(task.getCreateTime().getTime()/1000);
                             bpmHisTask.setComments(processInstanceComments
                                     .stream()
                                     .filter(c->StringUtils.equals(c.getTaskId(),t.getId()))
