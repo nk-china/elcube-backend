@@ -33,15 +33,18 @@ import java.util.stream.Collectors;
 public class NkCountersignatureJavaDelegate implements JavaDelegate {
     @Setter
     private FixedValue groupKey;
+    @Setter
+    private FixedValue groupExamine;
     @Autowired
     private UserAuthorizationService permService;
 
     @Override
     public void execute(DelegateExecution execution) throws Exception {
         String groupKeyValue = (String)this.groupKey.getValue(execution);
+        String groupExamineValue = (String)this.groupExamine.getValue(execution);
         UserGroupBO groupDetail = this.permService.getGroupDetailByKey(groupKeyValue);
         List<UserAccount> accounts = groupDetail.getAccounts();
         List<String> collect = accounts.stream().map(UserAccount::getId).collect(Collectors.toList());
-        execution.setVariableLocal(groupKeyValue, collect);
+        execution.setVariableLocal(groupExamineValue, collect);
     }
 }

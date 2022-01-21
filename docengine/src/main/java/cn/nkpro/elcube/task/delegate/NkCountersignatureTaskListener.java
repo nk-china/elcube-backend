@@ -45,6 +45,8 @@ import org.springframework.stereotype.Component;
  *      Collection 指定会签人员集合           = ${NK$COUNTERSIGNATURE_USERS}
  *      Element Variable 任务人变量          = userId
  *      Completion Condition 会签结束条件    = ${nrOfInstances == nrOfCompletedInstances}
+ *      Task Listener                      = ${NkCountersignatureCleanListener}
+ *          eventType                      = start
  *      Task Listener                      = ${NkCountersignatureTaskListener}
  *          eventType                      = complete
  *          pass                           = ${nkFlowId=='Flow_0kz1ipm'}
