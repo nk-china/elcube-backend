@@ -167,7 +167,8 @@ public class NkBpmTaskServiceImpl extends AbstractNkBpmSupport implements NkBpmT
             Task task = tasks.get(0);
 
             BpmTask bpmTask = BeanUtilz.copyFromObject(task, BpmTask.class);
-            bpmTask.setDelegationState(task.getDelegationState().name());
+            if(task.getDelegationState()!=null)
+                bpmTask.setDelegationState(task.getDelegationState().name());
 
             // 获取流程图内所有的节点
             List<? extends PvmActivity> activities = getProcessDefinitionActivities(task.getProcessDefinitionId());
@@ -180,24 +181,41 @@ public class NkBpmTaskServiceImpl extends AbstractNkBpmSupport implements NkBpmT
             List<Comment> processInstanceComments = processEngine.getTaskService()
                     .getProcessInstanceComments(task.getProcessInstanceId());
 
-            Map<String, String> accounts = processInstanceComments.stream().map(Comment::getUserId).filter(Objects::nonNull).distinct()
-                    .map(accountService::getAccountById)
-                    .collect(Collectors.toMap(UserAccount::getId, UserAccount::getRealname));
+            if(!processInstanceComments.isEmpty()){
 
-            bpmTask.setInstanceComments(
-                    processInstanceComments
-                    .stream()
-                    .map(comment -> {
-                        BpmComment bpmComment = new BpmComment();
-                        bpmComment.setComment(comment.getFullMessage());
-                        bpmComment.setId(comment.getId());
-                        bpmComment.setTime(comment.getTime().getTime()/1000);
-                        bpmComment.setUserId(comment.getUserId());
-                        bpmComment.setUser(accounts.getOrDefault(comment.getUserId(),comment.getUserId()));
-                        return bpmComment;
-                    })
-                    .sorted(Comparator.comparing(BpmComment::getTime))
-                    .collect(Collectors.toList()));
+                Map<String, String> accounts = processInstanceComments.stream().map(Comment::getUserId).filter(Objects::nonNull).distinct()
+                        .map(accountService::getAccountById)
+                        .collect(Collectors.toMap(UserAccount::getId, UserAccount::getRealname));
+
+                List<Task> taskList = processEngine.getTaskService().createTaskQuery()
+                        .processInstanceId(task.getProcessInstanceId())
+                        .orderByTaskCreateTime()
+                        .asc()
+                        .list();
+
+                bpmTask.setHistoricalTasks(
+                    taskList.stream()
+                        .map(t->{
+                            BpmTask bpmHisTask = BeanUtilz.copyFromObject(task, BpmTask.class);
+                            bpmHisTask.setComments(processInstanceComments
+                                    .stream()
+                                    .filter(c->StringUtils.equals(c.getTaskId(),t.getId()))
+                                    .map(comment->{
+                                        BpmComment bpmComment = new BpmComment();
+                                        bpmComment.setComment(comment.getFullMessage());
+                                        bpmComment.setId(comment.getId());
+                                        bpmComment.setTime(comment.getTime().getTime()/1000);
+                                        bpmComment.setUserId(comment.getUserId());
+                                        bpmComment.setUser(accounts.getOrDefault(comment.getUserId(),comment.getUserId()));
+                                        return bpmComment;
+                                    })
+                                    .collect(Collectors.toList()));
+
+                            return bpmHisTask;
+                        })
+                        .collect(Collectors.toList())
+                );
+            }
 
             return bpmTask;
         }

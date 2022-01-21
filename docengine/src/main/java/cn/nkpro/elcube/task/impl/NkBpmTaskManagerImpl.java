@@ -20,6 +20,7 @@ import cn.nkpro.elcube.basic.PageList;
 import cn.nkpro.elcube.docengine.model.DocHV;
 import cn.nkpro.elcube.docengine.service.NkDocEngineFrontService;
 import cn.nkpro.elcube.task.NkBpmTaskManager;
+import cn.nkpro.elcube.task.model.BpmComment;
 import cn.nkpro.elcube.task.model.BpmInstance;
 import cn.nkpro.elcube.task.model.BpmTask;
 import cn.nkpro.elcube.utils.BeanUtilz;
@@ -105,7 +106,15 @@ public class NkBpmTaskManagerImpl extends AbstractNkBpmSupport implements NkBpmT
                     task.setComments(
                         comments.stream()
                                 .filter(comment -> StringUtils.equals(comment.getTaskId(),task.getId()))
-                                .map(Comment::getFullMessage)
+                                .map(comment->{
+                                    BpmComment bpmComment = new BpmComment();
+                                    bpmComment.setComment(comment.getFullMessage());
+                                    bpmComment.setId(comment.getId());
+                                    bpmComment.setTime(comment.getTime().getTime()/1000);
+                                    bpmComment.setUserId(comment.getUserId());
+                                    //bpmComment.setUser(accounts.getOrDefault(comment.getUserId(),comment.getUserId()));
+                                    return bpmComment;
+                                })
                                 .collect(Collectors.toList())
                     );
 

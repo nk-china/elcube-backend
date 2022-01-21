@@ -55,13 +55,15 @@ public class BpmTask implements Cloneable{
     private String docType;
     private String classify;
 
-    private List<String> comments;
+    private List<BpmComment> comments;
     // flows
     private List<BpmTaskTransition> transitions;
     // variables
     private Map<String, Object> bpmVariables;
 
-    private List<BpmComment> instanceComments;
+    //private List<BpmComment> instanceComments;
+
+    private List<BpmTask> historicalTasks;
 
     @Override
     public Object clone() throws CloneNotSupportedException {
