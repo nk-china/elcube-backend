@@ -37,6 +37,7 @@ import org.apache.commons.lang3.StringUtils
 import org.apache.poi.xwpf.usermodel.XWPFDocument
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
+import cn.nkpro.elcube.utils.UUIDHexGenerator
 
 import java.text.Format
 import java.text.SimpleDateFormat
