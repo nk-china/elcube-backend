@@ -32,7 +32,7 @@
                       :max="20"
                       :lenMessage="`单据描述1-20个字`">
             {{doc.docName}}
-            <a-input v-model="doc.docName" slot="edit" allowClear ></a-input>
+            <a-input v-model="doc.docName" slot="edit" allowClear size="small" ></a-input>
         </nk-form-item>
         <nk-form-item term="创建时间">{{doc.createdTime | nkDatetimeFriendly}}</nk-form-item>
         <nk-form-item term="更新时间">{{doc.updatedTime | nkDatetimeFriendly}}</nk-form-item>
