@@ -82,7 +82,7 @@
                         data : res.data,
                         xField: config.xField[0],
                         yField: config.yField[0],
-                        seriesField: 'label',
+                        seriesField: config.yField[0],
                         legend: {
                             position: 'top-left',
                         },

@@ -102,7 +102,7 @@
                         },
                         meta: {
                             value: {
-                                alias: '数量',
+                                alias: config.yField,
                             },
                         },
                         columnBackground: config.columnBackground && {
