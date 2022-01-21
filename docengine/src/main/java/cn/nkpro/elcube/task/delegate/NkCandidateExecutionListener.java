@@ -34,16 +34,18 @@ public class NkCandidateExecutionListener implements ExecutionListener {
 
     @Setter
     private FixedValue groupKey;
-
+    @Setter
+    private FixedValue groupExamine;
     @Autowired@SuppressWarnings("all")
     private UserAuthorizationService permService;
 
     @Override
     public void notify(DelegateExecution delegateExecution) {
         String groupKeyValue = (String) groupKey.getValue(delegateExecution);
+        String groupExamineValue = (String) groupExamine.getValue(delegateExecution);
         UserGroupBO groupDetail = permService.getGroupDetailByKey(groupKeyValue);
         List<UserAccount> accounts = groupDetail.getAccounts();
         List<String> collect = accounts.stream().map(UserAccount::getId).collect(Collectors.toList());
-        delegateExecution.setVariableLocal(groupKeyValue, collect);
+        delegateExecution.setVariableLocal(groupExamineValue, collect);
     }
 }
