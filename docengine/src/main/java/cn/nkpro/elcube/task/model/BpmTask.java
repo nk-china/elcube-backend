@@ -40,6 +40,7 @@ public class BpmTask implements Cloneable{
     private List<String> candidate;
 
     private String deleteReason;
+    private String delegationState;
 
     private Date startTime;
     private Date endTime;

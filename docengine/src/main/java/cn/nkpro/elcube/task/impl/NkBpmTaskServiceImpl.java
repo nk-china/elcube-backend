@@ -167,6 +167,7 @@ public class NkBpmTaskServiceImpl extends AbstractNkBpmSupport implements NkBpmT
             Task task = tasks.get(0);
 
             BpmTask bpmTask = BeanUtilz.copyFromObject(task, BpmTask.class);
+            bpmTask.setDelegationState(task.getDelegationState().name());
 
             // 获取流程图内所有的节点
             List<? extends PvmActivity> activities = getProcessDefinitionActivities(task.getProcessDefinitionId());
