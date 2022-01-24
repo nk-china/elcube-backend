@@ -86,6 +86,11 @@
             <artifactId>component-financial</artifactId>
             <version>${parent.version}</version>
         </dependency>
+        <dependency>
+            <groupId>cn.nkpro.elcube</groupId>
+            <artifactId>demo</artifactId>
+            <version>${parent.version}</version>
+        </dependency>
 
         <!--SpringBoot 基础库-->
         <dependency>
