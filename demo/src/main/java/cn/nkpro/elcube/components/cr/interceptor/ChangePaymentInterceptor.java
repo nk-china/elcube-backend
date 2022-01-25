@@ -1,4 +1,4 @@
-package cn.nkpro.elcube.components.CR.interceptor;
+package cn.nkpro.elcube.components.cr.interceptor;
 
 import cn.nkpro.elcube.co.easy.EasyCollection;
 import cn.nkpro.elcube.co.easy.EasySingle;

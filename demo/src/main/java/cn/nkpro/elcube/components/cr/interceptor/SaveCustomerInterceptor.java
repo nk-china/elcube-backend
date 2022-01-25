@@ -1,13 +1,11 @@
-package cn.nkpro.elcube.components.CR.interceptor;
+package cn.nkpro.elcube.components.cr.interceptor;
 
-import cn.nkpro.elcube.co.easy.EasyCollection;
-import cn.nkpro.elcube.components.CR.pojo.WeightCategory;
+import cn.nkpro.elcube.components.cr.pojo.WeightCategory;
 import cn.nkpro.elcube.docengine.NkDocCycle;
 import cn.nkpro.elcube.docengine.NkDocEngine;
 import cn.nkpro.elcube.docengine.interceptor.abstracts.NkAbstractDocCycleInterceptor;
 import cn.nkpro.elcube.docengine.model.DocHV;
 import cn.nkpro.elcube.docengine.model.event.AbstractDocCycleEvent;
-import cn.nkpro.elcube.exception.NkException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
