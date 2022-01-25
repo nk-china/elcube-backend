@@ -1,4 +1,4 @@
-package cn.nkpro.elcube.components.CR.pojo;
+package cn.nkpro.elcube.components.cr.pojo;
 
 public class WeightCategory{
 
