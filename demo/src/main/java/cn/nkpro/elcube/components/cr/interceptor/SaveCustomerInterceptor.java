@@ -1,4 +1,4 @@
-package cn.nkpro.elcube.components.cr.Interceptor;
+package cn.nkpro.elcube.components.cr.interceptor;
 
 import cn.nkpro.elcube.components.cr.pojo.WeightCategory;
 import cn.nkpro.elcube.docengine.NkDocCycle;
