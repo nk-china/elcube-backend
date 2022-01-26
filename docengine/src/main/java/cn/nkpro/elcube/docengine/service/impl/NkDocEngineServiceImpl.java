@@ -34,10 +34,15 @@ import cn.nkpro.elcube.docengine.model.es.DocHES;
 import cn.nkpro.elcube.docengine.service.NkDocEngineFrontService;
 import cn.nkpro.elcube.docengine.service.NkDocPermService;
 import cn.nkpro.elcube.exception.NkAccessDeniedException;
+import cn.nkpro.elcube.exception.NkDefineException;
 import cn.nkpro.elcube.security.SecurityUtilz;
 import cn.nkpro.elcube.utils.BeanUtilz;
 import cn.nkpro.elcube.utils.UUIDHexGenerator;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.jsqlparser.JSQLParserException;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.update.Update;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,7 +55,9 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.util.Assert;
 
 import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -382,6 +389,45 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
             doc.clearItemContent();
             return doc;
         });
+    }
+
+    @Override
+    @Transactional
+    public List<DocHV> doUpdateByEql(String eql,String optSource){
+
+        try {
+            Statement statement = CCJSqlParserUtil.parse(eql);
+
+            Assert.isTrue(statement instanceof Update, "eql 不是一个有效的 update 语句");
+
+            Update update = (Update) statement;
+
+            String docType = update.getTable().getName();
+
+            System.out.println(eql);
+
+            return find(docType)
+                .expression(update.getWhere())
+                .listResult()
+                .stream()
+                .map(docH ->
+                    lockDocDo(docH.getDocId(),(docId)->{
+                        DocHV doc = detail(docId);
+
+                        // todo 执行 update set
+                        // update.getUpdateSets()
+
+                        doc = execUpdate(doc, optSource);
+                        doc.clearItemContent();
+                        return doc;
+                    })
+                )
+                .collect(Collectors.toList());
+
+
+        } catch (JSQLParserException e) {
+            throw new NkDefineException(e.getMessage());
+        }
     }
 
     @Override

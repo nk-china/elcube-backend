@@ -3,14 +3,17 @@ package cn.nkpro.elcube.docengine.service.impl;
 import cn.nkpro.elcube.data.mybatis.NkMybatisProperties;
 import cn.nkpro.elcube.data.mybatis.pagination.dialect.Dialect;
 import cn.nkpro.elcube.docengine.gen.DocH;
-import io.jsonwebtoken.lang.Assert;
+import cn.nkpro.elcube.exception.NkDefineException;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.jsqlparser.expression.*;
+import net.sf.jsqlparser.expression.operators.relational.*;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -251,7 +254,7 @@ public class NkDocFinder implements InitializingBean {
         return this;
     }
     public NkDocFinder docStateIn(String... value){
-        Assert.notEmpty(value);
+        Assert.notEmpty(value,"state is not empty");
 
         String collect = Arrays.stream(value).map(i -> "?").collect(Collectors.joining(", "));
         where.get().add(String.format("h.doc_state IN (%s)", collect));
@@ -451,6 +454,7 @@ public class NkDocFinder implements InitializingBean {
     }
 
     public List<DocH> listResult(){
+        System.out.println(build(null,null));
         try{
             return jdbcTemplate.query(build(null,null), args.get().toArray(), rowMapper);
         }finally {
@@ -479,5 +483,160 @@ public class NkDocFinder implements InitializingBean {
             where.remove();
             order.remove();
         }
+    }
+
+    public NkDocFinder where(String condWhere, Object... condArgs){
+        Assert.hasLength(condWhere,"where condition is not empty");
+        where.get().add("h."+condWhere);
+        if(condArgs!=null && condArgs.length>0)
+            Arrays.stream(condArgs).forEach(arg-> args.get().add(arg));
+        return this;
+    }
+
+    public NkDocFinder expression(Expression exp) {
+        List<Expression> expressions = new ArrayList<>();
+        exp.accept(new NkEqlExpressionVisitor(expressions));
+
+
+        expressions.forEach(expression -> {
+                if(expression instanceof LikeExpression || expression instanceof ComparisonOperator){
+                    Object value = getExpressionValue(((BinaryExpression) expression).getRightExpression());
+                    args.get().add(value);
+
+                    String string = value instanceof String ? "value" : "number_value";
+                    Expression leftExpression = ((BinaryExpression) expression).getLeftExpression();
+                    if(leftExpression.toString().toUpperCase().startsWith("DYNAMIC.")){
+                        where.get().add(String.format(
+                                "EXISTS (" +
+                                        "\n         SELECT i.doc_id FROM nk_doc_i_index AS i " +
+                                        "\n          WHERE i.doc_id = h.doc_id " +
+                                        "\n            AND i.name   = '%s' " +
+                                        "\n            AND i.%s  >= ?" +
+                                        "\n       )",
+                                leftExpression.toString().substring(8),
+                                string
+                        ));
+                    }else{
+                        where.get().add(
+                                String.format(
+                                        "%s %s ?",
+                                        leftExpression,
+                                        ((BinaryExpression) expression).getStringExpression()
+                                )
+                        );
+                    }
+
+                }else if(expression instanceof Between){
+
+                    Object start = getExpressionValue(((Between) expression).getBetweenExpressionStart());
+                    Object end   = getExpressionValue(((Between) expression).getBetweenExpressionEnd());
+                    args.get().add(start);
+                    args.get().add(end);
+
+                    String string = start instanceof String ? "value" : "number_value";
+                    Expression leftExpression = ((Between) expression).getLeftExpression();
+                    if(leftExpression.toString().toUpperCase().startsWith("DYNAMIC.")){
+                        where.get().add(String.format(
+                                "EXISTS (" +
+                                        "\n         SELECT i.doc_id FROM nk_doc_i_index AS i " +
+                                        "\n          WHERE i.doc_id = h.doc_id " +
+                                        "\n            AND i.name   = '%s' " +
+                                        "\n            AND i.%s BETWEEN ? AND ?" +
+                                        "\n       )",
+                                leftExpression.toString().substring(8),
+                                string
+                        ));
+                    }else{
+                        where.get().add(
+                                String.format(
+                                        "%s BETWEEN ? AND ?",
+                                        leftExpression
+                                )
+                        );
+                    }
+
+                }else if(expression instanceof InExpression){
+
+                    ExpressionList list = (ExpressionList) ((InExpression) expression).getRightItemsList();
+                    assert list.getExpressions().size() > 0;
+
+                    List<Object> values = list.getExpressions()
+                            .stream()
+                            .map(this::getExpressionValue)
+                            .collect(Collectors.toList());
+
+
+                    values.forEach(v->args.get().add(v));
+
+                    String string = values.get(0) instanceof String ? "value" : "number_value";
+                    Expression leftExpression = ((InExpression) expression).getLeftExpression();
+                    if(leftExpression.toString().toUpperCase().startsWith("DYNAMIC.")){
+                        where.get().add(String.format(
+                                "EXISTS (" +
+                                        "\n         SELECT i.doc_id FROM nk_doc_i_index AS i " +
+                                        "\n          WHERE i.doc_id = h.doc_id " +
+                                        "\n            AND i.name   = '%s' " +
+                                        "\n            AND i.%s IN (%s)" +
+                                        "\n       )",
+                                leftExpression.toString().substring(8),
+                                string,
+                                list.getExpressions().stream().map(e->"?").collect(Collectors.joining(", "))
+                        ));
+                    }else{
+                        where.get().add(
+                                String.format(
+                                        "%s IN (%s)",
+                                        leftExpression,
+                                        list.getExpressions().stream().map(e->"?").collect(Collectors.joining(", "))
+                                )
+                        );
+                    }
+
+                }else if(expression instanceof IsNullExpression){
+                    Expression leftExpression = ((IsNullExpression) expression).getLeftExpression();
+                    if(leftExpression.toString().toUpperCase().startsWith("DYNAMIC.")){
+                        if(((IsNullExpression) expression).isNot()){
+                            where.get().add(String.format(
+                                    "NOT EXISTS (" +
+                                            "\n         SELECT i.doc_id FROM nk_doc_i_index AS i " +
+                                            "\n          WHERE i.doc_id = h.doc_id " +
+                                            "\n            AND i.name   = '%s' " +
+                                            "\n       )",
+                                    leftExpression.toString().substring(8)
+                            ));
+                        }else{
+                            where.get().add(String.format(
+                                    "EXISTS (" +
+                                            "\n         SELECT i.doc_id FROM nk_doc_i_index AS i " +
+                                            "\n          WHERE i.doc_id = h.doc_id " +
+                                            "\n            AND i.name   = '%s' " +
+                                            "\n       )",
+                                    leftExpression.toString().substring(8)
+                            ));
+                        }
+                    }else{
+                        where.get().add(expression.toString());
+                    }
+                }else{
+                    throw new NkDefineException("不支持的操作");
+                }
+            });
+        return this;
+    }
+
+    private Object getExpressionValue(Expression expression){
+        if(expression instanceof StringValue){
+            return ((StringValue) expression).getValue();
+        }
+        if(expression instanceof LongValue){
+            return ((LongValue) expression).getValue();
+        }
+        if(expression instanceof DoubleValue){
+            return ((DoubleValue) expression).getValue();
+        }
+        if(expression instanceof HexValue){
+            return Long.parseLong(((HexValue) expression).getValue().substring(2),16);
+        }
+        throw new NkDefineException("不支持的操作");
     }
 }
