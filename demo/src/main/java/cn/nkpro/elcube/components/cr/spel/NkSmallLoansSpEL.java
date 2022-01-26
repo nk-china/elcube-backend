@@ -224,7 +224,7 @@ public class NkSmallLoansSpEL implements NkSpELInjection {
                                 flag = false;
                         } else if (expireDate instanceof Long)
                             if ((Long) expireDate == timeInMillis)
-                                flag = true;
+                                flag = false;
                     }
                     return flag;
                 }).collect(Collectors.summarizingDouble(l -> ((Double) l.get("receivable") - (Double) l.get("received")) <= 0D ? 0D : ((Double) l.get("receivable") - (Double) l.get("received")) )).getSum();
