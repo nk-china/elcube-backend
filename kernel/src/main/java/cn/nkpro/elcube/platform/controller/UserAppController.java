@@ -29,6 +29,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by bean on 2019/12/18.
@@ -103,4 +104,13 @@ public class UserAppController {
         return nkMobileService.sendVerificationCode(phone);
     }
 
+    @NkNote("5.移动端登录绑定")
+    @RequestMapping("/app/bind")
+    public Map<String,Object> appBind(@RequestParam("NK-App") String nkApp,
+                                       @RequestParam(value = "phone",required = false) String phone,
+                                       @RequestParam(value = "verCode",required = false)String verCode,
+                                       @RequestParam(value = "openId",required = false)String openId,
+                                       @RequestParam(value = "appleId",required = false)String appleId){
+        return nkMobileService.appBind(nkApp,phone,verCode,openId,appleId);
+    }
 }

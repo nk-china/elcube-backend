@@ -16,6 +16,8 @@
  */
 package cn.nkpro.elcube.platform.service;
 
+import java.util.Map;
+
 /**
  * @Author: wf
  * @Description 移动端服务抽象类
@@ -26,6 +28,11 @@ public class NkAbstractMobile implements NkMobileService{
 
     @Override
     public String sendVerificationCode(String phone) {
+        return null;
+    }
+
+    @Override
+    public Map<String, Object> appBind(String nkApp, String phone, String verCode, String openId, String appleId) {
         return null;
     }
 }

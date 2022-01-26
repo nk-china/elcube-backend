@@ -94,13 +94,11 @@ public class UserAuthController {
         tfmsSysAccountService.doChangePassword(SecurityUtilz.getUser().getId(),oldPassword,newPassword);
     }
 
-    @NkNote("7.App端手机验证码登录")
+    @NkNote("7.移动端登录")
     @RequestMapping("/app/login")
-    public Map<String,Object> appLogin(@RequestParam("phone") String phone,
-                                       @RequestParam("verCode")String verCode,
-                                       @RequestParam("openId")String openId,
-                                       @RequestParam("appleId")String appleId){
-        return tfmsSysAccountService.appLogin(phone,verCode,openId,appleId);
+    public Map<String,Object> appLogin(@RequestParam(value = "phone",required = false) String phone,
+                                       @RequestParam(value = "openId",required = false)String openId,
+                                       @RequestParam(value = "appleId",required = false)String appleId){
+        return tfmsSysAccountService.appLogin(phone,openId,appleId);
     }
-
 }

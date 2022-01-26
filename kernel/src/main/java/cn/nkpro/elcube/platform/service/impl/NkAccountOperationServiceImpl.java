@@ -17,6 +17,7 @@
 package cn.nkpro.elcube.platform.service.impl;
 
 import cn.nkpro.elcube.platform.gen.UserAccountExtend;
+import cn.nkpro.elcube.platform.gen.UserAccountMapper;
 import cn.nkpro.elcube.platform.service.NkAbstractAccountOperation;
 import cn.nkpro.elcube.security.UserAccountExtendService;
 import cn.nkpro.elcube.security.UserAuthorizationService;
@@ -38,6 +39,9 @@ public class NkAccountOperationServiceImpl extends NkAbstractAccountOperation {
     @Autowired@SuppressWarnings("all")
     private UserAccountExtendService userAccountExtendService;
 
+    @Autowired@SuppressWarnings("all")
+    private UserAccountMapper userAccountMapper;
+
     @Override
     public UserAccountBO createAccount(String phone, String openId, String appleId) {
         UserAccountBO user = new UserAccountBO();
@@ -58,6 +62,7 @@ public class NkAccountOperationServiceImpl extends NkAbstractAccountOperation {
         userAccountExtend.setOpenid(openId);
         userAccountExtend.setAppleid(appleId);
         userAccountExtend.setCreatedTime(DateTimeUtilz.nowSeconds());
+        userAccountMapper.insert(user);
         userAccountExtendService.addUserAccountExtend(userAccountExtend);
         return user;
     }

@@ -17,10 +17,18 @@
 package cn.nkpro.elcube.security.validate;
 
 import cn.nkpro.elcube.security.bo.AuthMobileTerminal;
+import com.alibaba.fastjson.JSONObject;
 import lombok.Getter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+
+import java.util.Collection;
+
 
 public class NkAppLoginAuthentication extends AbstractAuthenticationToken {
+
+    private final Object principal;
+
     @Getter
     private String nkAppSource;
     @Getter
@@ -39,6 +47,28 @@ public class NkAppLoginAuthentication extends AbstractAuthenticationToken {
         this.verCode = verCode;
         this.openId = openId;
         this.appleId = appleId;
+        AuthMobileTerminal authMobileTerminal = new AuthMobileTerminal();
+        authMobileTerminal.setPhone(phone);
+        authMobileTerminal.setOpenId(openId);
+        authMobileTerminal.setAppleId(appleId);
+        this.principal = JSONObject.toJSONString(authMobileTerminal);
+    }
+
+    public NkAppLoginAuthentication(Object principal,
+                                          Collection<? extends GrantedAuthority> authorities) {
+        super(authorities);
+        this.principal = principal;
+        // must use super, as we override
+        super.setAuthenticated(true);
+    }
+
+    @Override
+    public void setAuthenticated(boolean authenticated) {
+        if (authenticated) {
+            throw new IllegalArgumentException(
+                    "Cannot set this token to trusted - use constructor which takes a GrantedAuthority list instead");
+        }
+        super.setAuthenticated(false);
     }
 
     @Override
@@ -47,11 +77,12 @@ public class NkAppLoginAuthentication extends AbstractAuthenticationToken {
     }
 
     @Override
-    public AuthMobileTerminal getPrincipal() {
-        AuthMobileTerminal authMobileTerminal = new AuthMobileTerminal();
-        authMobileTerminal.setPhone(phone);
-        authMobileTerminal.setOpenId(openId);
-        authMobileTerminal.setAppleId(appleId);
-        return authMobileTerminal;
+    public Object getPrincipal() {
+        return this.principal;
+    }
+
+    @Override
+    public void eraseCredentials() {
+        super.eraseCredentials();
     }
 }

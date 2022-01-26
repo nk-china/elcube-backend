@@ -22,23 +22,23 @@ import cn.nkpro.elcube.basic.PageList;
 import cn.nkpro.elcube.data.mybatis.pagination.PaginationContext;
 import cn.nkpro.elcube.data.redis.RedisSupport;
 import cn.nkpro.elcube.platform.gen.*;
-import cn.nkpro.elcube.platform.service.NkAbstractDocOperation;
 import cn.nkpro.elcube.platform.service.NkAccountOperationService;
 import cn.nkpro.elcube.platform.service.NkDocOperationService;
 import cn.nkpro.elcube.security.*;
 import cn.nkpro.elcube.security.bo.AuthMobileTerminal;
 import cn.nkpro.elcube.security.bo.UserAccountBO;
 import cn.nkpro.elcube.security.bo.UserDetails;
-import cn.nkpro.elcube.security.validate.NkAppSource;
 import cn.nkpro.elcube.utils.BeanUtilz;
 import cn.nkpro.elcube.utils.DateTimeUtilz;
 import cn.nkpro.elcube.utils.UUIDHexGenerator;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
@@ -67,13 +67,13 @@ public class UserAccountServiceImpl implements UserAccountService {
     private UserAuthorizationService authorizationService;
 
     @Autowired@SuppressWarnings("all")
+    private UserAccountExtendService userAccountExtendService;
+
+    @Autowired@SuppressWarnings("all")
     private NkDocOperationService nkDocOperationService;
 
     @Autowired@SuppressWarnings("all")
     private NkAccountOperationService nkAccountOperationService;
-
-    @Autowired@SuppressWarnings("all")
-    private UserAccountExtendService userAccountExtendService;
 
     @Override
     public UserAccount getAccountById(String id){
@@ -97,13 +97,17 @@ public class UserAccountServiceImpl implements UserAccountService {
         if(preClear){
             redisTemplate.deleteHash(Constants.CACHE_USERS,username);
         }
-        return redisTemplate.getIfAbsent(Constants.CACHE_USERS,username,()-> getAccount(username));
+        return redisTemplate.getIfAbsent(Constants.CACHE_USERS,username,()-> getAccount(username,null));
     }
 
-    private UserAccountBO getAccount(String username){
+    private UserAccountBO getAccount(String username, String accountId){
 
         UserAccountExample example = new UserAccountExample();
-        example.createCriteria().andUsernameEqualTo(username);
+        if(StringUtils.isNotBlank(username)){
+            example.createCriteria().andUsernameEqualTo(username);
+        }else if(StringUtils.isNotBlank(accountId)){
+            example.createCriteria().andIdEqualTo(accountId);
+        }
 
         return userAccountMapper.selectByExample(example)
                 .stream()
@@ -282,31 +286,12 @@ public class UserAccountServiceImpl implements UserAccountService {
     }
 
     @Override
-    public Map<String,Object> appLogin(String phone, String verCode, String openId, String appleId) {
-        UserDetails userDetails = getAccountByMobileTerminal(phone, openId, appleId);
-        //todo phone和openId同时存在时，更新用户扩展表信息
-        if(null != userDetails){
-            refreshTokenMobileTerminal();
-        }
-        // 新建用户
-        UserAccountBO user = nkAccountOperationService.createAccount(phone, openId, appleId);
-        update(user);
-        // 用户授权
-        nkAccountOperationService.addAccountFromGroup(user.getId());
-        // 保存客户信息到单据
-        Map<String,String> dataMap = new HashMap<>();
-        dataMap.put("phone",phone);
-        dataMap.put("verCode",verCode);
-        dataMap.put("openId",openId);
-        dataMap.put("appleId",appleId);
-        Object obj = nkDocOperationService.createDoc(dataMap);
-        return createToken();
-    }
-
-    @Override
     public UserDetails getAccountByMobileTerminal(String phone, String openId, String appleId) {
-        UserAccountExtendExample example = null;
-        List<UserAccountExtend> userAccountExtends;
+        if(StringUtils.isBlank(phone) && StringUtils.isBlank(openId) && StringUtils.isBlank(appleId)){
+            return null;
+        }
+
+        UserAccountExtendExample example = new UserAccountExtendExample();
         if(StringUtils.isNoneBlank(phone)){
             example.createCriteria().andPhoneEqualTo(phone);
         }else if(StringUtils.isNoneBlank(openId)){
@@ -314,12 +299,18 @@ public class UserAccountServiceImpl implements UserAccountService {
         }else if(StringUtils.isNoneBlank(appleId)){
             example.createCriteria().andAppleidEqualTo(appleId);
         }
-        if(null != example){
-            example = new UserAccountExtendExample();
-            userAccountExtends = userAccountExtendService.selectByExample(example);
-            if(!CollectionUtils.isEmpty(userAccountExtends)){
-                return loadUserByAccountId(userAccountExtends.get(0).getAccountId());
+        List<UserAccountExtend> userAccountExtends = userAccountExtendService.selectByExample(example);
+        if(!CollectionUtils.isEmpty(userAccountExtends)){
+            UserAccountExtend userAccountExtend = userAccountExtends.get(0);
+            if(StringUtils.equals(openId,userAccountExtend.getOpenid())){
+                userAccountExtend.setOpenid(openId);
+                userAccountExtendService.updateUserAccountExtend(userAccountExtend);
             }
+            if(StringUtils.equals(appleId,userAccountExtend.getAppleid())){
+                userAccountExtend.setAppleid(appleId);
+                userAccountExtendService.updateUserAccountExtend(userAccountExtend);
+            }
+            return loadUserByAccountId(userAccountExtends.get(0).getAccountId());
         }
         return null;
     }
@@ -337,7 +328,7 @@ public class UserAccountServiceImpl implements UserAccountService {
             redisTemplate.deleteHash(Constants.CACHE_USERS,accountId);
         }
         return redisTemplate.getIfAbsent(Constants.CACHE_USERS,accountId,()-> {
-            UserAccount sysAccount = getAccount(accountId);
+            UserAccount sysAccount = getAccount(null, accountId);
             UserAccountBO ud = BeanUtilz.copyFromObject(sysAccount, UserAccountBO.class);
             ud.setAuthorities(authorizationService.buildGrantedPerms(sysAccount));
             return ud;
@@ -352,16 +343,12 @@ public class UserAccountServiceImpl implements UserAccountService {
      * @return token信息
      */
     @Override
-    public Map<String, Object> createTokenMobileTerminal() {
-
-        AuthMobileTerminal authMobileTerminal = (AuthMobileTerminal) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        //UserAccountBO account = getAccountById(username, false);
+    public Map<String, Object> createTokenMobileTerminal(String phone, String openId, String appleId) {
 
         Map<String,Object> map = new HashMap<>();
-        map.put("phone", authMobileTerminal.getPhone());
-        map.put("openId", authMobileTerminal.getOpenId());
-        map.put("appleId", authMobileTerminal.getAppleId());
+        map.put("phone", phone);
+        map.put("openId", openId);
+        map.put("appleId", appleId);
 
         long time   = 1000L * 60 * 45;             // 有效期默认为45分钟
         long expire = 1000L * 60 * 15;             // 过期时间设定为15分钟
@@ -379,6 +366,15 @@ public class UserAccountServiceImpl implements UserAccountService {
 
     @Override
     public Map<String, Object> refreshTokenMobileTerminal() {
-        return createTokenMobileTerminal();
+        AuthMobileTerminal authMobileTerminal = JSONObject.parseObject((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal(),AuthMobileTerminal.class);
+        return createTokenMobileTerminal(authMobileTerminal.getPhone(),authMobileTerminal.getOpenId(),authMobileTerminal.getAppleId());
+    }
+
+    @Override
+    public Map<String,Object> appLogin(String phone, String openId, String appleId) {
+        if(StringUtils.isAllBlank(phone,openId,appleId)){
+            return null;
+        }
+        return createTokenMobileTerminal(phone, openId, appleId);
     }
 }

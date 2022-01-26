@@ -58,19 +58,19 @@ public class NkAppLoginAuthenticationFilter extends GenericFilterBean  {
                 String nkApp    = StringUtils.defaultString(obtainParam(request, "NK-App"));
                 String tokenStr = obtainParam(request, "NK-Token");
                 String phone;
-                String verCode;
+                String verCode = null;
                 String openId;
                 String appleId;
-                if (StringUtils.isNoneBlank(nkApp) && NkAppSource.valueOf(nkApp)!=NkAppSource.elcube) {
+                if (StringUtils.isNoneBlank(nkApp) && NkAppSource.valueOf(nkApp)!=NkAppSource.elcube && !((HttpServletRequest) request).getRequestURI().contains("/app/bind")) {
                     if(StringUtils.isNoneBlank(tokenStr)){
                         // token验证
                         Claims token = JwtHelper.verifyJwt(tokenStr);
 
-                        if(token==null){
+                        if(null==token){
                             throw new BadCredentialsException("无效的token");
                         }
                         phone = token.get("phone", String.class);
-                        verCode = token.get("verCode", String.class);
+                        //verCode = token.get("verCode", String.class);
                         openId   = token.get("openId", String.class);
                         appleId  = token.get("appleId", String.class);
 
@@ -103,11 +103,11 @@ public class NkAppLoginAuthenticationFilter extends GenericFilterBean  {
     }
 
     private String obtainParam(ServletRequest request,String param) {
-        String token = ((HttpServletRequest)request).getHeader(param);
-        if (Objects.isNull(token)) {
-            token = request.getParameter(param);
+        String value = ((HttpServletRequest)request).getHeader(param);
+        if (Objects.isNull(value)) {
+            value = request.getParameter(param);
         }
-        return token;
+        return value;
     }
 
 }

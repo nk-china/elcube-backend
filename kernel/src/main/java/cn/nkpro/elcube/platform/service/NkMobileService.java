@@ -16,6 +16,8 @@
  */
 package cn.nkpro.elcube.platform.service;
 
+import java.util.Map;
+
 /**
  * @Author: wf
  * @Description 移动端服务接口
@@ -29,4 +31,7 @@ public interface NkMobileService {
      * @return
      */
     String sendVerificationCode(String phone);
+
+    Map<String,Object> appBind(String nkApp, String phone, String verCode, String openId, String appleId);
+
 }
