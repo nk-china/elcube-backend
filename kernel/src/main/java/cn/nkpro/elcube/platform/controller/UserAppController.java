@@ -19,6 +19,7 @@ package cn.nkpro.elcube.platform.controller;
 import cn.nkpro.elcube.annotation.NkNote;
 import cn.nkpro.elcube.basic.NkProperties;
 import cn.nkpro.elcube.platform.gen.UserSavedQuery;
+import cn.nkpro.elcube.platform.model.MobileOfficeAccBo;
 import cn.nkpro.elcube.platform.model.WebMenuBO;
 import cn.nkpro.elcube.platform.service.NkMobileService;
 import cn.nkpro.elcube.platform.service.PlatformRegistryService;
@@ -53,6 +54,8 @@ public class UserAppController {
 
     @Autowired@SuppressWarnings("all")
     private NkMobileService nkMobileService;
+    @Autowired@SuppressWarnings("all")
+    private MobileOfficeAccBo mobileOfficeAccBo;
 
 
     @NkNote("1.获取环境名称")
@@ -112,5 +115,12 @@ public class UserAppController {
                                        @RequestParam(value = "openId",required = false)String openId,
                                        @RequestParam(value = "appleId",required = false)String appleId){
         return nkMobileService.appBind(nkApp,phone,verCode,openId,appleId);
+    }
+
+    @NkNote("6.微信code获取openId")
+    @RequestMapping("/app/queryOpenId")
+    public Map<String,Object> queryOpenId(@RequestParam("code") String code){
+        mobileOfficeAccBo.setJsCode(code);
+        return nkMobileService.findOpenId(mobileOfficeAccBo);
     }
 }

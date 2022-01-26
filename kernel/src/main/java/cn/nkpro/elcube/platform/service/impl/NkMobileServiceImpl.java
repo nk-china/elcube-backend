@@ -17,6 +17,7 @@
 package cn.nkpro.elcube.platform.service.impl;
 
 import cn.nkpro.elcube.data.redis.RedisSupport;
+import cn.nkpro.elcube.platform.model.MobileOfficeAccBo;
 import cn.nkpro.elcube.platform.service.NkAbstractMobile;
 import cn.nkpro.elcube.platform.service.NkAccountOperationService;
 import cn.nkpro.elcube.platform.service.NkDocOperationService;
@@ -24,6 +25,7 @@ import cn.nkpro.elcube.security.UserAccountService;
 import cn.nkpro.elcube.security.bo.UserAccountBO;
 import cn.nkpro.elcube.security.bo.UserDetails;
 import cn.nkpro.elcube.security.validate.NkAppLoginAuthentication;
+import com.alibaba.fastjson.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -93,5 +95,17 @@ public class NkMobileServiceImpl extends NkAbstractMobile {
             nkDocOperationService.createDoc(dataMap);
         }
         return userAccountService.createTokenMobileTerminal(phone, openId, appleId);
+    }
+
+    @Override
+    public JSONObject findOpenId(MobileOfficeAccBo mobileOfficeAccBo) {
+        /*String url = mobileOfficeAccBo.getJscode2sessionUrl();
+        url += url+"?appid="+mobileOfficeAccBo.getAppid()+"&secret="+mobileOfficeAccBo.getSecret()+"&js_code="+mobileOfficeAccBo.getJsCode()
+                +"&grant_type="+mobileOfficeAccBo.getGrantType();
+        String resut = HttpClientUtil.sendGetRequest(url,null);*/
+
+        String resut = "{'opendId':'1111111'}";
+        JSONObject jsonObject = JSONObject.parseObject(resut);
+        return jsonObject;
     }
 }

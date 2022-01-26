@@ -16,6 +16,9 @@
  */
 package cn.nkpro.elcube.platform.service;
 
+import cn.nkpro.elcube.platform.model.MobileOfficeAccBo;
+import com.alibaba.fastjson.JSONObject;
+
 import java.util.Map;
 
 /**
@@ -33,6 +36,11 @@ public class NkAbstractMobile implements NkMobileService{
 
     @Override
     public Map<String, Object> appBind(String nkApp, String phone, String verCode, String openId, String appleId) {
+        return null;
+    }
+
+    @Override
+    public JSONObject findOpenId(MobileOfficeAccBo mobileOfficeAccBo) {
         return null;
     }
 }
