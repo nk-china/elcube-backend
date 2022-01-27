@@ -6,12 +6,14 @@ import cn.nkpro.elcube.docengine.gen.DocH;
 import cn.nkpro.elcube.docengine.model.DocHQL;
 import cn.nkpro.elcube.docengine.model.DocHV;
 import cn.nkpro.elcube.exception.NkDefineException;
+import cn.nkpro.elcube.exception.NkOperateNotAllowedCaution;
 import cn.nkpro.elcube.utils.BeanUtilz;
 import net.sf.jsqlparser.JSQLParserException;
 import net.sf.jsqlparser.expression.*;
 import net.sf.jsqlparser.parser.CCJSqlParserUtil;
 import net.sf.jsqlparser.schema.Column;
 import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.delete.Delete;
 import net.sf.jsqlparser.statement.select.*;
 import net.sf.jsqlparser.statement.update.Update;
 import net.sf.jsqlparser.util.TablesNamesFinder;
@@ -19,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.expression.EvaluationContext;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
@@ -36,6 +39,29 @@ public class NkEqlEngineImpl extends AbstractNkDocEngine implements NkEqlEngine 
     private NkDocEngine docEngine;
 
     @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public List<? extends DocH> executeEql(String eql){
+        try {
+            Statement statement = CCJSqlParserUtil.parse(eql);
+
+            if(statement instanceof Select){
+                return findByEql(eql);
+            }
+            if(statement instanceof Update){
+                return findByEql(eql);
+            }
+            if(statement instanceof Delete){
+                throw new NkOperateNotAllowedCaution("不支持的操作");
+            }
+            throw new NkOperateNotAllowedCaution("不支持的操作");
+
+        } catch (JSQLParserException e) {
+            throw new NkDefineException(e.getMessage());
+        }
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public List<DocHQL> findByEql(String eql) {
         try {
             Statement statement = CCJSqlParserUtil.parse(eql);
