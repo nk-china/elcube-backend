@@ -15,9 +15,9 @@ import java.util.List;
  * 注意：包含特殊字符的复杂的SpEL，需要用 " 或 ` 符号包裹
  *
  * SELECT * |
- *         <SpEL>  [as alias],
- *        `<SpEL>` [as alias],
- *        "<SpEL>" [as alias]
+ *         <SpEL>  [[AS] <alias>],
+ *        `<SpEL>` [[AS] <alias>],
+ *        "<SpEL>" [[AS] <alias>]
  *   FROM [doc|all|<docType>]
  *  WHERE <property> [=|>|>=|<|<=|!=|<>|LIKE] <value>
  *    AND <property> BETWEEN <value1> AND <value2>
@@ -39,10 +39,10 @@ import java.util.List;
  *
  *
  * UPDATE [doc|all|<docType>]
- *    SET  <property> = <property> | `<SpEL>` | "<SpEL>" | <Number> | '<String>',
- *         <SpEL>     = <property> | `<SpEL>` | "<SpEL>" | <Number> | '<String>',
- *        `<SpEL>`    = <property> | `<SpEL>` | "<SpEL>" | <Number> | '<String>',
- *        "<SpEL>"    = <property> | `<SpEL>` | "<SpEL>" | <Number> | '<String>'
+ *    SET  <property> = [<property> | `<SpEL>` | "<SpEL>" | <Number> | '<String>'],
+ *         <SpEL>     = [<property> | `<SpEL>` | "<SpEL>" | <Number> | '<String>'],
+ *        `<SpEL>`    = [<property> | `<SpEL>` | "<SpEL>" | <Number> | '<String>'],
+ *        "<SpEL>"    = [<property> | `<SpEL>` | "<SpEL>" | <Number> | '<String>']
  *  WHERE <property> [=|>|>=|<|<=|!=|<>|LIKE] <value>
  *    AND <property> BETWEEN <value1> AND <value2>
  *    AND <property> IN (...<value>)
