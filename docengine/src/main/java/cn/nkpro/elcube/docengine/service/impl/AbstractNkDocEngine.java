@@ -44,6 +44,9 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.expression.EvaluationContext;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.util.Assert;
 
 import java.util.*;
@@ -87,6 +90,20 @@ class AbstractNkDocEngine {
     //    log.info(NkDocEngineContext.currLog() + message, params);
     //}
 
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public DocHV detail(String docId) {
+
+        final long start = System.currentTimeMillis();
+        try{
+            if(log.isInfoEnabled())log.info("获取单据");
+
+            // 优先从本地线程变量中获取单据
+            // 本地线程变量需要显示调用NkDocEngineThreadLocal.enableLocalDoc()来启用
+            return NkDocEngineThreadLocal.localDoc(docId, (id)->persistentToHV(fetchDoc(id)));
+        }finally {
+            if(log.isInfoEnabled())log.info("获取单据 完成 总耗时{}ms",System.currentTimeMillis() - start);
+        }
+    }
 
     /**
      * 获取单据的持久化对象
@@ -417,6 +434,82 @@ class AbstractNkDocEngine {
                 }
             });
         }
+    }
+
+
+    DocHV execUpdate(DocHV doc, String optSource){
+        final long      start = System.currentTimeMillis();
+        String          docId = doc.getDocId();
+
+        if(log.isInfoEnabled())
+            log.info("开始保存单据");
+
+        validate(doc);
+
+
+        // 获取原始单据数据
+        if(log.isInfoEnabled()){
+            log.info(StringUtils.EMPTY);
+            log.info("准备获取原始单据 用于对比单据修改前后的差异");
+        }
+        Optional<DocHV> optionalOriginal = Optional.ofNullable(detail(doc.getDocId()));
+        if(log.isInfoEnabled()){
+            log.info("完成获取原始单据");
+            log.info(StringUtils.EMPTY);
+        }
+
+
+        if(optionalOriginal.isPresent()){
+            // 修改
+            // 检查单据数据是否已经发生变化
+            Assert.isTrue(StringUtils.equals(doc.getIdentification(),optionalOriginal.get().getIdentification()),
+                    "单据被其他用户修改，请刷新后重试");
+        }else{
+            // 新建
+            // 检查单据是否符合业务流控制
+            // 获取单据配置
+            DocDefHV def = docDefService.deserializeDef(doc.getDef());
+
+            DocHV preDoc = null;
+            if(StringUtils.isNotBlank(doc.getPreDocId()) && !StringUtils.equalsIgnoreCase(doc.getPreDocId(),"@")){
+                if(NkDocEngineThreadLocal.existUpdated(doc.getPreDocId())){
+                    preDoc = NkDocEngineThreadLocal.getUpdated(doc.getPreDocId());
+                }else{
+                    preDoc = detail(doc.getPreDocId());
+                }
+            }
+            validateFlow(def, preDoc);
+            //validateFlow(def, detail(doc.getPreDocId()));
+        }
+
+        // 获取单据处理器 并执行
+        doc = customObjectManager
+                .getCustomObject(doc.getDef().getRefObjectType(), NkDocProcessor.class)
+                .doUpdate(doc, optionalOriginal.orElse(null),optSource);
+
+        if(log.isInfoEnabled())
+            log.info("保存单据内容 创建重建index任务");
+
+        execDataSync(doc, optionalOriginal.orElse(null));
+
+        // 预创建一个持久化对象，在事务提交后使用
+        DocHPersistent docHPersistent = doc.toPersistent();
+
+        // tips: 先删除缓存，避免事务提交成功后，缓存更新失败
+        redisSupport.deleteHash(Constants.CACHE_DOC, docId);
+
+        TransactionSync.runAfterCompletion("更新单据缓存"+docId,(status)-> {
+
+            if(status == TransactionSynchronization.STATUS_COMMITTED){
+                // 如果事务更新成功，将更新后的单据更新到缓存
+                redisSupport.set(Constants.CACHE_DOC, docId, docHPersistent);
+                if(log.isInfoEnabled())log.info("更新缓存");
+            }
+
+            if(log.isInfoEnabled())log.info("保存单据 完成 总耗时{}ms", System.currentTimeMillis() - start);
+        });
+
+        return doc;
     }
 
     DocHV lockDocDo(String docId, Function<String,DocHV> function){

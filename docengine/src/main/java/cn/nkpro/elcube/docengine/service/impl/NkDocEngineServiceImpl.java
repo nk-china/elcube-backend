@@ -34,15 +34,10 @@ import cn.nkpro.elcube.docengine.model.es.DocHES;
 import cn.nkpro.elcube.docengine.service.NkDocEngineFrontService;
 import cn.nkpro.elcube.docengine.service.NkDocPermService;
 import cn.nkpro.elcube.exception.NkAccessDeniedException;
-import cn.nkpro.elcube.exception.NkDefineException;
 import cn.nkpro.elcube.security.SecurityUtilz;
 import cn.nkpro.elcube.utils.BeanUtilz;
 import cn.nkpro.elcube.utils.UUIDHexGenerator;
 import lombok.extern.slf4j.Slf4j;
-import net.sf.jsqlparser.JSQLParserException;
-import net.sf.jsqlparser.parser.CCJSqlParserUtil;
-import net.sf.jsqlparser.statement.Statement;
-import net.sf.jsqlparser.statement.update.Update;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,13 +46,9 @@ import org.springframework.transaction.IllegalTransactionStateException;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.interceptor.TransactionAspectSupport;
-import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.util.Assert;
 
 import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -196,22 +187,6 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
             if(log.isInfoEnabled()){
                 log.info("获取单据视图 完成 总耗时{}ms",System.currentTimeMillis() - start);
             }
-        }
-    }
-
-    @Override
-    @Transactional(propagation = Propagation.NOT_SUPPORTED)
-    public DocHV detail(String docId) {
-
-        final long start = System.currentTimeMillis();
-        try{
-            if(log.isInfoEnabled())log.info("获取单据");
-
-            // 优先从本地线程变量中获取单据
-            // 本地线程变量需要显示调用NkDocEngineThreadLocal.enableLocalDoc()来启用
-            return NkDocEngineThreadLocal.localDoc(docId, (id)->persistentToHV(fetchDoc(id)));
-        }finally {
-            if(log.isInfoEnabled())log.info("获取单据 完成 总耗时{}ms",System.currentTimeMillis() - start);
         }
     }
 
@@ -393,45 +368,6 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
 
     @Override
     @Transactional
-    public List<DocHV> doUpdateByEql(String eql,String optSource){
-
-        try {
-            Statement statement = CCJSqlParserUtil.parse(eql);
-
-            Assert.isTrue(statement instanceof Update, "eql 不是一个有效的 update 语句");
-
-            Update update = (Update) statement;
-
-            String docType = update.getTable().getName();
-
-            System.out.println(eql);
-
-            return find(docType)
-                .expression(update.getWhere())
-                .listResult()
-                .stream()
-                .map(docH ->
-                    lockDocDo(docH.getDocId(),(docId)->{
-                        DocHV doc = detail(docId);
-
-                        // todo 执行 update set
-                        // update.getUpdateSets()
-
-                        doc = execUpdate(doc, optSource);
-                        doc.clearItemContent();
-                        return doc;
-                    })
-                )
-                .collect(Collectors.toList());
-
-
-        } catch (JSQLParserException e) {
-            throw new NkDefineException(e.getMessage());
-        }
-    }
-
-    @Override
-    @Transactional
     public DocHV doUpdateAgain(String docId, String optSource, NkDocEngine.Function function){
 
         DocHV doc = NkDocEngineThreadLocal.getUpdated(docId);
@@ -490,82 +426,6 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
     public void reDataSync(DocHV doc){
         this.dataSync(doc, doc, true);
         searchEngine.indexBeforeCommit(DocHES.from(doc));
-    }
-
-
-    private DocHV execUpdate(DocHV doc, String optSource){
-        final long      start = System.currentTimeMillis();
-        String          docId = doc.getDocId();
-
-        if(log.isInfoEnabled())
-            log.info("开始保存单据");
-
-        validate(doc);
-
-
-        // 获取原始单据数据
-        if(log.isInfoEnabled()){
-            log.info(StringUtils.EMPTY);
-            log.info("准备获取原始单据 用于对比单据修改前后的差异");
-        }
-        Optional<DocHV> optionalOriginal = Optional.ofNullable(detail(doc.getDocId()));
-        if(log.isInfoEnabled()){
-            log.info("完成获取原始单据");
-            log.info(StringUtils.EMPTY);
-        }
-
-
-        if(optionalOriginal.isPresent()){
-            // 修改
-            // 检查单据数据是否已经发生变化
-            Assert.isTrue(StringUtils.equals(doc.getIdentification(),optionalOriginal.get().getIdentification()),
-                    "单据被其他用户修改，请刷新后重试");
-        }else{
-            // 新建
-            // 检查单据是否符合业务流控制
-            // 获取单据配置
-            DocDefHV def = docDefService.deserializeDef(doc.getDef());
-
-            DocHV preDoc = null;
-            if(StringUtils.isNotBlank(doc.getPreDocId()) && !StringUtils.equalsIgnoreCase(doc.getPreDocId(),"@")){
-                if(NkDocEngineThreadLocal.existUpdated(doc.getPreDocId())){
-                    preDoc = NkDocEngineThreadLocal.getUpdated(doc.getPreDocId());
-                }else{
-                    preDoc = detail(doc.getPreDocId());
-                }
-            }
-            validateFlow(def, preDoc);
-            //validateFlow(def, detail(doc.getPreDocId()));
-        }
-
-        // 获取单据处理器 并执行
-        doc = customObjectManager
-                .getCustomObject(doc.getDef().getRefObjectType(), NkDocProcessor.class)
-                .doUpdate(doc, optionalOriginal.orElse(null),optSource);
-
-        if(log.isInfoEnabled())
-            log.info("保存单据内容 创建重建index任务");
-
-        execDataSync(doc, optionalOriginal.orElse(null));
-
-        // 预创建一个持久化对象，在事务提交后使用
-        DocHPersistent docHPersistent = doc.toPersistent();
-
-        // tips: 先删除缓存，避免事务提交成功后，缓存更新失败
-        redisSupport.deleteHash(Constants.CACHE_DOC, docId);
-
-        TransactionSync.runAfterCompletion("更新单据缓存"+docId,(status)-> {
-
-            if(status == TransactionSynchronization.STATUS_COMMITTED){
-                // 如果事务更新成功，将更新后的单据更新到缓存
-                redisSupport.set(Constants.CACHE_DOC, docId, docHPersistent);
-                if(log.isInfoEnabled())log.info("更新缓存");
-            }
-
-            if(log.isInfoEnabled())log.info("保存单据 完成 总耗时{}ms", System.currentTimeMillis() - start);
-        });
-
-        return doc;
     }
 
     /**

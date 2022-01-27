@@ -43,17 +43,16 @@ public class NkDocFinder implements InitializingBean {
         dialect = (Dialect) Class.forName(properties.getDialect()).getConstructor().newInstance();
     }
 
-    NkDocFinder createFinder(String... value){
-        Assert.notEmpty(value);
+    public NkDocFinder createFinder(String... value){
 
         args.set(new ArrayList<>());
         where.set(new ArrayList<>());
         order.set(new ArrayList<>());
 
-        if(value.length==1){
+        if(value.length==1&&StringUtils.isNotBlank(value[0])){
             where.get().add("h.doc_type = ?");
             args.get().add(value[0]);
-        }else{
+        }else if(value.length>1){
             where.get().add(
                 String.format("h.doc_type IN (%s)",
                 Arrays.stream(value).map(i->"?")
@@ -454,7 +453,6 @@ public class NkDocFinder implements InitializingBean {
     }
 
     public List<DocH> listResult(){
-        System.out.println(build(null,null));
         try{
             return jdbcTemplate.query(build(null,null), args.get().toArray(), rowMapper);
         }finally {
@@ -505,7 +503,8 @@ public class NkDocFinder implements InitializingBean {
 
                     String string = value instanceof String ? "value" : "number_value";
                     Expression leftExpression = ((BinaryExpression) expression).getLeftExpression();
-                    if(leftExpression.toString().toUpperCase().startsWith("DYNAMIC.")){
+                    String dynamicColumn = convertPropertyToDynamic(leftExpression.toString());
+                    if(dynamicColumn!=null){
                         where.get().add(String.format(
                                 "EXISTS (" +
                                         "\n         SELECT i.doc_id FROM nk_doc_i_index AS i " +
@@ -513,14 +512,14 @@ public class NkDocFinder implements InitializingBean {
                                         "\n            AND i.name   = '%s' " +
                                         "\n            AND i.%s  >= ?" +
                                         "\n       )",
-                                leftExpression.toString().substring(8),
+                                dynamicColumn,
                                 string
                         ));
                     }else{
                         where.get().add(
                                 String.format(
                                         "%s %s ?",
-                                        leftExpression,
+                                        convertPropertyToColumn(leftExpression.toString()),
                                         ((BinaryExpression) expression).getStringExpression()
                                 )
                         );
@@ -535,7 +534,8 @@ public class NkDocFinder implements InitializingBean {
 
                     String string = start instanceof String ? "value" : "number_value";
                     Expression leftExpression = ((Between) expression).getLeftExpression();
-                    if(leftExpression.toString().toUpperCase().startsWith("DYNAMIC.")){
+                    String dynamicColumn = convertPropertyToDynamic(leftExpression.toString());
+                    if(dynamicColumn!=null){
                         where.get().add(String.format(
                                 "EXISTS (" +
                                         "\n         SELECT i.doc_id FROM nk_doc_i_index AS i " +
@@ -543,14 +543,14 @@ public class NkDocFinder implements InitializingBean {
                                         "\n            AND i.name   = '%s' " +
                                         "\n            AND i.%s BETWEEN ? AND ?" +
                                         "\n       )",
-                                leftExpression.toString().substring(8),
+                                dynamicColumn,
                                 string
                         ));
                     }else{
                         where.get().add(
                                 String.format(
                                         "%s BETWEEN ? AND ?",
-                                        leftExpression
+                                        convertPropertyToColumn(leftExpression.toString())
                                 )
                         );
                     }
@@ -570,7 +570,8 @@ public class NkDocFinder implements InitializingBean {
 
                     String string = values.get(0) instanceof String ? "value" : "number_value";
                     Expression leftExpression = ((InExpression) expression).getLeftExpression();
-                    if(leftExpression.toString().toUpperCase().startsWith("DYNAMIC.")){
+                    String dynamicColumn = convertPropertyToDynamic(leftExpression.toString());
+                    if(dynamicColumn!=null){
                         where.get().add(String.format(
                                 "EXISTS (" +
                                         "\n         SELECT i.doc_id FROM nk_doc_i_index AS i " +
@@ -578,7 +579,7 @@ public class NkDocFinder implements InitializingBean {
                                         "\n            AND i.name   = '%s' " +
                                         "\n            AND i.%s IN (%s)" +
                                         "\n       )",
-                                leftExpression.toString().substring(8),
+                                dynamicColumn,
                                 string,
                                 list.getExpressions().stream().map(e->"?").collect(Collectors.joining(", "))
                         ));
@@ -586,7 +587,7 @@ public class NkDocFinder implements InitializingBean {
                         where.get().add(
                                 String.format(
                                         "%s IN (%s)",
-                                        leftExpression,
+                                        convertPropertyToColumn(leftExpression.toString()),
                                         list.getExpressions().stream().map(e->"?").collect(Collectors.joining(", "))
                                 )
                         );
@@ -594,28 +595,43 @@ public class NkDocFinder implements InitializingBean {
 
                 }else if(expression instanceof IsNullExpression){
                     Expression leftExpression = ((IsNullExpression) expression).getLeftExpression();
-                    if(leftExpression.toString().toUpperCase().startsWith("DYNAMIC.")){
+                    String dynamicColumn = convertPropertyToDynamic(leftExpression.toString());
+                    if(dynamicColumn!=null){
                         if(((IsNullExpression) expression).isNot()){
-                            where.get().add(String.format(
-                                    "NOT EXISTS (" +
-                                            "\n         SELECT i.doc_id FROM nk_doc_i_index AS i " +
-                                            "\n          WHERE i.doc_id = h.doc_id " +
-                                            "\n            AND i.name   = '%s' " +
-                                            "\n       )",
-                                    leftExpression.toString().substring(8)
-                            ));
-                        }else{
                             where.get().add(String.format(
                                     "EXISTS (" +
                                             "\n         SELECT i.doc_id FROM nk_doc_i_index AS i " +
                                             "\n          WHERE i.doc_id = h.doc_id " +
                                             "\n            AND i.name   = '%s' " +
                                             "\n       )",
-                                    leftExpression.toString().substring(8)
+                                    dynamicColumn
+                            ));
+                        }else{
+                            where.get().add(String.format(
+                                    "NOT EXISTS (" +
+                                            "\n         SELECT i.doc_id FROM nk_doc_i_index AS i " +
+                                            "\n          WHERE i.doc_id = h.doc_id " +
+                                            "\n            AND i.name   = '%s' " +
+                                            "\n       )",
+                                    dynamicColumn
                             ));
                         }
                     }else{
-                        where.get().add(expression.toString());
+                        if(((IsNullExpression) expression).isNot()){
+                            where.get().add(
+                                    String.format(
+                                            "%s IS NOT NULL",
+                                            convertPropertyToColumn(leftExpression.toString())
+                                    )
+                            );
+                        }else{
+                            where.get().add(
+                                    String.format(
+                                            "%s IS NULL",
+                                            convertPropertyToColumn(leftExpression.toString())
+                                    )
+                            );
+                        }
                     }
                 }else{
                     throw new NkDefineException("不支持的操作");
@@ -638,5 +654,32 @@ public class NkDocFinder implements InitializingBean {
             return Long.parseLong(((HexValue) expression).getValue().substring(2),16);
         }
         throw new NkDefineException("不支持的操作");
+    }
+
+    private String convertPropertyToColumn(String property){
+        StringBuilder builder = new StringBuilder();
+        for(int i=0;i<property.length();i++){
+            char c = property.charAt(i);
+            if(Character.isUpperCase(c)){
+                builder.append('_');
+                builder.append(Character.toLowerCase(c));
+            }else{
+                builder.append(c);
+            }
+        }
+        return builder.toString();
+    }
+
+    private String convertPropertyToDynamic(String property){
+        if(property.toUpperCase().startsWith("DYNAMIC.")){
+            return property.substring(8);
+        }
+        if(property.toUpperCase().startsWith("DY.")){
+            return property.substring(3);
+        }
+        if(property.toUpperCase().startsWith("D.")){
+            return property.substring(2);
+        }
+        return null;
     }
 }

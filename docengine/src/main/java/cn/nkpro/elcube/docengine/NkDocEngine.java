@@ -16,6 +16,8 @@
  */
 package cn.nkpro.elcube.docengine;
 
+import cn.nkpro.elcube.docengine.gen.DocH;
+import cn.nkpro.elcube.docengine.model.DocHQL;
 import cn.nkpro.elcube.docengine.model.DocHV;
 import cn.nkpro.elcube.docengine.service.impl.NkDocFinder;
 import org.springframework.transaction.annotation.Propagation;
@@ -62,9 +64,6 @@ public interface NkDocEngine {
 
     @Transactional
     DocHV doUpdate(String docType, String businessKey, String optSource, Function function);
-
-    @Transactional
-    List<DocHV> doUpdateByEql(String eql, String optSource);
 
     @Transactional
     DocHV doUpdateAgain(String docId, String optSource, Function function);
