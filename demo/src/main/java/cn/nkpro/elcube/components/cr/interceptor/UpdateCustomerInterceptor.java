@@ -1,6 +1,5 @@
 package cn.nkpro.elcube.components.cr.interceptor;
 
-import cn.nkpro.elcube.co.easy.EasySingle;
 import cn.nkpro.elcube.docengine.NkDocCycle;
 import cn.nkpro.elcube.docengine.NkDocEngine;
 import cn.nkpro.elcube.docengine.interceptor.abstracts.NkAbstractDocCycleInterceptor;
