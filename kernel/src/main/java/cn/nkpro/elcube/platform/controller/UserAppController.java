@@ -19,6 +19,7 @@ package cn.nkpro.elcube.platform.controller;
 import cn.nkpro.elcube.annotation.NkNote;
 import cn.nkpro.elcube.basic.NkProperties;
 import cn.nkpro.elcube.platform.gen.UserSavedQuery;
+import cn.nkpro.elcube.platform.model.MobileOfficeAccBo;
 import cn.nkpro.elcube.platform.model.WebMenuBO;
 import cn.nkpro.elcube.platform.service.NkMobileService;
 import cn.nkpro.elcube.platform.service.PlatformRegistryService;
@@ -29,6 +30,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by bean on 2019/12/18.
@@ -52,6 +54,8 @@ public class UserAppController {
 
     @Autowired@SuppressWarnings("all")
     private NkMobileService nkMobileService;
+    @Autowired@SuppressWarnings("all")
+    private MobileOfficeAccBo mobileOfficeAccBo;
 
 
     @NkNote("1.获取环境名称")
@@ -103,4 +107,20 @@ public class UserAppController {
         return nkMobileService.sendVerificationCode(phone);
     }
 
+    @NkNote("5.移动端登录绑定")
+    @RequestMapping("/app/bind")
+    public Map<String,Object> appBind(@RequestParam("NK-App") String nkApp,
+                                       @RequestParam(value = "phone",required = false) String phone,
+                                       @RequestParam(value = "verCode",required = false)String verCode,
+                                       @RequestParam(value = "openId",required = false)String openId,
+                                       @RequestParam(value = "appleId",required = false)String appleId){
+        return nkMobileService.appBind(nkApp,phone,verCode,openId,appleId);
+    }
+
+    @NkNote("6.微信code获取openId")
+    @RequestMapping("/app/queryOpenId")
+    public Map<String,Object> queryOpenId(@RequestParam("code") String code){
+        mobileOfficeAccBo.setJsCode(code);
+        return nkMobileService.findOpenId(mobileOfficeAccBo);
+    }
 }

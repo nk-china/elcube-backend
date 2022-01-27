@@ -56,16 +56,16 @@ public interface UserAccountService extends UserDetailsService {
 
     void clearLoginLock(UserAccountBO user);
 
-    Map<String,Object> appLogin(String phone, String verCode, String openId, String appleId);
-
     UserDetails getAccountByMobileTerminal(String phone, String openId, String appleId);
 
     UserAccountBO getAccountById(String accountId, boolean preClear);
 
     UserDetails loadUserByAccountId(String accountId);
 
-    Map<String,Object> createTokenMobileTerminal();
+    Map<String,Object> createTokenMobileTerminal(String phone, String openId, String appleId);
 
     Map<String, Object> refreshTokenMobileTerminal();
+
+    Map<String,Object> appLogin(String phone, String openId, String appleId);
 
 }

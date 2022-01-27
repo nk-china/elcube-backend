@@ -473,7 +473,7 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService, D
     public Boolean checkGroupKey(UserGroupBO group) {
         AuthGroupExample authGroupExample = new AuthGroupExample();
         AuthGroupExample.Criteria criteria = authGroupExample.createCriteria();
-        criteria.andGroupKeyEqualTo(group.getGroupKey());
+        criteria.andGroupKeyEqualTo(group.getGroupKey() == null ? "" : group.getGroupKey());
         if(group.getGroupId() != null){
             criteria.andGroupIdNotEqualTo(group.getGroupId());
         }

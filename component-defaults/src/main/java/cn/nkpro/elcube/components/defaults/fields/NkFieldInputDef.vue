@@ -22,6 +22,14 @@
             {{value.pattern}}
             <a-input size="small" slot="edit" :min="1" :max="100" v-model="value.pattern"></a-input>
           </nk-form-item>
+          <nk-form-item title="执行 SpEL 表达式">
+            {{value.method}}
+            <a-input  slot="edit" v-model="value.method" ></a-input>
+          </nk-form-item>
+          <nk-form-item title="数据映射模版">
+            {{value.dataMappings}}
+            <nk-sp-el-template-editor slot="edit" v-model="value.dataMappings"></nk-sp-el-template-editor>
+          </nk-form-item>
         </nk-form>
     </div>
 </template>

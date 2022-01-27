@@ -45,4 +45,9 @@ public class UserAccountExtendServiceImpl implements UserAccountExtendService {
     public List<UserAccountExtend> selectByExample(UserAccountExtendExample example) {
         return userAccountExtendMapper.selectByExample(example);
     }
+
+    @Override
+    public int updateUserAccountExtend(UserAccountExtend userAccountExtend) {
+        return userAccountExtendMapper.updateByPrimaryKey(userAccountExtend);
+    }
 }

@@ -18,7 +18,7 @@ package cn.nkpro.elcube.security.validate;
 
 /**
  * @Author: wf
- * @Description 移动端登录来源
+ * @Description 登录来源
  * @date 2022/1/13 09:30
  */
 public enum NkAppSource {

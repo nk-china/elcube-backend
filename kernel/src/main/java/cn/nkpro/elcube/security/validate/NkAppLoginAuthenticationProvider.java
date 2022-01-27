@@ -18,9 +18,12 @@ package cn.nkpro.elcube.security.validate;
 
 import cn.nkpro.elcube.data.redis.RedisSupport;
 import cn.nkpro.elcube.security.UserAccountService;
+import cn.nkpro.elcube.security.bo.AuthMobileTerminal;
 import cn.nkpro.elcube.security.bo.UserDetails;
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.Authentication;
@@ -52,14 +55,14 @@ public class NkAppLoginAuthenticationProvider implements AuthenticationProvider 
 
                 }else if(StringUtils.isNoneBlank(nkAuthentication.getPhone())){
                     // 校验验证码
-                    Object code = redisSupport.get(nkAuthentication.getPhone());
+                    /*Object code = redisSupport.get(nkAuthentication.getPhone());
 
                     if(null==code)
                         throw new BadCredentialsException("验证码已过期");
 
                     if(!Objects.equals(code, nkAuthentication.getVerCode())){
                         throw new BadCredentialsException("验证码不正确");
-                    }
+                    }*/
 
                 }else{
                     throw new BadCredentialsException("openId为空");
@@ -78,16 +81,19 @@ public class NkAppLoginAuthenticationProvider implements AuthenticationProvider 
         details = userDetailsService.getAccountByMobileTerminal(nkAuthentication.getPhone(), nkAuthentication.getOpenId(), nkAuthentication.getAppleId());
 
         if(null==details){
-            throw new UsernameNotFoundException("账号没有找到");
+            throw new UsernameNotFoundException("token未绑定");
         }
         if(null!=details.getLocked() && details.getLocked()==1){
             throw new BadCredentialsException("账号已禁用");
         }
 
+        AuthMobileTerminal authMobileTerminal = new AuthMobileTerminal();
+        authMobileTerminal.setPhone(nkAuthentication.getPhone());
+        authMobileTerminal.setOpenId(nkAuthentication.getOpenId());
+        authMobileTerminal.setAppleId(nkAuthentication.getAppleId());
+
         AbstractAuthenticationToken auth = new NkAppLoginAuthentication(
-                nkAuthentication.getNkAppSource(), nkAuthentication.getPhone(),
-                nkAuthentication.getVerCode(), nkAuthentication.getOpenId(),
-                nkAuthentication.getAppleId());
+                JSONObject.toJSONString(authMobileTerminal) ,details.getAuthorities());
         auth.setDetails(details);
         return auth;
     }

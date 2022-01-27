@@ -72,10 +72,23 @@ public class NkTokenAuthenticationFilter extends GenericFilterBean {
                     String username = token.get("username", String.class);
                     String password = token.get("password", String.class);
 
-                    try{
-                        Authentication responseAuthentication = authenticationManager.authenticate(
+                    String phone = token.get("phone", String.class);
+                    String openId   = token.get("openId", String.class);
+                    String appleId  = token.get("appleId", String.class);
+
+                    Authentication responseAuthentication = null;
+
+                    if(StringUtils.isNoneBlank(username, password)){
+                        responseAuthentication = authenticationManager.authenticate(
                                 new UsernamePasswordAuthenticationToken(username, password)
                         );
+                    }else if(!StringUtils.isAllBlank(phone, openId, appleId)){
+                        responseAuthentication = authenticationManager.authenticate(
+                                new NkAppLoginAuthentication(nkApp, phone, null, openId, appleId)
+                        );
+                    }
+
+                    try{
 
                         if (responseAuthentication != null && responseAuthentication.isAuthenticated()) {
                             if(logger.isDebugEnabled())

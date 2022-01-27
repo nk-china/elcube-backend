@@ -31,4 +31,6 @@ public interface UserAccountExtendService {
     void addUserAccountExtend(UserAccountExtend userAccountExtend);
 
     List<UserAccountExtend> selectByExample(UserAccountExtendExample example);
+
+    int updateUserAccountExtend(UserAccountExtend userAccountExtend);
 }
