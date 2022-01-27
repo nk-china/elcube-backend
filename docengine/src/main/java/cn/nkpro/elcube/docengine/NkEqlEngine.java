@@ -59,6 +59,11 @@ import java.util.List;
  */
 public interface NkEqlEngine {
 
+    /**
+     *
+     * @param eql ELCube Query Language
+     * @return List
+     */
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     List<? extends DocH> executeEql(String eql);
 
@@ -70,8 +75,18 @@ public interface NkEqlEngine {
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     List<DocHQL> findByEql(String eql);
 
+    /**
+     *
+     * @param eql ELCube Query Language
+     * @return List
+     */
     List<DocHV> execUpdateEql(String eql);
 
+    /**
+     *
+     * @param eql ELCube Query Language
+     * @return List
+     */
     @Transactional
     List<DocHV> doUpdateByEql(String eql, String optSource);
 }
