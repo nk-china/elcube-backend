@@ -25,6 +25,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.IOException;
@@ -54,7 +55,9 @@ public class DevOpsDataSyncController {
 
     @NkNote("2.立即执行同步")
     @RequestMapping(value = "/redo")
-    public String reIndex(Boolean dropFirst, String where) throws IOException {
+    public String reIndex(
+            @RequestParam(value = "dropFirst",required = false, defaultValue = "false") Boolean dropFirst,
+            @RequestParam(value = "where",    required = false, defaultValue = "") String where) throws IOException {
         String asyncTaskId = UUIDHexGenerator.generate();
         docEngineIndexService.reindex(asyncTaskId, dropFirst, where);
         return asyncTaskId;
