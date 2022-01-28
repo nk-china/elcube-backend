@@ -430,7 +430,7 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService, D
             authGroupMapper.insert(group);
         }else{
             if(!checkGroupKey(group)){
-                throw new NkException("用户组id不能重复，请重新填写");
+                throw new NkException("用户组Key不能重复，请重新填写");
             }
             authGroupMapper.updateByPrimaryKey(group);
 
@@ -473,7 +473,10 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService, D
     public Boolean checkGroupKey(UserGroupBO group) {
         AuthGroupExample authGroupExample = new AuthGroupExample();
         AuthGroupExample.Criteria criteria = authGroupExample.createCriteria();
-        criteria.andGroupKeyEqualTo(group.getGroupKey() == null ? "" : group.getGroupKey());
+        if(group.getGroupKey() == null || StringUtils.isBlank(group.getGroupKey())){
+            return true;
+        }
+        criteria.andGroupKeyEqualTo(group.getGroupKey());
         if(group.getGroupId() != null){
             criteria.andGroupIdNotEqualTo(group.getGroupId());
         }

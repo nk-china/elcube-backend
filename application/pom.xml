@@ -88,7 +88,7 @@
         </dependency>
         <dependency>
             <groupId>cn.nkpro.elcube</groupId>
-            <artifactId>demo</artifactId>
+            <artifactId>business-scenario-demos</artifactId>
             <version>${parent.version}</version>
         </dependency>
 
