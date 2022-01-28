@@ -79,27 +79,33 @@ public class NkDocEngineIndexService {
             while((list = eqlEngine.findByEql(String.format(eql,eqlWhere,offset,rows))).size()>0){
 
                 list.forEach(doc->{
-                    // 记录日志
-                    redisReindexInfo.set(asyncTaskId,
-                            new ReindexInfo(
-                                    false,
-                                    total.get(),
-                                    finished.get(),
-                                    String.format("重建索引 docId = %s docName = %s",
-                                            doc.getDocId(),
-                                            doc.getDocName()
-                                    ),
-                                    null)
-                    );
-                    // 获取详情
-                    DocHV docHV = docEngineFrontService.detail(doc.getDocId());
+                    try{
 
-                    // 创建单据索引
-                    docEngineFrontService.reDataSync(docHV);
+                        // 记录日志
+                        redisReindexInfo.set(asyncTaskId,
+                                new ReindexInfo(
+                                        false,
+                                        total.get(),
+                                        finished.get(),
+                                        String.format("重建索引 docId = %s docName = %s",
+                                                doc.getDocId(),
+                                                doc.getDocName()
+                                        ),
+                                        null)
+                        );
+                        // 获取详情
+                        DocHV docHV = docEngineFrontService.detail(doc.getDocId());
 
-                    // 创建任务索引
-                    bpmTaskManager.indexDocTask(docHV);
-                    finished.addAndGet(1);
+                        // 创建单据索引
+                        docEngineFrontService.reDataSync(docHV);
+
+                        // 创建任务索引
+                        bpmTaskManager.indexDocTask(docHV);
+                        finished.addAndGet(1);
+
+                    }catch (Exception e){
+                        throw new RuntimeException(String.format("docType = %s, docId = %s, error = %s", doc.getDocType(),doc.getDocId(),e.getMessage()));
+                    }
                 });
                 offset += rows;
                 //finished.set(finished.get() + list.size());
