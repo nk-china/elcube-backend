@@ -37,6 +37,8 @@ public interface NkDocProcessor extends NkCustomObject {
 
     Object call(DocHV doc, String fromCard, String method, Object options);
 
+    void doUpdateIndex(DocHV doc, DocHV original, boolean forceUpdateDocHV);
+
     void doOnBpmKilled(DocHV docHV, String processKey, String optSource);
 
     DocHV random(DocHV doc);

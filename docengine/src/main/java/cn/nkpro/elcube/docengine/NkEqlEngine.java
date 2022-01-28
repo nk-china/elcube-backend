@@ -96,6 +96,14 @@ public interface NkEqlEngine {
     /**
      *
      * @param eql ELCube Query Language
+     * @return rows
+     */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    long countByEql(String eql);
+
+    /**
+     *
+     * @param eql ELCube Query Language
      * @return List
      */
     @Transactional(propagation = Propagation.NOT_SUPPORTED)

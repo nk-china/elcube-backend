@@ -54,9 +54,9 @@ public class DevOpsDataSyncController {
 
     @NkNote("2.立即执行同步")
     @RequestMapping(value = "/redo")
-    public String reIndex(Boolean dropFirst, String docType) throws IOException {
+    public String reIndex(Boolean dropFirst, String where) throws IOException {
         String asyncTaskId = UUIDHexGenerator.generate();
-        docEngineIndexService.reindex(asyncTaskId, dropFirst, docType);
+        docEngineIndexService.reindex(asyncTaskId, dropFirst, where);
         return asyncTaskId;
     }
 

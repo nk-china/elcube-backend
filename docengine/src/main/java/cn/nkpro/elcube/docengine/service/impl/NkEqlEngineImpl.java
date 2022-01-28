@@ -63,6 +63,29 @@ public class NkEqlEngineImpl extends AbstractNkDocEngine implements NkEqlEngine 
 
     @Override
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public long countByEql(String eql){
+        try{
+            Statement statement = CCJSqlParserUtil.parse(eql);
+            Assert.isTrue(statement instanceof Select, "eql 不是一个有效的 select 语句");
+
+            Select select = (Select) statement;
+
+            String docType = tablesNamesFinder.getTableList(select).stream().findFirst().orElse(null);
+            docType = StringUtils.equalsAnyIgnoreCase(docType,"all","doc") ? null : docType;
+
+            PlainSelect plainSelect = (PlainSelect) select.getSelectBody();
+
+            return docEngine.find(docType)
+                    .expression(plainSelect.getWhere())
+                    .countResult();
+
+        }catch (JSQLParserException e){
+            throw new NkDefineException(e.getMessage());
+        }
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     public List<DocHQL> findByEql(String eql) {
         try {
             Statement statement = CCJSqlParserUtil.parse(eql);
@@ -74,6 +97,17 @@ public class NkEqlEngineImpl extends AbstractNkDocEngine implements NkEqlEngine 
             docType = StringUtils.equalsAnyIgnoreCase(docType,"all","doc") ? null : docType;
 
             PlainSelect plainSelect = (PlainSelect) select.getSelectBody();
+
+            int offset = 0;
+            int rows   = 100;
+
+            Limit limit = plainSelect.getLimit();
+            if(limit!=null){
+                if(limit.getOffset()!=null)
+                    offset = Integer.parseInt(limit.getOffset().toString());
+                if(limit.getRowCount()!=null)
+                    rows   = Integer.parseInt(limit.getRowCount().toString());
+            }
 
             List<SelectExpressionItem> columns = plainSelect.getSelectItems()
                     .stream()
@@ -97,7 +131,7 @@ public class NkEqlEngineImpl extends AbstractNkDocEngine implements NkEqlEngine 
 
             return docEngine.find(docType)
                     .expression(plainSelect.getWhere())
-                    .listResult()
+                    .listResult(offset,rows)
                     .stream()
                     .map(docH -> {
                         DocHQL doc = BeanUtilz.copyFromObject(docH, DocHQL.class);

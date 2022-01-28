@@ -43,7 +43,6 @@ import com.alibaba.fastjson.JSONObject;
 import com.apifan.common.random.source.PersonInfoSource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.aop.framework.Advised;
@@ -59,7 +58,6 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Stream;
 
 @Order(0)
 @Slf4j
@@ -293,7 +291,6 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
             log.info("保存单据内容");
 
         AtomicReference<DocHV> atomic = new AtomicReference(doc);
-        doc.getDynamics().clear();
 
         // 原始单据
         Optional<DocHV> optionalOriginal = Optional.ofNullable(original);
@@ -445,119 +442,9 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         if(log.isInfoEnabled())log.info("保存单据内容 计算动态索引字段");
-        EvaluationContext context = spELManager.createContext(atomic.get());
-
-        DocIIndexExample example = new DocIIndexExample();
-        example.createCriteria().andDocIdEqualTo(atomic.get().getDocId());
-        docIIndexMapper.deleteByExample(example);
-        //
-        //if(MapUtils.isNotEmpty(doc.getDynamics())){
-        //    doc.getDynamics().forEach((name,value)->{
-        //        if(value!=null){
-        //            int i = name.lastIndexOf("_");
-        //
-        //            if(i==-1||i==name.length()-1){
-        //                throw new NkDefineException("索引名不合法");
-        //            }
-        //
-        //            DocIIndex index = new DocIIndex();
-        //            index.setDocId(atomic.get().getDocId());
-        //            index.setName(name);
-        //            index.setValue(JSON.toJSONString(value));
-        //            index.setDataType(name.substring(i+1));
-        //            index.setOrderBy(doc.getDynamics().size());
-        //            index.setUpdatedTime(DateTimeUtilz.nowSeconds());
-        //
-        //            if(optionalOriginal.isPresent()&&original.getDynamics().containsKey(name)){
-        //                docIIndexMapper.updateByPrimaryKey(index);
-        //            }else{
-        //                docIIndexMapper.insert(index);
-        //            }
-        //        }
-        //    });
-        //}
-        if(atomic.get().getDef().getIndexRules()!=null)
-            atomic.get().getDef()
-                .getIndexRules()
-                .forEach(rule->{
-                    String name = String.format("%s_%s",rule.getIndexName(),rule.getIndexType());
-                    Object value = spELManager.invoke(rule.getRuleSpEL(),context);
-
-                    if(value!=null){
-
-                        atomic.get().getDynamics().put(name,value);
-
-                        List<Object> list = new ArrayList<>();
-                        if(value instanceof List){
-                            list.addAll((List) value);
-                        }else if(value.getClass().isArray()){
-                            list.addAll(Arrays.asList((Object[])value));
-                        }else{
-                            list.add(value);
-                        }
-                        list.forEach(item->{
-
-                            DocIIndex index = new DocIIndex();
-                            index.setDocId(atomic.get().getDocId());
-                            index.setName(name);
-                            index.setSeq(list.indexOf(item));
-                            index.setOrderBy(doc.getDynamics().size()+rule.getOrderBy());
-                            index.setUpdatedTime(DateTimeUtilz.nowSeconds());
-
-                            if(item == null){
-                                index.setDataType(Void.class.getName());
-                                index.setValue(null);
-                            }else
-                            if(item instanceof Number){
-                                index.setDataType(Number.class.getName());
-                                index.setNumberValue(((Number) item).doubleValue());
-                            }else
-                            if(item instanceof String){
-                                index.setDataType(item.getClass().getName());
-                                index.setValue(item.toString());
-                            }
-
-                            docIIndexMapper.insert(index);
-
-                        });
-                    }
-                });
 
 
-        // 删除已过时的索引
-        //optionalOriginal.ifPresent(o -> o.getDynamics().forEach((k, v) -> {
-        //    if (!atomic.get().getDynamics().containsKey(k)) {
-        //        DocIIndexKey key = new DocIIndexKey();
-        //        key.setDocId(atomic.get().getDocId());
-        //        key.setName(k);
-        //        docIIndexMapper.deleteByPrimaryKey(key);
-        //    }
-        //}));
-
-        // 业务主键
-        atomic.get().setBusinessKey(StringUtils.EMPTY);
-        if(StringUtils.isNotBlank(atomic.get().getDef().getBusinessKeySpEL())){
-            Object businessKey = spELManager.invoke(atomic.get().getDef().getBusinessKeySpEL(), context);
-            atomic.get().setBusinessKey(businessKey!=null?businessKey.toString():StringUtils.EMPTY);
-            if(
-                    StringUtils.isNotBlank(atomic.get().getBusinessKey())&&
-                    !(
-                            optionalOriginal.isPresent() &&
-                                    StringUtils.equals(atomic.get().getBusinessKey(),optionalOriginal.get().getBusinessKey())
-                    )
-            ){
-
-                DocHExample docHExample = new DocHExample();
-                docHExample.createCriteria()
-                        .andBusinessKeyEqualTo(atomic.get().getBusinessKey());
-
-                docHMapper.selectByExample(docHExample,new RowBounds(0,1))
-                        .stream()
-                        .filter(e->!StringUtils.equals(e.getDocId(),atomic.get().getDocId()))
-                        .findFirst()
-                        .ifPresent((e)->{throw new NkDefineException("业务主键重复");});
-            }
-        }
+        doUpdateIndex(atomic.get(), optionalOriginal.orElse(null), false);
 
         // 数据更新前后对比
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -619,6 +506,109 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         atomic.get().setNewCreate(false);
 
         return atomic.get();
+    }
+
+    /**
+     *
+     * 将doc 与 original进行对比，如果original为null 或者 业务主键与索引字段不一致的情况下，更新数据库表
+     *
+     * @param doc 单据
+     * @param original 原始单据
+     * @param forceUpdateDocHV 是否强制执行一次 update doc_h 表
+     */
+    @Override
+    public void doUpdateIndex(DocHV doc, DocHV original, boolean forceUpdateDocHV){
+
+        EvaluationContext context = spELManager.createContext(doc);
+
+        doc.getDynamics().clear();
+
+        DocIIndexExample example = new DocIIndexExample();
+        example.createCriteria().andDocIdEqualTo(doc.getDocId());
+        docIIndexMapper.deleteByExample(example);
+
+        if(doc.getDef().getIndexRules()!=null)
+            doc.getDef()
+                    .getIndexRules()
+                    .forEach(rule->{
+                        String name = String.format("%s_%s",rule.getIndexName(),rule.getIndexType());
+                        Object value = spELManager.invoke(rule.getRuleSpEL(),context);
+
+                        if(value!=null){
+
+                            doc.getDynamics().put(name,value);
+
+                            List<Object> list = new ArrayList<>();
+                            if(value instanceof List){
+                                list.addAll((List) value);
+                            }else if(value.getClass().isArray()){
+                                list.addAll(Arrays.asList((Object[])value));
+                            }else{
+                                list.add(value);
+                            }
+                            list.forEach(item->{
+
+                                DocIIndex index = new DocIIndex();
+                                index.setDocId(doc.getDocId());
+                                index.setName(name);
+                                index.setSeq(list.indexOf(item));
+                                index.setOrderBy(doc.getDynamics().size()+rule.getOrderBy());
+                                index.setUpdatedTime(DateTimeUtilz.nowSeconds());
+
+                                if(item == null){
+                                    index.setDataType(Void.class.getName());
+                                    index.setValue(null);
+                                }else
+                                if(item instanceof Number){
+                                    index.setDataType(Number.class.getName());
+                                    index.setNumberValue(((Number) item).doubleValue());
+                                }else
+                                if(item instanceof String){
+                                    index.setDataType(item.getClass().getName());
+                                    index.setValue(item.toString());
+                                }
+
+                                docIIndexMapper.insert(index);
+
+                            });
+                        }
+                    });
+
+
+
+        // 业务主键
+        doc.setBusinessKey(StringUtils.EMPTY);
+        if(StringUtils.isNotBlank(doc.getDef().getBusinessKeySpEL())){
+            Object businessKey = spELManager.invoke(doc.getDef().getBusinessKeySpEL(), context);
+            doc.setBusinessKey(businessKey!=null?businessKey.toString():StringUtils.EMPTY);
+
+            // 如果业务主键不为空，且与原始单据的业务主键不一致
+            if(
+                    StringUtils.isNotBlank(doc.getBusinessKey())&&
+                            !(
+                                    original!=null &&
+                                            StringUtils.equals(doc.getBusinessKey(),original.getBusinessKey())
+                            )
+                    ){
+
+                DocHExample docHExample = new DocHExample();
+                docHExample.createCriteria()
+                        .andBusinessKeyEqualTo(doc.getBusinessKey());
+
+                docHMapper.selectByExample(docHExample,new RowBounds(0,1))
+                        .stream()
+                        .filter(e->!StringUtils.equals(e.getDocId(),doc.getDocId()))
+                        .findFirst()
+                        .ifPresent((e)->{throw new NkDefineException("业务主键重复");});
+            }
+
+            if(forceUpdateDocHV){
+                DocH record = new DocH();
+                record.setDocId(doc.getDocId());
+                record.setBusinessKey(doc.getBusinessKey());
+                docHMapper.updateByPrimaryKeySelective(record);
+            }
+        }
     }
 
 

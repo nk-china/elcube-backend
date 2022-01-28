@@ -403,12 +403,14 @@ public class NkDocFinder implements InitializingBean {
         String sql = String.format(
                 "SELECT COUNT(1) " +
                         "\n  FROM nk_doc_h AS h" +
-                        "\n WHERE %s " +
-                        "\n %s",
-                String.join("\n   AND ", where.get()),
+                        "%s " +
+                        "%s ",
+                where.get().isEmpty()?
+                        StringUtils.EMPTY:
+                        where.get().stream().collect(Collectors.joining("\n   AND ","\n WHERE ",StringUtils.EMPTY)),
                 order.get().isEmpty()?
                         StringUtils.EMPTY:
-                        order.get().stream().collect(Collectors.joining(", ","ORDER BY ", StringUtils.EMPTY))
+                        order.get().stream().collect(Collectors.joining(", ","\n ORDER BY ", StringUtils.EMPTY))
         );
 
         if(log.isInfoEnabled())

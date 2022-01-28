@@ -413,6 +413,9 @@ class AbstractNkDocEngine {
     }
 
     /**
+     *
+     * 通过对比doc 和 original来决定是否执行数据同步操作
+     *
      * todo 如果 doc 和 original是同一个对象，可以优化性能
      */
     void dataSync(DocHV doc, DocHV original, boolean reExecute){
