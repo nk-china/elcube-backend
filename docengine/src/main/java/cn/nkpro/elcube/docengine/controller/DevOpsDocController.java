@@ -45,26 +45,26 @@ public class DevOpsDocController {
 
     @NkNote("1.执行eql")
     @RequestMapping(value = "/eql/execute",method = RequestMethod.POST)
-    public List<? extends DocH> execute(@NkNote(value="EQL") @RequestParam("sql") String eql) {
+    public List<? extends DocH> execute(@NkNote(value="EQL") @RequestParam("eql") String eql) {
         return eqlEngine.executeEql(eql);
     }
 
     @NkNote("2.执行select eql")
     @RequestMapping(value = "/eql/find",method = RequestMethod.POST)
-    public List<DocHV> find(@NkNote(value="EQL") @RequestParam("sql") String eql) {
+    public List<DocHV> find(@NkNote(value="EQL") @RequestParam("eql") String eql) {
         return eqlEngine.execUpdateEql(eql);
     }
 
     @NkNote("3.执行update eql")
     @RequestMapping(value = "/eql/update",method = RequestMethod.POST)
-    public List<DocHV> update(@NkNote(value="EQL") @RequestParam("sql") String eql) {
+    public List<DocHV> update(@NkNote(value="EQL") @RequestParam("eql") String eql) {
         return eqlEngine.execUpdateEql(eql);
     }
 
     @NkNote("4.执行doUpdate eql 并保存单据")
     @RequestMapping(value = "/eql/doUpdate",method = RequestMethod.POST)
     public List<DocHV> doUpdate(
-            @NkNote(value="EQL") @RequestParam("sql") String eql,
+            @NkNote(value="EQL") @RequestParam("eql") String eql,
             @NkNote(value="修改原因") @RequestParam("source") String source) {
         return eqlEngine.doUpdateByEql(eql, source);
     }

@@ -48,7 +48,7 @@ public class NkEqlEngineImpl extends AbstractNkDocEngine implements NkEqlEngine 
                 return findByEql(eql);
             }
             if(statement instanceof Update){
-                return findByEql(eql);
+                return execUpdateEql(eql);
             }
             if(statement instanceof Delete){
                 throw new NkOperateNotAllowedCaution("不支持的操作");
