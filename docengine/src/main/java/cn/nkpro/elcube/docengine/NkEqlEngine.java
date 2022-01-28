@@ -68,7 +68,7 @@ import java.util.List;
  *         data.customer.name,
  *         "data.customer.name" as name1,
  *         `data.customer.name` as name2,
- *         `data.plans?.^[true]?.name` as plan_name,
+ *         `data.plans?.^[true]?.name` as plan_name
  *         //el('data.plans?.^[true]?.name') // 这种函数语法不支持，可使用SpEL来执行函数
  *    from doc
  *   where d.abc is null

@@ -1,6 +1,7 @@
 package cn.nkpro.elcube.docengine.service.impl;
 
 import cn.nkpro.elcube.docengine.NkDocEngine;
+import cn.nkpro.elcube.docengine.NkDocEngineThreadLocal;
 import cn.nkpro.elcube.docengine.NkEqlEngine;
 import cn.nkpro.elcube.docengine.gen.DocH;
 import cn.nkpro.elcube.docengine.model.DocHQL;
@@ -212,8 +213,20 @@ public class NkEqlEngineImpl extends AbstractNkDocEngine implements NkEqlEngine 
             List<String> updateELs = parseUpdateELs(update);
             return queryByUpdate(update)
                     .stream()
-                    .map(docH ->
-                        lockDocDo(docH.getDocId(),(docId)->{
+                    .map(docH ->{
+
+                        if(NkDocEngineThreadLocal.existUpdated(docH.getDocId())){
+                            DocHV doc = NkDocEngineThreadLocal.getUpdated(docH.getDocId());
+                            // 执行 update set
+                            EvaluationContext context = spELManager.createContext(doc);
+                            updateELs.forEach(el-> spELManager.invoke(el, context));
+
+                            doc = execUpdate(doc, optSource);
+                            doc.clearItemContent();
+                            return doc;
+                        }
+
+                        return lockDocDo(docH.getDocId(),(docId)->{
                             DocHV doc = docEngine.detail(docId);
                             // 执行 update set
                             EvaluationContext context = spELManager.createContext(doc);
@@ -222,8 +235,8 @@ public class NkEqlEngineImpl extends AbstractNkDocEngine implements NkEqlEngine 
                             doc = execUpdate(doc, optSource);
                             doc.clearItemContent();
                             return doc;
-                        })
-                    )
+                        });
+                    })
                     .collect(Collectors.toList());
         } catch (JSQLParserException e) {
             throw new NkDefineException(e.getMessage());

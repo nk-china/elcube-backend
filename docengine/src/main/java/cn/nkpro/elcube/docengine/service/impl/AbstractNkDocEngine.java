@@ -541,10 +541,9 @@ class AbstractNkDocEngine {
         try{
             return function.apply(docId);
         }finally {
-            String finalDocId = docId;
             String finalLockedValue = lockedValue;
             TransactionSync.runAfterCompletionLast("解除Redis锁",(status)->
-                    redisSupport.unlock(finalDocId, finalLockedValue)
+                    redisSupport.unlock(docId, finalLockedValue)
             );
         }
     }
