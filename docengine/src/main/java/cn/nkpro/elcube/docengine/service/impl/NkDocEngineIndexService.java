@@ -104,7 +104,7 @@ public class NkDocEngineIndexService {
                         finished.addAndGet(1);
 
                     }catch (Exception e){
-                        throw new RuntimeException(String.format("docType = %s, docId = %s, error = %s", doc.getDocType(),doc.getDocId(),e.getMessage()));
+                        throw new RuntimeException(String.format("docType = %s, docId = %s, error = %s", doc.getDocType(),doc.getDocId(),e.getMessage()),e);
                     }
                 });
                 offset += rows;
