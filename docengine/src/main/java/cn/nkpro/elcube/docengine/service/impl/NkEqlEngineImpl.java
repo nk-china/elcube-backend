@@ -192,6 +192,8 @@ public class NkEqlEngineImpl extends AbstractNkDocEngine implements NkEqlEngine 
                         EvaluationContext context = spELManager.createContext(doc);
                         updateELs.forEach(el-> spELManager.invoke(el, context));
 
+                        doc.setDebug(true);
+
                         return doc;
                     })
                     .collect(Collectors.toList());
