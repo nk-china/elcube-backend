@@ -22,7 +22,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>demo</artifactId>
+    <artifactId>business-scenario-demos</artifactId>
     <dependencies>
         <dependency>
             <groupId>cn.nkpro.elcube</groupId>
