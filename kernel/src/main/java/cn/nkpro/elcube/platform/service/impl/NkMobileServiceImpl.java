@@ -17,15 +17,20 @@
 package cn.nkpro.elcube.platform.service.impl;
 
 import cn.nkpro.elcube.data.redis.RedisSupport;
-import cn.nkpro.elcube.platform.model.MobileOfficeAccBo;
+import cn.nkpro.elcube.platform.gen.UserAccountExtend;
+import cn.nkpro.elcube.platform.gen.UserAccountExtendExample;
+import cn.nkpro.elcube.platform.model.MobileOfficeAccProperties;
 import cn.nkpro.elcube.platform.service.NkAbstractMobile;
 import cn.nkpro.elcube.platform.service.NkAccountOperationService;
 import cn.nkpro.elcube.platform.service.NkDocOperationService;
+import cn.nkpro.elcube.security.UserAccountExtendService;
 import cn.nkpro.elcube.security.UserAccountService;
 import cn.nkpro.elcube.security.bo.UserAccountBO;
 import cn.nkpro.elcube.security.bo.UserDetails;
 import cn.nkpro.elcube.security.validate.NkAppLoginAuthentication;
+import cn.nkpro.elcube.utils.http.HttpClientUtil;
 import com.alibaba.fastjson.JSONObject;
+import liquibase.repackaged.org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -33,6 +38,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -51,6 +57,10 @@ public class NkMobileServiceImpl extends NkAbstractMobile {
     private NkDocOperationService nkDocOperationService;
     @Autowired@SuppressWarnings("all")
     private NkAccountOperationService nkAccountOperationService;
+    @Autowired@SuppressWarnings("all")
+    private MobileOfficeAccProperties mobileOfficeAccProperties;
+    @Autowired@SuppressWarnings("all")
+    private UserAccountExtendService userAccountExtendService;
 
     @Override
     public String sendVerificationCode(String phone) {
@@ -98,7 +108,7 @@ public class NkMobileServiceImpl extends NkAbstractMobile {
     }
 
     @Override
-    public JSONObject findOpenId(MobileOfficeAccBo mobileOfficeAccBo) {
+    public JSONObject findOpenId(MobileOfficeAccProperties mobileOfficeAccProperties) {
         /*String url = mobileOfficeAccBo.getJscode2sessionUrl();
         url += url+"?appid="+mobileOfficeAccBo.getAppid()+"&secret="+mobileOfficeAccBo.getSecret()+"&js_code="+mobileOfficeAccBo.getJsCode()
                 +"&grant_type="+mobileOfficeAccBo.getGrantType();
@@ -108,4 +118,97 @@ public class NkMobileServiceImpl extends NkAbstractMobile {
         JSONObject jsonObject = JSONObject.parseObject(resut);
         return jsonObject;
     }
+
+    @Override
+    public String queryToken(MobileOfficeAccProperties mobileOfficeAccProperties){
+        /*String url = mobileOfficeAccProperties.getTokenUrl();
+        url += "?grant_type="+ mobileOfficeAccProperties.getGrantType()+"&appid="+ mobileOfficeAccProperties.getAppid()+"&secret="+ mobileOfficeAccProperties.getSecret();
+        String result = HttpClientUtil.sendGetRequest(url,null);
+        System.out.println("获取token"+result);
+        JSONObject jsonObject = JSONObject.parseObject(result);
+        Object accessToken =  jsonObject.get("access_token");
+        if(accessToken == null){
+            String errmsg =  jsonObject.get("errmsg").toString();
+            return "error:"+errmsg;
+        }
+        String  token = accessToken.toString();
+        redisSupport.set("access_token",token);
+        redisSupport.expire("access_token", Long.valueOf(jsonObject.get("expires_in").toString()));
+        */
+        String token = "12133";
+        Long expireIn = 1000000L;
+        redisSupport.set("access_token",token);
+        redisSupport.expire("access_token", expireIn);
+        return token;
+    }
+
+
+    @Override
+    public JSONObject getPhoneInfo(String code){
+        //获取access_token
+       /* Object access_token = redisSupport.get("access_token");
+        if(access_token == null){
+            access_token = this.queryToken(mobileOfficeAccProperties);
+        }
+        JSONObject object = new JSONObject();
+        object.put("code",code);
+        String resut = HttpClientUtil.sendPostRequest(mobileOfficeAccProperties.getPhonenumberUrl()+"?access_token="+access_token,object.toJSONString(),"utf-8");
+        JSONObject jsonObject = JSONObject.parseObject(resut);*/
+
+        String re = "{\n" +
+                "    \"errcode\":0,\n" +
+                "    \"errmsg\":\"ok\",\n" +
+                "    \"phone_info\": {\n" +
+                "        \"phoneNumber\":\"18131372283\",\n" +
+                "        \"purePhoneNumber\": \"18131372283\",\n" +
+                "        \"countryCode\": 86,\n" +
+                "        \"watermark\": {\n" +
+                "            \"timestamp\": 1637744274,\n" +
+                "            \"appid\": \"xxxx\"\n" +
+                "        }\n" +
+                "    }\n" +
+                "}";
+        JSONObject jsonObject = JSONObject.parseObject(re);
+        return jsonObject;
+    }
+
+
+    @Override
+    public Map<String,Object> weChatLogin(String phone){
+        //校验手机号是否在系统中存在
+        UserAccountExtendExample example = new UserAccountExtendExample();
+        example.createCriteria().andPhoneEqualTo(phone);
+        List<UserAccountExtend> userAccountExtends = userAccountExtendService.selectByExample(example);
+        String openId = "";
+        String appleId = "";
+        String verCode = "";
+        //如果不存在，就创建TP单据
+        if(CollectionUtils.isEmpty(userAccountExtends)){
+            UserDetails userDetails;
+                // 新建用户
+                UserAccountBO user = nkAccountOperationService.createAccount(phone, openId, appleId);
+                userAccountService.update(user);
+                // 用户授权
+                nkAccountOperationService.addAccountFromGroup(user.getId());
+                userDetails = userAccountService.getAccountByMobileTerminal(phone, openId, appleId);
+                AbstractAuthenticationToken auth = new NkAppLoginAuthentication(
+                        "elcube", phone,
+                        "", "",
+                        "");
+                auth.setDetails(userDetails);
+                SecurityContextHolder.getContext().setAuthentication(auth);
+                // 保存客户信息到单据
+                Map<String,String> dataMap = new HashMap<>();
+                dataMap.put("phone",phone);
+                dataMap.put("verCode",verCode);
+                dataMap.put("openId","");
+                dataMap.put("appleId","");
+                dataMap.put("realname",userDetails.getRealname());
+                nkDocOperationService.createDoc(dataMap);
+        }
+        return userAccountService.createTokenMobileTerminal(phone, openId, appleId);
+    }
+
+
+
 }

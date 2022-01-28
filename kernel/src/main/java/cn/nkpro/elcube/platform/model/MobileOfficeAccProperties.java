@@ -12,10 +12,12 @@ import org.springframework.context.annotation.Configuration;
 @Data
 @Configuration
 @ConfigurationProperties(prefix = "mobile.officeacc")
-public class MobileOfficeAccBo {
+public class MobileOfficeAccProperties {
     private String appid;
     private String secret;
     private String grantType;
     private String jscode2sessionUrl;
     private String jsCode;
+    private String tokenUrl;
+    private String phonenumberUrl;
 }

@@ -16,7 +16,7 @@
  */
 package cn.nkpro.elcube.platform.service;
 
-import cn.nkpro.elcube.platform.model.MobileOfficeAccBo;
+import cn.nkpro.elcube.platform.model.MobileOfficeAccProperties;
 import com.alibaba.fastjson.JSONObject;
 
 import java.util.Map;
@@ -40,8 +40,26 @@ public class NkAbstractMobile implements NkMobileService{
     }
 
     @Override
-    public JSONObject findOpenId(MobileOfficeAccBo mobileOfficeAccBo) {
+    public JSONObject findOpenId(MobileOfficeAccProperties mobileOfficeAccProperties) {
         return null;
     }
+
+    @Override
+    public String queryToken(MobileOfficeAccProperties mobileOfficeAccProperties){
+        return null;
+    }
+
+    @Override
+    public JSONObject getPhoneInfo(String code){
+        return null;
+    }
+
+
+
+    @Override
+    public Map<String,Object> weChatLogin(String phone){
+        return null;
+    }
+
 }
 

@@ -18,12 +18,15 @@ package cn.nkpro.elcube.docengine.service.impl;
 
 import cn.nkpro.elcube.co.easy.EasySingle;
 import cn.nkpro.elcube.docengine.NkDocEngine;
+import cn.nkpro.elcube.docengine.gen.DocH;
 import cn.nkpro.elcube.docengine.model.DocHV;
 import cn.nkpro.elcube.platform.service.NkAbstractDocOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -47,6 +50,7 @@ public class NkDocOperationServiceImpl extends NkAbstractDocOperation {
         String docType = "TP02";
         Map<String,String> map = (HashMap) obj;
         DocHV doc = docEngine.create(docType,null,"移动端创建客户", (docHv) ->{
+            docHv.setDocName(map.get("realname"));
             EasySingle cusinfoSingle = docHv.fetch("cusBaseInfo");
             cusinfoSingle.set("cusPhone",map.get("phone"));
 
@@ -59,7 +63,10 @@ public class NkDocOperationServiceImpl extends NkAbstractDocOperation {
     }
 
     @Override
-    public Object getDocByDocContent(Map map) {
-        return docEngine.find("TP02").dynamicEquals(map);
+    public List<Object> getDocByDocContent(Map map,String... docType) {
+        List<DocH> re = docEngine.find(docType).dynamicEquals(map).listResult();
+        List<Object> list = new ArrayList<>();
+        list.addAll(re);
+        return list;
     }
 }

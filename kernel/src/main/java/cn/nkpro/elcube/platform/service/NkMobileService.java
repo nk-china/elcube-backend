@@ -16,7 +16,7 @@
  */
 package cn.nkpro.elcube.platform.service;
 
-import cn.nkpro.elcube.platform.model.MobileOfficeAccBo;
+import cn.nkpro.elcube.platform.model.MobileOfficeAccProperties;
 import com.alibaba.fastjson.JSONObject;
 
 import java.util.Map;
@@ -37,5 +37,41 @@ public interface NkMobileService {
 
     Map<String,Object> appBind(String nkApp, String phone, String verCode, String openId, String appleId);
 
-    JSONObject findOpenId(MobileOfficeAccBo mobileOfficeAccBo);
+    /**
+      *@description:查询openId
+      *@Author:YF
+      *@date:2022/1/27 10:52
+      *@param:[mobileOfficeAccBo]
+      *@return:com.alibaba.fastjson.JSONObject
+     **/
+    JSONObject findOpenId(MobileOfficeAccProperties mobileOfficeAccProperties);
+
+    /**
+      *@description:微信登录小程序获取access_token
+      *@Author:YF
+      *@date:2022/1/27 10:53
+      *@param:
+      *@return:
+     **/
+    String queryToken(MobileOfficeAccProperties mobileOfficeAccProperties);
+
+
+    /**
+      *@description:获取微信手机号
+      *@Author:YF
+      *@date:2022/1/27 11:02
+      *@param:[code]
+      *@return:com.alibaba.fastjson.JSONObject
+     **/
+    JSONObject getPhoneInfo(String code);
+
+
+    /**
+      *@description:微信手机号一键登录小程序
+      *@Author:YF
+      *@date:2022/1/28 11:24
+      *@param:[phone]
+      *@return:java.util.Map<java.lang.String,java.lang.Object>
+     **/
+    Map<String,Object> weChatLogin(String phone);
 }

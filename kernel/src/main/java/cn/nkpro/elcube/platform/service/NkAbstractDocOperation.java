@@ -16,6 +16,7 @@
  */
 package cn.nkpro.elcube.platform.service;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -27,10 +28,10 @@ public abstract class NkAbstractDocOperation implements NkDocOperationService {
 
     public Object createDoc(Object obj){
         return null;
-    };
+    }
 
     @Override
-    public Object getDocByDocContent(Map map) {
+    public List<Object> getDocByDocContent(Map map,String... docType) {
         return null;
     }
 }

@@ -16,6 +16,7 @@
  */
 package cn.nkpro.elcube.platform.service;
 
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -37,6 +38,6 @@ public interface NkDocOperationService {
      * @param map
      * @return
      */
-    Object getDocByDocContent(Map map);
+    List<Object> getDocByDocContent(Map map, String... docType);
 
 }
