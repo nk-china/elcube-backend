@@ -424,6 +424,8 @@ public class NkDocEngineServiceImpl extends AbstractNkDocEngine implements NkDoc
     @Transactional
     @Override
     public void reDataSync(DocHV doc){
+        customObjectManager.getCustomObject(doc.getDef().getRefObjectType(), NkDocProcessor.class)
+                .doUpdateIndex(doc, null, true);
         this.dataSync(doc, doc, true);
         searchEngine.indexBeforeCommit(DocHES.from(doc));
     }

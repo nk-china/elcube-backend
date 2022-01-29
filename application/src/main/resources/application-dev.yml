@@ -31,3 +31,8 @@ spring:
       password: 1qazxsw2
   liquibase:
     enabled: true
+    drop-first: true
+camunda:
+  bpm:
+    database:
+      schema-update: drop-create

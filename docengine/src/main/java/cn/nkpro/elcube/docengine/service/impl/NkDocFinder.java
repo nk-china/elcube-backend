@@ -198,9 +198,9 @@ public class NkDocFinder implements InitializingBean {
     public NkDocFinder dynamicIn(String key, Number... value){
         return dynamicIn(key,Arrays.asList(value));
     }
-    public NkDocFinder dynamicIn(String key, List<Object> value){
+    public NkDocFinder dynamicIn(String key, List<?> value){
 
-        Assert.notEmpty(value);
+        Assert.notEmpty(value, "IN 查询 条件不能为空");
 
         String collect = value.stream().map(i -> "?").collect(Collectors.joining(", "));
 
@@ -373,12 +373,14 @@ public class NkDocFinder implements InitializingBean {
                 "\n       created_time," +
                 "\n       updated_time" +
                 "\n  FROM nk_doc_h AS h" +
-                "\n WHERE %s " +
-                "\n %s",
-                String.join("\n   AND ", where.get()),
+                "%s " +
+                "%s ",
+                where.get().isEmpty()?
+                    StringUtils.EMPTY:
+                    where.get().stream().collect(Collectors.joining("\n   AND ","\n WHERE ",StringUtils.EMPTY)),
                 order.get().isEmpty()?
                     StringUtils.EMPTY:
-                    order.get().stream().collect(Collectors.joining(", ","ORDER BY ", StringUtils.EMPTY))
+                    order.get().stream().collect(Collectors.joining(", ","\n ORDER BY ", StringUtils.EMPTY))
         );
 
         if(offset!=null && limit!=null){
@@ -401,12 +403,14 @@ public class NkDocFinder implements InitializingBean {
         String sql = String.format(
                 "SELECT COUNT(1) " +
                         "\n  FROM nk_doc_h AS h" +
-                        "\n WHERE %s " +
-                        "\n %s",
-                String.join("\n   AND ", where.get()),
+                        "%s " +
+                        "%s ",
+                where.get().isEmpty()?
+                        StringUtils.EMPTY:
+                        where.get().stream().collect(Collectors.joining("\n   AND ","\n WHERE ",StringUtils.EMPTY)),
                 order.get().isEmpty()?
                         StringUtils.EMPTY:
-                        order.get().stream().collect(Collectors.joining(", ","ORDER BY ", StringUtils.EMPTY))
+                        order.get().stream().collect(Collectors.joining(", ","\n ORDER BY ", StringUtils.EMPTY))
         );
 
         if(log.isInfoEnabled())
@@ -492,151 +496,155 @@ public class NkDocFinder implements InitializingBean {
     }
 
     public NkDocFinder expression(Expression exp) {
-        List<Expression> expressions = new ArrayList<>();
-        exp.accept(new NkEqlExpressionVisitor(expressions));
+
+        if(exp!=null){
+
+            List<Expression> expressions = new ArrayList<>();
+            exp.accept(new NkEqlExpressionVisitor(expressions));
 
 
-        expressions.forEach(expression -> {
-                if(expression instanceof LikeExpression || expression instanceof ComparisonOperator){
-                    Object value = getExpressionValue(((BinaryExpression) expression).getRightExpression());
-                    args.get().add(value);
+            expressions.forEach(expression -> {
+                    if(expression instanceof LikeExpression || expression instanceof ComparisonOperator){
+                        Object value = getExpressionValue(((BinaryExpression) expression).getRightExpression());
+                        args.get().add(value);
 
-                    String string = value instanceof String ? "value" : "number_value";
-                    Expression leftExpression = ((BinaryExpression) expression).getLeftExpression();
-                    String dynamicColumn = convertPropertyToDynamic(leftExpression.toString());
-                    if(dynamicColumn!=null){
-                        where.get().add(String.format(
-                                "EXISTS (" +
-                                        "\n         SELECT i.doc_id FROM nk_doc_i_index AS i " +
-                                        "\n          WHERE i.doc_id = h.doc_id " +
-                                        "\n            AND i.name   = '%s' " +
-                                        "\n            AND i.%s  >= ?" +
-                                        "\n       )",
-                                dynamicColumn,
-                                string
-                        ));
-                    }else{
-                        where.get().add(
-                                String.format(
-                                        "%s %s ?",
-                                        convertPropertyToColumn(leftExpression.toString()),
-                                        ((BinaryExpression) expression).getStringExpression()
-                                )
-                        );
-                    }
-
-                }else if(expression instanceof Between){
-
-                    Object start = getExpressionValue(((Between) expression).getBetweenExpressionStart());
-                    Object end   = getExpressionValue(((Between) expression).getBetweenExpressionEnd());
-                    args.get().add(start);
-                    args.get().add(end);
-
-                    String string = start instanceof String ? "value" : "number_value";
-                    Expression leftExpression = ((Between) expression).getLeftExpression();
-                    String dynamicColumn = convertPropertyToDynamic(leftExpression.toString());
-                    if(dynamicColumn!=null){
-                        where.get().add(String.format(
-                                "EXISTS (" +
-                                        "\n         SELECT i.doc_id FROM nk_doc_i_index AS i " +
-                                        "\n          WHERE i.doc_id = h.doc_id " +
-                                        "\n            AND i.name   = '%s' " +
-                                        "\n            AND i.%s BETWEEN ? AND ?" +
-                                        "\n       )",
-                                dynamicColumn,
-                                string
-                        ));
-                    }else{
-                        where.get().add(
-                                String.format(
-                                        "%s BETWEEN ? AND ?",
-                                        convertPropertyToColumn(leftExpression.toString())
-                                )
-                        );
-                    }
-
-                }else if(expression instanceof InExpression){
-
-                    ExpressionList list = (ExpressionList) ((InExpression) expression).getRightItemsList();
-                    assert list.getExpressions().size() > 0;
-
-                    List<Object> values = list.getExpressions()
-                            .stream()
-                            .map(this::getExpressionValue)
-                            .collect(Collectors.toList());
-
-
-                    values.forEach(v->args.get().add(v));
-
-                    String string = values.get(0) instanceof String ? "value" : "number_value";
-                    Expression leftExpression = ((InExpression) expression).getLeftExpression();
-                    String dynamicColumn = convertPropertyToDynamic(leftExpression.toString());
-                    if(dynamicColumn!=null){
-                        where.get().add(String.format(
-                                "EXISTS (" +
-                                        "\n         SELECT i.doc_id FROM nk_doc_i_index AS i " +
-                                        "\n          WHERE i.doc_id = h.doc_id " +
-                                        "\n            AND i.name   = '%s' " +
-                                        "\n            AND i.%s IN (%s)" +
-                                        "\n       )",
-                                dynamicColumn,
-                                string,
-                                list.getExpressions().stream().map(e->"?").collect(Collectors.joining(", "))
-                        ));
-                    }else{
-                        where.get().add(
-                                String.format(
-                                        "%s IN (%s)",
-                                        convertPropertyToColumn(leftExpression.toString()),
-                                        list.getExpressions().stream().map(e->"?").collect(Collectors.joining(", "))
-                                )
-                        );
-                    }
-
-                }else if(expression instanceof IsNullExpression){
-                    Expression leftExpression = ((IsNullExpression) expression).getLeftExpression();
-                    String dynamicColumn = convertPropertyToDynamic(leftExpression.toString());
-                    if(dynamicColumn!=null){
-                        if(((IsNullExpression) expression).isNot()){
+                        String string = value instanceof String ? "value" : "number_value";
+                        Expression leftExpression = ((BinaryExpression) expression).getLeftExpression();
+                        String dynamicColumn = convertPropertyToDynamic(leftExpression.toString());
+                        if(dynamicColumn!=null){
                             where.get().add(String.format(
                                     "EXISTS (" +
                                             "\n         SELECT i.doc_id FROM nk_doc_i_index AS i " +
                                             "\n          WHERE i.doc_id = h.doc_id " +
                                             "\n            AND i.name   = '%s' " +
+                                            "\n            AND i.%s  >= ?" +
                                             "\n       )",
-                                    dynamicColumn
+                                    dynamicColumn,
+                                    string
                             ));
                         }else{
+                            where.get().add(
+                                    String.format(
+                                            "%s %s ?",
+                                            convertPropertyToColumn(leftExpression.toString()),
+                                            ((BinaryExpression) expression).getStringExpression()
+                                    )
+                            );
+                        }
+
+                    }else if(expression instanceof Between){
+
+                        Object start = getExpressionValue(((Between) expression).getBetweenExpressionStart());
+                        Object end   = getExpressionValue(((Between) expression).getBetweenExpressionEnd());
+                        args.get().add(start);
+                        args.get().add(end);
+
+                        String string = start instanceof String ? "value" : "number_value";
+                        Expression leftExpression = ((Between) expression).getLeftExpression();
+                        String dynamicColumn = convertPropertyToDynamic(leftExpression.toString());
+                        if(dynamicColumn!=null){
                             where.get().add(String.format(
-                                    "NOT EXISTS (" +
+                                    "EXISTS (" +
                                             "\n         SELECT i.doc_id FROM nk_doc_i_index AS i " +
                                             "\n          WHERE i.doc_id = h.doc_id " +
                                             "\n            AND i.name   = '%s' " +
+                                            "\n            AND i.%s BETWEEN ? AND ?" +
                                             "\n       )",
-                                    dynamicColumn
+                                    dynamicColumn,
+                                    string
                             ));
-                        }
-                    }else{
-                        if(((IsNullExpression) expression).isNot()){
-                            where.get().add(
-                                    String.format(
-                                            "%s IS NOT NULL",
-                                            convertPropertyToColumn(leftExpression.toString())
-                                    )
-                            );
                         }else{
                             where.get().add(
                                     String.format(
-                                            "%s IS NULL",
+                                            "%s BETWEEN ? AND ?",
                                             convertPropertyToColumn(leftExpression.toString())
                                     )
                             );
                         }
+
+                    }else if(expression instanceof InExpression){
+
+                        ExpressionList list = (ExpressionList) ((InExpression) expression).getRightItemsList();
+                        assert list.getExpressions().size() > 0;
+
+                        List<Object> values = list.getExpressions()
+                                .stream()
+                                .map(this::getExpressionValue)
+                                .collect(Collectors.toList());
+
+
+                        values.forEach(v->args.get().add(v));
+
+                        String string = values.get(0) instanceof String ? "value" : "number_value";
+                        Expression leftExpression = ((InExpression) expression).getLeftExpression();
+                        String dynamicColumn = convertPropertyToDynamic(leftExpression.toString());
+                        if(dynamicColumn!=null){
+                            where.get().add(String.format(
+                                    "EXISTS (" +
+                                            "\n         SELECT i.doc_id FROM nk_doc_i_index AS i " +
+                                            "\n          WHERE i.doc_id = h.doc_id " +
+                                            "\n            AND i.name   = '%s' " +
+                                            "\n            AND i.%s IN (%s)" +
+                                            "\n       )",
+                                    dynamicColumn,
+                                    string,
+                                    list.getExpressions().stream().map(e->"?").collect(Collectors.joining(", "))
+                            ));
+                        }else{
+                            where.get().add(
+                                    String.format(
+                                            "%s IN (%s)",
+                                            convertPropertyToColumn(leftExpression.toString()),
+                                            list.getExpressions().stream().map(e->"?").collect(Collectors.joining(", "))
+                                    )
+                            );
+                        }
+
+                    }else if(expression instanceof IsNullExpression){
+                        Expression leftExpression = ((IsNullExpression) expression).getLeftExpression();
+                        String dynamicColumn = convertPropertyToDynamic(leftExpression.toString());
+                        if(dynamicColumn!=null){
+                            if(((IsNullExpression) expression).isNot()){
+                                where.get().add(String.format(
+                                        "EXISTS (" +
+                                                "\n         SELECT i.doc_id FROM nk_doc_i_index AS i " +
+                                                "\n          WHERE i.doc_id = h.doc_id " +
+                                                "\n            AND i.name   = '%s' " +
+                                                "\n       )",
+                                        dynamicColumn
+                                ));
+                            }else{
+                                where.get().add(String.format(
+                                        "NOT EXISTS (" +
+                                                "\n         SELECT i.doc_id FROM nk_doc_i_index AS i " +
+                                                "\n          WHERE i.doc_id = h.doc_id " +
+                                                "\n            AND i.name   = '%s' " +
+                                                "\n       )",
+                                        dynamicColumn
+                                ));
+                            }
+                        }else{
+                            if(((IsNullExpression) expression).isNot()){
+                                where.get().add(
+                                        String.format(
+                                                "%s IS NOT NULL",
+                                                convertPropertyToColumn(leftExpression.toString())
+                                        )
+                                );
+                            }else{
+                                where.get().add(
+                                        String.format(
+                                                "%s IS NULL",
+                                                convertPropertyToColumn(leftExpression.toString())
+                                        )
+                                );
+                            }
+                        }
+                    }else{
+                        throw new NkDefineException("不支持的操作");
                     }
-                }else{
-                    throw new NkDefineException("不支持的操作");
-                }
-            });
+                });
+        }
         return this;
     }
 

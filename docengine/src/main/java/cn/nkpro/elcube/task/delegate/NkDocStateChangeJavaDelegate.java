@@ -17,11 +17,16 @@
 package cn.nkpro.elcube.task.delegate;
 
 import cn.nkpro.elcube.docengine.NkDocEngineThreadLocal;
+import cn.nkpro.elcube.docengine.model.DocHV;
+import cn.nkpro.elcube.docengine.service.impl.NkDocTransactionProcessor;
 import cn.nkpro.elcube.exception.NkDefineException;
 import lombok.Setter;
+import org.apache.commons.lang3.StringUtils;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 import org.camunda.bpm.engine.impl.el.FixedValue;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component("NkDocStateChangeJavaDelegate")
@@ -35,9 +40,14 @@ public class NkDocStateChangeJavaDelegate implements JavaDelegate {
 
         if(NkDocEngineThreadLocal.getCurr()==null)
             throw new NkDefineException("NkDocStateChangeJavaDelegate 仅支持工作流启动时配置");
-
-        NkDocEngineThreadLocal.getCurr().setDocState(
+        DocHV doc = NkDocEngineThreadLocal.getCurr();
+        doc.setDocState(
                 (String) state.getValue(delegateExecution)
         );
+        doc.getDef().getStatus().stream()
+                .filter(defDocStatus -> StringUtils.equals(defDocStatus.getDocState(),doc.getDocState()))
+                .findAny().ifPresent(state ->
+                        doc.setDocStateDesc(String.format("%s | %s",state.getDocState(),state.getDocStateDesc()))
+                );
     }
 }

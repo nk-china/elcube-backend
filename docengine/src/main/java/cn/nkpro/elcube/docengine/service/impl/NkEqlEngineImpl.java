@@ -1,6 +1,7 @@
 package cn.nkpro.elcube.docengine.service.impl;
 
 import cn.nkpro.elcube.docengine.NkDocEngine;
+import cn.nkpro.elcube.docengine.NkDocEngineThreadLocal;
 import cn.nkpro.elcube.docengine.NkEqlEngine;
 import cn.nkpro.elcube.docengine.gen.DocH;
 import cn.nkpro.elcube.docengine.model.DocHQL;
@@ -48,7 +49,7 @@ public class NkEqlEngineImpl extends AbstractNkDocEngine implements NkEqlEngine 
                 return findByEql(eql);
             }
             if(statement instanceof Update){
-                return findByEql(eql);
+                return execUpdateEql(eql);
             }
             if(statement instanceof Delete){
                 throw new NkOperateNotAllowedCaution("不支持的操作");
@@ -56,6 +57,29 @@ public class NkEqlEngineImpl extends AbstractNkDocEngine implements NkEqlEngine 
             throw new NkOperateNotAllowedCaution("不支持的操作");
 
         } catch (JSQLParserException e) {
+            throw new NkDefineException(e.getMessage());
+        }
+    }
+
+    @Override
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    public long countByEql(String eql){
+        try{
+            Statement statement = CCJSqlParserUtil.parse(eql);
+            Assert.isTrue(statement instanceof Select, "eql 不是一个有效的 select 语句");
+
+            Select select = (Select) statement;
+
+            String docType = tablesNamesFinder.getTableList(select).stream().findFirst().orElse(null);
+            docType = StringUtils.equalsAnyIgnoreCase(docType,"all","doc") ? null : docType;
+
+            PlainSelect plainSelect = (PlainSelect) select.getSelectBody();
+
+            return docEngine.find(docType)
+                    .expression(plainSelect.getWhere())
+                    .countResult();
+
+        }catch (JSQLParserException e){
             throw new NkDefineException(e.getMessage());
         }
     }
@@ -73,6 +97,17 @@ public class NkEqlEngineImpl extends AbstractNkDocEngine implements NkEqlEngine 
             docType = StringUtils.equalsAnyIgnoreCase(docType,"all","doc") ? null : docType;
 
             PlainSelect plainSelect = (PlainSelect) select.getSelectBody();
+
+            int offset = 0;
+            int rows   = 100;
+
+            Limit limit = plainSelect.getLimit();
+            if(limit!=null){
+                if(limit.getOffset()!=null)
+                    offset = Integer.parseInt(limit.getOffset().toString());
+                if(limit.getRowCount()!=null)
+                    rows   = Integer.parseInt(limit.getRowCount().toString());
+            }
 
             List<SelectExpressionItem> columns = plainSelect.getSelectItems()
                     .stream()
@@ -96,7 +131,7 @@ public class NkEqlEngineImpl extends AbstractNkDocEngine implements NkEqlEngine 
 
             return docEngine.find(docType)
                     .expression(plainSelect.getWhere())
-                    .listResult()
+                    .listResult(offset,rows)
                     .stream()
                     .map(docH -> {
                         DocHQL doc = BeanUtilz.copyFromObject(docH, DocHQL.class);
@@ -191,6 +226,8 @@ public class NkEqlEngineImpl extends AbstractNkDocEngine implements NkEqlEngine 
                         EvaluationContext context = spELManager.createContext(doc);
                         updateELs.forEach(el-> spELManager.invoke(el, context));
 
+                        doc.setDebug(true);
+
                         return doc;
                     })
                     .collect(Collectors.toList());
@@ -212,8 +249,20 @@ public class NkEqlEngineImpl extends AbstractNkDocEngine implements NkEqlEngine 
             List<String> updateELs = parseUpdateELs(update);
             return queryByUpdate(update)
                     .stream()
-                    .map(docH ->
-                        lockDocDo(docH.getDocId(),(docId)->{
+                    .map(docH ->{
+
+                        if(NkDocEngineThreadLocal.existUpdated(docH.getDocId())){
+                            DocHV doc = NkDocEngineThreadLocal.getUpdated(docH.getDocId());
+                            // 执行 update set
+                            EvaluationContext context = spELManager.createContext(doc);
+                            updateELs.forEach(el-> spELManager.invoke(el, context));
+
+                            doc = execUpdate(doc, optSource);
+                            doc.clearItemContent();
+                            return doc;
+                        }
+
+                        return lockDocDo(docH.getDocId(),(docId)->{
                             DocHV doc = docEngine.detail(docId);
                             // 执行 update set
                             EvaluationContext context = spELManager.createContext(doc);
@@ -222,8 +271,8 @@ public class NkEqlEngineImpl extends AbstractNkDocEngine implements NkEqlEngine 
                             doc = execUpdate(doc, optSource);
                             doc.clearItemContent();
                             return doc;
-                        })
-                    )
+                        });
+                    })
                     .collect(Collectors.toList());
         } catch (JSQLParserException e) {
             throw new NkDefineException(e.getMessage());

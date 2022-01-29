@@ -68,8 +68,7 @@ import java.util.List;
  *         data.customer.name,
  *         "data.customer.name" as name1,
  *         `data.customer.name` as name2,
- *         'data.customer.name' as name3,
- *         `data.plans?.^[true]?.name` as plan_name,
+ *         `data.plans?.^[true]?.name` as plan_name
  *         //el('data.plans?.^[true]?.name') // 这种函数语法不支持，可使用SpEL来执行函数
  *    from doc
  *   where d.abc is null
@@ -93,6 +92,14 @@ public interface NkEqlEngine {
      */
     @Transactional(propagation = Propagation.NOT_SUPPORTED)
     List<? extends DocH> executeEql(String eql);
+
+    /**
+     *
+     * @param eql ELCube Query Language
+     * @return rows
+     */
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
+    long countByEql(String eql);
 
     /**
      *
