@@ -25,12 +25,17 @@ import cn.nkpro.elcube.platform.service.NkMobileService;
 import cn.nkpro.elcube.platform.service.PlatformRegistryService;
 import cn.nkpro.elcube.platform.service.UserQueryService;
 import cn.nkpro.elcube.platform.service.WebMenuService;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.List;
 import java.util.Map;
+import java.util.jar.Attributes;
+import java.util.jar.Manifest;
 
 /**
  * Created by bean on 2019/12/18.
@@ -57,11 +62,24 @@ public class UserAppController {
     @Autowired@SuppressWarnings("all")
     private MobileOfficeAccProperties mobileOfficeAccProperties;
 
+    private static String version = "0.0.0";
+
+    static{
+        try{
+            URLClassLoader cl = (URLClassLoader) UserAppController.class.getClassLoader();
+            URL url = cl.findResource("META-INF/MANIFEST.MF");
+            if(url!=null){
+                Manifest manifest = new Manifest(url.openStream());
+                Attributes attributes = manifest.getMainAttributes();
+                version = attributes.getValue("Implementation-Version");
+            }
+        }catch (Exception ignored){}
+    }
 
     @NkNote("1.获取环境名称")
     @RequestMapping("/env")
-    public String env(){
-        return properties.getEnvName();
+    public Object env(){
+        return new String[]{properties.getEnvName(),version};
     }
 
     @PreAuthorize("authenticated")
