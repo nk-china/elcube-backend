@@ -28,7 +28,6 @@ import cn.nkpro.elcube.security.UserAccountService;
 import cn.nkpro.elcube.security.bo.UserAccountBO;
 import cn.nkpro.elcube.security.bo.UserDetails;
 import cn.nkpro.elcube.security.validate.NkAppLoginAuthentication;
-import cn.nkpro.elcube.utils.http.HttpClientUtil;
 import com.alibaba.fastjson.JSONObject;
 import liquibase.repackaged.org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
