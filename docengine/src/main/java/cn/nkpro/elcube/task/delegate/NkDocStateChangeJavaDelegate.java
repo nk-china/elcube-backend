@@ -40,14 +40,8 @@ public class NkDocStateChangeJavaDelegate implements JavaDelegate {
 
         if(NkDocEngineThreadLocal.getCurr()==null)
             throw new NkDefineException("NkDocStateChangeJavaDelegate 仅支持工作流启动时配置");
-        DocHV doc = NkDocEngineThreadLocal.getCurr();
-        doc.setDocState(
+        NkDocEngineThreadLocal.getCurr().setDocState(
                 (String) state.getValue(delegateExecution)
         );
-        doc.getDef().getStatus().stream()
-                .filter(defDocStatus -> StringUtils.equals(defDocStatus.getDocState(),doc.getDocState()))
-                .findAny().ifPresent(state ->
-                        doc.setDocStateDesc(String.format("%s | %s",state.getDocState(),state.getDocStateDesc()))
-                );
     }
 }
