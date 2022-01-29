@@ -38,4 +38,11 @@ spring:
     contexts: default,demo-data
     drop-first: false
     enabled: true
+mobile:
+  officeacc:
+    grant_type: client_credential
+    appid: wxb0652cb24f747365
+    secret: 3e9b8718f161673fceda4c33ca8ccfa5
+    token-url: https://api.weixin.qq.com/cgi-bin/token
+    phonenumber-url: https://api.weixin.qq.com/wxa/business/getuserphonenumber
 
