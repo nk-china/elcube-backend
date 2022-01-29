@@ -369,7 +369,9 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        //wujun TODO -- 2022-01-28 -->TO: 在这里 工作流启动会执行NkDocStateChangeJavaDelegate.java 此时状态还未改变 所以docStateDesc会出现数据不一致的问题
+
+        // 设置单据的描述类信息，工作流需要使用
+        fixPartnerName(doc);
         humanize(doc);
 
         // 单据状态发生变化
@@ -396,6 +398,9 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
                             NkDocEngineThreadLocal.setCurr(atomic.get());
                             String processInstanceId = bpmTaskService.start(bpm.getProcessKey(), atomic.get().getDocId());
                             atomic.get().setProcessInstanceId(processInstanceId);
+
+                            // 单据有可能被工作流修改，所以需要重新设置一下单据描述
+                            humanize(atomic.get());
                         }finally {
                             NkDocEngineThreadLocal.clearCurr();
                         }
@@ -652,7 +657,8 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
                 && StringUtils.isNotBlank(original.getItems().get(defIV.getCardKey()).getDocId());
     }
 
-    private void humanize(DocHV doc){
+
+    private void fixPartnerName(DocHV doc){
 
         // 设置单据交易伙伴
         if(StringUtils.isNotBlank(doc.getPartnerId())){
@@ -672,6 +678,9 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
                 }
             }
         }
+    }
+
+    private void humanize(DocHV doc){
 
         doc.setDocTypeDesc(String.format("%s | %s",doc.getDocType(),doc.getDef().getDocName()));
         doc.getDef().getStatus().stream()
