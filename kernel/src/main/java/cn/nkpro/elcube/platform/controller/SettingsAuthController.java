@@ -100,7 +100,7 @@ public class SettingsAuthController {
     
     @RequestMapping("/group/update")
     public UserGroupBO groupUpdate(@RequestBody UserGroupBO group){
-        permService.updateGroup(group);
+        permService.updateGroup(group,false);
         return permService.getGroupDetail(group.getGroupId());
     }
     
@@ -111,7 +111,7 @@ public class SettingsAuthController {
 
     @RequestMapping("/group/check")
     public Boolean groupCheck(@RequestBody UserGroupBO group){
-        return permService.checkGroupKey(group);
+        return permService.checkGroupKey(group,false);
     }
 
     @RequestMapping("/group/remove/account")

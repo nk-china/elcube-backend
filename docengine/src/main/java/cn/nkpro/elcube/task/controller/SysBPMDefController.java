@@ -95,7 +95,7 @@ public class SysBPMDefController {
     @NkNote("3.部署流程定义")
     @RequestMapping(value = "/deploy",method = RequestMethod.POST)
     public ResourceDeployment deploy(@RequestBody ResourceDefinition definition){
-        return defBpmService.deploy(definition);
+        return defBpmService.deploy(definition,false);
     }
 
     @NkNote("4.拉取部署记录")

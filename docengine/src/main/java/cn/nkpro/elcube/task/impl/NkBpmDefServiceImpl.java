@@ -51,7 +51,7 @@ public class NkBpmDefServiceImpl implements NkBpmDefService, DeployAble {
     private ProcessEngine processEngine;
 
     @Override
-    public ResourceDeployment deploy(ResourceDefinition definition){
+    public ResourceDeployment deploy(ResourceDefinition definition,Boolean ignore){
 
         ProcessDefinition existsDefinition = processEngine.getRepositoryService()
                 .createProcessDefinitionQuery()
@@ -60,7 +60,7 @@ public class NkBpmDefServiceImpl implements NkBpmDefService, DeployAble {
                 .singleResult();
 
         // 判断key是否允许覆盖
-        if(existsDefinition!=null && (definition.getFromId()==null || !StringUtils.equals(definition.getFromId().split(":")[0],definition.getKey()))){
+        if(!ignore && existsDefinition!=null && (definition.getFromId()==null || !StringUtils.equals(definition.getFromId().split(":")[0],definition.getKey()))){
             throw new NkDefineException(String.format("流程定义[%s]已经存在，请从历史版本进行创建",definition.getKey()));
         }
 
@@ -173,8 +173,9 @@ public class NkBpmDefServiceImpl implements NkBpmDefService, DeployAble {
     @Override
     public void importConfig(JSONObject data) {
         if(data.containsKey("bpmDefs")){
-            data.getJSONArray("bpmDefs").toJavaList(ResourceDefinition.class)
-                    .forEach(this::deploy);
+            for (ResourceDefinition resourceDefinition : data.getJSONArray("bpmDefs").toJavaList(ResourceDefinition.class)) {
+                deploy(resourceDefinition,true);
+            }
         }
     }
 

@@ -22,7 +22,7 @@ import cn.nkpro.elcube.task.model.ResourceDeployment;
 
 public interface NkBpmDefService {
 
-    ResourceDeployment deploy(ResourceDefinition definition);
+    ResourceDeployment deploy(ResourceDefinition definition,Boolean ignore);
 
     ResourceDefinition getProcessDefinition(String definitionId);
 

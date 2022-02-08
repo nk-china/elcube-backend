@@ -59,11 +59,11 @@ public interface UserAuthorizationService {
 
     UserGroupBO getGroupDetailByKey(String groupKey);
 
-    void updateGroup(UserGroupBO group);
+    void updateGroup(UserGroupBO group,Boolean ignore);
 
     void removeGroup(String groupId);
 
-    Boolean checkGroupKey(UserGroupBO group);
+    Boolean checkGroupKey(UserGroupBO group,Boolean ignore);
 
     void removeAccountFromGroup(String groupId, String accountId);
 

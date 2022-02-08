@@ -113,7 +113,7 @@ public class SysDMNDefController {
     @NkNote("3.部署流程定义")
     @RequestMapping(value = "/deploy",method = RequestMethod.POST)
     public ResourceDeployment deploy(@RequestBody ResourceDefinition definition){
-        return defBpmService.deploy(definition);
+        return defBpmService.deploy(definition,false);
     }
 
     @NkNote("4.测试运行")

@@ -419,7 +419,7 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService, D
 
     @SneakyThrows
     @Override
-    public void updateGroup(UserGroupBO group){
+    public void updateGroup(UserGroupBO group,Boolean ignore){
 
 
         Assert.isTrue(StringUtils.isBlank(group.getGroupId()) || !group.getGroupId().startsWith("nk-default-"),"系统用户组不可更新");
@@ -429,7 +429,7 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService, D
             group.setGroupId(guid.nextId(AuthGroup.class));
             authGroupMapper.insert(group);
         }else{
-            if(!checkGroupKey(group)){
+            if(!checkGroupKey(group,ignore)){
                 throw new NkException("用户组Key不能重复，请重新填写");
             }
             authGroupMapper.updateByPrimaryKey(group);
@@ -470,10 +470,11 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService, D
     }
 
     @Override
-    public Boolean checkGroupKey(UserGroupBO group) {
+    public Boolean checkGroupKey(UserGroupBO group,Boolean ignore) {
         AuthGroupExample authGroupExample = new AuthGroupExample();
         AuthGroupExample.Criteria criteria = authGroupExample.createCriteria();
-        if(group.getGroupKey() == null || StringUtils.isBlank(group.getGroupKey())){
+        // ignore表示是否忽略判断(目前用于配置的导入问题)
+        if(ignore || group.getGroupKey() == null || StringUtils.isBlank(group.getGroupKey())){
             return true;
         }
         criteria.andGroupKeyEqualTo(group.getGroupKey());
@@ -555,10 +556,11 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService, D
                     .forEach(this::updatePerm);
         }
         if(data.containsKey("groups")){
-            data.getJSONArray("groups").toJavaList(UserGroupBO.class)
-                    .stream()
-                    .filter(group->!group.getGroupId().startsWith("nk-default-"))
-                    .forEach(this::updateGroup);
+            for (UserGroupBO group : data.getJSONArray("groups").toJavaList(UserGroupBO.class)) {
+                if (!group.getGroupId().startsWith("nk-default-")) {
+                    updateGroup(group,true);
+                }
+            }
         }
     }
 }
