@@ -17,9 +17,7 @@
 package cn.nkpro.elcube.docengine;
 
 import cn.nkpro.elcube.docengine.service.SequenceSupport;
-import cn.nkpro.elcube.docengine.service.impl.NkDocOperationServiceImpl;
 import cn.nkpro.elcube.docengine.service.sequences.DefaultSequenceSupportImpl;
-import cn.nkpro.elcube.platform.service.NkAbstractDocOperation;
 import cn.nkpro.elcube.task.NkBpmTaskService;
 import cn.nkpro.elcube.task.DefaultBpmTaskServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,13 +59,11 @@ public class NkDocEngineAutoConfiguration implements ApplicationRunner, WebMvcCo
         return new DefaultBpmTaskServiceImpl();
     }
 
-    @ConditionalOnMissingBean
-    @Bean
-    public NkAbstractDocOperation nkAbstractDocOperation(){
-        return new NkDocOperationServiceImpl();
-    }
-
-
+//    @ConditionalOnMissingBean
+//    @Bean
+//    public NkAbstractDocOperation nkAbstractDocOperation(){
+//        return new NkDocOperationServiceImpl();
+//    }
 //    @Override
 //    public void addInterceptors(InterceptorRegistry registry) {
 //        registry.addInterceptor(new ThreadLocalClearInterceptor());

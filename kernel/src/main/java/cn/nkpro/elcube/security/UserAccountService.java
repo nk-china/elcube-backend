@@ -18,9 +18,9 @@ package cn.nkpro.elcube.security;
 
 import cn.nkpro.elcube.basic.PageList;
 import cn.nkpro.elcube.platform.gen.UserAccount;
+import cn.nkpro.elcube.platform.gen.UserAccountSecret;
 import cn.nkpro.elcube.security.bo.UserAccountBO;
 import cn.nkpro.elcube.security.bo.UserDetails;
-import cn.nkpro.elcube.security.validate.NkAppSource;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
@@ -38,6 +38,8 @@ public interface UserAccountService extends UserDetailsService {
 
     UserAccountBO getAccount(String username, boolean preClear);
 
+    UserAccountSecret getAccountSecretByCode(String code);
+
     void clear();
 
     void checkPasswordStrategyAndSha1(UserAccount account);
@@ -48,6 +50,8 @@ public interface UserAccountService extends UserDetailsService {
 
     Map<String, Object> refreshToken();
 
+    UserDetails loadUserById(String accountId);
+
     UserDetails loadUserByUsernameFromCache(String username) throws UsernameNotFoundException;
 
     PageList<UserAccount> accountsPage(Integer from, Integer size, String orderField, String order, String keyword);
@@ -56,16 +60,16 @@ public interface UserAccountService extends UserDetailsService {
 
     void clearLoginLock(UserAccountBO user);
 
-    UserDetails getAccountByMobileTerminal(String phone, String openId, String appleId);
-
-    UserAccountBO getAccountById(String accountId, boolean preClear);
-
-    UserDetails loadUserByAccountId(String accountId);
-
-    Map<String,Object> createTokenMobileTerminal(String phone, String openId, String appleId);
-
-    Map<String, Object> refreshTokenMobileTerminal();
-
-    Map<String,Object> appLogin(String phone, String openId, String appleId);
+//    UserDetails getAccountByMobileTerminal(String phone, String openId, String appleId);
+//
+//    UserAccountBO getAccountById(String accountId, boolean preClear);
+//
+//    UserDetails loadUserByAccountId(String accountId);
+//
+//    Map<String,Object> createTokenMobileTerminal(String phone, String openId, String appleId);
+//
+//    Map<String, Object> refreshTokenMobileTerminal();
+//
+//    Map<String,Object> appLogin(String phone, String openId, String appleId);
 
 }

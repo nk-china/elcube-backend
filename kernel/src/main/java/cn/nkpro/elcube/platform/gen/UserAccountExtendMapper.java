@@ -1,5 +1,7 @@
 package cn.nkpro.elcube.platform.gen;
 
+import cn.nkpro.elcube.platform.gen.UserAccountExtend;
+import cn.nkpro.elcube.platform.gen.UserAccountExtendExample;
 import java.util.List;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.session.RowBounds;

@@ -22,23 +22,21 @@ import cn.nkpro.elcube.basic.PageList;
 import cn.nkpro.elcube.data.mybatis.pagination.PaginationContext;
 import cn.nkpro.elcube.data.redis.RedisSupport;
 import cn.nkpro.elcube.platform.gen.*;
-import cn.nkpro.elcube.platform.service.NkAccountOperationService;
-import cn.nkpro.elcube.platform.service.NkDocOperationService;
-import cn.nkpro.elcube.security.*;
-import cn.nkpro.elcube.security.bo.AuthMobileTerminal;
+import cn.nkpro.elcube.security.HashUtil;
+import cn.nkpro.elcube.security.JwtHelper;
+import cn.nkpro.elcube.security.UserAccountService;
+import cn.nkpro.elcube.security.UserAuthorizationService;
 import cn.nkpro.elcube.security.bo.UserAccountBO;
 import cn.nkpro.elcube.security.bo.UserDetails;
 import cn.nkpro.elcube.utils.BeanUtilz;
 import cn.nkpro.elcube.utils.DateTimeUtilz;
 import cn.nkpro.elcube.utils.UUIDHexGenerator;
-import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.RowBounds;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
@@ -54,6 +52,8 @@ public class UserAccountServiceImpl implements UserAccountService {
 
     @Autowired@SuppressWarnings("all")
     private UserAccountMapper userAccountMapper;
+    @Autowired@SuppressWarnings("all")
+    private UserAccountSecretMapper userAccountSecretMapper;
 
     @Autowired@SuppressWarnings("all")
     private RedisSupport<UserAccount> redisTemplateAccount;
@@ -66,18 +66,18 @@ public class UserAccountServiceImpl implements UserAccountService {
     @Autowired@SuppressWarnings("all")
     private UserAuthorizationService authorizationService;
 
-    @Autowired@SuppressWarnings("all")
-    private UserAccountExtendService userAccountExtendService;
+//    @Autowired@SuppressWarnings("all")
+//    private UserAccountExtendService userAccountExtendService;
+//
+//    @Autowired@SuppressWarnings("all")
+//    private NkDocOperationService nkDocOperationService;
 
-    @Autowired@SuppressWarnings("all")
-    private NkDocOperationService nkDocOperationService;
-
-    @Autowired@SuppressWarnings("all")
-    private NkAccountOperationService nkAccountOperationService;
+//    @Autowired@SuppressWarnings("all")
+//    private NkAccountOperationService nkAccountOperationService;
 
     @Override
     public UserAccount getAccountById(String id){
-        return StringUtils.isBlank(id)?null:redisTemplateAccount.getIfAbsent(Constants.CACHE_USERS,id,()-> userAccountMapper.selectByPrimaryKey(id));
+        return StringUtils.isBlank(id)?null:userAccountMapper.selectByPrimaryKey(id);
     }
 
     public List<UserAccount> getAccountsByObjectId(List<String> docIds) {
@@ -98,6 +98,18 @@ public class UserAccountServiceImpl implements UserAccountService {
             redisTemplate.deleteHash(Constants.CACHE_USERS,username);
         }
         return redisTemplate.getIfAbsent(Constants.CACHE_USERS,username,()-> getAccount(username,null));
+    }
+
+    @Override
+    public UserAccountSecret getAccountSecretByCode(String code) {
+
+        UserAccountSecretExample example = new UserAccountSecretExample();
+        example.createCriteria().andCodeEqualTo(code);
+
+        return userAccountSecretMapper.selectByExample(example)
+                .stream()
+                .findFirst()
+                .orElse(null);
     }
 
     private UserAccountBO getAccount(String username, String accountId){
@@ -201,6 +213,14 @@ public class UserAccountServiceImpl implements UserAccountService {
 
 
     @Override
+    public UserDetails loadUserById(String accountId) {
+        UserAccount account = getAccountById(accountId);
+        if(account!=null){
+            return loadUserByUsername(account.getUsername());
+        }
+        return null;
+    }
+    @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return Optional.ofNullable(getAccount(username,true))
                 .map(account-> BeanUtilz.copyFromObject(account, UserDetails.class))
@@ -285,96 +305,90 @@ public class UserAccountServiceImpl implements UserAccountService {
         redisTemplate.delete(Constants.CACHE_AUTH_ERROR+user.getUsername());
     }
 
-    @Override
-    public UserDetails getAccountByMobileTerminal(String phone, String openId, String appleId) {
-        if(StringUtils.isBlank(phone) && StringUtils.isBlank(openId) && StringUtils.isBlank(appleId)){
-            return null;
-        }
-
-        UserAccountExtendExample example = new UserAccountExtendExample();
-        if(StringUtils.isNoneBlank(phone)){
-            example.createCriteria().andPhoneEqualTo(phone);
-        }else if(StringUtils.isNoneBlank(openId)){
-            example.createCriteria().andOpenidEqualTo(openId);
-        }else if(StringUtils.isNoneBlank(appleId)){
-            example.createCriteria().andAppleidEqualTo(appleId);
-        }
-        List<UserAccountExtend> userAccountExtends = userAccountExtendService.selectByExample(example);
-        if(!CollectionUtils.isEmpty(userAccountExtends)){
-            UserAccountExtend userAccountExtend = userAccountExtends.get(0);
-            if(StringUtils.equals(openId,userAccountExtend.getOpenid())){
-                userAccountExtend.setOpenid(openId);
-                userAccountExtendService.updateUserAccountExtend(userAccountExtend);
-            }
-            if(StringUtils.equals(appleId,userAccountExtend.getAppleid())){
-                userAccountExtend.setAppleid(appleId);
-                userAccountExtendService.updateUserAccountExtend(userAccountExtend);
-            }
-            return loadUserByAccountId(userAccountExtends.get(0).getAccountId());
-        }
-        return null;
-    }
-
-    @Override
-    public UserDetails loadUserByAccountId(String accountId) throws UsernameNotFoundException {
-        return Optional.ofNullable(getAccountById(accountId,true))
-                .map(account-> BeanUtilz.copyFromObject(account, UserDetails.class))
-                .orElse(null);
-    }
-
-    @Override
-    public UserAccountBO getAccountById(String accountId, boolean preClear) {
-        if(preClear){
-            redisTemplate.deleteHash(Constants.CACHE_USERS,accountId);
-        }
-        return redisTemplate.getIfAbsent(Constants.CACHE_USERS,accountId,()-> {
-            UserAccount sysAccount = getAccount(null, accountId);
-            UserAccountBO ud = BeanUtilz.copyFromObject(sysAccount, UserAccountBO.class);
-            ud.setAuthorities(authorizationService.buildGrantedPerms(sysAccount));
-            return ud;
-        });
-    }
-
-    /**
-     *
-     * 创建一个token，有效期为30分钟，
-     * 返回给前端的过期时间为15分钟，
-     * token过期后的15分钟以内，用户仍然可以通过token来刷新token
-     * @return token信息
-     */
-    @Override
-    public Map<String, Object> createTokenMobileTerminal(String phone, String openId, String appleId) {
-
-        Map<String,Object> map = new HashMap<>();
-        map.put("phone", phone);
-        map.put("openId", openId);
-        map.put("appleId", appleId);
-
-        long time   = 1000L * 60 * 45;             // 有效期默认为45分钟
-        long expire = 1000L * 60 * 15;             // 过期时间设定为15分钟
-
-        String token = JwtHelper.createJWT(map,time);
-
-        Map<String,Object> tokenInfo = new HashMap<>();
-        tokenInfo.put("accessToken",token);
-        tokenInfo.put("expire",expire);
-        tokenInfo.put("refresh",time);
-
-        return tokenInfo;
-
-    }
-
-    @Override
-    public Map<String, Object> refreshTokenMobileTerminal() {
-        AuthMobileTerminal authMobileTerminal = JSONObject.parseObject((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal(),AuthMobileTerminal.class);
-        return createTokenMobileTerminal(authMobileTerminal.getPhone(),authMobileTerminal.getOpenId(),authMobileTerminal.getAppleId());
-    }
-
-    @Override
-    public Map<String,Object> appLogin(String phone, String openId, String appleId) {
-        if(StringUtils.isAllBlank(phone,openId,appleId)){
-            return null;
-        }
-        return createTokenMobileTerminal(phone, openId, appleId);
-    }
+//    @Override
+//    public UserDetails getAccountByMobileTerminal(String phone, String openId, String appleId) {
+//        if(StringUtils.isBlank(phone) && StringUtils.isBlank(openId) && StringUtils.isBlank(appleId)){
+//            return null;
+//        }
+//
+//        UserAccountExtendExample example = new UserAccountExtendExample();
+//        if(StringUtils.isNoneBlank(phone)){
+//            example.createCriteria().andPhoneEqualTo(phone);
+//        }else if(StringUtils.isNoneBlank(openId)){
+//            example.createCriteria().andOpenidEqualTo(openId);
+//        }else if(StringUtils.isNoneBlank(appleId)){
+//            example.createCriteria().andAppleidEqualTo(appleId);
+//        }
+//        List<UserAccountExtend> userAccountExtends = userAccountExtendService.selectByExample(example);
+//        if(!CollectionUtils.isEmpty(userAccountExtends)){
+//            UserAccountExtend userAccountExtend = userAccountExtends.get(0);
+//            if(StringUtils.equals(openId,userAccountExtend.getOpenid())){
+//                userAccountExtend.setOpenid(openId);
+//                userAccountExtendService.updateUserAccountExtend(userAccountExtend);
+//            }
+//            if(StringUtils.equals(appleId,userAccountExtend.getAppleid())){
+//                userAccountExtend.setAppleid(appleId);
+//                userAccountExtendService.updateUserAccountExtend(userAccountExtend);
+//            }
+//            return loadUserByAccountId(userAccountExtends.get(0).getAccountId());
+//        }
+//        return null;
+//    }
+//
+//
+//    @Override
+//    public UserAccountBO getAccountById(String accountId, boolean preClear) {
+//        if(preClear){
+//            redisTemplate.deleteHash(Constants.CACHE_USERS,accountId);
+//        }
+//        return redisTemplate.getIfAbsent(Constants.CACHE_USERS,accountId,()-> {
+//            UserAccount sysAccount = getAccount(null, accountId);
+//            UserAccountBO ud = BeanUtilz.copyFromObject(sysAccount, UserAccountBO.class);
+//            ud.setAuthorities(authorizationService.buildGrantedPerms(sysAccount));
+//            return ud;
+//        });
+//    }
+//
+//    /**
+//     *
+//     * 创建一个token，有效期为30分钟，
+//     * 返回给前端的过期时间为15分钟，
+//     * token过期后的15分钟以内，用户仍然可以通过token来刷新token
+//     * @return token信息
+//     */
+//    @Override
+//    public Map<String, Object> createTokenMobileTerminal(String phone, String openId, String appleId) {
+//
+//        Map<String,Object> map = new HashMap<>();
+//        map.put("phone", phone);
+//        map.put("openId", openId);
+//        map.put("appleId", appleId);
+//
+//        long time   = 1000L * 60 * 45;             // 有效期默认为45分钟
+//        long expire = 1000L * 60 * 15;             // 过期时间设定为15分钟
+//
+//        String token = JwtHelper.createJWT(map,time);
+//
+//        Map<String,Object> tokenInfo = new HashMap<>();
+//        tokenInfo.put("accessToken",token);
+//        tokenInfo.put("expire",expire);
+//        tokenInfo.put("refresh",time);
+//
+//        return tokenInfo;
+//
+//    }
+//
+//    @Override
+//    public Map<String, Object> refreshTokenMobileTerminal() {
+//        AuthMobileTerminal authMobileTerminal = JSONObject.parseObject((String) SecurityContextHolder.getContext().getAuthentication().getPrincipal(),AuthMobileTerminal.class);
+//        return createTokenMobileTerminal(authMobileTerminal.getPhone(),authMobileTerminal.getOpenId(),authMobileTerminal.getAppleId());
+//    }
+//
+//    @Override
+//    public Map<String,Object> appLogin(String phone, String openId, String appleId) {
+//        if(StringUtils.isAllBlank(phone,openId,appleId)){
+//            return null;
+//        }
+//        return createTokenMobileTerminal(phone, openId, appleId);
+//    }
 }

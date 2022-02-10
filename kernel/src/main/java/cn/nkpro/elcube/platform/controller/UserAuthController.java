@@ -47,7 +47,7 @@ public class UserAuthController {
 
     @Qualifier("NkSysAccountService")
     @Autowired@SuppressWarnings("all")
-    private UserAccountService tfmsSysAccountService;
+    private UserAccountService accountService;
 
     @Autowired@SuppressWarnings("all")
     private UserAuthorizationService permService;
@@ -56,19 +56,26 @@ public class UserAuthController {
     @NkNote("1.获取token登陆")
     @RequestMapping("/token")
     public Map<String,Object> token(){
-        return tfmsSysAccountService.createToken();
+        return accountService.createToken();
+    }
+
+    @PreAuthorize("hasAnyAuthority('*:*','SYS:LOGIN')")
+    @NkNote("1.获取token登陆")
+    @RequestMapping("/preToken")
+    public Map<String,Object> preToken(){
+        return accountService.createToken();
     }
 
     @NkNote("2.刷新token")
     @RequestMapping("/refresh_token")
     public Map<String, Object> refreshToken(){
-        return tfmsSysAccountService.refreshToken();
+        return accountService.refreshToken();
     }
 
     @NkNote("3.清除token并退出")
     @RequestMapping("/clear")
     public void clear(){
-        tfmsSysAccountService.clear();
+        accountService.clear();
     }
 
     @NkNote("4.获取用户信息")
@@ -91,14 +98,22 @@ public class UserAuthController {
     @NkNote("6.修改密码")
     @RequestMapping("/change_password")
     public void changePassword(@RequestParam("oldPassword") String oldPassword, @RequestParam("newPassword")String newPassword){
-        tfmsSysAccountService.doChangePassword(SecurityUtilz.getUser().getId(),oldPassword,newPassword);
+        accountService.doChangePassword(SecurityUtilz.getUser().getId(),oldPassword,newPassword);
     }
 
-    @NkNote("7.移动端登录")
-    @RequestMapping("/app/login")
-    public Map<String,Object> appLogin(@RequestParam(value = "phone",required = false) String phone,
-                                       @RequestParam(value = "openId",required = false)String openId,
-                                       @RequestParam(value = "appleId",required = false)String appleId){
-        return tfmsSysAccountService.appLogin(phone,openId,appleId);
-    }
+//    @NkNote("7.移动端登录")
+//    @RequestMapping("/app/login")
+//    public Map<String,Object> appLogin(@RequestParam(value = "phone",required = false) String phone,
+//                                       @RequestParam(value = "openId",required = false)String openId,
+//                                       @RequestParam(value = "appleId",required = false)String appleId){
+//        return accountService.appLogin(phone,openId,appleId);
+//    }
+
+//    @NkNote("7.移动端登录")
+//    @RequestMapping("/app/login")
+//    public Map<String,Object> appLogin(@RequestParam(value = "type") String type,
+//                                       @RequestParam(value = "code") String code,
+//                                       @RequestParam(value = "secret",required = false)String secret){
+//        return accountService.appLogin(phone,openId,appleId);
+//    }
 }

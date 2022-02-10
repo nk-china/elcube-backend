@@ -112,21 +112,45 @@
         </sql>
     </changeSet>
 
-    <changeSet id="NK_USER_ACCOUNT_EXTEND-01" author="wf" context="default">
+<!--    <changeSet id="NK_USER_ACCOUNT_EXTEND-01" author="wf" context="default">-->
+<!--        <preConditions onFail="MARK_RAN">-->
+<!--            <not>-->
+<!--                <tableExists tableName="NK_USER_ACCOUNT_EXTEND" />-->
+<!--            </not>-->
+<!--        </preConditions>-->
+<!--        <comment />-->
+<!--        <createTable tableName="NK_USER_ACCOUNT_EXTEND" remarks="">-->
+<!--            <column name="ID" type="${type.uuid}" remarks="" >-->
+<!--                <constraints primaryKey="true" />-->
+<!--            </column>-->
+<!--            <column name="PHONE" type="${type.uuid}" remarks="" />-->
+<!--            <column name="OPENID" type="${type.uuid}" remarks="" />-->
+<!--            <column name="APPLEID" type="${type.uuid}" remarks="" />-->
+<!--            <column name="ACCOUNT_ID" type="${type.uuid}" remarks="" />-->
+<!--            <column name="CREATED_TIME" type="${type.long}" remarks="" />-->
+<!--            <column name="UPDATED_TIME" type="${type.long}" remarks="" />-->
+<!--        </createTable>-->
+<!--    </changeSet>-->
+
+    <changeSet id="NK_USER_ACCOUNT_SECRET-01" author="bean" context="default">
         <preConditions onFail="MARK_RAN">
             <not>
-                <tableExists tableName="NK_USER_ACCOUNT_EXTEND" />
+                <tableExists tableName="NK_USER_ACCOUNT_SECRET" />
             </not>
         </preConditions>
         <comment />
-        <createTable tableName="NK_USER_ACCOUNT_EXTEND" remarks="">
-            <column name="ID" type="${type.uuid}" remarks="" >
+        <createTable tableName="NK_USER_ACCOUNT_SECRET" remarks="">
+            <column name="ACCOUNT_ID" type="${type.uuid}" remarks="" >
                 <constraints primaryKey="true" />
             </column>
-            <column name="PHONE" type="${type.uuid}" remarks="" />
-            <column name="OPENID" type="${type.uuid}" remarks="" />
-            <column name="APPLEID" type="${type.uuid}" remarks="" />
-            <column name="ACCOUNT_ID" type="${type.uuid}" remarks="" />
+            <column name="TYPE" type="${type.desc}" remarks="绑定的密钥类型如：wxmp、alimp、dingtalk 等" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="CODE" type="${type.desc}" remarks="绑定的账户key，如 微信openid等" >
+                <constraints primaryKey="true" />
+            </column>
+            <column name="NAME" type="${type.desc}" remarks="绑定的账户名称或描述" />
+            <column name="SECRET" type="${type.desc}" remarks="绑定的账户密钥" />
             <column name="CREATED_TIME" type="${type.long}" remarks="" />
             <column name="UPDATED_TIME" type="${type.long}" remarks="" />
         </createTable>

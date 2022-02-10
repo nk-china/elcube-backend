@@ -16,10 +16,6 @@
  */
 package cn.nkpro.elcube.basic;
 
-import cn.nkpro.elcube.platform.service.NkAccountOperationService;
-import cn.nkpro.elcube.platform.service.NkMobileService;
-import cn.nkpro.elcube.platform.service.impl.NkAccountOperationServiceImpl;
-import cn.nkpro.elcube.platform.service.impl.NkMobileServiceImpl;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.autoconfigure.AutoConfigureOrder;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -92,15 +88,15 @@ public class NkAutoConfigurer {
         return taskExecutor;
     }
 
-    @ConditionalOnMissingBean
-    @Bean
-    public NkMobileService nkMobileService(){
-        return new NkMobileServiceImpl();
-    }
-
-    @ConditionalOnMissingBean
-    @Bean
-    public NkAccountOperationService nkAccountOperationService(){
-        return new NkAccountOperationServiceImpl();
-    }
+//    @ConditionalOnMissingBean
+//    @Bean
+//    public NkMobileService nkMobileService(){
+//        return new NkMobileServiceImpl();
+//    }
+//
+//    @ConditionalOnMissingBean
+//    @Bean
+//    public NkAccountOperationService nkAccountOperationService(){
+//        return new NkAccountOperationServiceImpl();
+//    }
 }

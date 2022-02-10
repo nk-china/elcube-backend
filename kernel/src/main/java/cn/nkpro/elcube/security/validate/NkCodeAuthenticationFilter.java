@@ -21,7 +21,6 @@ import io.jsonwebtoken.Claims;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -37,19 +36,18 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Objects;
 
-/**
- * Created by bean on 2019/12/30.
- */
-public class NkTokenAuthenticationFilter extends GenericFilterBean {
+
+public class NkCodeAuthenticationFilter extends GenericFilterBean  {
 
     private AuthenticationManager authenticationManager;
 
     private AuthenticationEntryPoint authenticationEntryPoint;
 
-    public NkTokenAuthenticationFilter(AuthenticationManager authenticationManager, AuthenticationEntryPoint authenticationEntryPoint) {
+    public NkCodeAuthenticationFilter(AuthenticationManager authenticationManager, AuthenticationEntryPoint authenticationEntryPoint) {
         this.authenticationManager = authenticationManager;
         this.authenticationEntryPoint = authenticationEntryPoint;
     }
+
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain filterChain) throws IOException, ServletException {
@@ -61,34 +59,14 @@ public class NkTokenAuthenticationFilter extends GenericFilterBean {
             if (authentication == null || !authentication.isAuthenticated()) {
 
                 String nkApp    = StringUtils.defaultString(obtainParam(request, "NK-App"));
-                String tokenStr = obtainParam(request, "NK-Token");
+                String code     = StringUtils.defaultString(obtainParam(request, "Nk-Code"));
+                String secret   = StringUtils.defaultString(obtainParam(request, "Nk-Secret"));
 
-                if (StringUtils.isNoneBlank(nkApp, tokenStr)) {
-                    Claims token = JwtHelper.verifyJwt(tokenStr);
-
-                    if(token==null){
-                        throw new BadCredentialsException("无效的token");
-                    }
-                    String username = token.get("username", String.class);
-                    String password = token.get("password", String.class);
-
-//                    String phone = token.get("phone", String.class);
-//                    String openId   = token.get("openId", String.class);
-//                    String appleId  = token.get("appleId", String.class);
-
-                    Authentication responseAuthentication = null;
-
-                    if(StringUtils.isNoneBlank(username, password)){
-                        responseAuthentication = authenticationManager.authenticate(
-                                new UsernamePasswordAuthenticationToken(username, password)
-                        );
-//                    }else if(!StringUtils.isAllBlank(phone, openId, appleId)){
-//                        responseAuthentication = authenticationManager.authenticate(
-//                                new NkAppLoginAuthentication(nkApp, phone, null, openId, appleId)
-//                        );
-                    }
-
+                if (StringUtils.isNoneBlank(nkApp, code)) {
                     try{
+                        Authentication responseAuthentication = authenticationManager.authenticate(
+                            new NkCodeAuthentication(nkApp, code, secret)
+                        );
 
                         if (responseAuthentication != null && responseAuthentication.isAuthenticated()) {
                             if(logger.isDebugEnabled())
@@ -107,10 +85,11 @@ public class NkTokenAuthenticationFilter extends GenericFilterBean {
     }
 
     private String obtainParam(ServletRequest request,String param) {
-        String token = ((HttpServletRequest)request).getHeader(param);
-        if (Objects.isNull(token)) {
-            token = request.getParameter(param);
+        String value = ((HttpServletRequest)request).getHeader(param);
+        if (Objects.isNull(value)) {
+            value = request.getParameter(param);
         }
-        return token;
+        return value;
     }
+
 }

@@ -29,8 +29,11 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+
+import java.util.List;
 
 /**
  * Created by bean on 2019/12/30.
@@ -42,6 +45,10 @@ public class NkWebSecurityConfig extends WebSecurityConfigurerAdapter {
     @SuppressWarnings("all")
     @Autowired
     private UserAccountService userDetailsService;
+
+    @SuppressWarnings("all")
+    @Autowired
+    private List<NkCodeUserDetailsService> userDetailsServices;
 
     @SuppressWarnings("all")
     @Autowired
@@ -59,7 +66,8 @@ public class NkWebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(AuthenticationManagerBuilder auth) {
         auth.authenticationProvider(new NkUsernamePasswordAuthenticationProvider(userDetailsService,redisSupport));
         auth.authenticationProvider(new NkUsernamePasswordVerCodeAuthenticationProvider(userDetailsService,redisSupport));
-        auth.authenticationProvider(new NkAppLoginAuthenticationProvider(userDetailsService,redisSupport));
+        auth.authenticationProvider(new NkCodeAuthenticationProvider(userDetailsServices));
+        //auth.authenticationProvider(new NkAppLoginAuthenticationProvider(userDetailsService,redisSupport));
     }
 
 
@@ -76,7 +84,8 @@ public class NkWebSecurityConfig extends WebSecurityConfigurerAdapter {
             .addFilterBefore(new NkTokenAuthenticationFilter(authenticationManager(),nkAuthenticationEntryPoint), UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(new BasicAuthenticationFilter(authenticationManager(),nkAuthenticationEntryPoint), UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(new NkUsernamePasswordVerCodeAuthenticationFilter(authenticationManager(),nkAuthenticationEntryPoint), UsernamePasswordAuthenticationFilter.class)
-            .addFilterBefore(new NkAppLoginAuthenticationFilter(authenticationManager(),nkAuthenticationEntryPoint), UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(new NkCodeAuthenticationFilter(authenticationManager(),nkAuthenticationEntryPoint), UsernamePasswordAuthenticationFilter.class)
+            //.addFilterBefore(new NkAppLoginAuthenticationFilter(authenticationManager(),nkAuthenticationEntryPoint), UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling()
                 .accessDeniedHandler(new NkAccessDeniedHandler())
                 .authenticationEntryPoint(nkAuthenticationEntryPoint)
