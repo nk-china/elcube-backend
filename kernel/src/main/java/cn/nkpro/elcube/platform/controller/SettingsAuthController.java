@@ -138,7 +138,7 @@ public class SettingsAuthController {
 
     @RequestMapping("/accounts/detail")
     public UserAccountBO accountsDetail(@RequestParam(value = "username") String username){
-        UserAccountBO account = accountService.getAccount(username, false);
+        UserAccountBO account = accountService.getAccountDetail(username);
         account.setPassword(null);
         return account;
     }

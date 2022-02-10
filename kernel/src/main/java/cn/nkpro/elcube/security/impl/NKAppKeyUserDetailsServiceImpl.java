@@ -24,7 +24,7 @@ public class NKAppKeyUserDetailsServiceImpl implements NkCodeUserDetailsService 
 
     @Override
     public UserDetails loadUser(String code,String secret) throws UsernameNotFoundException {
-        UserAccountSecret accountSecret = accountService.getAccountSecretByCode(code);
+        UserAccountSecret accountSecret = accountService.getAccountSecretByCode("appKey",code);
 
         if(!StringUtils.equals(accountSecret.getSecret(),secret)){
             throw new BadCredentialsException("密钥错误");

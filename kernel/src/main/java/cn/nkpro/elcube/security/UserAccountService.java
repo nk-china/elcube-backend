@@ -36,9 +36,11 @@ public interface UserAccountService extends UserDetailsService {
 
     List<UserAccount> getAccountsByObjectId(List<String> docIds);
 
+    UserAccountBO getAccountDetail(String username);
+
     UserAccountBO getAccount(String username, boolean preClear);
 
-    UserAccountSecret getAccountSecretByCode(String code);
+    UserAccountSecret getAccountSecretByCode(String type, String code);
 
     void clear();
 

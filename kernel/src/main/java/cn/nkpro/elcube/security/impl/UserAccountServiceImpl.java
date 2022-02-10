@@ -93,6 +93,21 @@ public class UserAccountServiceImpl implements UserAccountService {
     }
 
     @Override
+    public UserAccountBO getAccountDetail(String username) {
+        UserAccountBO account = redisTemplate.getIfAbsent(Constants.CACHE_USERS,username,()-> getAccount(username,null));
+
+        if(account!=null){
+            UserAccountSecretExample example = new UserAccountSecretExample();
+            example.createCriteria().andAccountIdEqualTo(account.getId());
+            account.setSecrets(userAccountSecretMapper.selectByExample(example)
+                .stream()
+                .peek(e->e.setSecret(null)).collect(Collectors.toList()));
+        }
+
+        return account;
+    }
+
+    @Override
     public UserAccountBO getAccount(String username, boolean preClear) {
         if(preClear){
             redisTemplate.deleteHash(Constants.CACHE_USERS,username);
@@ -101,10 +116,10 @@ public class UserAccountServiceImpl implements UserAccountService {
     }
 
     @Override
-    public UserAccountSecret getAccountSecretByCode(String code) {
+    public UserAccountSecret getAccountSecretByCode(String type, String code) {
 
         UserAccountSecretExample example = new UserAccountSecretExample();
-        example.createCriteria().andCodeEqualTo(code);
+        example.createCriteria().andCodeEqualTo(code).andTypeEqualTo(type);
 
         return userAccountSecretMapper.selectByExample(example)
                 .stream()
@@ -216,7 +231,7 @@ public class UserAccountServiceImpl implements UserAccountService {
     public UserDetails loadUserById(String accountId) {
         UserAccount account = getAccountById(accountId);
         if(account!=null){
-            return loadUserByUsername(account.getUsername());
+            return loadUserByUsernameFromCache(account.getUsername());
         }
         return null;
     }

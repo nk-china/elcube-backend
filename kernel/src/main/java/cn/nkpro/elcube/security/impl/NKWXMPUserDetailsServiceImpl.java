@@ -73,7 +73,7 @@ public class NKWXMPUserDetailsServiceImpl implements NkCodeUserDetailsService {
 
         // 根据openId获取账号信息
         String openId = jsonObject.getString("openid");
-        UserAccountSecret accountSecret = accountService.getAccountSecretByCode(openId);
+        UserAccountSecret accountSecret = accountService.getAccountSecretByCode("wxmp",openId);
 
         // openId 未绑定
         if(accountSecret==null){

@@ -17,6 +17,7 @@
 package cn.nkpro.elcube.security.bo;
 
 import cn.nkpro.elcube.platform.gen.UserAccount;
+import cn.nkpro.elcube.platform.gen.UserAccountSecret;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -29,4 +30,7 @@ public class UserAccountBO extends UserAccount {
 
     @Getter@Setter
     private List<GrantedAuthority> authorities;
+
+    @Getter@Setter
+    private List<UserAccountSecret> secrets;
 }
