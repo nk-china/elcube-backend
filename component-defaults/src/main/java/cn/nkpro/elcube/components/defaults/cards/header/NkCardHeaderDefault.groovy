@@ -43,7 +43,7 @@ class NkCardHeaderDefault extends NkAbstractCard<Map,Def> {
     @Override
     Map afterGetData(DocHV doc, Map data, DocDefIV defIV, Def d) {
 
-        if(StringUtils.isBlank(d.getPartnerIdSpEL()) && StringUtils.isNotBlank(d.getPartnerNameSpEL())){
+        if(StringUtils.isNotBlank(d.getPartnerIdSpEL()) && StringUtils.isNotBlank(d.getPartnerNameSpEL())){
             if(StringUtils.isBlank(doc.getPartnerName())){
                 def context = spELManager.createContext(doc)
                 doc.setPartnerName(spELManager.invoke(d.getPartnerNameSpEL(), context) as String)
