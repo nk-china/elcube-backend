@@ -16,19 +16,21 @@
         <nk-form :col="1" :edit="editMode">
             <nk-form-item title="单据默认名称EL" :width="140">
                 {{def.docNameDefaultSpEL}}
-                <nk-sp-el-editor slot="edit" v-model="def.docNameDefaultSpEL"></nk-sp-el-editor>
+                <nk-sp-el-editor slot="edit" v-model="def.docNameDefaultSpEL" style="max-width:300px;"></nk-sp-el-editor>
             </nk-form-item>
             <nk-form-item title="单据名称EL" :width="140">
                 {{def.docNameSpEL}}
-                <nk-sp-el-editor slot="edit" v-model="def.docNameSpEL"></nk-sp-el-editor>
+                <nk-sp-el-editor slot="edit" v-model="def.docNameSpEL" style="max-width:300px;"></nk-sp-el-editor>
             </nk-form-item>
             <nk-form-item title="伙伴ID EL" :width="140">
                 {{def.partnerIdSpEL}}
-                <nk-sp-el-editor slot="edit" v-model="def.partnerIdSpEL"></nk-sp-el-editor>
+                <nk-sp-el-editor slot="edit" v-model="def.partnerIdSpEL" style="max-width:300px;"></nk-sp-el-editor>
+
             </nk-form-item>
             <nk-form-item title="伙伴名称EL" :width="140">
                 {{def.partnerNameSpEL}}
-                <nk-sp-el-editor slot="edit" v-model="def.partnerNameSpEL"></nk-sp-el-editor>
+                <nk-sp-el-editor slot="edit" v-model="def.partnerNameSpEL" style="max-width:300px;"></nk-sp-el-editor>
+                <span slot="edit" style="color: #aaa">tips: 默认通过伙伴ID EL获取伙伴单据名称；如指定该EL表达式则以该结果作为伙伴名称</span>
             </nk-form-item>
         </nk-form>
     </nk-def-card>
