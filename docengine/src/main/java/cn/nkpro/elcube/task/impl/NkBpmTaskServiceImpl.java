@@ -23,6 +23,7 @@ import cn.nkpro.elcube.task.NkBpmTaskService;
 import cn.nkpro.elcube.task.model.*;
 import cn.nkpro.elcube.utils.BeanUtilz;
 import org.apache.commons.lang3.StringUtils;
+import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Comment;
@@ -35,6 +36,7 @@ import org.springframework.util.Assert;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class NkBpmTaskServiceImpl extends AbstractNkBpmSupport implements NkBpmTaskService {
@@ -179,43 +181,48 @@ public class NkBpmTaskServiceImpl extends AbstractNkBpmSupport implements NkBpmT
 
             // 设置实例的备注
             List<Comment> processInstanceComments = processEngine.getTaskService()
-                    .getProcessInstanceComments(task.getProcessInstanceId());
+                    .getProcessInstanceComments(task.getProcessInstanceId()).stream().sorted(Comparator.comparing(Comment::getTime)).collect(Collectors.toList());
 
             if(!processInstanceComments.isEmpty()){
 
-                Map<String, String> accounts = processInstanceComments.stream().map(Comment::getUserId).filter(Objects::nonNull).distinct()
-                        .map(accountService::getAccountById)
-                        .collect(Collectors.toMap(UserAccount::getId, UserAccount::getRealname));
+                Map<String, String> accounts = processInstanceComments.stream()
+                    .map(Comment::getUserId).filter(Objects::nonNull).distinct()
+                    .map(accountService::getAccountById)
+                    .collect(Collectors.toMap(UserAccount::getId, UserAccount::getRealname));
 
-                List<Task> taskList = processEngine.getTaskService().createTaskQuery()
+                List<HistoricTaskInstance> taskList = new ArrayList<>();
+                processInstanceComments.forEach(comment -> {
+                    HistoricTaskInstance historicTaskInstance = processEngine.getHistoryService().createHistoricTaskInstanceQuery()
+                        .taskId(comment.getTaskId())
                         .processInstanceId(task.getProcessInstanceId())
-                        .orderByTaskCreateTime()
-                        .asc()
-                        .list();
+                        .singleResult();
+                    taskList.add(historicTaskInstance);
+                });
 
-                bpmTask.setHistoricalTasks(
-                    taskList.stream()
+                List<BpmTask> historicalTasks = new ArrayList<>();
+                if(!taskList.isEmpty()){
+                    historicalTasks = taskList.stream()
                         .map(t->{
-                            BpmTask bpmHisTask = BeanUtilz.copyFromObject(task, BpmTask.class);
-                            bpmHisTask.setCreateTime(task.getCreateTime().getTime()/1000);
+                            BpmTask bpmHisTask = BeanUtilz.copyFromObject(t, BpmTask.class);
+                            bpmHisTask.setCreateTime(t.getStartTime().getTime()/1000);
                             bpmHisTask.setComments(processInstanceComments
-                                    .stream()
-                                    .filter(c->StringUtils.equals(c.getTaskId(),t.getId()))
-                                    .map(comment->{
-                                        BpmComment bpmComment = new BpmComment();
-                                        bpmComment.setComment(comment.getFullMessage());
-                                        bpmComment.setId(comment.getId());
-                                        bpmComment.setTime(comment.getTime().getTime()/1000);
-                                        bpmComment.setUserId(comment.getUserId());
-                                        bpmComment.setUser(accounts.getOrDefault(comment.getUserId(),comment.getUserId()));
-                                        return bpmComment;
-                                    })
-                                    .collect(Collectors.toList()));
-
+                                .stream()
+                                .filter(c->StringUtils.equals(c.getTaskId(),t.getId()))
+                                .map(comment->{
+                                    BpmComment bpmComment = new BpmComment();
+                                    bpmComment.setComment(comment.getFullMessage());
+                                    bpmComment.setId(comment.getId());
+                                    bpmComment.setTime(comment.getTime().getTime()/1000);
+                                    bpmComment.setUserId(comment.getUserId());
+                                    bpmComment.setUser(accounts.getOrDefault(comment.getUserId(),comment.getUserId()));
+                                    return bpmComment;
+                                })
+                                .collect(Collectors.toList()));
                             return bpmHisTask;
                         })
-                        .collect(Collectors.toList())
-                );
+                        .collect(Collectors.toList());
+                }
+                bpmTask.setHistoricalTasks(historicalTasks);
             }
 
             return bpmTask;
