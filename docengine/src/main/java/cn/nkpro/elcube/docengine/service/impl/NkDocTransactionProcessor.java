@@ -273,6 +273,7 @@ public class NkDocTransactionProcessor implements NkDocProcessor {
             );
         });
 
+        fixPartnerName(doc);
         humanize(doc);
 
         if(log.isInfoEnabled())

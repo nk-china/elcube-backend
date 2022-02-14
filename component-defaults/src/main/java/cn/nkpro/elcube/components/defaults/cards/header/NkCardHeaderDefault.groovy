@@ -43,11 +43,14 @@ class NkCardHeaderDefault extends NkAbstractCard<Map,Def> {
     @Override
     Map afterGetData(DocHV doc, Map data, DocDefIV defIV, Def d) {
 
-        if(StringUtils.isNotBlank(d.getPartnerIdSpEL()) && StringUtils.isNotBlank(d.getPartnerNameSpEL())){
-            if(StringUtils.isBlank(doc.getPartnerName())){
-                def context = spELManager.createContext(doc)
-                doc.setPartnerName(spELManager.invoke(d.getPartnerNameSpEL(), context) as String)
-            }
+        /*
+         * 如果单据交易伙伴ID不为空，单据引擎会自动查找单据最新的单据名称
+         *
+         * 但是如果单据交易伙伴名称SpEL 不为空，以用户配置的表达式结果为准，所以这里会再赋值一次
+         */
+        if(StringUtils.isNotBlank(d.getPartnerNameSpEL())){
+            def context = spELManager.createContext(doc)
+            doc.setPartnerName(spELManager.invoke(d.getPartnerNameSpEL(), context) as String)
         }
 
         return super.afterGetData(doc, data, defIV, d) as Map
@@ -75,10 +78,17 @@ class NkCardHeaderDefault extends NkAbstractCard<Map,Def> {
 
         def context = spELManager.createContext(doc)
 
+        /*
+         * 如果交易伙伴ID SpEL不为空，设置单据的交易伙伴ID
+         *
+         */
         if(StringUtils.isNotBlank(d.getPartnerIdSpEL())){
             doc.setPartnerId(spELManager.invoke(d.getPartnerIdSpEL(), context) as String)
         }
-
+        /*
+         * 如果单据交易伙伴名称SpEL 不为空，以用户配置的表达式结果为准
+         * 否则，单据引擎会自动查找单据最新的单据名称
+         */
         if(StringUtils.isNotBlank(d.getPartnerNameSpEL())){
             doc.setPartnerName(spELManager.invoke(d.getPartnerNameSpEL(), context) as String)
         }
