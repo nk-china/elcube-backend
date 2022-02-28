@@ -22,7 +22,7 @@ import java.util.Collection;
 import java.util.Map;
 
 @SuppressWarnings("all")
-public interface EasySingle {
+public interface EasySingle extends Cloneable{
 
     Object target();
 
