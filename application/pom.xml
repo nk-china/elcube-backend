@@ -58,38 +58,38 @@
         <dependency>
             <groupId>cn.nkpro.elcube</groupId>
             <artifactId>web-front-resources</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <dependency>
             <groupId>cn.nkpro.elcube</groupId>
             <artifactId>kernel</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>cn.nkpro.elcube</groupId>
             <artifactId>docengine</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>cn.nkpro.elcube</groupId>
             <artifactId>bigdata</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>cn.nkpro.elcube</groupId>
             <artifactId>component-defaults</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>cn.nkpro.elcube</groupId>
             <artifactId>component-financial</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
         <dependency>
             <groupId>cn.nkpro.elcube</groupId>
             <artifactId>business-scenario-demos</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <!--SpringBoot 基础库-->
@@ -157,6 +157,7 @@
             <plugin>
                 <groupId>org.sonatype.plugins</groupId>
                 <artifactId>nexus-staging-maven-plugin</artifactId>
+                <version>1.6.12</version>
                 <configuration>
                     <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
                 </configuration>

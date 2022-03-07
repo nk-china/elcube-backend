@@ -41,13 +41,13 @@
         <dependency>
             <groupId>cn.nkpro.elcube</groupId>
             <artifactId>kernel</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <dependency>
             <groupId>cn.nkpro.elcube</groupId>
             <artifactId>docengine</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
 
     </dependencies>

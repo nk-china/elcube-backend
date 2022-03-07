@@ -59,7 +59,7 @@
         <dependency>
             <groupId>cn.nkpro.elcube</groupId>
             <artifactId>commons</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <!--SpringBoot 基础库-->

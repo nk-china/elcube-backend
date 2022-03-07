@@ -32,6 +32,7 @@
                 <configuration>
                     <source>8</source>
                     <target>8</target>
+                    <compilerVersion>1.8</compilerVersion>
                 </configuration>
             </plugin>
         </plugins>
@@ -42,7 +43,7 @@
         <dependency>
             <groupId>cn.nkpro.elcube</groupId>
             <artifactId>kernel</artifactId>
-            <version>${parent.version}</version>
+            <version>${project.parent.version}</version>
         </dependency>
 
         <!-- Word 文件模版工具 -->
