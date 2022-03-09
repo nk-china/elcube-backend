@@ -22,6 +22,8 @@ nk:
       max-lifetime: 1800000
       minimumIdle: 5
       maximumPoolSize: 10
+  mysql:
+    default-scheme: ts5_bb_preview
 
 #  aliyun:
 #    access-key-id: LTAI4G6YUdTBx8b9C8uR3gTU
