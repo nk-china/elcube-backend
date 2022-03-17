@@ -12,7 +12,10 @@
 	along with ELCube.  If not, see <https://www.gnu.org/licenses/>.
 -->
 <template>
-    <a v-if="!editMode" :href="value" target="_blank">{{value}}</a>
+    <a v-if="!editMode && value" :href="value" target="_blank">
+      {{value}}
+    </a>
+    <span v-else-if="!editMode" class="empty"></span>
     <a-input size="small" v-else v-model="val" @blur="blur" :max-length="inputOptions.maxLength"></a-input>
 </template>
 

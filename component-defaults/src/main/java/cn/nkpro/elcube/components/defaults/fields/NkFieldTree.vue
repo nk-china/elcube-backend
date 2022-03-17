@@ -12,7 +12,10 @@
 	along with ELCube.  If not, see <https://www.gnu.org/licenses/>.
 -->
 <template>
-    <span v-if="!editMode">{{value | formatTree(inputOptions.optionsObject)}}</span>
+    <span v-if="!editMode">
+      <template v-if="value && value.length">{{value | formatTree(inputOptions.optionsObject)}}</template>
+      <span v-else class="empty"></span>
+    </span>
     <a-tree-select size="small"
               v-else
               v-model="val"

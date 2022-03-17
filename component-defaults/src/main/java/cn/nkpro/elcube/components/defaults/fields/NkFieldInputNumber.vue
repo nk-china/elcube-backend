@@ -12,7 +12,10 @@
 	along with ELCube.  If not, see <https://www.gnu.org/licenses/>.
 -->
 <template>
-    <span v-if="!editMode">{{value | nkNumber(inputOptions.format||'0.00')}}</span>
+    <span v-if="!editMode">
+      <template v-if="value !== undefined">{{value | nkNumber(inputOptions.format||'0.00')}}</template>
+      <span v-else class="empty"></span>
+    </span>
     <a-select size="small"
               v-else-if="options"
               v-model="val"

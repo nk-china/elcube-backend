@@ -13,7 +13,8 @@
 -->
 <template>
     <span v-if="!editMode">
-        <nk-doc-link :doc="value"></nk-doc-link>
+        <nk-doc-link v-if="value && value.docId" :doc="value"></nk-doc-link>
+        <span v-else class="empty"></span>
     </span>
     <div v-else>
         <a-input size="small"

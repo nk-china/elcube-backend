@@ -13,7 +13,8 @@
 -->
 <template>
     <span v-if="!editMode">
-        {{display | nkDatetimeISO(inputOptions.format||(inputOptions.showTime?'YYYY/MM/DD HH:mm:ss':'YYYY/MM/DD'))}}
+      <template v-if="display">{{display | nkDatetimeISO(inputOptions.format||(inputOptions.showTime?'YYYY/MM/DD HH:mm:ss':'YYYY/MM/DD'))}}</template>
+      <span v-else class="empty"></span>
     </span>
     <a-date-picker size="small" v-else v-model="val" @change="change" :show-time="inputOptions.showTime"></a-date-picker>
 </template>

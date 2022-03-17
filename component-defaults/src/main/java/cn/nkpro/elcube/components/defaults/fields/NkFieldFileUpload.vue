@@ -14,14 +14,15 @@
 <template>
     <div style="width: 90%;">
         <div  v-if="!editMode" style="display: flex">
-            <template v-if="inputOptions.listType==='picture-card'">
+            <template v-if="fileList && fileList.length && inputOptions.listType==='picture-card'">
                 <div v-for="item in fileList" :key="item.uid" class="avatar-border" @click="handlePreview(item)">
                     <a-avatar :src="item.url" shape="square" :size="84"></a-avatar>
                 </div>
             </template>
-            <template v-else>
+            <template v-else-if="fileList && fileList.length">
                 <a v-for="item in fileList" :key="item.uid" @click="handlePreview(item)">{{item.name}}</a>
             </template>
+            <span v-else class="empty"></span>
         </div>
         <div v-else style="display: flex;align-items: center;">
             <a-upload v-if="editMode && fileList"

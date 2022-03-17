@@ -14,7 +14,7 @@
 <template>
     <nk-form ref="form" :col="2" :edit="editMode">
         <nk-form-item term="单据类型">
-            {{doc.def && doc.def.docType}} | {{doc.def && doc.def.docName}}
+            <span class="nk-text-ellipsis">{{doc.def && doc.def.docType}} | {{doc.def && doc.def.docName}}</span>
         </nk-form-item>
         <nk-form-item term="交易伙伴">
             <router-link v-if="doc.partnerId" :to="`/apps/docs/detail/${doc.partnerId}`">{{doc.partnerName}}</router-link>

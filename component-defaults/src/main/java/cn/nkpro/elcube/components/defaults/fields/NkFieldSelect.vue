@@ -13,12 +13,13 @@
 -->
 <template>
     <span v-if="!editMode">
-        <template v-if="inputOptions.tagColor">
+        <template v-if="list && list.length && inputOptions.tagColor">
             <a-tag v-for="(item,index) in list" :key="index" :color="inputOptions.tagColor">{{item | nkFromList(inputOptions.optionsObject)}}</a-tag>
         </template>
-        <template v-else>
-            {{value | nkFromList(inputOptions.optionsObject)}}
+        <template v-else-if="list && list.length">
+            {{list | nkFromList(inputOptions.optionsObject)}}
         </template>
+        <span v-else class="empty"></span>
     </span>
 
     <a-checkbox-group
