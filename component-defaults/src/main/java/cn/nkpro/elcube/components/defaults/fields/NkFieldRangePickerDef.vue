@@ -18,10 +18,6 @@
         {{value.range}}
         <nk-sp-el-editor slot="edit" v-model="value.range"></nk-sp-el-editor>
       </nk-form-item>
-      <nk-form-item title="时间选择">
-        {{value.showTime}}
-        <a-switch size="small" slot="edit" v-model="value.showTime"></a-switch>
-      </nk-form-item>
       <nk-form-item title="显示格式">
         {{value.format}}
         <a-input size="small" slot="edit" v-model="value.format"></a-input>

@@ -25,15 +25,17 @@ import cn.nkpro.elcube.docengine.cards.NkDynamicFormDefI
 import cn.nkpro.elcube.docengine.cards.NkDynamicFormField
 import cn.nkpro.elcube.docengine.cards.NkDynamicGridField
 import cn.nkpro.elcube.docengine.cards.NkLinkageFormField
+import com.alibaba.fastjson.JSON
+import com.alibaba.fastjson.JSONArray
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.core.annotation.Order
 import org.springframework.expression.EvaluationContext
 import org.springframework.stereotype.Component
 
-@Order(30)
-@NkNote("日期")
-@Component("NkFieldDatePicker")
-class NkFieldDatePicker extends NkAbstractField implements NkDynamicFormField, NkDynamicGridField, NkLinkageFormField {
+@Order(31)
+@NkNote("日期区间")
+@Component("NkFieldRangePicker")
+class NkFieldRangePicker extends NkAbstractField implements NkDynamicFormField, NkDynamicGridField, NkLinkageFormField {
 
     @Autowired
     private NkSpELManager spELManager
