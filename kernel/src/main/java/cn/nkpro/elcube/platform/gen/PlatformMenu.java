@@ -25,6 +25,13 @@ public class PlatformMenu implements Serializable {
 
     private Long updatedTime;
 
+    /**
+     * 徽标参数
+     *
+     * @mbggenerated
+     */
+    private String badgeOption;
+
     private String menuOptions;
 
     /**
@@ -114,6 +121,29 @@ public class PlatformMenu implements Serializable {
 
     public void setUpdatedTime(Long updatedTime) {
         this.updatedTime = updatedTime;
+    }
+
+    /**
+     * 获取 徽标参数
+     *
+     * @return 徽标参数
+     *
+     * @mbggenerated
+     */
+    @cn.nkpro.elcube.annotation.CodeFieldNotes("徽标参数")
+    public String getBadgeOption() {
+        return badgeOption;
+    }
+
+    /**
+     * 设置 徽标参数
+     *
+     * @return 徽标参数
+     *
+     * @mbggenerated
+     */
+    public void setBadgeOption(String badgeOption) {
+        this.badgeOption = badgeOption;
     }
 
     @cn.nkpro.elcube.annotation.CodeFieldNotes("")

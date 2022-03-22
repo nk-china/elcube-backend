@@ -23,11 +23,13 @@ import cn.nkpro.elcube.task.NkBpmTaskService;
 import cn.nkpro.elcube.task.model.*;
 import cn.nkpro.elcube.utils.BeanUtilz;
 import org.apache.commons.lang3.StringUtils;
+import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Comment;
 import org.camunda.bpm.engine.task.DelegationState;
+import org.camunda.bpm.engine.task.IdentityLink;
 import org.camunda.bpm.engine.task.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -36,7 +38,6 @@ import org.springframework.util.Assert;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class NkBpmTaskServiceImpl extends AbstractNkBpmSupport implements NkBpmTaskService {
@@ -178,52 +179,8 @@ public class NkBpmTaskServiceImpl extends AbstractNkBpmSupport implements NkBpmT
             // 当前任务节点的对外连接线
             bpmTask.setTransitions(getTaskTransition(activities, task.getTaskDefinitionKey()));
 
-
-            // 设置实例的备注
-            List<Comment> processInstanceComments = processEngine.getTaskService()
-                    .getProcessInstanceComments(task.getProcessInstanceId()).stream().sorted(Comparator.comparing(Comment::getTime)).collect(Collectors.toList());
-
-            if(!processInstanceComments.isEmpty()){
-
-                Map<String, String> accounts = processInstanceComments.stream()
-                    .map(Comment::getUserId).filter(Objects::nonNull).distinct()
-                    .map(accountService::getAccountById)
-                    .collect(Collectors.toMap(UserAccount::getId, UserAccount::getRealname));
-
-                List<HistoricTaskInstance> taskList = new ArrayList<>();
-                processInstanceComments.forEach(comment -> {
-                    HistoricTaskInstance historicTaskInstance = processEngine.getHistoryService().createHistoricTaskInstanceQuery()
-                        .taskId(comment.getTaskId())
-                        .processInstanceId(task.getProcessInstanceId())
-                        .singleResult();
-                    taskList.add(historicTaskInstance);
-                });
-
-                List<BpmTask> historicalTasks = new ArrayList<>();
-                if(!taskList.isEmpty()){
-                    historicalTasks = taskList.stream()
-                        .map(t->{
-                            BpmTask bpmHisTask = BeanUtilz.copyFromObject(t, BpmTask.class);
-                            bpmHisTask.setCreateTime(t.getStartTime().getTime()/1000);
-                            bpmHisTask.setComments(processInstanceComments
-                                .stream()
-                                .filter(c->StringUtils.equals(c.getTaskId(),t.getId()))
-                                .map(comment->{
-                                    BpmComment bpmComment = new BpmComment();
-                                    bpmComment.setComment(comment.getFullMessage());
-                                    bpmComment.setId(comment.getId());
-                                    bpmComment.setTime(comment.getTime().getTime()/1000);
-                                    bpmComment.setUserId(comment.getUserId());
-                                    bpmComment.setUser(accounts.getOrDefault(comment.getUserId(),comment.getUserId()));
-                                    return bpmComment;
-                                })
-                                .collect(Collectors.toList()));
-                            return bpmHisTask;
-                        })
-                        .collect(Collectors.toList());
-                }
-                bpmTask.setHistoricalTasks(historicalTasks);
-            }
+            // 设置当前任务实例的历史任务
+            bpmTask.setHistoricalTasks(instanceTaskHistories(task.getProcessInstanceId()));
 
             return bpmTask;
         }
@@ -241,5 +198,82 @@ public class NkBpmTaskServiceImpl extends AbstractNkBpmSupport implements NkBpmT
                     .taskCandidateUser(assignee)
                     .taskAssignee(assignee)
                 .endOr().count()>0;
+    }
+
+    @Override
+    public List<BpmInstance> instanceHistories(String businessKey){
+        return processEngine.getHistoryService().createHistoricProcessInstanceQuery()
+                .processInstanceBusinessKey(businessKey)
+                .list()
+                .stream()
+                .map(processInstance -> BeanUtilz.copyFromObject(processInstance, BpmInstance.class))
+                .sorted(Comparator.comparing(BpmInstance::getStartTime))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<BpmTask> instanceTaskHistories(String processInstanceId){
+        // 获取实例的所有Comment
+        List<Comment> processInstanceComments = processEngine.getTaskService()
+                .getProcessInstanceComments(processInstanceId)
+                .stream()
+                .sorted(Comparator.comparing(Comment::getTime))
+                .collect(Collectors.toList());
+
+        // 获取用户信息
+        Map<String, String> accounts = processInstanceComments.isEmpty()
+            ?Collections.emptyMap()
+            :processInstanceComments.stream()
+                .map(Comment::getUserId).filter(Objects::nonNull).distinct()
+                .map(accountService::getAccountById)
+                .collect(Collectors.toMap(UserAccount::getId, UserAccount::getRealname));
+
+        // 获取任务信息
+        return processEngine.getHistoryService().createHistoricTaskInstanceQuery()
+                .processInstanceId(processInstanceId)
+                .list()
+                .stream()
+                .map(t->{
+                    BpmTask bpmHisTask = BeanUtilz.copyFromObject(t, BpmTask.class);
+                    bpmHisTask.setCreateTime(t.getStartTime().getTime()/1000);
+                    bpmHisTask.setComments(processInstanceComments
+                            .stream()
+                            .filter(c->StringUtils.equals(c.getTaskId(),t.getId()))
+                            .map(comment->{
+                                BpmComment bpmComment = new BpmComment();
+                                bpmComment.setComment(comment.getFullMessage());
+                                bpmComment.setId(comment.getId());
+                                bpmComment.setTime(comment.getTime().getTime()/1000);
+                                bpmComment.setUserId(comment.getUserId());
+                                bpmComment.setUser(accounts.getOrDefault(comment.getUserId(),comment.getUserId()));
+                                return bpmComment;
+                            })
+                            .collect(Collectors.toList()));
+
+                    // 如果任务是活动的，获取更详细的信息
+                    if(bpmHisTask.getEndTime()==null){
+                        bpmHisTask.setUsers(Collections.emptyList());
+                        // 获取任务候选人
+                        if(StringUtils.isBlank(bpmHisTask.getAssignee())){
+                            bpmHisTask.setUsers(
+                                    processEngine.getTaskService().getIdentityLinksForTask(bpmHisTask.getId())
+                                            .stream()
+                                            .filter(identityLink -> StringUtils.equals(identityLink.getType(),"candidate"))
+                                            .map(IdentityLink::getUserId)
+                                            .map(accountService::getAccountById)
+                                            .map(account -> BeanUtilz.copyFromObject(account,BpmUser.class))
+                                            .collect(Collectors.toList())
+                            );
+                        }else{
+                            UserAccount account = accountService.getAccountById(bpmHisTask.getAssignee());
+                            if(account!=null){
+                                bpmHisTask.setUsers(Collections.singletonList(BeanUtilz.copyFromObject(account,BpmUser.class)));
+                            }
+                        }
+                    }
+
+                    return bpmHisTask;
+                })
+                .collect(Collectors.toList());
     }
 }

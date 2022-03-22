@@ -42,6 +42,17 @@
             <column name="UPDATED_TIME" type="${type.long}" remarks="" />
         </createTable>
     </changeSet>
+    
+    <changeSet id="NK_PLATFORM_MENU-02" author="bean">
+        <preConditions onFail="MARK_RAN">
+            <not>
+                <columnExists tableName="NK_PLATFORM_MENU" columnName="BADGE_OPTION" />
+            </not>
+        </preConditions>
+        <addColumn tableName="NK_PLATFORM_MENU">
+            <column name="BADGE_OPTION" type="${type.var1}" remarks="徽标参数" />
+        </addColumn>
+    </changeSet>
 
     <changeSet id="NK_PLATFORM_REGISTRY-01" author="bean" context="default">
         <preConditions onFail="MARK_RAN">
