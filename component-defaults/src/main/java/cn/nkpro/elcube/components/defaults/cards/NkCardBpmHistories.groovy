@@ -18,41 +18,31 @@ package cn.nkpro.elcube.components.defaults.cards
 
 import cn.nkpro.elcube.annotation.NkNote
 import cn.nkpro.elcube.docengine.NkAbstractCard
-import cn.nkpro.elcube.docengine.model.DocDefHV
+import cn.nkpro.elcube.docengine.NkDocEngine
+import cn.nkpro.elcube.docengine.model.DocDefIV
 import cn.nkpro.elcube.docengine.model.DocHV
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import cn.nkpro.elcube.task.NkBpmTaskService
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Component
 
-@NkNote("日期")
-@Component("NkCardDate")
-class NkCardDate extends NkAbstractCard<Map,Map> {
+@NkNote("业务流程历史")
+@Component("NkCardBpmHistories")
+class NkCardBpmHistories extends NkAbstractCard<Map,Map> {
 
-    Logger logger = LoggerFactory.getLogger(getClass());
+    @Autowired
+    private NkDocEngine docEngine
 
-    String date;
+    @Autowired
+    private NkBpmTaskService bpmTaskService
 
-    NkCardDate(){
-    }
-    //@Override
-    String getComponentDesc() {
-        return null
-    }
+    @Override
+    Object call(DocHV doc, Map data, DocDefIV defIV, Map d, Object options) {
 
-    //@Override
-    protected Map doGetData(DocHV doc, Map o) throws Exception {
-        return null
-    }
-
-    //@Override
-    protected Map toCreate(DocHV doc, DocHV preDoc, DocDefHV docDef, Map o) throws Exception {
-        return null
-    }
-
-    //@Override
-    protected void doUpdate(DocHV doc, DocDefHV docDef, Map data, Map o) throws Exception {
+        if(options){
+            return bpmTaskService.instanceTaskHistories(options as String)
+        }else{
+            return bpmTaskService.instanceHistories(doc.docId)
+        }
 
     }
-
-
 }

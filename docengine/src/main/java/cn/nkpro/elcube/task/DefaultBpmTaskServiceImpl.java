@@ -18,9 +18,12 @@ package cn.nkpro.elcube.task;
 
 import cn.nkpro.elcube.exception.NkSystemException;
 import cn.nkpro.elcube.task.NkBpmTaskService;
+import cn.nkpro.elcube.task.model.BpmInstance;
 import cn.nkpro.elcube.task.model.BpmTask;
 import cn.nkpro.elcube.task.model.BpmTaskComplete;
 import cn.nkpro.elcube.task.model.BpmTaskForward;
+
+import java.util.List;
 
 
 public class DefaultBpmTaskServiceImpl implements NkBpmTaskService {
@@ -52,5 +55,14 @@ public class DefaultBpmTaskServiceImpl implements NkBpmTaskService {
     @Override
     public boolean isDocAssignee(String businessKey, String assignee) {
         throw new NkSystemException("操作不支持");
+    }
+
+    @Override
+    public List<BpmInstance> instanceHistories(String businessKey) {
+        throw new NkSystemException("操作不支持");
+    }
+
+    @Override
+    public List<BpmTask> instanceTaskHistories(String processInstanceId) {throw new NkSystemException("操作不支持");
     }
 }

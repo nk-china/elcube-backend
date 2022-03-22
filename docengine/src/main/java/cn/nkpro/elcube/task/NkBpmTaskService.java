@@ -16,10 +16,13 @@
  */
 package cn.nkpro.elcube.task;
 
+import cn.nkpro.elcube.task.model.BpmInstance;
 import cn.nkpro.elcube.task.model.BpmTask;
 import cn.nkpro.elcube.task.model.BpmTaskComplete;
 import cn.nkpro.elcube.task.model.BpmTaskForward;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 public interface NkBpmTaskService {
     @Transactional
@@ -37,4 +40,8 @@ public interface NkBpmTaskService {
     BpmTask taskByBusinessAndAssignee(String businessKey, String assignee);
 
     boolean isDocAssignee(String businessKey, String assignee);
+
+    List<BpmInstance> instanceHistories(String businessKey);
+
+    List<BpmTask> instanceTaskHistories(String processInstanceId);
 }
