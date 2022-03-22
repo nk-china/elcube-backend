@@ -18,7 +18,8 @@ package cn.nkpro.elcube.co.spel;
 
 import cn.nkpro.elcube.platform.service.PlatformRegistryService;
 import cn.nkpro.elcube.security.SecurityUtilz;
-import org.apache.commons.lang3.StringUtils;
+import cn.nkpro.elcube.security.UserBusinessAdapter;
+import cn.nkpro.elcube.security.bo.UserDetails;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -27,14 +28,37 @@ public class NkDefaultSpEL implements NkSpELInjection {
 
     @Autowired@SuppressWarnings("all")
     private PlatformRegistryService registryService;
+    @Autowired@SuppressWarnings("all")
+    private UserBusinessAdapter userBusinessAdapter;
 
+    /**
+     * 推荐使用 @dict.json()
+     * @param key key
+     * @return json
+     */
     @SuppressWarnings("unused")
+    @Deprecated
     public Object dict(String key){
         return registryService.getJSON("@DICT",key);
     }
 
     @SuppressWarnings("unused")
-    public Object account(){
+    public String account(){
         return SecurityUtilz.getUser().getObjectId();
+    }
+
+    @SuppressWarnings("unused")
+    public String realname(){
+        return SecurityUtilz.getUser().getRealname();
+    }
+
+    @SuppressWarnings("unused")
+    public UserDetails user(){
+        return SecurityUtilz.getUser();
+    }
+
+    @SuppressWarnings("unused")
+    public Object me(){
+        return userBusinessAdapter.getUser(SecurityUtilz.getUser());
     }
 }
