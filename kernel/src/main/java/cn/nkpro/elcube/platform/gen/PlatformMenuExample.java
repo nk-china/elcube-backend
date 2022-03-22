@@ -803,6 +803,76 @@ public class PlatformMenuExample {
             addCriterion("UPDATED_TIME not between", value1, value2, "updatedTime");
             return (Criteria) this;
         }
+
+        public Criteria andBadgeOptionIsNull() {
+            addCriterion("BADGE_OPTION is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBadgeOptionIsNotNull() {
+            addCriterion("BADGE_OPTION is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andBadgeOptionEqualTo(String value) {
+            addCriterion("BADGE_OPTION =", value, "badgeOption");
+            return (Criteria) this;
+        }
+
+        public Criteria andBadgeOptionNotEqualTo(String value) {
+            addCriterion("BADGE_OPTION <>", value, "badgeOption");
+            return (Criteria) this;
+        }
+
+        public Criteria andBadgeOptionGreaterThan(String value) {
+            addCriterion("BADGE_OPTION >", value, "badgeOption");
+            return (Criteria) this;
+        }
+
+        public Criteria andBadgeOptionGreaterThanOrEqualTo(String value) {
+            addCriterion("BADGE_OPTION >=", value, "badgeOption");
+            return (Criteria) this;
+        }
+
+        public Criteria andBadgeOptionLessThan(String value) {
+            addCriterion("BADGE_OPTION <", value, "badgeOption");
+            return (Criteria) this;
+        }
+
+        public Criteria andBadgeOptionLessThanOrEqualTo(String value) {
+            addCriterion("BADGE_OPTION <=", value, "badgeOption");
+            return (Criteria) this;
+        }
+
+        public Criteria andBadgeOptionLike(String value) {
+            addCriterion("BADGE_OPTION like", value, "badgeOption");
+            return (Criteria) this;
+        }
+
+        public Criteria andBadgeOptionNotLike(String value) {
+            addCriterion("BADGE_OPTION not like", value, "badgeOption");
+            return (Criteria) this;
+        }
+
+        public Criteria andBadgeOptionIn(List<String> values) {
+            addCriterion("BADGE_OPTION in", values, "badgeOption");
+            return (Criteria) this;
+        }
+
+        public Criteria andBadgeOptionNotIn(List<String> values) {
+            addCriterion("BADGE_OPTION not in", values, "badgeOption");
+            return (Criteria) this;
+        }
+
+        public Criteria andBadgeOptionBetween(String value1, String value2) {
+            addCriterion("BADGE_OPTION between", value1, value2, "badgeOption");
+            return (Criteria) this;
+        }
+
+        public Criteria andBadgeOptionNotBetween(String value1, String value2) {
+            addCriterion("BADGE_OPTION not between", value1, value2, "badgeOption");
+            return (Criteria) this;
+        }
     }
 
     /**
