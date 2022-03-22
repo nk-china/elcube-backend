@@ -18,6 +18,7 @@ package cn.nkpro.elcube.docengine.datasync.defaults;
 
 import cn.nkpro.elcube.docengine.datasync.NkAbstractDocDataAsyncAdapter;
 import cn.nkpro.elcube.docengine.gen.DocAsyncQueue;
+import cn.nkpro.elcube.docengine.gen.DocAsyncQueueWithBLOBs;
 import cn.nkpro.elcube.exception.NkSystemException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -27,7 +28,7 @@ import org.springframework.stereotype.Component;
 public class NkDocSimpleAsyncImpl extends NkAbstractDocDataAsyncAdapter {
 
     @Override
-    protected void schedule(DocAsyncQueue asyncQueue) {
+    protected void schedule(DocAsyncQueueWithBLOBs asyncQueue) {
 
         log.info(asyncQueue.toString());
         if(Math.random()>0)

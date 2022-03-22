@@ -118,7 +118,7 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
 
     @Async("nkTaskExecutor")
     @Override
-    public void run(DocAsyncQueue asyncQueue) {
+    public void run(DocAsyncQueueWithBLOBs asyncQueue) {
 
         long now = DateTimeUtilz.nowSeconds();
 
@@ -221,7 +221,7 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
         asyncQueueMapper.updateByPrimaryKeySelective(asyncQueue);
     }
 
-    protected abstract void schedule(DocAsyncQueue asyncQueue);
+    protected abstract void schedule(DocAsyncQueueWithBLOBs asyncQueue);
     protected int limit(){
         return 10;
     };
