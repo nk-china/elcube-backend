@@ -30,7 +30,6 @@
     <packaging>pom</packaging>
 
     <modules>
-        <module>web-front-resources</module>
         <module>mybatis-generator-plugin</module>
         <module>commons</module>
         <module>kernel</module>
@@ -40,8 +39,10 @@
         <module>component-defaults</module>
         <module>component-financial</module>
 
-        <module>application</module>
+        <module>web-front-resources</module>
         <module>business-scenario-demos</module>
+
+        <module>application</module>
     </modules>
 
     <properties>
