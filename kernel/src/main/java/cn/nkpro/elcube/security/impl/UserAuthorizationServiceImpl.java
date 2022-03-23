@@ -50,6 +50,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Order(20)
@@ -88,8 +89,6 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService, D
     @Override
     public List<GrantedAuthority> buildGrantedPerms(UserAccount account){
 
-        Object user = userBusinessAdapter.getUser(account);
-
         // 构造权限列表
         List<GrantedAuthority> permList = new ArrayList<>();
 
@@ -120,15 +119,27 @@ public class UserAuthorizationServiceImpl implements UserAuthorizationService, D
                             ()-> authLimitMapper.selectByPrimaryKey(limitId))
                 ).collect(Collectors.toMap(AuthLimit::getLimitId,v->v));
 
-        EvaluationContext context = spELManager.createContext(user);
+
+        final AtomicReference<EvaluationContext> context = new AtomicReference<>();
 
         permList.forEach(authority -> {
             if(authority.getLimitIds()!=null){
+
                 List<String> query = Arrays.stream(authority.getLimitIds())
                         .map(limits::get)
                         .filter(limit->limit!=null && limit.getContent()!=null)
                         .map(AuthLimit::getContent)
-                        .map(limit->spELManager.convert(limit,context))
+                        .map(limit->{
+                            if(spELManager.hasTemplate(limit)){
+                                if(context.get()==null){
+                                    Object user = userBusinessAdapter.getUser(account);
+                                    context.set(spELManager.createContext(user));
+                                }
+                                return spELManager.convert(limit,context.get());
+                            }else{
+                                return limit;
+                            }
+                        })
                         .collect(Collectors.toList());
                 if(query.size()>1){
                     authority.setLimitQuery(

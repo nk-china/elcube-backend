@@ -86,6 +86,14 @@ public class NkSpELManager {
         }
     }
 
+    public boolean hasTemplate(String input){
+        if(StringUtils.isBlank(input)){
+            return false;
+        }
+        Matcher matcher = pattern.matcher(input);
+        return matcher.find();
+    }
+
     /**
      * 为什么没有采用SpEL的Template的#{} 语法？
      * 因为我们的目的是通过一个字符串模版生成一个JSON格式的内容，#{} 只能将表达式的返回值通过toString()的方式潜入到模版中，

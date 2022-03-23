@@ -16,14 +16,10 @@
  */
 package cn.nkpro.elcube.docengine;
 
-import cn.nkpro.elcube.docengine.gen.DocH;
-import cn.nkpro.elcube.docengine.model.DocHQL;
 import cn.nkpro.elcube.docengine.model.DocHV;
 import cn.nkpro.elcube.docengine.service.impl.NkDocFinder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 public interface NkDocEngine {
 

@@ -28,6 +28,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -45,6 +47,8 @@ import java.util.stream.Collectors;
  * 由它来管理脚本对象的脚本内容
  */
 public abstract class NkAbstractCustomScriptObject implements NkCustomScriptObject, InitializingBean {
+
+    protected Logger log = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private NkProperties properties;

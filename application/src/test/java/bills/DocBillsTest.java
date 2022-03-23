@@ -14,28 +14,28 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with ELCube.  If not, see <https://www.gnu.org/licenses/>.
  */
-package cn.nkpro.elcube.docengine;
+package bills;
 
-import lombok.Data;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
-import java.util.Map;
+import cn.nkpro.elcube.ELCubeApplication;
+import cn.nkpro.elcube.docengine.scheduled.NkBillRecalculateScheduled;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.junit4.SpringRunner;
 
 /**
- * Created by bean on 2020/7/28.
+ * Created by bean on 2020/7/22.
  */
-@Data
-@ConfigurationProperties(prefix = "nk.doc")
-public class NkDocProperties {
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes={ELCubeApplication.class})
+public class DocBillsTest {
+    @Autowired
+    private NkBillRecalculateScheduled billRecalculate;
 
-    private Map<String,Class> indices;
+    @Test
+    public void test1() throws Exception {
 
-    private Cron cron;
-
-    @Data
-    private static class Cron{
-
-        private String billRecalculate;
+        billRecalculate.exec();
     }
 }
-
