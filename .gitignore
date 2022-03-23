@@ -13,3 +13,4 @@ package-lock.json
 
 /classes/
 /elcube-customized**/**
+/target/
