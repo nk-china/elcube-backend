@@ -38,7 +38,6 @@ import org.springframework.scheduling.annotation.Async;
 
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -118,7 +117,7 @@ public abstract class NkAbstractDocDataAsyncAdapter<K> extends NkAbstractDocData
 
     @Async("nkTaskExecutor")
     @Override
-    public void run(DocAsyncQueueWithBLOBs asyncQueue) {
+    public void run(DocAsyncQueue asyncQueue) {
 
         long now = DateTimeUtilz.nowSeconds();
 

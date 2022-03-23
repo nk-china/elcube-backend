@@ -16,9 +16,9 @@
  */
 package cn.nkpro.elcube.docengine.datasync;
 
-import cn.nkpro.elcube.docengine.gen.DocAsyncQueueWithBLOBs;
+import cn.nkpro.elcube.docengine.gen.DocAsyncQueue;
 
 public interface NkDocDataAsyncAdapter extends NkDocDataAdapter {
 
-    void run(DocAsyncQueueWithBLOBs asyncQueue);
+    void run(DocAsyncQueue asyncQueue);
 }
